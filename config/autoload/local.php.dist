@@ -1,0 +1,17 @@
+<?php
+/**
+ * Local configuration excluded from vcs due to sensitive info
+ * Edit to your needs
+ */
+return [
+    // Credentials to allow doctrine to access database
+    'doctrine' => [
+        'connection' => [
+            'orm_default' => [
+                'params' => [
+                    'url' => 'mysql://USERNAME:PASSWORD@localhost/DATABASE_NAME',
+                ],
+            ],
+        ],
+    ],
+];

@@ -1,0 +1,32 @@
+<?php
+$this->headTitle('Account');
+
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Account Settings' => $this->url('account'),
+]);
+?>
+<div class="container">
+    <h1>Account Settings</h1>
+
+    <div class="row">
+        <div class="col-4">
+            <div class="list-group" id="list-tab" role="tablist">
+                <a class="list-group-item list-group-item-action active" id="list-account-list" data-toggle="list" href="#account-security" role="tab" aria-controls="home">Security</a>
+            </div>
+        </div>
+        <div class="col-8">
+
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="account-security" role="tabpanel" aria-labelledby="list-account-security">
+                    <ul class="list-group">
+                        <li class="list-group-item"><a href="<?= $this->url('mfa.enable'); ?>">Enable MFA</a></li>
+                    </ul>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>
+

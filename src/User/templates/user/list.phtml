@@ -1,0 +1,60 @@
+<?php
+$this->headTitle('Manage Users');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Administration' => $this->url('admin'),
+    'List Users' => $this->url('admin.user.list'),
+]);
+
+?>
+<div class="container">
+    <h1>Manage Users</h1>
+    <p>
+        <a class="btn btn-primary" href="<?= $this->url('admin.user.create'); ?>">
+            New User
+        </a>
+    </p>
+    <div class="widget">
+        <table class="table table-striped table-bordered">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>E-Mail</th>
+                    <th>Full Name</th>
+                    <th>Role(s)</th>
+                    <th>Date Created</th>
+                    <th>Status</th>
+                    <th>MFA</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+                <?php
+                /** @var \User\Entity\User $user */
+                foreach($this->users as $user): ?>
+                <tr>
+                    <td><?= $this->escapeHtml($user->getId()); ?></td>
+                    <td>
+                        <a href="<?= $this->url('admin.user.view', ['id' => $user->getId()]); ?>">
+                            <?= $this->escapeHtml($user->getEmail()); ?>
+                        </a>
+                    </td>
+                    <td><?= $this->escapeHtml($user->getFullName()); ?></td>
+                    <td><?= $this->escapeHtml($user->getRolesAsString()); ?></td>
+                    <td class="nowrap"><?= $this->escapeHtml($user->getDateCreated()); ?></td>
+                    <td><?= $this->escapeHtml($user->getStatusAsString()); ?></td>
+                    <td>
+                        <?= $user->isMfaEnabled() ? 'Yes' : 'No' ?>
+                    </td>
+                    <td>
+                        <a class="btn btn-info" href="<?= $this->url('admin.user.edit', ['id' => $user->getId()]); ?>">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                    </td>
+                </tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>

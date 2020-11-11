@@ -1,0 +1,12 @@
+<?php
+    /** @var \User\Entity\Role $role */
+    $role = $this->role;
+?>
+<div class="container">
+    <h1>Delete Role</h1>
+    <p>
+        Are you sure you wish to delete the role <?= $this->escapeHtml($role->getDescription()); ?>
+    </p>
+    <a class="btn btn-danger" href="<?= $this->url('admin.role.delete', [], ['confirm' => '1']); ?>">Yes</a>
+    <a class="btn btn-info" href="<?= $this->url('admin.role.list'); ?>">Cancel</a>
+</div>

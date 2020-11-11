@@ -1,0 +1,36 @@
+<?php
+$this->headTitle('Multi-factor Authentication');
+$form = $this->form->prepare();
+$form->get('csrf')->setValue($this->token);
+$form->get('secret_key')->setValue($this->secret_key);
+?>
+<div class="container">
+    <div class="row mb-4">
+        <div class="col-md-6 col-offset-2 mx-auto">
+            <img src="/img/casilium-black.svg" alt="Casilium Logo" class="img-fluid">
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-xs-3 mx-auto text-center">
+            <?= $this->form()->openTag($form); ?>
+            <div class="form-group">
+                <?= $this->escapeHtml($this->secret_key); ?><br/>
+                <img src="<?= $this->qrcode_url; ?>" alt="enter pin">
+            </div>
+            <div class="form-group">
+                <?= $this->formLabel($form->get('pin')); ?>
+                <?= $this->formElement($form->get('pin')); ?>
+                <?= $this->formElementErrors()->render($form->get('pin'), ['class' => 'help-block']); ?>
+            </div>
+            <div class="form-group">
+                <?= $this->formHidden($form->get('csrf')); ?>
+                <?= $this->formElementErrors($form->get('csrf')); ?>
+                <?= $this->formElement($form->get('submit')); ?>
+                <?php if (!empty($this->error)) echo $this->error; ?>
+            </div>
+            <?= $this->FormElement($form->get('secret_key')); ?>
+            <?= $this->form()->closeTag($form); ?>
+        </div>
+
+    </div>
+</div>

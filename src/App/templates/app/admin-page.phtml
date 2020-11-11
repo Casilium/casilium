@@ -1,0 +1,40 @@
+<?php
+$this->headTitle('Administration');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Administration' => $this->url('admin'),
+]);
+?>
+<div class="container">
+    <h1>Administration</h1>
+
+    <div class="row">
+        <div class="col-4">
+            <div class="list-group" id="list-tab" role="tablist">
+                <a class="list-group-item list-group-item-action active" id="list-account-list" data-toggle="list" href="#list-account" role="tab" aria-controls="home">Place holder</a>
+                <a class="list-group-item list-group-item-action" id="list-user-list" data-toggle="list" href="#list-user" role="tab" aria-controls="profile">Users</a>
+            </div>
+        </div>
+        <div class="col-8">
+            <div class="tab-content" id="nav-tabContent">
+                <div class="tab-pane fade show active" id="list-account" role="tabpanel" aria-labelledby="list-account-list">
+
+                    <p>Category is empty</p>
+
+                </div>
+
+                <div class="tab-pane fade" id="list-user" role="tabpanel" aria-labelledby="list-user-list">
+
+                    <ul class="list-group">
+                        <li class="list-group-item"><a href="<?= $this->url('admin.user.list'); ?>">User Manager</a></li>
+                        <li class="list-group-item"><a href="<?= $this->url('admin.role.list'); ?>">Role Manager</a></li>
+                        <li class="list-group-item"><a href="<?= $this->url('admin.permission.list'); ?>">Permission Manager</a></li>
+                    </ul>
+
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+

@@ -1,0 +1,45 @@
+<?php
+$this->headTitle('Add Role');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Administration' => $this->url('admin'),
+    'Roles' => $this->url('admin.role.list'),
+    'Create' => 'admin.role.add',
+]);
+$form = $this->form->prepare();
+$form->get('csrf')->setValue($this->token);
+?>
+<div class="container">
+    <h1>Add Role</h1>
+    <div class="row">
+        <div class="col-md-6">
+            <?= $this->form()->openTag($form); ?>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('name')); ?>
+                <?= $this->formElement($form->get('name')); ?>
+                <?= $this->formElementErrors($form->get('name')); ?>
+            </div>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('description')); ?>
+                <?= $this->formElement($form->get('description')); ?>
+                <?= $this->formElementErrors($form->get('description')); ?>
+            </div>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('inherit_roles')); ?>
+                <?= $this->formElement($form->get('inherit_roles')); ?>
+                <?= $this->formElementErrors($form->get('inherit_roles')); ?>
+            </div>
+
+            <?= $this->formElement($form->get('csrf')); ?>
+            <?= $this->formElementErrors($form->get('csrf')); ?>
+
+            <?= $this->formElement($form->get('submit')); ?>
+
+            <?= $this->form()->closeTag(); ?>
+        </div>
+    </div>
+</div>

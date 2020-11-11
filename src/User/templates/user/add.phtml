@@ -1,0 +1,114 @@
+<?php
+$this->headTitle('Add User');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Administration' => $this->url('admin'),
+    'Users' => $this->url('admin.user.list'),
+    'Create' => $this->url('admin.user.create'),
+]);
+
+/** @var \Laminas\Form\Form $form */
+$form = $this->form->prepare();
+$form->get('csrf')->setValue($this->token);
+
+// styles for password strength
+$style = <<<HS
+.strength0 { background-color: #ff0000; color: white }
+.strength1 { background-color: #ff0099; color: white }
+.strength2 { background-color: #ff6f00; color: white }
+.strength3 { background-color: #ffe600; color: black }
+.strength4 { background-color: #e6ff00; color: black }
+.strength5 { background-color: #6aff00; color: black }
+HS;
+$this->headStyle()->appendStyle($style);
+?>
+<div class="container">
+    <h1>Add User</h1>
+
+    <p>
+        Please fill out the following form and click the <i>Create</i> button.
+    </p>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="widget">
+            <?= $this->form()->openTag($form); ?>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('email')); ?>
+                <?= $this->formElement($form->get('email')); ?>
+                <?= $this->formElementErrors($form->get('email')); ?>
+            </div>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('full_name')); ?>
+                <?= $this->formElement($form->get('full_name')); ?>
+                <?= $this->formElementErrors($form->get('full_name')); ?>
+            </div>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('password')); ?>
+                <?= $this->formElement($form->get('password')); ?>
+                <?= $this->formElementErrors($form->get('password')); ?>
+                <div id="passwordStrength">
+                    <div id="passwordDescription"></div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('confirm_password')); ?>
+                <?= $this->formElement($form->get('confirm_password')); ?>
+                <?= $this->formElementErrors($form->get('confirm_password')); ?>
+            </div>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('status')); ?>
+                <?= $this->formElement($form->get('status')); ?>
+                <?= $this->formElementErrors($form->get('status')); ?>
+            </div>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('roles')); ?>
+                <?= $this->formElement($form->get('roles')); ?>
+                <?= $this->formElementErrors($form->get('roles')); ?>
+            </div>
+
+            <?= $this->formHidden($form->get('mfa_enabled')->setValue(false)) ?>
+            <?= $this->formElement($form->get('csrf')); ?>
+            <?= $this->formElementErrors($form->get('csrf')); ?>
+            <?= $this->formElement($form->get('submit')); ?>
+            <?= $this->form()->closeTag(); ?>
+            </div>
+        </div>
+    </div>
+</div>
+<?= $this->inlineScript()->captureStart(); ?>
+// <script>
+    function passwordStrength(password)
+    {
+        let score = 0;
+        const desc = ["Very Week", "Weak", "Better", "Medium", "Strong", "Very Strong"];
+
+        //if password bigger than 6 give 1 point
+        if (password.length > 6) score++;
+        //if password has both lower and uppercase characters give 1 point
+        if ( ( password.match(/[a-z]/) ) && ( password.match(/[A-Z]/) ) ) score++;
+        //if password has at least one number give 1 point
+        if (password.match(/\d+/)) score++;
+        //if password has at least one special caracther give 1 point
+        if ( password.match(/.[!,@,#,$,%,^,&,*,?,_,~,-,(,)]/) ) score++;
+        //if password bigger than 12 give another 1 point
+        if (password.length > 12) score++;
+
+        $('#passwordDescription').html(desc[score]);
+        $('#passwordDescription').removeClass().addClass('mt-2 p-2 strength' + score);
+    }
+
+    $(document).ready(function() {
+        $('#password').keyup(function() {
+            passwordStrength($(this).val());
+        });
+    });
+// </script>
+<?= $this->inlineScript()->captureEnd(); ?>

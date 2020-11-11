@@ -1,0 +1,59 @@
+<?php
+$this->headTitle('View User');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Administration' => $this->url('admin'),
+    'Users' => $this->url('admin.user.list'),
+    'View User' => $this->url('admin.user.view'),
+]);
+
+$user = $this->user;
+?>
+<div class="container">
+    <h1>View User <?= $this->escapeHtml($user->getEmail()) ?></h1>
+    <p>
+        <a class="btn btn-info" href="<?= $this->url('admin.user.edit', ['id' => $user->getId()]); ?>">
+            <i class="fas fa-edit"></i> Edit
+        </a>
+    </p>
+    <div class="row">
+        <div class="col-md-6">
+            <div class="widget">
+                <table class="table table-striped table-bordered">
+                    <tr>
+                        <th>ID:</th>
+                        <td><?= $this->escapeHtml($user->getId()) ?></td>
+                    </tr>
+                    <tr>
+                        <th>E-mail:</th>
+                        <td><?= $this->escapeHtml($user->getEmail()) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Full Name:</th>
+                        <td><?= $this->escapeHtml($user->getFullName()) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Date Created:</th>
+                        <td><?= $this->escapeHtml($user->getDateCreated()) ?></td>
+                    </tr>
+                    <tr>
+                        <th>Status:</th>
+                        <td><?= $this->escapeHtml($user->getStatusAsString()) ?></td>
+                    </tr>
+                    <tr>
+                        <th>MFA Enabled:</th>
+                        <td><?= $user->isMfaEnabled() ? 'Yes' : 'No' ?></td>
+                    </tr>
+                    <tr>
+                        <th>Roles:</th>
+                        <td><?= $this->escapeHtml($user->getRolesAsString()) ?></td>
+                    </tr>
+                </table>
+            </div>
+        </div>
+    </div>
+    <a class="btn btn-primary" href="<?= $this->url('admin.user.list'); ?>">
+        <i class="fas fa-list"></i> User List
+    </a>
+</div>

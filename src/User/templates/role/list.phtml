@@ -1,0 +1,54 @@
+<?php
+$this->headTitle('Role List');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Administration' => $this->url('admin'),
+    'Roles' => $this->url('admin.role.list'),
+]);
+?>
+<div class="container">
+    <h1>Roles</h1>
+    <p>
+        <a class="btn btn-primary" href="<?= $this->url('admin.role.add'); ?>" data-toggle="tooltip" title="Add new role">
+            <i class="fas fa-plus-circle"></i>
+        </a>
+    </p>
+    <div class="widget">
+        <table class="table table-striped">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Description</th>
+                    <th>Date Created</th>
+                    <th>Actions</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php
+            /** @var \User\Entity\Role $role */
+            foreach ($this->roles as $role): ?>
+                <tr>
+                    <td><?= $this->escapeHtml($role->getId()); ?></td>
+                    <td>
+                        <a href="<?= $this->url('admin.role-view', ['id' => $role->getId()]); ?>">
+                            <?= $this->escapeHtml($role->getName()); ?>
+                        </a>
+                    </td>
+                    <td><?= $this->escapeHtml($role->getDescription()); ?></td>
+                    <td><nobr><?= $this->escapeHtml($role->getDateCreated()); ?></nobr></td>
+                    <td>
+                        <a class="btn btn-info" href="<?= $this->url('admin.role.edit', ['id' => $role->getId()]); ?>">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <a class="btn btn-danger" href="<?= $this->url('admin.role.delete',['id' => $role->getId()]); ?>">
+                            <i class="fas fa-trash-alt"></i> Delete
+                        </a>
+                    </td>
+                </tr>
+            <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>

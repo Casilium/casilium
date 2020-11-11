@@ -1,0 +1,47 @@
+<?php
+    $form = $this->form->prepare();
+?>
+<div class="container">
+    <div class="jumbotron">
+    <div class="row">
+        <div class="col-md-6 col-offset-2 mx-auto">
+            <img src="/img/casilium-black.svg" class="img-fluid" alt="Consilium" />
+            <hr/>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-md-6 col-offset-2 mx-auto">
+            <?= $this->form()->openTag($form) ?>
+            <div class="form-group">
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-user fa-fw"></i></span>
+                    </div>
+                    <?= $this->formElement($form->get('username')) ?>
+                </div>
+                <?= $this->formElementErrors($form->get('username')) ?>
+            </div>
+            <div class="form-group">
+
+                <div class="input-group mb-3">
+                    <div class="input-group-prepend">
+                        <span class="input-group-text"><i class="fas fa-lock fa-fw"></i></span>
+                    </div>
+                    <?= $this->formElement($form->get('password')) ?>
+                </div>
+                <?= $this->formElementErrors($form->get('password')) ?>
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-dark"><i class="fas fa-angle-double-right"></i> Login</button>
+                <?= $this->formElement($form->get('csrf')) ?>
+                <?= $this->formElementErrors($form->get('csrf')) ?>
+            </div>
+            <?= $this->form()->closeTag() ?>
+            <?php if (null !== $this->error): ?>
+                <p class="error"><?= $this->error ?></p>
+            <?php endif ?>
+        </div>
+    </div>
+    </div>
+</div>

@@ -1,0 +1,21 @@
+<?php
+/**
+ * Authentication database configuration
+ * Edit this to your requirements
+ */
+return [
+    'authentication' => [
+        'pdo' => [
+            'dsn'   => 'mysql:host=localhost; dbname=YOUR_DBNAME',
+            'table' => 'user',
+            'field' => [
+                'identity' => 'email',
+                'password' => 'password',
+
+            ],
+            'sql_get_details' => 'SELECT id,status,mfa_enabled FROM user WHERE user.email = :identity',
+            'username' => 'YOUR_PASSWORD',
+            'password' => 'YOUR_USERNAME'
+        ],
+    ],
+];

@@ -1,0 +1,57 @@
+<?php
+$this->headTitle('Permissions');
+
+$this->pageBreadcrumbs()->setItems([
+        'Home' => $this->url('home'),
+        'Administration' => $this->url('admin'),
+        'Permissions' => $this->url('admin.permission.list'),
+]);
+?>
+<div class="container">
+    <h1><i class="fas fa-lock"></i> Manage Permissions</h1>
+    <p>
+        <a class="btn btn-primary" href="<?= $this->url('admin.permission.create'); ?>"
+           data-toggle="tooltip" title="Add new permission">
+            <i class="fas fa-plus-circle"></i>
+        </a>
+    </p>
+    <div class="widget">
+    <table class="table table-striped">
+        <thead>
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Description</th>
+                <th>Date Created</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        <?php
+        /** @var \User\Entity\Permission $permission */
+        foreach ($this->permissions as $permission): ?>
+            <tr>
+                <td><?= $this->escapeHtml($permission->getId()); ?></td>
+                <td>
+                    <a href="<?= $this->url('admin.permission.view', ['id' => $permission->getId()]); ?>">
+                        <?= $this->escapeHtml($permission->getName()); ?>
+                    </a>
+                </td>
+                <td><?= $this->escapeHtml($permission->getDescription()); ?></td>
+                <td class="nowrap">
+                    <?= $this->escapeHtml($permission->getDateCreated()); ?>
+                </td>
+                <td>
+                    <a class="btn btn-info" href="<?= $this->url('admin.permission.edit', ['id' => $permission->getId()]); ?>">
+                        <i class="fas fa-edit"></i> Edit
+                    </a>
+                    <a class="btn btn-danger" href="<?= $this->url('admin.permission.delete',['id' => $permission->getId()]); ?>">
+                        <i class="fas fa-trash-alt"></i> Delete
+                    </a>
+                </td>
+            </tr>
+        <?php endforeach; ?>
+        </tbody>
+    </table>
+    </div>
+</div>
