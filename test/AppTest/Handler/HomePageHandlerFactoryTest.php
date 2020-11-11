@@ -40,6 +40,6 @@ class HomePageHandlerFactoryTest extends TestCase
 
         $homePage = $factory($this->container->reveal());
 
-        $this->assertInstanceOf(HomePageHandler::class, $homePage);
+        self::assertInstanceOf(HomePageHandler::class, $homePage);
     }
 }

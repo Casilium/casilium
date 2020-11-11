@@ -24,28 +24,23 @@ class HomePageHandlerTest extends TestCase
     /** @var ContainerInterface */
     protected $container;
 
-    /** @var TemplateRendererInterface */
-    protected $renderer;
-
     protected function setUp(): void
     {
-        $this->renderer  = $this->prophesize(TemplateRendererInterface::class);
         $this->container = $this->prophesize(ContainerInterface::class);
     }
 
 
-    public function testReturnsHtmlResponse()
+    public function testReturnsHtmlResponse(): void
     {
-        $this->renderer
+        $renderer = $this->prophesize(TemplateRendererInterface::class);
+        $renderer
             ->render('app::home-page', Argument::type('array'))
             ->willReturn('');
 
-        $homePage = new HomePageHandler($this->renderer->reveal());
+        $homePage = new HomePageHandler($renderer->reveal());
 
-        $request = $this->prophesize(ServerRequestInterface::class);
+        $response = $homePage->handle($this->prophesize(ServerRequestInterface::class)->reveal());
 
-        $response = $homePage->handle($request->reveal());
-
-        $this->assertInstanceOf(HtmlResponse::class, $response);
+        self::assertInstanceOf(HtmlResponse::class, $response);
     }
 }
