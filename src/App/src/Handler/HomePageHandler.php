@@ -37,6 +37,6 @@ class HomePageHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return new HtmlResponse($this->renderer->render('app::home-page'));
+        return new HtmlResponse($this->renderer->render('app::home-page', []));
     }
 }

@@ -37,6 +37,6 @@ class AdminPageHandler implements RequestHandlerInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return new HtmlResponse($this->renderer->render('app::admin-page'));
+        return new HtmlResponse($this->renderer->render('app::admin-page',[]));
     }
 }
