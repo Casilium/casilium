@@ -47,10 +47,10 @@ Currently, there is gui installer until the project is more complete.
 
 * Create a suitable database in MySQL
 * Copy **config/auth.local.php.dist** to **config/auth.local.php**
-  * Modify the dsn to suit your needs
-  * Modify te username/password fields
+  * Modify the **dsn** to suit your needs
+  * Modify the username/password fields
 * Copy **config/local.php.dist** to **config/local.php**
-  * Edit the *url* key for your database details
+  * Edit the **url** key for your database details
     
 **Database Setup**
 
