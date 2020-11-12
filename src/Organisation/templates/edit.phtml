@@ -1,0 +1,45 @@
+<?php
+$this->headTitle('Update Organisation');
+
+$this->pageBreadcrumbs()->setItems([
+'Home' => $this->url('home'),
+'Organisation' => $this->url('organisation.list'),
+'Update Organisation' => $this->url('organisation.edit'),
+]);
+
+$form = $this->form->prepare();
+$form->get('submit')->setValue('Update Organisation');
+?>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Edit Organisation</h1>
+            <?= $this->form()->openTag($form) ?>
+            <div class="form-group">
+                <?= $this->formLabel($form->get('name')) ?>
+                <?= $this->formElement($form->get('name')) ?>
+                <?= $this->formElementErrors($form->get('name', ['class' => 'help-block'])) ?>
+            </div>
+            <div class="form-group">
+                <?= $this->formLabel($form->get('is_active')) ?>
+                <?= $this->formElement($form->get('is_active')) ?>
+                <?= $this->formElementErrors($form->get('is_active', ['class' => 'help-block'])) ?>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group">
+                <?= $this->formElement($form->get('submit')) ?>
+                <a href="<?= $this->url('organisation.list') ?>" class="btn btn-secondary">Back to list</a>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group text-right">
+                <a class="btn btn-danger" href="<?= $this->url('organisation.delete', ['id' => $this->id]) ?>">Delete</a>
+            </div>
+        </div>
+
+    </div>
+    <?= $this->form()->closeTag() ?>
+</div>

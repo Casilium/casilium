@@ -1,0 +1,39 @@
+<?php
+
+declare(strict_types=1);
+
+use Organisation\Entity\OrganisationInterface;
+
+/** @var OrganisationInterface $organisation */
+$organisation = $this->organisation;
+
+$this->headTitle($this->escapeHtml($organisation->getName()));
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Organisation' => $this->url('organisation.list'),
+    $organisation->getName() => $this->url('organisation.list'),
+]);
+?>
+<div class="container">
+    <h1><?= $this->escapeHtml($organisation->getName()) ?></h1>
+    <p>
+        Date created:
+        <span class="text-info">
+            <?= $this->escapeHtml($organisation->getCreated()->format('d/m/Y H:i')) ?>
+        </span>
+    </p>
+    <p>
+        Last modified:
+        <span class="text-info">
+            <?= $this->escapeHtml($organisation->getModified()->format('d/m/Y H:i')) ?>
+        </span>
+    </p>
+    <p>
+        Is active: <span class="text-info"><?= $organisation->getIsActive() === 1 ? 'true' : 'false' ?></span>
+    </p>
+    <a class="btn btn-sm btn-primary" href="<?= $this->url('organisation.list') ?>">Organisation List</a>
+    <a class="btn btn-sm btn-info" href="<?= $this->url('organisation.edit', ['id' => $organisation->getUuid()]) ?>">
+        Edit Organisation
+    </a>
+</div>

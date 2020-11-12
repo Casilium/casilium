@@ -1,0 +1,36 @@
+<?php
+$this->headTitle('Organisations');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Organisation' => $this->url('organisation.list'),
+    'List' => $this->url('organisation.list'),
+]);
+
+$organisations = $this->organisations;
+?>
+<h1>Organisations</h1>
+<div style="padding-bottom: 25px;">
+    <a class="btn btn-sm btn-primary" href="<?= $this->url('organisation.create') ?>">New Organisation</a>
+    <?php if (! empty($organisations)) : ?>
+    <div class="organisation-list mt-3">
+        <?php foreach ($organisations as $organisation): ?>
+           <div class="row mt-1">
+               <div class="col">
+                   <ul class="list-group">
+                        <li class="list-group-item">
+                            <a href="<?= $this->url('organisation.view', ['id' => $organisation->getUuid()]) ?>">
+                                <?php if ($organisation->getIsActive() === 0): ?>
+                                    <span class="text-muted"><?= $this->escapeHtml($organisation->getName()) ?></span>
+                                <?php else: ?>
+                                    <?= $this->escapeHtml($organisation->getName()) ?>
+                                <?php endif ?>
+                           </a>
+                       </li>
+                   </ul>
+               </div>
+           </div>
+        <?php endforeach; ?>
+    </div>
+    <?php endif ?>
+</div>

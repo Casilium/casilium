@@ -1,0 +1,34 @@
+<?php
+/** @var \Organisation\Entity\Organisation $organisation */
+$organisation = $this->organisation;
+
+$this->headTitle(sprintf('Delete %s', $this->escapeHtml($organisation->getName())));
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Organisation' => $this->url('organisation.list'),
+    $this->escapeHtml($organisation->getName()) => $this->url('organisation.view', ['id' => $organisation->getUuid()]),
+    'Delete' => $this->url('organisation.delete', ['id' => $this->escapeHtml($organisation->getUuid())])
+]);
+
+?>
+<div class="container">
+    <div class="row">
+        <div class="col">
+            <h1>Delete <?= $this->escapeHtml($organisation->getName()) ?></h1>
+            <div class="alert alert-danger">
+                Are you sure you wish to delete the organisation <?= $organisation->getName() ?>?
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6 text-left">
+            <a class="btn btn-primary btn-lg">No, do not delete!</a>
+        </div>
+        <div class="col-sm-6 text-right">
+            <form method="post" action="<?= $this->url('organisation.delete', ['id' => $organisation->getUuid()]) ?>">
+                <button type="submit" class="btn btn-danger btn-sm">Yes, delete I know what I am doing!</button>
+            </form>
+        </div>
+    </div>
+</div>

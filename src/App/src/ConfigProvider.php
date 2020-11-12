@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App;
 
+use ContainerInteropDoctrine\EntityManagerFactory;
+use Doctrine\ORM\EntityManager;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
 /**
@@ -38,6 +40,8 @@ class ConfigProvider
                 Command\TestCommand::class,
             ],
             'factories'  => [
+                EntityManager::class => EntityManagerFactory::class,
+
                 Handler\HomePageHandler::class => Handler\Factory\HomePageHandlerFactory::class,
                 Handler\AdminPageHandler::class => Handler\Factory\AdminPageHandlerFactory::class,
             ],

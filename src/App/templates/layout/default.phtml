@@ -15,16 +15,10 @@
                 <div class="collapse navbar-collapse" id="navbarCollapse">
                     <ul class="navbar-nav mr-auto">
                         <li class="nav-item">
-                            <a href="https://docs.mezzio.dev/mezzio" target="_blank" class="nav-link">
-                                <i class="fa fa-book"></i> Docs
+                            <a href="<?= $this->url('organisation.list') ?>" class="nav-link">
+                                <i class="fa fa-book"></i> Organisations
                             </a>
                         </li>
-                        <li class="nav-item">
-                            <a href="https://github.com/mezzio/mezzio" target="_blank" class="nav-link">
-                                <i class="fa fa-wrench"></i> Contribute
-                            </a>
-                        </li>
-
                     </ul>
 
                     <?php if ($this->identity() != null): ?>

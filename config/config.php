@@ -43,10 +43,14 @@ $aggregator = new ConfigAggregator([
     \Mezzio\ConfigProvider::class,
     \Mezzio\Router\ConfigProvider::class,
     \Laminas\Diactoros\ConfigProvider::class,
-
+    // user authentication
     \UserAuthentication\ConfigProvider::class,
+
+    // user account preferences
     \Account\ConfigProvider::class,
 
+    // organisation access
+    \Organisation\ConfigProvider::class,
 
     // Swoole config to overwrite some services (if installed)
    // class_exists(\Mezzio\Swoole\ConfigProvider::class)
