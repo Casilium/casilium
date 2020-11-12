@@ -52,6 +52,18 @@ Currently, there is gui installer until the project is more complete.
 * Copy **config/local.php.dist** to **config/local.php**
   * Edit the *url* key for your database details
     
+**Database Setup**
+
+Calsium uses Doctrine for database and migrations which enables easy
+modification and setup of the databases. To run the database migration
+tool, from the project root run:
+
+    ./vendor/bin/doctrine-migrations: migrations:migrate
+
+You will need to ensure that the scripts are executable, if not run
+
+    chmod a+x /vendor/bin/*
+
 License
 -------
 Calisium os released under the GPL2 license. See the included LICENSE.txt
@@ -60,6 +72,7 @@ file for details of the General Public License.
 Calsium is uses several open source projects, including
 [Laminas](https://getlaminas.org/),
 [Mezzio](https://docs.mezzio.dev/),
+[Doctrine](https://www.doctrine-project.org/),
 [Bootstrap](https://getbootstrap.com/),
 [Font-Awesome](https://fontawesome.com/),
 [jQuery](https://jquery.com/).
