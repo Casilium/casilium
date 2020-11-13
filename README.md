@@ -64,6 +64,15 @@ You will need to ensure that the scripts are executable, if not run
 
     chmod a+x /vendor/bin/*
 
+**Example Apache Configuration**
+
+Files should be served from the "public" directory:
+
+    <VirtualHost *:80>
+        ServerName casilium.yourdomain.com
+        DocumentRoot /usr/local/www/casilium/public
+    </VirtualHost>     
+
 License
 -------
 Calisium os released under the GPL2 license. See the included LICENSE.txt
