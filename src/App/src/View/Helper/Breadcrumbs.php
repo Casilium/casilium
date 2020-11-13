@@ -50,7 +50,7 @@ class Breadcrumbs extends AbstractHelper
 
         // resulting HTML code will be stored in this var
         $result  = '<div class="container" aria-label="Breadcrumb">';
-        $result .= '<ol class="breadcrumb" itemscope itemtype="http://schema.org/BreadcrumbList">';
+        $result .= '<ol class="breadcrumb" style="background-color: transparent" itemscope itemtype="http://schema.org/BreadcrumbList">';
 
         // get item count
         $itemCount = count($this->items);

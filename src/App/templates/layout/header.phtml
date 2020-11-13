@@ -24,16 +24,13 @@ $this->inlineScript()
     <?=$this->headMeta()?>
     <?=$this->headLink()?>
     <style>
-        body { padding-top: 70px; }
-        .app { min-height: 100vh; }
-        .app-footer { padding-bottom: 1em; }
         .casilium-blue, h2 a, h2 a:hover { color: #447799; }
         .navbar-brand { padding: 0; }
         .navbar-brand img { margin: -.5rem 0; filter: brightness(0) invert(1); }
     </style>
     <?= $this->headStyle() ?>
 </head>
-<body class="app">
+<body>
 <?php if ($flashes = $this->flash()) :?>
     <div class="alert alert-info alert-dismissible fade show">
         <ul class="list-unstyled">
