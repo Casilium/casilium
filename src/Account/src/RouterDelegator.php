@@ -16,6 +16,8 @@ class RouterDelegator
 
         $app->get('/account', Handler\AccountPageHandler::class, 'account');
 
+        $app->route('/account/change-password',
+            Handler\ChangePasswordHandler::class, ['GET', 'POST'], 'account.change_password');
         return $app;
     }
 }

@@ -19,6 +19,12 @@ class RoleManager
      */
     private $rbacManager;
 
+    /**
+     * RoleManager constructor.
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param RbacManager $rbacManager
+     */
     public function __construct(EntityManagerInterface $entityManager, RbacManager $rbacManager)
     {
         $this->entityManager = $entityManager;
@@ -27,6 +33,7 @@ class RoleManager
 
     /**
      * Add new role to database
+     *
      * @param array $data
      * @throws \Exception
      */
@@ -44,13 +51,13 @@ class RoleManager
         $role->setDateCreated(date('Y-m-d H:i:s'));
 
         // add parent roles to inherit
-        $inheritedRoles = isset($data['inherit_roles']) ? $data['inherit_roles'] : [];
+        $inheritedRoles = $data['inherit_roles'] ?? [];
         if (count($inheritedRoles) > 0) {
             foreach ($inheritedRoles as $roleId) {
                 $parentRole = $this->entityManager->getRepository(Role::class)
                     ->findOneById($roleId);
 
-                if ($parentRole == null) {
+                if ($parentRole === null) {
                     throw new \Exception('Role to inherit not found');
                 }
 
@@ -69,6 +76,7 @@ class RoleManager
 
     /**
      * Update an existing role
+     *
      * @param Role $role
      * @param array $data
      * @throws \Doctrine\ORM\ORMException
@@ -79,7 +87,7 @@ class RoleManager
         $existingRole = $this->entityManager->getRepository(Role::class)
             ->findOneByName($data['name']);
 
-        if ($existingRole != null && $existingRole != $role) {
+        if ($existingRole !== null && $existingRole !== $role) {
             throw new \Exception('Another role with such name already exists');
         }
 
@@ -114,6 +122,7 @@ class RoleManager
 
     /**
      * Delete a role from DB
+     *
      * @param Role $role
      * @throws \Doctrine\ORM\ORMException
      * @throws \Doctrine\ORM\OptimisticLockException
@@ -127,6 +136,7 @@ class RoleManager
 
     /**
      * Retrieves all the permissions from the given role and its child roles
+     *
      * @param Role $role
      * @return array
      */

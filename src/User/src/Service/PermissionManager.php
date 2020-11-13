@@ -30,6 +30,8 @@ class PermissionManager
     }
 
     /**
+     * Add permission
+     *
      * @param array $data
      * @throws \Exception
      */
@@ -55,6 +57,8 @@ class PermissionManager
     }
 
     /**
+     * Update permission
+     *
      * @param Permission $permission
      * @param array $data
      * @throws \Exception
@@ -64,7 +68,7 @@ class PermissionManager
         $existingPermission = $this->entityManager->getRepository(Permission::class)
             ->findOneByName($data['name']);
 
-        if ($existingPermission != null && $existingPermission != $permission) {
+        if ($existingPermission !== null && $existingPermission !== $permission) {
             throw new \Exception('Another permission with such name already exists');
         }
 
@@ -78,6 +82,8 @@ class PermissionManager
     }
 
     /**
+     * Remove permission
+     *
      * @param Permission $permission
      */
     public function deletePermission(Permission $permission): void

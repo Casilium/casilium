@@ -15,6 +15,10 @@ $form->get('submit')->setValue('Update');
 
 /** @var \User\Entity\User $user */
 $user = $this->user;
+
+if ($user->isMfaEnabled() === false) {
+    $form->get('mfa_enabled')->setAttribute('readonly', true);
+}
 ?>
 <div class="container">
     <h1>Edit User <?= $this->escapeHtml($user->getEmail()) ?></h1>
@@ -42,10 +46,16 @@ $user = $this->user;
                 </div>
 
                 <div class="form-group">
+                    <?php if($user->isMfaEnabled() === false): ?>
+                        <p class="text-info">MFA cannot be enabled from here for another user.</p>
+                    <?php else: ?>
+                        <p class="text-danger">You may disable MFA for this user if required.</p>
+                    <?php endif ?>
                     <?= $this->formLabel($form->get('mfa_enabled')); ?>
                     <?= $this->formElement($form->get('mfa_enabled')); ?>
                     <?= $this->formElementErrors($form->get('mfa_enabled')); ?>
                 </div>
+
 
                 <div class="form-group">
                     <?= $this->formLabel($form->get('roles')); ?>

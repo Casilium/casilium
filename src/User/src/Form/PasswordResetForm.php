@@ -1,8 +1,10 @@
 <?php
 namespace User\Form;
 
+use Laminas\Filter;
+use Laminas\Form\Element;
 use Laminas\Form\Form;
-use Laminas\InputFilter\InputFilter;
+use Laminas\Validator;
 
 /**
  * This form is used to collect user's E-mail address (used to recover password).
@@ -29,14 +31,14 @@ class PasswordResetForm extends Form
      */
     protected function addElements(): void
     {
-        // Add "email" field
-        $this->add([
-            'type'  => 'email',
-            'name' => 'email',
-            'options' => [
-                'label' => 'Your E-mail',
-            ],
-        ]);
+        $element = new Element\Email('email');
+        $element->setLabel('E-Mail')
+            ->setAttributes([
+                'id' => 'email',
+                'class' => 'form-control',
+                'placeholder' => 'email',
+            ]);
+        $this->add($element);
 
         // Add the CAPTCHA field
         $this->add([

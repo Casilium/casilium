@@ -8,34 +8,44 @@ use User\Entity\Role;
 use User\Entity\User;
 use Laminas\Crypt\Password\Bcrypt;
 use Mezzio\Template\TemplateRendererInterface;
+use User\Exception\PasswordMismatchException;
 
 class UserManager
 {
     /**
      * @var EntityManagerInterface
      */
-    private $entityManager;
+    protected $entityManager;
 
     /**
      * @var RoleManager
      */
-    private $roleManager;
+    protected $roleManager;
 
     /**
      * @var PermissionManager
      */
-    private $permissionManager;
+    protected $permissionManager;
 
     /**
      * @var TemplateRendererInterface
      */
-    private $renderer;
+    protected $renderer;
 
     /**
      * @var array
      */
-    private $config;
+    protected $config;
 
+    /**
+     * UserManager constructor.
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param RoleManager $roleManager
+     * @param PermissionManager $permissionManager
+     * @param TemplateRendererInterface $renderer
+     * @param array $config
+     */
     public function __construct(
         EntityManagerInterface $entityManager,
         RoleManager $roleManager,
@@ -52,6 +62,7 @@ class UserManager
 
     /**
      * Add new user to database
+     *
      * @param array $data
      * @return User|null
      * @throws \Exception
@@ -65,9 +76,7 @@ class UserManager
         $user = new User();
         $user->setEmail($data['email']);
         $user->setFullName($data['full_name']);
-
-        $bcrypt = new Bcrypt();
-        $password_hash = $bcrypt->create($data['password']);
+        $password_hash = password_hash($data['password'], PASSWORD_BCRYPT);
         $user->setPassword($password_hash);
         $user->setStatus($data['status']);
         $user->setDateCreated(date('Y-m-d H:i:s'));
@@ -81,7 +90,20 @@ class UserManager
     }
 
     /**
+     * Create Password Hash
+     *
+     * @param string $password
+     * @return string
+     */
+    public function getPasswordHash(string $password): string
+    {
+        $bcrypt = new Bcrypt();
+        return $bcrypt->create($password);
+    }
+
+    /**
      * Update an existing user
+     *
      * @param User $user
      * @param array $data
      * @return bool
@@ -90,7 +112,7 @@ class UserManager
     public function updateUser(User $user, array $data): bool
     {
         // Do not allow to change user email if another user with such email already exits.
-        if ($user->getEmail() != $data['email'] && $this->checkUserExists($data['email'])) {
+        if ($user->getEmail() !== $data['email'] && $this->checkUserExists($data['email'])) {
             throw new \Exception("Another user with email address " . $data['email'] . " already exists");
         }
 
@@ -109,6 +131,7 @@ class UserManager
 
     /**
      * A helper method which assigns new roles to the user
+     *
      * @param User $user
      * @param array $roleIds
      * @throws \Exception
@@ -123,7 +146,7 @@ class UserManager
             /** @var Role $role */
             $role = $this->entityManager->getRepository(Role::class)->find($roleId);
 
-            if ($role == null) {
+            if ($role === null) {
                 throw new \Exception('Not found role by ID');
             }
 
@@ -133,6 +156,7 @@ class UserManager
 
     /**
      * Checks whether a user with the given email address already exists in the database
+     *
      * @param string $email
      * @return bool
      */
@@ -144,9 +168,15 @@ class UserManager
         return $user !== null;
     }
 
+    /**
+     * Generate password reset token to send to user via email
+     *
+     * @param User $user
+     * @throws \Exception
+     */
     public function generatePasswordResetToken(User $user): void
     {
-        if ($user->getStatus() != User::STATUS_ACTIVE) {
+        if ($user->getStatus() !== User::STATUS_ACTIVE) {
             throw new \Exception('Cannot generate password reset token for inactive user');
         }
 
@@ -155,8 +185,7 @@ class UserManager
         $token = bin2hex(random_bytes(32));
 
         // encrypt token before storing it in db
-        $bcrypt = new Bcrypt();
-        $tokenHash = $bcrypt->create($token);
+        $tokenHash = password_hash($token, PASSWORD_BCRYPT);
 
         // save token to DB
         $user->setPasswordResetToken($tokenHash);
@@ -168,31 +197,64 @@ class UserManager
         $this->entityManager->flush();
     }
 
-    public function verifyPasswordResetToken(string $email, string $passwordResetToken)
+    /**
+     * Verify password reset token
+     *
+     * @param string $email
+     * @param string $passwordResetToken
+     * @return bool
+     */
+    public function verifyPasswordResetToken(string $email, string $passwordResetToken): bool
     {
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class);
-        if (null == $user || $user->getStatus() != User::STATUS_ACTIVE) {
+        if (null === $user || $user->getStatus() !== User::STATUS_ACTIVE) {
             return false;
         }
 
         // check token has matches the token in our DB
-        $bCrypt = new Bcrypt();
-        $tokenHash = $user->getPasswordResetToken();
-
-        if ($bCrypt->verify($passwordResetToken, $tokenHash)) {
+        if (password_verify($passwordResetToken, $user->getPasswordResetToken())) {
             return false; // mismatch
         }
 
         $tokenCreationDate = $user->getPasswordResetTokenCreationDate();
         $tokenCreationDate = strtotime($tokenCreationDate);
 
-        $currentDate = strtotime('now');
+        $currentDate = time();
 
-        if ($currentDate - $tokenCreationDate > 24*60*60) {
-            return false; // expired
+        return !($currentDate - $tokenCreationDate > 24 * 60 * 60);
+    }
+
+    /**
+     * Change current user password
+     *
+     * @param int $id user id
+     * @param string $current_password current password
+     * @param string $new_password the new password
+     * @return bool
+     */
+    public function changePassword(int $id, string $current_password, string $new_password): bool
+    {
+        if (strcmp($current_password,$new_password) === 0) {
+            throw PasswordMismatchException::whenPasswordsAreSame();
         }
 
-        return true;
+        $user = $this->entityManager->getRepository(User::class)
+            ->find($id);
+
+        if ($user instanceof User) {
+            // verify password
+            if (! password_verify($current_password, $user->getPassword())) {
+                throw PasswordMismatchException::whenVerifying();
+            }
+
+            // set new password
+            $user->setPassword(password_hash($new_password, PASSWORD_BCRYPT));
+
+            // save password
+            $this->entityManager->flush();
+        }
+
+        return false;
     }
 }

@@ -21,7 +21,18 @@ $this->pageBreadcrumbs()->setItems([
             <div class="tab-content" id="nav-tabContent">
                 <div class="tab-pane fade show active" id="account-security" role="tabpanel" aria-labelledby="list-account-security">
                     <ul class="list-group">
-                        <li class="list-group-item"><a href="<?= $this->url('mfa.enable'); ?>">Enable MFA</a></li>
+                        <li class="list-group-item">
+                            <?php if ($this->mfa_enabled === 1): ?>
+                                <span class="text-muted">Enabled MFA</span>
+                            <?php else: ?>
+                                <a href="<?= $this->url('mfa.enable') ?>">Enable MFA</a>
+                            <?php endif ?>
+                        </li>
+                    </ul>
+                    <ul class="list-group mt-1">
+                        <li class="list-group-item"><a href="<?= $this->url('account.change_password'); ?>">
+                                Change Password</a>
+                        </li>
                     </ul>
                 </div>
             </div>

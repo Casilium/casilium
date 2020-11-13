@@ -19,6 +19,12 @@ class AuthManager
      */
     private $rbacManager;
 
+    /**
+     * AuthManager constructor.
+     *
+     * @param RbacManager $rbacManager
+     * @param array $config
+     */
     public function __construct(RbacManager $rbacManager, array $config)
     {
         $this->rbacManager = $rbacManager;
@@ -27,6 +33,7 @@ class AuthManager
 
     /**
      * Check to see if current user has access to resource
+     *
      * @param string $route
      * @param string|null $identity
      * @return int
@@ -41,14 +48,13 @@ class AuthManager
 
             // get route action
             $actionName = array_pop($routeParts);
-            //$actionName = end($routeParts);
 
             // rebuild route
             $route = implode('.', $routeParts);
         }
 
         $mode = $this->config['options']['mode'] ?? 'restrictive';
-        if ($mode != 'permissive' && $mode != 'restrictive') {
+        if ($mode !== 'permissive' && $mode !== 'restrictive') {
             throw new \Exception('Invalid access filter mode (expected either restrictive or permissive');
         }
 
@@ -61,52 +67,60 @@ class AuthManager
                 $allow = $item['allow'];
 
                 // else if action is specified
-                if ((is_array($actionList) && in_array($actionName, $actionList, true) || $actionList == '*')
-                    || $actionList == null) {
-                    if ($allow == '*') {
+                if ($actionList === '*'
+                    || $actionList === null
+                    || ((is_array($actionList) && in_array($actionName, $actionList, true))))
+                {
+                    if ($allow === '*') {
                         // anyone is allowed
                         return self::ACCESS_GRANTED;
-                    } elseif (! $identity) {
+                    }
+
+                    if (! $identity) {
                         // only authenticate user is allowed to see the page
                         return self::AUTH_REQUIRED;
                     }
 
-                    if ($allow == '@') {
+                    if ($allow === '@') {
                         // any authenticated user is allowed to see the page
                         return self::ACCESS_GRANTED;
-                    } elseif (substr($allow, 0, 1) == '@') {
+                    }
+
+                    if (strpos($allow, '@') === 0) {
                         // only the specific user is allowed to see the page
                         $target_identity = substr($allow, 1);
-                        if ($target_identity == $identity) {
+                        if ($target_identity === $identity) {
                             return self::ACCESS_GRANTED;
-                        } else {
-                            return self::ACCESS_DENIED;
                         }
-                    } elseif (substr($allow, 0, 1) == '+') {
+
+                        return self::ACCESS_DENIED;
+                    }
+
+                    if (strpos($allow, '+') === 0) {
                         // only a user with this permission is allowed to see the page
                         $permission = substr($allow, 1);
 
                         if ($this->rbacManager->isGranted($identity, $permission)) {
                             return self::ACCESS_GRANTED;
-                        } else {
-                            return self::ACCESS_DENIED;
                         }
-                    } else {
-                        throw new \Exception('Unexpected value for "allow" expected ' .
-                            'either "?", "@", "@identity" or "+permission');
+
+                        return self::ACCESS_DENIED;
                     }
+
+                    throw new \Exception('Unexpected value for "allow" expected ' .
+                        'either "?", "@", "@identity" or "+permission');
                 }
             }
         }
 
         // in restrictive mode, we require authentication for any action not listed under 'access_filter' key,
         // and deny access to authorized users (for security reasons)
-        if ($mode == 'restrictive') {
+        if ($mode === 'restrictive') {
             if (! $identity) {
                 return self::AUTH_REQUIRED;
-            } else {
-                return self::ACCESS_DENIED;
             }
+
+            return self::ACCESS_DENIED;
         }
 
         return self::ACCESS_GRANTED;

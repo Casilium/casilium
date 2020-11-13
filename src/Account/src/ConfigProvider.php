@@ -43,6 +43,7 @@ class ConfigProvider
             ],
             'factories'  => [
                 Handler\AccountPageHandler::class => Handler\Factory\AccountPageHandlerFactory::class,
+                Handler\ChangePasswordHandler::class => Handler\Factory\ChangePasswordHandlerFactory::class,
             ],
         ];
     }

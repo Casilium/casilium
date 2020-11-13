@@ -31,6 +31,12 @@ class RbacManager
      */
     private $rbac;
 
+    /**
+     * RbacManager constructor.
+     *
+     * @param StorageInterface $cache
+     * @param EntityManagerInterface $entityManager
+     */
     public function __construct(StorageInterface $cache, EntityManagerInterface $entityManager)
     {
         $this->cache = $cache;
@@ -39,6 +45,7 @@ class RbacManager
 
     /**
      * Initialize the RBAC container
+     *
      * @param bool $forceCreate Force creation if already initialized
      * @return bool
      */
@@ -85,6 +92,7 @@ class RbacManager
 
     /**
      * Check if user access access to resource
+     *
      * @param string $identity
      * @param string $permission
      * @param string|null $params
@@ -100,7 +108,7 @@ class RbacManager
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->findOneByEmail($identity);
 
-        if ($user == null) {
+        if ($user === null) {
             throw new \Exception(sprintf('No such user "%s"', $identity));
         }
 
@@ -108,10 +116,8 @@ class RbacManager
 
         /** @var Role $role */
         foreach ($roles as $role) {
-            if ($this->rbac->isGranted($role->getName(), $permission)) {
-                if ($params === null) {
-                    return true;
-                }
+            if ($params === null && $this->rbac->isGranted($role->getName(), $permission)) {
+                return true;
             }
 
             foreach ($this->assertionManagers as $assertionManager) {
