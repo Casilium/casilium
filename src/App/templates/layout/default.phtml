@@ -4,7 +4,9 @@
     <!-- Sidebar -->
     <div class="bg-dark" id="sidebar-wrapper">
         <div class="sidebar-heading mb-4">
-                <img src="/img/casilium-white.svg" alt="Casilium Service Management" height="24" />
+            <a href="<?= $this->url('home') ?>">
+                <img src="/img/casilium-white.svg" alt="Casilium Service Management" class="img-fluid" />
+            </a>
         </div>
         <div class="list-group list-group-flush">
             <a href="#" class="list-group-item list-group-item-action bg-dark">
@@ -55,7 +57,7 @@
         <div class="container-fluid">
             <!-- Breadcrumbs -->
             <div class="mt-2 mb-2">
-                <?= $this->pageBreadcrumbs()->render(); ?>
+                <?= $this->pageBreadcrumbs()->render() ?>
             </div>
             <?= $this->content ?>
         </div>
