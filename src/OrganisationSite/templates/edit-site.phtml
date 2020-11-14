@@ -1,0 +1,69 @@
+<?php
+
+/** @var \OrganisationSite\Entity\SiteEntity $site */
+$site = $this->site;
+$form = $this->form->prepare();
+?>
+<h1>Edit Site</h1>
+
+<?= $this->form()->openTag($form) ?>
+<div class="form-group">
+    <?= $this->formLabel($form->get('name')) ?>
+    <?= $this->formElement($form->get('name')) ?>
+    <?= $this->formElementErrors()->render($form->get('name'), ['class' => 'help-block']) ?>
+</div>
+<div class="form-group">
+    <?= $this->formLabel($form->get('street_address')) ?>
+    <?= $this->formElement($form->get('street_address')) ?>
+    <?= $this->formElementErrors()->render($form->get('street_address'), ['class' => 'help-block']) ?>
+</div>
+<div class="form-group">
+    <?= $this->formLabel($form->get('street_address2')) ?>
+    <?= $this->formElement($form->get('street_address2')) ?>
+    <?= $this->formElementErrors()->render($form->get('street_address2'), ['class' => 'help-block']) ?>
+</div>
+<div class="form-group">
+    <?= $this->formLabel($form->get('town')) ?>
+    <?= $this->formElement($form->get('town')) ?>
+    <?= $this->formElementErrors()->render($form->get('city'), ['class' => 'help-block']) ?>
+</div>
+<div class="form-group">
+    <?= $this->formLabel($form->get('city')) ?>
+    <?= $this->formElement($form->get('city')) ?>
+    <?= $this->formElementErrors()->render($form->get('city'), ['class' => 'help-block']) ?>
+</div>
+<div class="form-group">
+    <?= $this->formLabel($form->get('county')); ?>
+    <?= $this->formElement($form->get('county')); ?>
+    <?= $this->formElementErrors()->render($form->get('county'), ['class' => 'help-block']) ?>
+</div>
+<div class="form-group">
+    <?= $this->formLabel($form->get('postal_code')) ?>
+    <?= $this->formElement($form->get('postal_code')) ?>
+    <?= $this->formElementErrors()->render($form->get('postal_code'), ['class' => 'help-block']) ?>
+</div>
+<div class="form-group">
+    <?= $this->formLabel($form->get('country_id')) ?>
+    <?= $this->formElement($form->get('country_id')) ?>
+    <?= $this->formElementErrors()->render($form->get('country_id'), ['class' => 'help-block']); ?>
+</div>
+<div class="form-group">
+    <?= $this->formLabel($form->get('telephone')) ?>
+    <?= $this->formElement($form->get('telephone')) ?>
+    <?= $this->formElementErrors()->render($form->get('telephone'), ['class' => 'help-block']) ?>
+</div>
+<div class="form-group">
+    <div class="row">
+        <div class="col-sm-6">
+            <?= $this->formHidden($form->get('id')) ?>
+            <?= $this->formElement($form->get('submit')) ?>
+        </div>
+        <div class="col-sm-6">
+            <a class="btn btn-danger" href="<?= $this->url('organisation_site.delete', [
+                'id' => $site->getUuid()]) ?>">
+                Delete Site
+            </a>
+        </div>
+    </div>
+</div>
+<?= $this->form()->closeTag() ?>

@@ -40,7 +40,7 @@
     "require": {
         "php": "^7.3",
         "dasprid/container-interop-doctrine": "^1.1.0",
-        "doctrine/migrations": "^3.0",
+        "doctrine/migrations": "^2.2",
         "composer/package-versions-deprecated": "^1.10.99",
         "laminas/laminas-component-installer": "^2.1.2",
         "laminas/laminas-config-aggregator": "^1.2",
@@ -92,7 +92,8 @@
             "User\\": "src/User/src/",
             "Mfa\\": "src/Mfa/src/",
             "Account\\": "src/Account/src",
-            "Organisation\\": "src/Organisation/src"
+            "Organisation\\": "src/Organisation/src",
+            "OrganisationSite\\": "src/OrganisationSite/src"
         }
     },
     "autoload-dev": {

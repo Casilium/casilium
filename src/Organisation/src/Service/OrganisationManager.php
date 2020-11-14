@@ -10,7 +10,9 @@ use Organisation\Entity\OrganisationInterface;
 use Organisation\Exception\OrganisationExistsException;
 use Organisation\Exception\OrganisationNameException;
 use Organisation\Exception\OrganisationNotFoundException;
+use Organisation\Exception\OrganisationSitesExistException;
 use Organisation\Form\OrganisationForm;
+use OrganisationSite\Service\SiteManager;
 use Ramsey\Uuid\Uuid;
 
 class OrganisationManager
@@ -20,9 +22,21 @@ class OrganisationManager
      */
     protected $entityManager;
 
-    public function __construct(EntityManagerInterface  $entityManager)
+    /**
+     * @var SiteManager
+     */
+    protected $siteManager;
+
+    /**
+     * OrganisationManager constructor.
+     *
+     * @param EntityManagerInterface $entityManager
+     * @param SiteManager $siteManager
+     */
+    public function __construct(EntityManagerInterface  $entityManager, SiteManager $siteManager)
     {
         $this->entityManager = $entityManager;
+        $this->siteManager = $siteManager;
     }
 
     /**
@@ -172,6 +186,12 @@ class OrganisationManager
      */
     public function delete(Organisation $organisation): void
     {
+        // check if organisation has sites before deleting.
+        if ($sites = $this->siteManager->fetchSitesByOrganisationId($organisation->getId())) {
+            throw OrganisationSitesExistException::whenDeleting($organisation->getName());
+        }
+
+        // remove the organisation
         $this->entityManager->remove($organisation);
         $this->entityManager->flush();
     }

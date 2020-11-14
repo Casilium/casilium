@@ -1,0 +1,46 @@
+<?php
+
+/** @var \OrganisationSite\Entity\SiteEntity $site */
+$site = $this->site;
+
+$this->headTitle($this->escapeHtml($site->getOrganisation()->getName()));
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Organisation' => $this->url('organisation.list'),
+    $site->getOrganisation()->getName() => $this->url('organisation.view', [
+        'id' => $site->getOrganisation()->getUuid()
+    ]),
+    'Site' => $this->url('organisation_site.read', ['id' => $site->getUuid()]),
+    'Delete' => $this->url('organisation_site.delete', ['id' => $site->getUuid()]),
+]);
+?>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h1><?= $this->escapeHtml($site->getOrganisation()->getName()) ?></h1>
+            <div class="alert alert-danger">
+                <h2><i class="fas fa-exclamation-triangle fa-fw"></i> Delete Site</h2>
+                <p>
+                    Are you sure you want to delete the following
+                    site:<br>"<?= $this->escapeHtml($site->getAddressAsString()) ?>"?
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+             <a class="btn btn-primary" href="<?= $this->url('organisation_site.list', [
+                 'id' => $site->getOrganisation()->getUuid() ]) ?>">
+                 No!
+             </a>
+        </div>
+        <div class="col-sm-6 text-right">
+            <a class="btn btn-danger" href="<?= $this->url('organisation_site.delete', [
+                'id' => $site->getUuid(), 'confirm' => 'confirm']) ?>">
+                Yes, I know what I am doing!
+            </a>
+        </div>
+    </div>
+</div>
+

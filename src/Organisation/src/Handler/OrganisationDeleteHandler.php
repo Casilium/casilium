@@ -6,8 +6,10 @@ namespace Organisation\Handler;
 
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
+use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
+use Organisation\Exception\OrganisationSitesExistException;
 use Organisation\Service\OrganisationManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -48,7 +50,13 @@ class OrganisationDeleteHandler implements RequestHandlerInterface
 
         if ($request->getMethod() === 'POST') {
             // delete on post
-            $this->organisationManager->delete($organisation);
+            try {
+                $this->organisationManager->delete($organisation);
+            } catch (OrganisationSitesExistException $exception) {
+                $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
+                $flashMessages->flash('error', $exception->getMessage());
+            }
+
             return new RedirectResponse($this->urlHelper->generate('organisation.list'));
         }
 

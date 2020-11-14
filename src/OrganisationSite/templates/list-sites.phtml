@@ -1,0 +1,57 @@
+<?php
+/** @var \OrganisationSite\Entity\SiteEntity[] $sites */
+$sites = $this->sites;
+
+/** @var \Organisation\Entity\Organisation $organisation */
+$organisation = $this->organisation;
+
+$this->headTitle($this->escapeHtml($organisation->getName()));
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Organisation' => $this->url('organisation.list'),
+    $organisation->getName() => $this->url('organisation.view', ['id' => $organisation->getUuid()]),
+    'Sites' => $this->url('organisation_site.list', ['id' => $organisation->getUuid()]),
+]);
+?>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-sm-6">
+            <h1><i class="fas fa-building"></i> <?= $this->escapeHtml($organisation->getName()) ?></h1>
+        </div>
+        <div>
+            <a class="btn btn-primary" href="<?= $this->url('organisation_site.create', [
+                    'id' => $organisation->getUuid()]) ?>">
+                New Site
+            </a>
+        </div>
+        <hr>
+    </div>
+
+    <?php if (! empty($sites)): ?>
+        <?php foreach ($sites as $site): ?>
+            <div class="row">
+                <div class="col list-group-item">
+                    <span class="text-info">
+                        <a href="<?= $this->url('organisation_site.read', ['id' => $site->getUuid()]) ?>">
+                            <?= $this->escapeHtml($site->getName()) ?>
+                        </a>
+                    </span>
+                    <?php if (null !== $site->getTelephone()): ?>:
+                        <a href="tel:<?= $this->escapeHtml($site->getTelephone()) ?>">
+                            <?= $this->escapeHtml($site->getTelephone()) ?>
+                        </a>
+                    <?php endif ?>
+                    <div>
+                        <p class="text-muted">
+                            <?= $this->escapeHtml($site->getAddressAsString()) ?>
+                            (<a href="https://www.google.co.uk/maps/place/<?= $this->escapeHtml($site->getAddressAsString()) ?>">Map</a>)
+                        </p>
+                    </div>
+                </div>
+            </div>
+        <?php endforeach; ?>
+    <?php else: ?>
+    <p>No sites found for "<?= $this->escapeHtml($organisation->getName()) ?>"</p>
+    <?php endif ?>
+</div>

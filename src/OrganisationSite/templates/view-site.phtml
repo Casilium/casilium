@@ -1,0 +1,36 @@
+<?php
+
+/** @var \OrganisationSite\Entity\SiteEntity $site */
+$site = $this->site;
+$this->headTitle($this->escapeHtml($site->getOrganisation()->getName()));
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Organisation' => $this->url('organisation.list'),
+    $site->getOrganisation()->getName() => $this->url('organisation.view', ['id' => $site->getOrganisation()->getUuid()]),
+    'Sites' => $this->url('organisation_site.list', ['id' => $site->getOrganisation()->getUuid()]),
+]);
+?>
+<h1><?= $this->escapeHtml($site->getOrganisation()->getName()) ?></h1
+<div class="list-group">
+    <div class="list-group-item">
+        <p>
+            <?= $this->escapeHtml($site->getAddressAsString()) ?>
+            <hr>
+            <a href="tel:<?= $this->escapeHtml($site->getTelephone()) ?>">
+                <?= $this->escapeHtml($site->getTelephone()) ?>
+            </a>
+        </p>
+        <hr>
+        <p>
+            <a href="https://www.google.co.uk/maps/place/<?= $this->escapeHtml($site->getAddressAsString()) ?>"
+            class="btn btn-primary">
+                Google Maps
+            </a>
+            <a href="<?= $this->url('organisation_site.edit', ['id' => $site->getUuid()]) ?>"
+               class="btn btn-secondary">
+                Edit Site
+            </a>
+        </p>
+    </div>
+</div>

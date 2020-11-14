@@ -49,7 +49,7 @@ class ConfigProvider
     }
 
     /**
-     * Returns the template configuration
+     * Returns the templates configuration
      *
      * @return array
      */

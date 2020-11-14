@@ -1,3 +1,19 @@
+h1 {
+  /* Extra small devices (phones, less than 768px) */
+  font-size: 14px;
+  /* Small devices (tablets, 768px and up) */
+  /* Medium devices (desktops, 992px and up) */
+  /* Large devices (large desktops, 1200px and up) */ }
+  @media (min-width: 768px) {
+    h1 {
+      font-size: 18px; } }
+  @media (min-width: 992px) {
+    h1 {
+      font-size: 24px; } }
+  @media (min-width: 1200px) {
+    h1 {
+      font-size: 36px; } }
+
 /*!
  * Start Bootstrap - Simple Sidebar (https://startbootstrap.com/template/simple-sidebar)
  * Copyright 2013-2020 Start Bootstrap

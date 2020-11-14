@@ -1,0 +1,64 @@
+<?php
+$form = $this->form->prepare();
+
+/** @var \Organisation\Entity\Organisation $organisation */
+$organisation = $this->organisation;
+?>
+<div class="container">
+    <h1>New Site for <?= $this->escapeHtml($organisation->getName()) ?></h1>
+
+    <?= $this->form()->openTag($form) ?>
+    <div class="form-group">
+        <?= $this->formLabel($form->get('name')) ?>
+        <?= $this->formElement($form->get('name')) ?>
+        <?= $this->formElementErrors()->render($form->get('name'), ['class' => 'help-block']) ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formLabel($form->get('street_address')) ?>
+        <?= $this->formElement($form->get('street_address')) ?>
+        <?= $this->formElementErrors()->render($form->get('street_address'), ['class' => 'help-block']); ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formLabel($form->get('street_address2')) ?>
+        <?= $this->formElement($form->get('street_address2')) ?>
+        <?= $this->formElementErrors()->render($form->get('street_address2'), ['class' => 'help-block']); ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formLabel($form->get('town')) ?>
+        <?= $this->formElement($form->get('town')) ?>
+        <?= $this->formElementErrors()->render($form->get('city'), ['class' => 'help-block']) ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formLabel($form->get('city')) ?>
+        <?= $this->formElement($form->get('city')) ?>
+        <?= $this->formElementErrors()->render($form->get('city'), ['class' => 'help-block']) ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formLabel($form->get('county')) ?>
+        <?= $this->formElement($form->get('county')) ?>
+        <?= $this->formElementErrors()->render($form->get('county'), ['class' => 'help-block']) ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formLabel($form->get('postal_code')) ?>
+        <?= $this->formElement($form->get('postal_code')) ?>
+        <?= $this->formElementErrors()->render($form->get('postal_code'), ['class' => 'help-block']) ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formLabel($form->get('country_id')) ?>
+        <?= $this->formElement($form->get('country_id')) ?>
+        <?= $this->formElementErrors()->render($form->get('country_id'), ['class' => 'help-block']) ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formLabel($form->get('telephone')) ?>
+        <?= $this->formElement($form->get('telephone')) ?>
+        <?= $this->formElementErrors()->render($form->get('telephone'), ['class' => 'help-block']) ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formHidden($form->get('id')) ?>
+        <?= $this->formElement($form->get('submit')) ?>
+    </div>
+    <?= $this->form()->closeTag() ?>
+
+</div>
+
+
