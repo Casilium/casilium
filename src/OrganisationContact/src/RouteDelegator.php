@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OrganisationContact;
 
 use OrganisationContact\Handler\CreateContactHandler;
+use OrganisationContact\Handler\DeleteContactHandler;
 use OrganisationContact\Handler\EditContactHandler;
 use OrganisationContact\Handler\ListContactHandler;
 use OrganisationContact\Handler\ViewContactHandler;
@@ -34,6 +35,12 @@ class RouteDelegator
             '/organisation/{id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}/contact/view/{contact_id:[\d]+}',
             ViewContactHandler::class, ['GET'],
             'contact.view'
+        );
+
+        $app->route(
+            '/organisation/{id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}/contact/delete/{contact_id:[\d]+}[/confirm/{confirm}]',
+            DeleteContactHandler::class, ['GET'],
+            'contact.delete'
         );
 
         $app->get(

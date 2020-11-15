@@ -1,0 +1,54 @@
+<?php
+
+/** @var \OrganisationContact\Entity\Contact $contact */
+$contact = $this->contact;
+
+/** @var \Organisation\Entity\Organisation $organisation */
+$organisation = $contact->getOrganisation();
+
+$this->headTitle('Contacts');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Organisations' => $this->url('organisation.list'),
+    $this->escapeHtml($organisation->getName())  => $this->url('organisation.view', ['id' => $organisation->getUuid()]),
+    'Contacts' => $this->url('contact.list', ['id' => $organisation->getUuid()]),
+    $this->escapeHtml($contact->getFirstName()) . ' ' . $this->escapeHtml($contact->getLastName())
+    => $this->url('contact.delete', ['id' => $organisation->getUuid()]),
+]);
+?>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h1><?= $this->escapeHtml($contact->getOrganisation()->getName()) ?></h1>
+            <div class="alert alert-danger">
+                <h2><i class="fas fa-exclamation-triangle fa-fw"></i> Delete Contact</h2>
+                <p>
+                    Are you sure you want to delete the following
+                    contact:<br>"
+                    <?= $this->escapeHtml($contact->getFirstName()) ?>
+                    <?= $this->escapeHtml($contact->getLastName()) ?>
+                    (<?= $this->escapeHtml($contact->getWorkEmail()) ?>)
+                    "?
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <a class="btn btn-primary" href="<?= $this->url('contact.list', [
+                'id' => $contact->getOrganisation()->getUuid() ]) ?>">
+                No!
+            </a>
+        </div>
+        <div class="col-sm-6 text-right">
+            <a class="btn btn-danger" href="<?= $this->url('contact.delete', [
+                'id' => $organisation->getUuid(),
+                'contact_id' => $contact->getId(),
+                'confirm' => 'true']) ?>">
+                Yes, I know what I am doing!
+            </a>
+        </div>
+    </div>
+</div>
+

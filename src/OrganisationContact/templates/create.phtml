@@ -109,7 +109,8 @@ $this->pageBreadcrumbs()->setItems([
                     <?= $this->formSubmit($form->get('submit')); ?>
 
                     <?php if ($contactId = $this->form->get('id')->getValue()): ?>
-                        <a href="<?= $this->url('contact.edit', ['contact_id' => $contactId]); ?>" class="btn btn-danger">Delete</a>
+                        <a href="<?= $this->url('contact.delete', [ 'id' => $organisation->getUuid(),
+                            'contact_id' => $contactId]); ?>" class="btn btn-danger">Delete</a>
                     <?php endif ?>
                 </div>
             </div>

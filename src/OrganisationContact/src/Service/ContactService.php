@@ -105,4 +105,15 @@ class ContactService
 
         $this->entityManager->flush();
     }
+
+    /**
+     * Remove contact from database
+     *
+     * @param Contact $contact
+     */
+    public function deleteContact(Contact $contact): void
+    {
+        $this->entityManager->remove($contact);
+        $this->entityManager->flush();
+    }
 }
