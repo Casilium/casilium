@@ -9,6 +9,7 @@ $this->headTitle('Contacts');
 $this->pageBreadcrumbs()->setItems([
     'Home' => $this->url('home'),
     $this->escapeHtml($organisation->getName())  => $this->url('organisation.list'),
+    'Contacts' => $this->url('contact.list', ['id' => $organisation->getUuid()]),
     'New Contact' => $this->url('contact.create', ['id' => $organisation->getUuid()]),
 ]);
 ?>
