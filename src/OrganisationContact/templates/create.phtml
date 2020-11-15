@@ -8,7 +8,8 @@ $this->headTitle('Contacts');
 
 $this->pageBreadcrumbs()->setItems([
     'Home' => $this->url('home'),
-    $this->escapeHtml($organisation->getName())  => $this->url('organisation.list'),
+    'Organisations' => $this->url('organisation.list'),
+    $this->escapeHtml($organisation->getName())  => $this->url('organisation.view', ['id' => $organisation->getUuid()]),
     'Contacts' => $this->url('contact.list', ['id' => $organisation->getUuid()]),
     'New Contact' => $this->url('contact.create', ['id' => $organisation->getUuid()]),
 ]);
