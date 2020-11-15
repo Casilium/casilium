@@ -93,7 +93,8 @@
             "Mfa\\": "src/Mfa/src/",
             "Account\\": "src/Account/src",
             "Organisation\\": "src/Organisation/src",
-            "OrganisationSite\\": "src/OrganisationSite/src"
+            "OrganisationSite\\": "src/OrganisationSite/src",
+            "OrganisationContact\\": "src/OrganisationContact/src"
         }
     },
     "autoload-dev": {

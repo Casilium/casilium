@@ -1,0 +1,110 @@
+<?php
+$form = $this->form->prepare();
+
+/** @var \Organisation\Entity\Organisation $organisation */
+$organisation = $this->organisation;
+
+$this->headTitle('Contacts');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    $this->escapeHtml($organisation->getName())  => $this->url('organisation.list'),
+    'New Contact' => $this->url('contact.create', ['id' => $organisation->getUuid()]),
+]);
+?>
+<h1>New Organisation Contact</h1>
+<h2><?= $this->escapeHtml($organisation->getName()) ?></h2>
+<div class="row">
+    <div class="col-sm-6">
+        <div class="widget">
+            <?= $this->form()->openTag($form); ?>
+
+            <div class="row">
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <?= $this->formLabel($form->get('first_name')); ?>
+                        <div class="controls"><?= $this->formInput($form->get('first_name')); ?></div>
+                        <?= $this->formElementErrors($form->get('first_name')); ?>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <?= $this->formLabel($form->get('middle_name')); ?>
+                        <div class="controls"><?= $this->formInput($form->get('middle_name')); ?></div>
+                        <?= $this->formElementErrors($form->get('middle_name')); ?>
+                    </div>
+                </div>
+                <div class="col-sm-4">
+                    <div class="form-group">
+                        <?= $this->formLabel($form->get('last_name')); ?>
+                        <div class="controls"><?= $this->formInput($form->get('last_name')); ?></div>
+                        <?= $this->formElementErrors($form->get('last_name')); ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <?= $this->formLabel($form->get('work_telephone')); ?>
+                        <div class="controls"><?= $this->formInput($form->get('work_telephone')); ?></div>
+                        <?= $this->formElementErrors($form->get('work_telephone')); ?>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <?= $this->formLabel($form->get('work_extension')); ?>
+                        <div class="controls"><?= $this->formInput($form->get('work_extension')); ?></div>
+                        <?= $this->formElementErrors($form->get('work_extension')); ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <?= $this->formLabel($form->get('mobile_telephone')); ?>
+                        <div class="controls"><?= $this->formInput($form->get('mobile_telephone')); ?></div>
+                        <?= $this->formElementErrors($form->get('mobile_telephone')); ?>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <?= $this->formLabel($form->get('home_telephone')); ?>
+                        <div class="controls"><?= $this->formInput($form->get('home_telephone')); ?></div>
+                        <?= $this->formElementErrors($form->get('home_telephone')); ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <?= $this->formLabel($form->get('work_email')); ?>
+                        <div class="controls"><?= $this->formInput($form->get('work_email')); ?></div>
+                        <?= $this->formElementErrors($form->get('work_email')); ?>
+                    </div>
+                </div>
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <?= $this->formLabel($form->get('other_email')); ?>
+                        <div class="controls"><?= $this->formInput($form->get('other_email')); ?></div>
+                        <?= $this->formElementErrors($form->get('other_email')); ?>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-group">
+                <div class="controls">
+                    <?= $this->formHidden($form->get('id')); ?>
+                    <?= $this->formSubmit($form->get('submit')); ?>
+
+                    <?php if ($employeeId = $this->form->get('id')->getValue()): ?>
+                        <a href="<?= $this->url('employee.delete', ['employee_id' => $employeeId]); ?>" class="btn btn-danger">Delete</a>
+                    <?php endif ?>
+                </div>
+            </div>
+            <?= $this->form()->closeTag(); ?>
+        </div>
+    </div>
+</div>

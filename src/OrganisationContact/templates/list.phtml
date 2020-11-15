@@ -1,0 +1,29 @@
+<?php
+    $contacts = $this->contacts;
+    $organisation = $this->organisation;
+
+    $this->headTitle('Contacts');
+
+    $this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    $this->escapeHtml($organisation->getName())  => $this->url('organisation.list'),
+    'Contacts' => $this->url('contact.list', ['id' => $organisation->getUuid()]),
+]);
+?>
+<h1>Contacts</h1>
+<h2><?= $organisation->getName() ?></h2>
+<?php if (! empty($contacts)): ?>
+<div class="list-group">
+    <?php foreach ($contacts as $contact): ?>
+        <div class="list-group-item">
+            <?= $this->escapeHtml($contact->getFirstName()) ?>
+            <?= $this->escapeHtml($contact->getLastName()) ?>
+        </div>
+    <?php endforeach ?>
+</div>
+<?php else: ?>
+    <p class="text-info">
+        No contacts are defined for <?= $this->escapeHtml($organisation->getName()) ?>
+    </p>
+<?php endif ?>
+

@@ -51,6 +51,7 @@ $aggregator = new ConfigAggregator([
 
     // organisation access
     \Organisation\ConfigProvider::class,
+    \OrganisationContact\ConfigProvider::class,
     \OrganisationSite\ConfigProvider::class,
 
     // Swoole config to overwrite some services (if installed)
