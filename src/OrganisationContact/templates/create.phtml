@@ -1,8 +1,15 @@
 <?php
 $form = $this->form->prepare();
 
-/** @var \Organisation\Entity\Organisation $organisation */
-$organisation = $this->organisation;
+if (isset($this->organisation)) {
+
+    /** @var \Organisation\Entity\Organisation $organisation */
+    $organisation = $this->organisation;
+} elseif (isset($this->contact)) {
+    /** @var \OrganisationContact\Entity\Contact $contact */
+    $contact = $this->contact;
+    $organisation = $contact->getOrganisation();
+}
 
 $this->headTitle('Contacts');
 
@@ -101,8 +108,8 @@ $this->pageBreadcrumbs()->setItems([
                     <?= $this->formHidden($form->get('id')); ?>
                     <?= $this->formSubmit($form->get('submit')); ?>
 
-                    <?php if ($employeeId = $this->form->get('id')->getValue()): ?>
-                        <a href="<?= $this->url('employee.delete', ['employee_id' => $employeeId]); ?>" class="btn btn-danger">Delete</a>
+                    <?php if ($contactId = $this->form->get('id')->getValue()): ?>
+                        <a href="<?= $this->url('contact.edit', ['contact_id' => $contactId]); ?>" class="btn btn-danger">Delete</a>
                     <?php endif ?>
                 </div>
             </div>

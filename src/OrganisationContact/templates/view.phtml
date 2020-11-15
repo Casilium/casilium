@@ -1,0 +1,39 @@
+<?php
+
+/** @var \OrganisationContact\Entity\Contact $contact */
+$contact = $this->contact;
+
+/** @var \Organisation\Entity\Organisation $organisation */
+$organisation = $contact->getOrganisation();
+
+$this->headTitle('Contacts');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Organisations' => $this->url('organisation.list'),
+    $this->escapeHtml($organisation->getName())  => $this->url('organisation.view', ['id' => $organisation->getUuid()]),
+    'Contacts' => $this->url('contact.list', ['id' => $organisation->getUuid()]),
+    $this->escapeHtml($contact->getFirstName()) . ' ' . $this->escapeHtml($contact->getLastName())
+    => $this->url('contact.view', ['id' => $organisation->getUuid()]),
+]);
+?>
+<h1><?= $this->escapeHtml($organisation->getName()) ?></h1>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+        <h2>
+            <?= $this->escapeHtml($contact->getFirstName()) ?>
+            <?= $this->escapeHtml($contact->getMiddleName()) ?>
+            <?= $this->escapeHtml($contact->getLastName()) ?>
+        </h2>
+        <p>
+            <?= $this->escapeHtml($contact->getWorkEmail()) ?><br/>
+            <?= $this->escapeHtml($contact->getWorkTelephone()) ?>
+        </p>
+        </div>
+    </div>
+</div>
+<a href="<?= $this->url('contact.edit', ['id' => $organisation->getUuid(), 'contact_id' => $contact->getId()])?>"
+    class="btn btn-primary">
+    Edit
+</a>

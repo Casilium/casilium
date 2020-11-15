@@ -19,8 +19,12 @@
 <div class="list-group">
     <?php foreach ($contacts as $contact): ?>
         <div class="list-group-item">
+            <a href="<?= $this->url('contact.view', [
+                    'id' => $organisation->getUuid(),
+                'contact_id' => $contact->getId()]) ?>">
             <?= $this->escapeHtml($contact->getFirstName()) ?>
             <?= $this->escapeHtml($contact->getLastName()) ?>
+            </a>
         </div>
     <?php endforeach ?>
 </div>
