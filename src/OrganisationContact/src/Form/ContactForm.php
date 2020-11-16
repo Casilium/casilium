@@ -20,7 +20,7 @@ class ContactForm extends Form implements InputFilterProviderInterface
     public function __construct()
     {
         // specify our own form name
-        parent::__construct('employee-form');
+        parent::__construct('contact-form');
 
         // form attributes
         $this->setAttribute('method', 'post');

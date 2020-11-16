@@ -69,5 +69,51 @@ class ContactService
             ->findByCorporationId($id);
     }
 
+    /**
+     * Get contact by id
+     *
+     * @param int $id
+     * @return null|Contact
+     */
+    public function findContactById(int $id): ?Contact
+    {
+        return $this->entityManager->getRepository(Contact::class)
+            ->find($id);
+    }
 
+    /**
+     * Update contact details
+     *
+     * @param Contact $updatedContact
+     */
+    public function updateContact(Contact $updatedContact)
+    {
+        /** @var Contact $currentContactContact */
+        $currentContactContact = $this->entityManager->getRepository(Contact::class)
+            ->find($updatedContact->getId());
+
+        $currentContactContact->setSite($updatedContact->getSite());
+        $currentContactContact->setFirstName($updatedContact->getFirstName());
+        $currentContactContact->setMiddleName($updatedContact->getMiddleName());
+        $currentContactContact->setLastName($updatedContact->getLastName());
+        $currentContactContact->setWorkTelephone($updatedContact->getWorkTelephone());
+        $currentContactContact->setWorkExtension($updatedContact->getWorkExtension());
+        $currentContactContact->setMobileTelephone($updatedContact->getMobileTelephone());
+        $currentContactContact->setHomeTelephone($updatedContact->getHomeTelephone());
+        $currentContactContact->setWorkEmail($updatedContact->getWorkEmail());
+        //$currentContactContact->setGender($updatedContact->getGender());
+
+        $this->entityManager->flush();
+    }
+
+    /**
+     * Remove contact from database
+     *
+     * @param Contact $contact
+     */
+    public function deleteContact(Contact $contact): void
+    {
+        $this->entityManager->remove($contact);
+        $this->entityManager->flush();
+    }
 }

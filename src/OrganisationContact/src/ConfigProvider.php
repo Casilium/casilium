@@ -35,7 +35,10 @@ class ConfigProvider
             ],
             'factories'  => [
                 Handler\CreateContactHandler::class => Handler\Factory\CreateContactHandlerFactory::class,
+                Handler\DeleteContactHandler::class => Handler\Factory\DeleteContactHandlerFactory::class,
+                Handler\EditContactHandler::class => Handler\Factory\EditContactHandlerFactory::class,
                 Handler\ListContactHandler::class => Handler\Factory\ListContactHandlerFactory::class,
+                Handler\ViewContactHandler::class => Handler\Factory\ViewContactHandlerFactory::class,
                 Service\ContactService::class => Service\Factory\ContactServiceFactory::class,
             ],
         ];

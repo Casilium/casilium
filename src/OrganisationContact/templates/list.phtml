@@ -6,18 +6,25 @@
 
     $this->pageBreadcrumbs()->setItems([
     'Home' => $this->url('home'),
-    $this->escapeHtml($organisation->getName())  => $this->url('organisation.list'),
+    'Organisations'  => $this->url('organisation.list'),
+    $this->escapeHtml($organisation->getName())  => $this->url('organisation.view',['id' => $organisation->getUuid()]),
     'Contacts' => $this->url('contact.list', ['id' => $organisation->getUuid()]),
 ]);
 ?>
 <h1>Contacts</h1>
 <h2><?= $organisation->getName() ?></h2>
+<a href="<?= $this->url('contact.create', ['id' => $organisation->getUuid()]) ?>"
+    class="btn btn-primary btn-sm mb-2">New Contact</a>
 <?php if (! empty($contacts)): ?>
 <div class="list-group">
     <?php foreach ($contacts as $contact): ?>
         <div class="list-group-item">
+            <a href="<?= $this->url('contact.view', [
+                    'id' => $organisation->getUuid(),
+                'contact_id' => $contact->getId()]) ?>">
             <?= $this->escapeHtml($contact->getFirstName()) ?>
             <?= $this->escapeHtml($contact->getLastName()) ?>
+            </a>
         </div>
     <?php endforeach ?>
 </div>
@@ -26,4 +33,3 @@
         No contacts are defined for <?= $this->escapeHtml($organisation->getName()) ?>
     </p>
 <?php endif ?>
-
