@@ -18,6 +18,7 @@ class ContactRepository extends EntityRepository
             ->from(Contact::class, 'c')
             ->join(Organisation::class, 'o')
             ->where('c.organisation = :id')
+            ->orderBy('c.first_name')
             ->setParameter('id', $id)
             ->getQuery()
             ->getResult();
