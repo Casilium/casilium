@@ -75,6 +75,9 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
 
     $app->pipe(\User\Middleware\AuthorisationMiddleware::class);
 
+    // AJAX / XMLHttpRequest detection
+    $app->pipe(\App\Middleware\XMLHttpRequestTemplateMiddleware::class);
+
     // Register the dispatch middleware in the middleware pipeline
     $app->pipe(DispatchMiddleware::class);
 

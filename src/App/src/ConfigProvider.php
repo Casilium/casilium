@@ -6,6 +6,7 @@ namespace App;
 
 use ContainerInteropDoctrine\EntityManagerFactory;
 use Doctrine\ORM\EntityManager;
+use Laminas\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 
 /**
@@ -44,6 +45,8 @@ class ConfigProvider
 
                 Handler\HomePageHandler::class => Handler\Factory\HomePageHandlerFactory::class,
                 Handler\AdminPageHandler::class => Handler\Factory\AdminPageHandlerFactory::class,
+
+                Middleware\XMLHttpRequestTemplateMiddleware::class => ReflectionBasedAbstractFactory::class,
             ],
         ];
     }
