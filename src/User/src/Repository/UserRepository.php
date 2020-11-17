@@ -47,4 +47,26 @@ class UserRepository extends EntityRepository
 
         $this->_em->flush();
     }
+
+    /**
+     * @param int $id
+     * @param false $fetchCredentials
+     * @return User|null
+     */
+    public function findUserById(int $id, $fetchCredentials = false): ?User
+    {
+        /** @var User $user */
+       $user = $this->find($id);
+       if (null === $user) {
+           return null;
+       }
+
+       if (false === $fetchCredentials) {
+           $user->setPassword('hidden');
+           $user->setSecretKey('hidden');
+           $user->setPasswordResetToken('hidden');
+       }
+
+       return $user;
+    }
 }

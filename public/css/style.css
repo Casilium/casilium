@@ -14,6 +14,24 @@ h1 {
     h1 {
       font-size: 36px; } }
 
+.ticket-list {
+  margin-bottom: 5px; }
+  .ticket-list .header {
+    background: #666666;
+    font-weight: bold;
+    border-bottom: 1px solid #ffffff; }
+
+.priority .low {
+  background-color: #494c15 !important; }
+.priority .medium {
+  background-color: #1d754b; }
+.priority .high {
+  background-color: #e9a627; }
+.priority .urgent {
+  background-color: #ea6e2d; }
+.priority .critical {
+  background-color: #f13c3c; }
+
 /*!
  * Start Bootstrap - Simple Sidebar (https://startbootstrap.com/template/simple-sidebar)
  * Copyright 2013-2020 Start Bootstrap

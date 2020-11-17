@@ -134,6 +134,19 @@ class SiteManager
             ->findOneBy(['uuid' => $uuid]);
     }
 
+
+    /**
+     * Find site by id
+     *
+     * @param int $id
+     * @return SiteEntity|Object|null
+     */
+    public function fetchSiteById(int $id): ?SiteEntity
+    {
+        return $this->entityManager->getRepository(SiteEntity::class)
+            ->find($id);
+    }
+
     /**
      * Remove site from database
      *

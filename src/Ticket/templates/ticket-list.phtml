@@ -1,0 +1,44 @@
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h1>Ticket List</h1>
+        </div>
+    </div>
+
+    <div class="row ticket-list">
+            <div class="col header">ID</div>
+            <div class="col header">Description</div>
+            <div class="col header">Contact</div>
+            <div class="col header">Status</div>
+            <div class="col header">Priority</div>
+        </div>
+    </div>
+
+    <?php
+    /** @var \Ticket\Entity\Ticket $ticket */
+    foreach ($this->tickets as $ticket): ?>
+
+    <div class="row mb-1">
+        <div class="col">
+            TK:<?= $this->escapehtml($ticket->getId()) ?>
+        </div>
+        <div class="col">
+            <?= $this->escapeHtml($ticket->getShortDescription()) ?>
+        </div>
+        <div class="col">
+            <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>
+            <?= $this->escapeHtml($ticket->getContact()->getLastName()) ?>
+        </div>
+        <div class="col">
+            <?= $this->escapeHtml($ticket->getStatus()->getDescription()) ?>
+        </div>
+        <div class="col priority">
+            <div class="<?= strtolower($this->escapeHtml($ticket->getPriority()->getName())) ?>">
+                <?= $this->escapeHtml($ticket->getPriority()->getName()) ?>
+            </div>
+        </div>
+    </div>
+
+    <?php endforeach; ?>
+
+</div>

@@ -43,4 +43,7 @@ $this->pageBreadcrumbs()->setItems([
     <a class="btn btn-sm btn-info" href="<?= $this->url('contact.list', ['id' => $organisation->getUuid()]) ?>">
         Contacts
     </a>
+    <a class="btn btn-sm btn-info" href="<?= $this->url('ticket.create', ['org_id' => $organisation->getUuid()]) ?>">
+        New Ticket
+    </a>
 </div>

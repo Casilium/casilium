@@ -221,9 +221,9 @@ class SiteEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getStreetAddress2(): string
+    public function getStreetAddress2(): ?string
     {
         return $this->street_address2;
     }
@@ -239,18 +239,18 @@ class SiteEntity
     }
 
     /**
-     * @return string
+     * @return string|null
      */
-    public function getTown(): string
+    public function getTown(): ?string
     {
         return $this->town;
     }
 
     /**
      * @param string $town
-     * @return SiteEntity
+     * @return SiteEntity|null
      */
-    public function setTown(string $town): SiteEntity
+    public function setTown(string $town): ?SiteEntity
     {
         $this->town = $town;
         return $this;
@@ -321,7 +321,7 @@ class SiteEntity
     }
 
     /**
-     * @param Organisation $organisation
+     * @param Organisation|null $organisation
      * @return SiteEntity
      */
     public function setOrganisation(?Organisation $organisation): SiteEntity

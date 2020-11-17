@@ -1,0 +1,148 @@
+<?php
+    $form = $this->form->prepare();
+?>
+<h1><i class="fas fa-ticket-alt"></i> Create New Ticket</h1>
+<?= $this->form()->openTag($form); ?>
+<div class="widget">
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <?= $this->formLabel($form->get('short_description')) ?>
+                <?= $this->formElement($form->get('short_description')) ?>
+                <?= $this->formElementErrors($form->get('short_description')) ?>
+            </div>
+            <div class="form-group">
+                <?= $this->formLabel($form->get('contact_id')) ?>
+                <?= $this->formElement($form->get('contact_id')) ?>
+                <?= $this->formElementErrors($form->get('contact_id')) ?>
+            </div>
+            <div class="form-group">
+                <?= $this->formLabel($form->get('site_id')) ?>
+                <?= $this->formElement($form->get('site_id')) ?>
+                <?= $this->formElementErrors($form->get('site_id')) ?>
+            </div>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('type_id')) ?>
+                <?= $this->formElement($form->get('type_id')) ?>
+                <?= $this->formElementErrors($form->get('type_id')) ?>
+            </div>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('start_date')) ?>
+                <div class="input-group date" id="start_date_picker" data-target-input="nearest">
+                    <?= $this->formElement($form->get('start_date')) ?>
+                    <div class="input-group-append" data-target="#start_date_picker" data-toggle="datetimepicker">
+                        <div class="input-group-text"><i class="fa fa-calendar"></i></div>
+                    </div>
+                </div>
+                <?= $this->formElementErrors($form->get('start_date')) ?>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <?= $this->formLabel($form->get('source')) ?>
+                <?= $this->formElement($form->get('source')) ?>
+                <?= $this->formElementErrors($form->get('source')) ?>
+            </div>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('queue_id')) ?>
+                <?= $this->formElement($form->get('queue_id')) ?>
+                <?= $this->formElementErrors($form->get('queue_id')) ?>
+            </div>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('impact')) ?>
+                <div class="input-group mb-3">
+                    <?= $this->formElement($form->get('impact')) ?>
+                    <div class="input-group-append ml-3 pt-3">
+                        <i class="far fa-question-circle fa-fw" data-toggle="tooltip" title="Impact is a measure of the effect of an incident, problem, or change on business processes. Impact is often based on how service levels will be affected."></i>
+                    </div>
+                </div>
+                <?= $this->formElementErrors($form->get('impact')) ?>
+            </div>
+
+            <div class="form-group">
+                <?= $this->formLabel($form->get('urgency')) ?>
+                <div class="input-group mb-3">
+                    <?= $this->formElement($form->get('urgency')) ?>
+                    <div class="input-group-append ml-3 pt-3">
+                        <i class="far fa-question-circle fa-fw" data-toggle="tooltip" title="Urgency is a measure of how long it will be until an incident, problem, or change has a significant business impact. For example, a high impact incident may have low urgency if the impact will not affect the business until the end of the financial year."></i>
+                    </div>
+                </div>
+                <?= $this->formElementErrors($form->get('urgency')) ?>
+            </div>
+
+            <div class="form-group">
+                <label for="priority">Priority</label>
+                <input id="priority" type="text" readonly="readonly" class="form-control">
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="form-group">
+                <?= $this->formLabel($form->get('long_description')) ?>
+                <?= $this->formElement($form->get('long_description')) ?>
+                <?= $this->formElementErrors($form->get('long_description')) ?>
+            </div>
+            <div class="form-group">
+                <?= $this->formHidden($form->get('id')); ?>
+                <?= $this->formHidden($form->get('agent_id')) ?>
+                <?= $this->formElementErrors($form->get('id')) ?>
+                <?= $this->formSubmit($form->get('submit'))  ?>
+            </div>
+        </div>
+    </div>
+</div>
+
+<?= $this->form()->closeTag(); ?>
+<?php
+$this->inlineScript()->captureStart();
+echo <<<JS
+
+function updatePriority()
+{
+    var priority = [];
+    
+    priority[2] = "Critical";
+    priority[3] = "Urgent";
+    priority[4] = "High";
+    priority[5] = "Medium";
+    priority[6] = "Low";
+    
+    var urgency = parseInt($('#urgency').val()) || 0;
+    var impact = parseInt($('#impact').val()) || 0;
+    
+    var weight = urgency + impact;
+    
+    $('#priority').val(priority[weight]);
+}
+
+$(document).ready(function() {
+    $('#urgency').change(function(){
+        updatePriority()
+    });
+    $('#impact').change(function(){
+        updatePriority()
+    });
+    
+    function toggleStartDate() {
+      if ($('#type_id').val() === "2") {
+          $('#start_date').prop("readonly", true);
+          $('#start_date').val("");
+      } else {
+          $('#start_date').prop("readonly", false);
+      }  
+    }
+    
+    $('#type_id').change(function() {
+      toggleStartDate();
+    });
+    updatePriority();
+    toggleStartDate();
+    
+});
+JS;
+$this->inlineScript()->captureEnd();

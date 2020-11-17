@@ -40,10 +40,7 @@
     "require": {
         "php": "^7.3",
         "roave/psr-container-doctrine": "^2.2",
-        "doctrine/cache": "^1.10",
-        "doctrine/common": "^2.13",
         "doctrine/doctrine-laminas-hydrator": "^2.0",
-        "doctrine/persistence": "^1.3",
         "doctrine/migrations": "^2.2",
         "composer/package-versions-deprecated": "^1.10.99",
         "laminas/laminas-component-installer": "^2.1.2",
@@ -98,7 +95,8 @@
             "Account\\": "src/Account/src",
             "Organisation\\": "src/Organisation/src",
             "OrganisationSite\\": "src/OrganisationSite/src",
-            "OrganisationContact\\": "src/OrganisationContact/src"
+            "OrganisationContact\\": "src/OrganisationContact/src",
+            "Ticket\\": "src/Ticket/src"
         }
     },
     "autoload-dev": {

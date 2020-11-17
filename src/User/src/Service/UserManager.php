@@ -257,4 +257,16 @@ class UserManager
 
         return false;
     }
+
+    /**
+     * Find user by id
+     *
+     * @param int $id
+     * @return User
+     */
+    public function findById(int $id): User
+    {
+        return $this->entityManager->getRepository(User::class)->find($id);
+    }
+
 }

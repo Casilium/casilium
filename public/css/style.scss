@@ -18,6 +18,37 @@ h1 {
   }
 }
 
+.ticket-list {
+  .header {
+    background: #666666;
+    font-weight: bold;
+    border-bottom: 1px solid #ffffff;
+  }
+  margin-bottom: 5px;
+}
+
+.priority {
+  .low {
+    background-color: #494c15 !important;
+  }
+
+  .medium {
+    background-color: #1d754b;
+  }
+
+  .high {
+    background-color: #e9a627;
+  }
+
+  .urgent {
+    background-color: #ea6e2d;
+  }
+
+  .critical {
+    background-color: #f13c3c;
+  }
+}
+
 /*!
  * Start Bootstrap - Simple Sidebar (https://startbootstrap.com/template/simple-sidebar)
  * Copyright 2013-2020 Start Bootstrap
