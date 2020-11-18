@@ -1,8 +1,11 @@
 <?php
+
 namespace User\Validator;
 
 use Laminas\Validator\AbstractValidator;
 use User\Entity\User;
+use function is_array;
+use function is_scalar;
 
 /**
  * This validator class is designed for checking if there is an existing user
@@ -12,11 +15,12 @@ class UserExistsValidator extends AbstractValidator
 {
     /**
      * Available validator options.
+     *
      * @var array
      */
     protected $options = [
         'entityManager' => null,
-        'user' => null
+        'user'          => null,
     ];
 
     // Validation failure message IDs.
@@ -25,18 +29,18 @@ class UserExistsValidator extends AbstractValidator
 
     /**
      * Validation failure messages.
+     *
      * @var array
      */
     protected $messageTemplates = [
         self::NOT_SCALAR  => "The email must be a scalar value",
-        self::USER_EXISTS  => "Another user with such an email already exists"
+        self::USER_EXISTS => "Another user with such an email already exists",
     ];
 
     /**
-     * UserExistsValidator constructor.
      * @param array|null $options
      */
-    public function __construct(array $options = null)
+    public function __construct(?array $options = null)
     {
         // Set filter options (if provided).
         if (is_array($options)) {
@@ -54,8 +58,8 @@ class UserExistsValidator extends AbstractValidator
 
     /**
      * Check if user exists.
+     *
      * @param mixed $value
-     * @return bool
      */
     public function isValid($value): bool
     {
@@ -71,7 +75,7 @@ class UserExistsValidator extends AbstractValidator
             ->findOneByEmail($value);
 
         if ($this->options['user'] == null) {
-            $isValid = ($user == null);
+            $isValid = $user == null;
         } else {
             if ($this->options['user']->getEmail() != $value && $user != null) {
                 $isValid = false;

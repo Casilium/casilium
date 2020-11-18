@@ -5,13 +5,7 @@ namespace User\Handler;
 
 use App\Traits\CsrfTrait;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use User\Entity\Permission;
-use User\Entity\Role;
-use User\Form\RolePermissionsForm;
-use User\Service\RoleManager;
+use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Csrf\CsrfMiddleware;
@@ -19,29 +13,31 @@ use Mezzio\Csrf\SessionCsrfGuard;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use User\Entity\Permission;
+use User\Entity\Role;
+use User\Form\RolePermissionsForm;
+use User\Service\RoleManager;
+use function gettype;
+use function is_array;
+use function sprintf;
 
 class EditRolePermissionsPageHandler implements RequestHandlerInterface
 {
     use CsrfTrait;
 
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     private $helper;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
-    /**
-     * @var RoleManager
-     */
+    /** @var RoleManager */
     private $roleManager;
 
     public function __construct(
@@ -51,14 +47,14 @@ class EditRolePermissionsPageHandler implements RequestHandlerInterface
         UrlHelper $helper
     ) {
         $this->entityManager = $entityManager;
-        $this->roleManager = $roleManager;
-        $this->renderer = $renderer;
-        $this->helper = $helper;
+        $this->roleManager   = $roleManager;
+        $this->renderer      = $renderer;
+        $this->helper        = $helper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $id = (int)$request->getAttribute('id', -1);
+        $id = (int) $request->getAttribute('id', -1);
         if ($id < 1) {
             return new HtmlResponse($this->renderer->render('error::404'), 404);
         }
@@ -80,16 +76,17 @@ class EditRolePermissionsPageHandler implements RequestHandlerInterface
         $guard = $request->getAttribute(CsrfMiddleware::GUARD_ATTRIBUTE);
         $token = $this->getToken($session, $guard);
 
-
         // create form
         $form = new RolePermissionsForm($this->entityManager, $guard);
         /** @var Permission $permission */
         foreach ($allPermissions as $permission) {
-            $label = $permission->getName();
+            $label      = $permission->getName();
             $isDisabled = false;
-            if (isset($effectivePermissions[$permission->getName()])
-                && $effectivePermissions[$permission->getName()] == 'inherited') {
-                $label .= ' (inherited)';
+            if (
+                isset($effectivePermissions[$permission->getName()])
+                && $effectivePermissions[$permission->getName()] == 'inherited'
+            ) {
+                $label     .= ' (inherited)';
                 $isDisabled = true;
             }
             $form->addPermissionField($permission->getName(), $label, $isDisabled);
@@ -100,12 +97,12 @@ class EditRolePermissionsPageHandler implements RequestHandlerInterface
             if ($form->isValid()) {
                 $data = $form->getData();
                 if (! is_array($data)) {
-                    throw new \Exception(sprintf('Expected array return type, got %s', gettype($data)));
+                    throw new Exception(sprintf('Expected array return type, got %s', gettype($data)));
                 }
 
                 $this->roleManager->updateRolePermissions($role, $data);
                 return new RedirectResponse($this->helper->generate('admin.role-view', [
-                    'id' => $role->getId()
+                    'id' => $role->getId(),
                 ]));
             }
 
@@ -121,12 +118,12 @@ class EditRolePermissionsPageHandler implements RequestHandlerInterface
 
         $errors = $form->getMessages();
         return new HtmlResponse($this->renderer->render('role::edit-permissions', [
-            'form' => $form,
-            'role' => $role,
-            'allPermissions' => $allPermissions,
+            'form'                 => $form,
+            'role'                 => $role,
+            'allPermissions'       => $allPermissions,
             'effectivePermissions' => $effectivePermissions,
-            'errors' => $errors,
-            'token' => $token,
+            'errors'               => $errors,
+            'token'                => $token,
         ]));
     }
 }

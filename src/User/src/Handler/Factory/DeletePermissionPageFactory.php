@@ -3,17 +3,18 @@ declare(strict_types=1);
 
 namespace User\Handler\Factory;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mezzio\Helper\UrlHelper;
+use Mezzio\Template\TemplateRendererInterface;
 use Psr\Container\ContainerInterface;
 use User\Handler\DeletePermissionPageHandler;
 use User\Service\PermissionManager;
-use Mezzio\Helper\UrlHelper;
-use Mezzio\Template\TemplateRendererInterface;
 
 class DeletePermissionPageFactory
 {
     public function __invoke(ContainerInterface $container): DeletePermissionPageHandler
     {
-        /** @var \Doctrine\ORM\EntityManagerInterface $em */
+        /** @var EntityManagerInterface $em */
         $em = $container->get('doctrine.entity_manager.orm_default');
 
         /** @var PermissionManager $permissionManager */

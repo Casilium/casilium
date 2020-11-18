@@ -9,12 +9,11 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use function in_array;
 
 class XMLHttpRequestTemplateMiddleware implements MiddlewareInterface
 {
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
     public function __construct(TemplateRendererInterface $renderer)

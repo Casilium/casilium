@@ -1,11 +1,11 @@
 <?php
+
 namespace User\Form;
 
-use Laminas\Filter;
 use Laminas\Form\Element;
 use Laminas\Form\Form;
-use Laminas\Validator;
 use Laminas\InputFilter\InputFilterProviderInterface;
+use Laminas\Validator;
 
 /**
  * This form is used when changing user's password (to collect user's old password
@@ -15,12 +15,12 @@ class PasswordChangeForm extends Form implements InputFilterProviderInterface
 {
     /**
      * There can be two scenarios - 'change' or 'reset'.
+     *
      * @var string
      */
     private $scenario;
 
     /**
-     * Constructor.
      * @param string $scenario Either 'change' or 'reset'.
      */
     public function __construct(string $scenario = 'change')
@@ -43,15 +43,14 @@ class PasswordChangeForm extends Form implements InputFilterProviderInterface
     {
         // If scenario is 'change', we do not ask for old password.
         if ($this->scenario === 'change') {
-
             // add current password field
             $element = new Element\Password('current_password');
             $element->setLabel('Current password');
             $element->setAttributes([
                 'autocomplete' => 'off',
-                'class' => 'form-control',
-                'id' => 'current_password',
-                'placeholder' => 'current password'
+                'class'        => 'form-control',
+                'id'           => 'current_password',
+                'placeholder'  => 'current password',
             ]);
             $this->add($element);
         }
@@ -61,9 +60,9 @@ class PasswordChangeForm extends Form implements InputFilterProviderInterface
         $element->setLabel('New password');
         $element->setAttributes([
             'autocomplete' => 'off',
-            'class' => 'form-control',
-            'id' => 'new_password',
-            'placeholder' => 'new password'
+            'class'        => 'form-control',
+            'id'           => 'new_password',
+            'placeholder'  => 'new password',
         ]);
         $this->add($element);
 
@@ -72,9 +71,9 @@ class PasswordChangeForm extends Form implements InputFilterProviderInterface
         $element->setLabel('confirm new password');
         $element->setAttributes([
             'autocomplete' => 'off',
-            'class' => 'form-control',
-            'id' => 'confirm_new_password',
-            'placeholder' => 'Confirm you password'
+            'class'        => 'form-control',
+            'id'           => 'confirm_new_password',
+            'placeholder'  => 'Confirm you password',
         ]);
         $this->add($element);
 
@@ -83,8 +82,8 @@ class PasswordChangeForm extends Form implements InputFilterProviderInterface
         $element->setLabel('submit')
             ->setValue('Change password')
             ->setAttributes([
-                'id' => 'submit',
-                'class' => 'btn btn-primary'
+                'id'    => 'submit',
+                'class' => 'btn btn-primary',
             ]);
         $this->add($element);
     }
@@ -92,47 +91,46 @@ class PasswordChangeForm extends Form implements InputFilterProviderInterface
     /**
      * This method creates input filter (used for form filtering/validation).
      */
-    public function getInputFilterSpecification() : array
+    public function getInputFilterSpecification(): array
     {
         return [
             [
-                'name' => 'current_password',
-                'required' => true,
+                'name'       => 'current_password',
+                'required'   => true,
                 'validators' => [
                     [
                         'name'    => Validator\StringLength::class,
                         'options' => [
                             'min' => 6,
-                            'max' => 64
+                            'max' => 64,
                         ],
                     ],
                 ],
             ],
             [
-                'name'     => 'new_password',
-                'required' => true,
+                'name'       => 'new_password',
+                'required'   => true,
                 'validators' => [
                     [
                         'name'    => Validator\StringLength::class,
                         'options' => [
                             'min' => 6,
-                            'max' => 64
+                            'max' => 64,
                         ],
                     ],
                 ],
             ],
             [
-                'name'     => 'confirm_new_password',
-                'required' => true,
-                'filters'  => [
-                ],
+                'name'       => 'confirm_new_password',
+                'required'   => true,
+                'filters'    => [],
                 'validators' => [
                     [
                         'name'    => Validator\Identical::class,
                         'options' => [
-                            'token' => 'new_password',
+                            'token'    => 'new_password',
                             'messages' => [
-                                Validator\Identical::NOT_SAME => 'Passwords do not match'
+                                Validator\Identical::NOT_SAME => 'Passwords do not match',
                             ],
                         ],
                     ],

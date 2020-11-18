@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace User\Service\Factory;
 
-use User\Service\RbacManager;
-use User\Service\PermissionManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
+use User\Service\PermissionManager;
+use User\Service\RbacManager;
 
 class PermissionManagerFactory
 {

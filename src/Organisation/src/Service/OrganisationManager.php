@@ -5,47 +5,36 @@ declare(strict_types=1);
 namespace Organisation\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Organisation\Entity\Organisation;
 use Organisation\Entity\OrganisationInterface;
 use Organisation\Exception\OrganisationExistsException;
 use Organisation\Exception\OrganisationNameException;
 use Organisation\Exception\OrganisationNotFoundException;
 use Organisation\Exception\OrganisationSitesExistException;
-use Organisation\Form\OrganisationForm;
 use OrganisationSite\Service\SiteManager;
-use Ramsey\Uuid\Uuid;
+use function strcmp;
 
 class OrganisationManager
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     protected $entityManager;
 
-    /**
-     * @var SiteManager
-     */
+    /** @var SiteManager */
     protected $siteManager;
 
-    /**
-     * OrganisationManager constructor.
-     *
-     * @param EntityManagerInterface $entityManager
-     * @param SiteManager $siteManager
-     */
-    public function __construct(EntityManagerInterface  $entityManager, SiteManager $siteManager)
+    public function __construct(EntityManagerInterface $entityManager, SiteManager $siteManager)
     {
         $this->entityManager = $entityManager;
-        $this->siteManager = $siteManager;
+        $this->siteManager   = $siteManager;
     }
 
     /**
      * Create organisation from object
      *
-     * @param OrganisationInterface $organisation
      * @return Organisation|null
      */
-    public function createOrganisation(OrganisationInterface $organisation) : ?OrganisationInterface
+    public function createOrganisation(OrganisationInterface $organisation): ?OrganisationInterface
     {
         // if organisation exists, throw an exception
         if ($result = $this->findOrganisationByName($organisation->getName())) {
@@ -64,8 +53,7 @@ class OrganisationManager
      * Create organisation from array
      *
      * @param array $data
-     * @return Organisation|null
-     * @throws \Exception
+     * @throws Exception
      */
     public function createOrganisationFromArray(array $data): ?Organisation
     {
@@ -78,11 +66,8 @@ class OrganisationManager
 
     /**
      * Find organisation by name
-     *
-     * @param string $name
-     * @return Organisation|null
      */
-    public function findOrganisationByName(string $name) : ?Organisation
+    public function findOrganisationByName(string $name): ?Organisation
     {
         // find organisation in repository
         $organisation = $this->entityManager->getRepository(Organisation::class)
@@ -100,7 +85,6 @@ class OrganisationManager
     /**
      * Find organisation by id
      *
-     * @param int $id
      * @return Organisation|null|Object
      */
     public function findOrganisationById(int $id): ?Organisation
@@ -111,9 +95,6 @@ class OrganisationManager
 
     /**
      * Find organisation by uuid
-     *
-     * @param string $uuid
-     * @return Organisation|null
      */
     public function findOrganisationByUuid(string $uuid): ?Organisation
     {
@@ -124,11 +105,9 @@ class OrganisationManager
     /**
      * Update organisation from array
      *
-     * @param OrganisationInterface $target
      * @param array $data
-     * @return Organisation
      */
-    public function updateOrganisation(OrganisationInterface  $target, array $data): Organisation
+    public function updateOrganisation(OrganisationInterface $target, array $data): Organisation
     {
         /** @var Organisation $organisation */
         $organisation = $this->entityManager->getRepository(Organisation::class)->find($target->getId());
@@ -145,8 +124,8 @@ class OrganisationManager
         }
 
         $hasChanges = false;
-        $name = $data['name'] ?? null;
-        $is_active = $data['is_active'] ?? null;
+        $name       = $data['name'] ?? null;
+        $is_active  = $data['is_active'] ?? null;
 
         // update organisation name
         if (null !== $name) {
@@ -156,7 +135,7 @@ class OrganisationManager
 
         // update organisation active status
         if (null !== $is_active) {
-            $organisation->setIsActive((int)$is_active);
+            $organisation->setIsActive((int) $is_active);
             $hasChanges = true;
         }
 
@@ -181,8 +160,6 @@ class OrganisationManager
 
     /**
      * Delete an organisation
-     *
-     * @param Organisation $organisation
      */
     public function delete(Organisation $organisation): void
     {

@@ -3,15 +3,14 @@ declare(strict_types=1);
 
 namespace User\Repository;
 
-use User\Entity\User;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query;
+use User\Entity\User;
 
 class UserRepository extends EntityRepository
 {
-    /**
-     * @return \Doctrine\ORM\Query
-     */
     public function findAllUsers(): Query
     {
         $entityManager = $this->getEntityManager();
@@ -26,7 +25,6 @@ class UserRepository extends EntityRepository
     }
 
     /**
-     * @param string $email
      * @return object|null
      */
     public function findOneByEmail(string $email)
@@ -35,9 +33,8 @@ class UserRepository extends EntityRepository
     }
 
     /**
-     * @param User $user
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function save(User $user): void
     {
@@ -49,24 +46,22 @@ class UserRepository extends EntityRepository
     }
 
     /**
-     * @param int $id
      * @param false $fetchCredentials
-     * @return User|null
      */
     public function findUserById(int $id, $fetchCredentials = false): ?User
     {
         /** @var User $user */
-       $user = $this->find($id);
-       if (null === $user) {
-           return null;
-       }
+        $user = $this->find($id);
+        if (null === $user) {
+            return null;
+        }
 
-       if (false === $fetchCredentials) {
-           $user->setPassword('hidden');
-           $user->setSecretKey('hidden');
-           $user->setPasswordResetToken('hidden');
-       }
+        if (false === $fetchCredentials) {
+            $user->setPassword('hidden');
+            $user->setSecretKey('hidden');
+            $user->setPasswordResetToken('hidden');
+        }
 
-       return $user;
+        return $user;
     }
 }

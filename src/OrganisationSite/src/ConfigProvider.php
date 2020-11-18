@@ -6,6 +6,7 @@ namespace OrganisationSite;
 
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Mezzio\Application;
 use OrganisationSite\Service\Factory\SiteManagerFactory;
 use OrganisationSite\Service\SiteManager;
 
@@ -19,12 +20,12 @@ class ConfigProvider
      *
      * @returns array
      */
-    public function __invoke() : array
+    public function __invoke(): array
     {
         return [
-            'dependencies' => $this->getDependencies(),
-            'templates' => $this->getTemplates(),
-            'doctrine' => $this->getDoctrineEntities(),
+            'dependencies'  => $this->getDependencies(),
+            'templates'     => $this->getTemplates(),
+            'doctrine'      => $this->getDoctrineEntities(),
             'access_filter' => $this->getAccessFilter(),
         ];
     }
@@ -34,35 +35,36 @@ class ConfigProvider
      *
      * @return array
      */
-    public function getDependencies() : array
+    public function getDependencies(): array
     {
         return [
             'delegators' => [
-                \Mezzio\Application::class => [
+                Application::class => [
                     RoutesDelegator::class,
                 ],
             ],
-            'factories' => [
-                SiteManager::class => SiteManagerFactory::class,
+            'factories'  => [
+                SiteManager::class               => SiteManagerFactory::class,
                 Handler\CreateSiteHandler::class => Handler\Factory\CreateSiteHandlerFactory::class,
                 Handler\DeleteSiteHandler::class => Handler\Factory\DeleteSiteHandlerFactory::class,
-                Handler\EditSiteHandler::class => Handler\Factory\EditSiteHandlerFactory::class,
-                Handler\ListSiteHandler::class => Handler\Factory\ListSiteHandlerFactory::class,
-                Handler\ViewSiteHandler::class => Handler\Factory\ViewSiteHandlerFactory::class,
+                Handler\EditSiteHandler::class   => Handler\Factory\EditSiteHandlerFactory::class,
+                Handler\ListSiteHandler::class   => Handler\Factory\ListSiteHandlerFactory::class,
+                Handler\ViewSiteHandler::class   => Handler\Factory\ViewSiteHandlerFactory::class,
             ],
         ];
     }
 
     /**
      * Configure doctrine entities
+     *
      * @return array
      */
-    public function getDoctrineEntities() : array
+    public function getDoctrineEntities(): array
     {
         return [
             'driver' => [
-                'orm_default' => [
-                    'class' => MappingDriverChain::class,
+                'orm_default'              => [
+                    'class'   => MappingDriverChain::class,
                     'drivers' => [
                         'OrganisationSite\Entity' => 'organisation_site_entity',
                     ],
@@ -81,12 +83,12 @@ class ConfigProvider
      *
      * @return array
      */
-    public function getAccessFilter() : array
+    public function getAccessFilter(): array
     {
         return [
             'routes' => [
                 'organisation_site' => [
-                    ['allow' => '@']
+                    ['allow' => '@'],
                 ],
             ],
         ];
@@ -97,11 +99,11 @@ class ConfigProvider
      *
      * @returns array
      */
-    public function getTemplates() : array
+    public function getTemplates(): array
     {
         return [
             'paths' => [
-                'site'    => [__DIR__ . '/../templates/'],
+                'site' => [__DIR__ . '/../templates/'],
             ],
         ];
     }

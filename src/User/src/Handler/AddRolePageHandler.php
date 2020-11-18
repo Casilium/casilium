@@ -5,44 +5,39 @@ namespace User\Handler;
 
 use App\Traits\CsrfTrait;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use User\Entity\Role;
-use User\Form\RoleForm;
-use User\Service\RoleManager;
+use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
-use Mezzio\Authentication\UserInterface;
 use Mezzio\Csrf\CsrfMiddleware;
 use Mezzio\Csrf\SessionCsrfGuard;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\Session;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use User\Entity\Role;
+use User\Form\RoleForm;
+use User\Service\RoleManager;
+use function gettype;
+use function is_array;
+use function sprintf;
 
 class AddRolePageHandler implements RequestHandlerInterface
 {
     use CsrfTrait;
 
-    /**
-     * @var \Doctrine\ORM\EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     private $helper;
 
-    /**
-     * @var RoleManager
-     */
+    /** @var RoleManager */
     private $roleManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
     public function __construct(
@@ -52,9 +47,9 @@ class AddRolePageHandler implements RequestHandlerInterface
         UrlHelper $helper
     ) {
         $this->entityManager = $entityManager;
-        $this->roleManager = $roleManager;
-        $this->renderer = $renderer;
-        $this->helper = $helper;
+        $this->roleManager   = $roleManager;
+        $this->renderer      = $renderer;
+        $this->helper        = $helper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -69,7 +64,7 @@ class AddRolePageHandler implements RequestHandlerInterface
         $form = new RoleForm($guard, 'create', $this->entityManager);
 
         $roleList = [];
-        $roles = $this->entityManager->getRepository(Role::class)
+        $roles    = $this->entityManager->getRepository(Role::class)
             ->findBy([], ['name' => 'ASC']);
 
         /** @var Role $role */
@@ -86,7 +81,7 @@ class AddRolePageHandler implements RequestHandlerInterface
             if ($form->isValid()) {
                 $data = $form->getData();
                 if (! is_array($data)) {
-                    throw new \Exception(sprintf('Expected array return type, got %s', gettype($data)));
+                    throw new Exception(sprintf('Expected array return type, got %s', gettype($data)));
                 }
 
                 $this->roleManager->addRole($data);
@@ -98,7 +93,7 @@ class AddRolePageHandler implements RequestHandlerInterface
         }
 
         return new HtmlResponse($this->renderer->render('role::add', [
-            'form' => $form,
+            'form'  => $form,
             'token' => $token,
         ]));
     }

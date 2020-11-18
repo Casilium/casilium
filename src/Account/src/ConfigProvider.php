@@ -19,7 +19,7 @@ class ConfigProvider
      * To add a bit of a structure, each section is defined in a separate
      * method which returns an array with its configuration.
      */
-    public function __invoke() : array
+    public function __invoke(): array
     {
         return [
             'dependencies'  => $this->getDependencies(),
@@ -31,7 +31,7 @@ class ConfigProvider
     /**
      * Returns the container dependencies
      */
-    public function getDependencies() : array
+    public function getDependencies(): array
     {
         return [
             'delegators' => [
@@ -39,10 +39,9 @@ class ConfigProvider
                     RouterDelegator::class,
                 ],
             ],
-            'invokables' => [
-            ],
+            'invokables' => [],
             'factories'  => [
-                Handler\AccountPageHandler::class => Handler\Factory\AccountPageHandlerFactory::class,
+                Handler\AccountPageHandler::class    => Handler\Factory\AccountPageHandlerFactory::class,
                 Handler\ChangePasswordHandler::class => Handler\Factory\ChangePasswordHandlerFactory::class,
             ],
         ];
@@ -51,21 +50,21 @@ class ConfigProvider
     /**
      * Returns the templates configuration
      */
-    public function getTemplates() : array
+    public function getTemplates(): array
     {
         return [
             'paths' => [
-                'account'    => [__DIR__ . '/../templates/'],
+                'account' => [__DIR__ . '/../templates/'],
             ],
         ];
     }
 
-    public function getAccessFilter() : array
+    public function getAccessFilter(): array
     {
         return [
             'routes' => [
                 'account' => [
-                    ['allow' => '@']
+                    ['allow' => '@'],
                 ],
             ],
         ];

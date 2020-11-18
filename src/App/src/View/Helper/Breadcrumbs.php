@@ -4,24 +4,19 @@ declare(strict_types=1);
 namespace App\View\Helper;
 
 use Laminas\View\Helper\AbstractHelper;
+use function count;
 
 /**
  * Breadcrumbs
  *
  * Breadcrumbs view helper to allow breadcrumbs to be defined within views
- *
- * @package App\View\Helper
  */
 class Breadcrumbs extends AbstractHelper
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $items;
 
     /**
-     * Breadcrumbs constructor.
-     *
      * @param array $items
      */
     public function __construct($items = [])
@@ -39,8 +34,6 @@ class Breadcrumbs extends AbstractHelper
 
     /**
      * Renders the breadcrumbs
-     *
-     * @return string
      */
     public function render(): string
     {
@@ -61,7 +54,7 @@ class Breadcrumbs extends AbstractHelper
         // walk through items
         foreach ($this->items as $label => $link) {
             // make the last item inactive
-            $isActive = ($itemNum == $itemCount ? true : false);
+            $isActive = $itemNum == $itemCount ? true : false;
 
             $result .= $this->renderItem($label, $link, $itemNum, $isActive);
 
@@ -75,12 +68,6 @@ class Breadcrumbs extends AbstractHelper
 
     /**
      * Renders an item
-     *
-     * @param string $label
-     * @param string $link
-     * @param int $itemNum
-     * @param bool $isActive
-     * @return string
      */
     public function renderItem(string $label, string $link, int $itemNum, bool $isActive): string
     {

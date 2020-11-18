@@ -3,43 +3,42 @@ declare(strict_types=1);
 
 namespace User\Service;
 
+use Exception;
+use function array_pop;
+use function explode;
+use function implode;
+use function in_array;
+use function is_array;
+use function strpos;
+use function substr;
+
 class AuthManager
 {
     public const ACCESS_GRANTED = 1;
     public const AUTH_REQUIRED  = 2;
     public const ACCESS_DENIED  = 3;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $config;
 
-    /**
-     * @var RbacManager
-     */
+    /** @var RbacManager */
     private $rbacManager;
 
     /**
-     * AuthManager constructor.
-     *
-     * @param RbacManager $rbacManager
      * @param array $config
      */
     public function __construct(RbacManager $rbacManager, array $config)
     {
         $this->rbacManager = $rbacManager;
-        $this->config = $config;
+        $this->config      = $config;
     }
 
     /**
      * Check to see if current user has access to resource
      *
-     * @param string $route
-     * @param string|null $identity
-     * @return int
-     * @throws \Exception
+     * @throws Exception
      */
-    public function filterAccess(string $route, string $identity = null): int
+    public function filterAccess(string $route, ?string $identity = null): int
     {
         $actionName = null;
 
@@ -55,22 +54,22 @@ class AuthManager
 
         $mode = $this->config['options']['mode'] ?? 'restrictive';
         if ($mode !== 'permissive' && $mode !== 'restrictive') {
-            throw new \Exception('Invalid access filter mode (expected either restrictive or permissive');
+            throw new Exception('Invalid access filter mode (expected either restrictive or permissive');
         }
 
         if (isset($this->config['routes'])) {
             $items = $this->config['routes'][$route] ?? [];
 
-
             foreach ($items as $item) {
                 $actionList = $item['actions'] ?? null;
-                $allow = $item['allow'];
+                $allow      = $item['allow'];
 
                 // else if action is specified
-                if ($actionList === '*'
+                if (
+                    $actionList === '*'
                     || $actionList === null
-                    || ((is_array($actionList) && in_array($actionName, $actionList, true))))
-                {
+                    || (is_array($actionList) && in_array($actionName, $actionList, true))
+                ) {
                     if ($allow === '*') {
                         // anyone is allowed
                         return self::ACCESS_GRANTED;
@@ -107,8 +106,8 @@ class AuthManager
                         return self::ACCESS_DENIED;
                     }
 
-                    throw new \Exception('Unexpected value for "allow" expected ' .
-                        'either "?", "@", "@identity" or "+permission');
+                    throw new Exception('Unexpected value for "allow" expected '
+                        . 'either "?", "@", "@identity" or "+permission');
                 }
             }
         }

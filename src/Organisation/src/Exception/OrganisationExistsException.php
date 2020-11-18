@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace Organisation\Exception;
 
-class OrganisationExistsException extends \RuntimeException implements ExceptionInterface
+use RuntimeException;
+use function sprintf;
+
+class OrganisationExistsException extends RuntimeException implements ExceptionInterface
 {
     public static function whenCreating(string $name): self
     {

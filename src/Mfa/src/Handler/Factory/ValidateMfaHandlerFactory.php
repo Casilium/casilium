@@ -4,23 +4,17 @@ declare(strict_types=1);
 namespace Mfa\Handler\Factory;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mfa\Handler;
-use Psr\Container\ContainerInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
+use Mfa\Handler;
+use Psr\Container\ContainerInterface;
 
 /**
  * Displays the MFA form for validation after user login
- *
- * @package Mfa\Handler\Factory
  */
 class ValidateMfaHandlerFactory
 {
-    /**
-     * @param ContainerInterface $container
-     * @return Handler\ValidateMfaHandler
-     */
     public function __invoke(ContainerInterface $container): Handler\ValidateMfaHandler
     {
         // get mfa config

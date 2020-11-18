@@ -6,5 +6,4 @@ namespace OrganisationSite\Exception;
 
 interface ExceptionInterface
 {
-
 }

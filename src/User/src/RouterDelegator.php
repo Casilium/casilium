@@ -4,12 +4,13 @@ declare(strict_types=1);
 
 namespace User;
 
-use Psr\Container\ContainerInterface;
 use Mezzio\Application;
+use Mezzio\Csrf\CsrfMiddleware;
+use Psr\Container\ContainerInterface;
 
 class RouterDelegator
 {
-    public function __invoke(ContainerInterface $container, string $serviceName, callable $callback) : Application
+    public function __invoke(ContainerInterface $container, string $serviceName, callable $callback): Application
     {
         /** @var Application $app */
         $app = $callback();
@@ -18,7 +19,7 @@ class RouterDelegator
         $app->route(
             '/admin/role/add',
             [
-                \Mezzio\Csrf\CsrfMiddleware::class,
+                CsrfMiddleware::class,
                 Handler\AddRolePageHandler::class,
             ],
             ['GET', 'POST'],
@@ -41,7 +42,7 @@ class RouterDelegator
         $app->route(
             '/admin/role/edit/{id}',
             [
-                \Mezzio\Csrf\CsrfMiddleware::class,
+                CsrfMiddleware::class,
                 Handler\EditRolePageHandler::class,
             ],
             ['GET', 'POST'],
@@ -58,13 +59,12 @@ class RouterDelegator
         $app->route(
             '/admin/permission/add',
             [
-                \Mezzio\Csrf\CsrfMiddleware::class,
+                CsrfMiddleware::class,
                 Handler\AddPermissionPageHandler::class,
             ],
             ['GET', 'POST'],
             'admin.permission.create'
         );
-
 
         // Permission :: List
         $app->get(
@@ -82,7 +82,7 @@ class RouterDelegator
         $app->route(
             '/admin/permission/edit/{id}',
             [
-                \Mezzio\Csrf\CsrfMiddleware::class,
+                CsrfMiddleware::class,
                 Handler\EditPermissionPageHandler::class,
             ],
             ['GET', 'POST'],
@@ -98,7 +98,7 @@ class RouterDelegator
         $app->route(
             '/admin/role/{id}/edit-permission',
             [
-                \Mezzio\Csrf\CsrfMiddleware::class,
+                CsrfMiddleware::class,
                 Handler\EditRolePermissionsPageHandler::class,
             ],
             ['GET', 'POST'],
@@ -109,7 +109,7 @@ class RouterDelegator
         $app->route(
             '/admin/user/add',
             [
-                \Mezzio\Csrf\CsrfMiddleware::class,
+                CsrfMiddleware::class,
                 Handler\AddUserPageHandler::class,
             ],
             ['GET', 'POST'],
@@ -120,7 +120,7 @@ class RouterDelegator
         $app->route(
             '/admin/user/edit/{id}',
             [
-                \Mezzio\Csrf\CsrfMiddleware::class,
+                CsrfMiddleware::class,
                 Handler\EditUserPageHandler::class,
             ],
             ['GET', 'POST'],

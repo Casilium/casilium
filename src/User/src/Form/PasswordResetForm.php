@@ -1,19 +1,16 @@
 <?php
+
 namespace User\Form;
 
-use Laminas\Filter;
 use Laminas\Form\Element;
 use Laminas\Form\Form;
-use Laminas\Validator;
+use Laminas\Validator\Hostname;
 
 /**
  * This form is used to collect user's E-mail address (used to recover password).
  */
 class PasswordResetForm extends Form
 {
-    /**
-     * Constructor.
-     */
     public function __construct()
     {
         // Define form name
@@ -34,53 +31,53 @@ class PasswordResetForm extends Form
         $element = new Element\Email('email');
         $element->setLabel('E-Mail')
             ->setAttributes([
-                'id' => 'email',
-                'class' => 'form-control',
+                'id'          => 'email',
+                'class'       => 'form-control',
                 'placeholder' => 'email',
             ]);
         $this->add($element);
 
         // Add the CAPTCHA field
         $this->add([
-            'type' => 'captcha',
-            'name' => 'captcha',
+            'type'    => 'captcha',
+            'name'    => 'captcha',
             'options' => [
-                'label' => 'Human check',
+                'label'   => 'Human check',
                 'captcha' => [
-                    'class' => 'Image',
-                    'imgDir' => 'public/img/captcha',
-                    'suffix' => '.png',
-                    'imgUrl' => '/img/captcha/',
-                    'imgAlt' => 'CAPTCHA Image',
-                    'font' => './data/font/thorne_shaded.ttf',
-                    'fsize' => 24,
-                    'width' => 350,
-                    'height' => 100,
-                    'expiration' => 600,
-                    'dotNoiseLevel' => 40,
-                    'lineNoiseLevel' => 3
+                    'class'          => 'Image',
+                    'imgDir'         => 'public/img/captcha',
+                    'suffix'         => '.png',
+                    'imgUrl'         => '/img/captcha/',
+                    'imgAlt'         => 'CAPTCHA Image',
+                    'font'           => './data/font/thorne_shaded.ttf',
+                    'fsize'          => 24,
+                    'width'          => 350,
+                    'height'         => 100,
+                    'expiration'     => 600,
+                    'dotNoiseLevel'  => 40,
+                    'lineNoiseLevel' => 3,
                 ],
             ],
         ]);
 
         // Add the CSRF field
         $this->add([
-            'type' => 'csrf',
-            'name' => 'csrf',
+            'type'    => 'csrf',
+            'name'    => 'csrf',
             'options' => [
                 'csrf_options' => [
-                    'timeout' => 600
-                ]
+                    'timeout' => 600,
+                ],
             ],
         ]);
 
         // Add the Submit button
         $this->add([
-            'type'  => 'submit',
-            'name' => 'submit',
+            'type'       => 'submit',
+            'name'       => 'submit',
             'attributes' => [
                 'value' => 'Reset Password',
-                'id' => 'submit',
+                'id'    => 'submit',
             ],
         ]);
     }
@@ -95,17 +92,17 @@ class PasswordResetForm extends Form
 
         // Add input for "email" field
         $inputFilter->add([
-            'name'     => 'email',
-            'required' => true,
-            'filters'  => [
+            'name'       => 'email',
+            'required'   => true,
+            'filters'    => [
                 ['name' => 'StringTrim'],
             ],
             'validators' => [
                 [
-                    'name' => 'EmailAddress',
+                    'name'    => 'EmailAddress',
                     'options' => [
-                        'allow' => \Laminas\Validator\Hostname::ALLOW_DNS,
-                        'useMxCheck'    => false,
+                        'allow'      => Hostname::ALLOW_DNS,
+                        'useMxCheck' => false,
                     ],
                 ],
             ],

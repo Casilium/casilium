@@ -3,15 +3,17 @@ declare(strict_types=1);
 
 namespace Ticket\Validator;
 
+use DateTime;
 use Laminas\Validator\AbstractValidator;
+use function is_string;
 
 class DateTimeValidator extends AbstractValidator
 {
-    const NOT_STRING = "notString";
+    const NOT_STRING     = "notString";
     const INVALID_FORMAT = 'invalidForm';
 
     protected $messageTemplates = [
-        self::NOT_STRING => 'Date/Time must be a string',
+        self::NOT_STRING     => 'Date/Time must be a string',
         self::INVALID_FORMAT => 'Date/Time is not an accepted format',
     ];
 
@@ -22,7 +24,7 @@ class DateTimeValidator extends AbstractValidator
             return false;
         }
 
-        if (\DateTime::createFromFormat('Y-m-d H:i:s', $value) !== false) {
+        if (DateTime::createFromFormat('Y-m-d H:i:s', $value) !== false) {
             return true;
         }
 

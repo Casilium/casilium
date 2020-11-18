@@ -20,27 +20,21 @@ use Ticket\Entity\Ticket;
 use Ticket\Form\TicketForm;
 use Ticket\Hydrator\TicketHydrator;
 use Ticket\Service\TicketService;
+use function count;
+use function sprintf;
 
 class CreateTicketHandler implements RequestHandlerInterface
 {
-    /**
-     * @var TicketService
-     */
+    /** @var TicketService */
     protected $ticketService;
 
-    /**
-     * @var TicketHydrator
-     */
+    /** @var TicketHydrator */
     protected $hydrator;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
     public function __construct(
@@ -48,21 +42,20 @@ class CreateTicketHandler implements RequestHandlerInterface
         TicketHydrator $ticketHydrator,
         TemplateRendererInterface $renderer,
         UrlHelper $urlHelper
-    )
-    {
+    ) {
         $this->ticketService = $ticketService;
-        $this->hydrator = $ticketHydrator;
-        $this->renderer = $renderer;
-        $this->urlHelper = $urlHelper;
+        $this->hydrator      = $ticketHydrator;
+        $this->renderer      = $renderer;
+        $this->urlHelper     = $urlHelper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $organisation = $this->ticketService->getOrganisationByUuid($request->getAttribute('org_id'));
 
-        $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
-        $user = $session->get(UserInterface::class);
-        $agent_id = (int)$user['details']['id'];
+        $session  = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
+        $user     = $session->get(UserInterface::class);
+        $agent_id = (int) $user['details']['id'];
 
         $form = new TicketForm();
 
@@ -73,9 +66,9 @@ class CreateTicketHandler implements RequestHandlerInterface
                 /** @var Ticket $ticket */
                 $data = $form->getData();
 
-                $data['agent_id'] = $agent_id;
+                $data['agent_id']        = $agent_id;
                 $data['organisation_id'] = $organisation->getId();
-                $ticket = $this->ticketService->save($data);
+                $ticket                  = $this->ticketService->save($data);
 
                 $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
                 $flashMessages->flash('info', sprintf('Ticket #%s successfully created', $ticket->getId()));

@@ -5,12 +5,7 @@ namespace User\Handler;
 
 use App\Traits\CsrfTrait;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use User\Entity\Role;
-use User\Form\UserForm;
-use User\Service\UserManager;
+use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Csrf\CsrfMiddleware;
@@ -19,29 +14,30 @@ use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\Session;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use User\Entity\Role;
+use User\Form\UserForm;
+use User\Service\UserManager;
+use function gettype;
+use function is_array;
+use function sprintf;
 
 class AddUserPageHandler implements RequestHandlerInterface
 {
     use CsrfTrait;
 
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var UserManager
-     */
+    /** @var UserManager */
     private $userManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     private $urlHelper;
 
     public function __construct(
@@ -51,9 +47,9 @@ class AddUserPageHandler implements RequestHandlerInterface
         UrlHelper $urlHelper
     ) {
         $this->entityManager = $entityManager;
-        $this->userManager = $userManager;
-        $this->renderer = $renderer;
-        $this->urlHelper = $urlHelper;
+        $this->userManager   = $userManager;
+        $this->renderer      = $renderer;
+        $this->urlHelper     = $urlHelper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -84,7 +80,7 @@ class AddUserPageHandler implements RequestHandlerInterface
             if ($form->isValid()) {
                 $data = $form->getData();
                 if (! is_array($data)) {
-                    throw new \Exception(sprintf('Expected array return type, got %s', gettype($data)));
+                    throw new Exception(sprintf('Expected array return type, got %s', gettype($data)));
                 }
 
                 $user = $this->userManager->addUser($data);
@@ -95,7 +91,7 @@ class AddUserPageHandler implements RequestHandlerInterface
         }
 
         return new HtmlResponse($this->renderer->render('user::add', [
-            'form' => $form,
+            'form'  => $form,
             'token' => $token,
         ]));
     }

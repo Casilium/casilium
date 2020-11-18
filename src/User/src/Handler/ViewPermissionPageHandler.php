@@ -4,34 +4,30 @@ declare(strict_types=1);
 namespace User\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Laminas\Diactoros\Response\HtmlResponse;
+use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use User\Entity\Permission;
-use Laminas\Diactoros\Response\HtmlResponse;
-use Mezzio\Template\TemplateRendererInterface;
 
 class ViewPermissionPageHandler implements RequestHandlerInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
     public function __construct(EntityManagerInterface $entityManager, TemplateRendererInterface $renderer)
     {
         $this->entityManager = $entityManager;
-        $this->renderer = $renderer;
+        $this->renderer      = $renderer;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $id = (int)$request->getAttribute('id', -1);
+        $id = (int) $request->getAttribute('id', -1);
         if ($id < 1) {
             return new HtmlResponse($this->renderer->render('error::404'), 404);
         }

@@ -3,10 +3,10 @@ declare(strict_types=1);
 
 namespace User\Service\Factory;
 
-use User\Service\RbacManager;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Container\ContainerInterface;
 use Laminas\Cache\Storage\StorageInterface;
+use Psr\Container\ContainerInterface;
+use User\Service\RbacManager;
 
 class RbacManagerFactory
 {

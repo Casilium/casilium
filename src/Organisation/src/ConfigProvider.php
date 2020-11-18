@@ -10,20 +10,20 @@ use Mezzio\Application;
 
 class ConfigProvider
 {
-    public function __invoke() : array
+    public function __invoke(): array
     {
         return [
-            'dependencies' => $this->getDependencies(),
-            'templates' => $this->getTemplates(),
+            'dependencies'  => $this->getDependencies(),
+            'templates'     => $this->getTemplates(),
             'access_filter' => $this->getAccessFilter(),
-            'doctrine' => $this->getDoctrineConfiguration(),
+            'doctrine'      => $this->getDoctrineConfiguration(),
         ];
     }
 
     /**
      * Returns the container dependencies
      */
-    public function getDependencies() : array
+    public function getDependencies(): array
     {
         return [
             'delegators' => [
@@ -31,16 +31,15 @@ class ConfigProvider
                     RouteDelegator::class,
                 ],
             ],
-            'invokables' => [
-            ],
+            'invokables' => [],
             'factories'  => [
                 Handler\OrganisationCreateHandler::class => Handler\Factory\OrganisationCreateHandlerFactory::class,
-                Handler\OrganisationEditHandler::class => Handler\Factory\OrganisationEditHandlerFactory::class,
-                Handler\OrganisationListHandler::class => Handler\Factory\OrganisationListHandlerFactory::class,
-                Handler\OrganisationReadHandler::class => Handler\Factory\OrganisationReadHandlerFactory::class,
+                Handler\OrganisationEditHandler::class   => Handler\Factory\OrganisationEditHandlerFactory::class,
+                Handler\OrganisationListHandler::class   => Handler\Factory\OrganisationListHandlerFactory::class,
+                Handler\OrganisationReadHandler::class   => Handler\Factory\OrganisationReadHandlerFactory::class,
                 Handler\OrganisationDeleteHandler::class => Handler\Factory\OrganisationDeleteHandlerFactory::class,
-                Service\OrganisationManager::class => Service\Factory\OrganisationManagerFactory::class,
-           ],
+                Service\OrganisationManager::class       => Service\Factory\OrganisationManagerFactory::class,
+            ],
         ];
     }
 
@@ -49,12 +48,12 @@ class ConfigProvider
      *
      * @return array
      */
-    public function getDoctrineConfiguration() : array
+    public function getDoctrineConfiguration(): array
     {
         return [
             'driver' => [
-                'orm_default' => [
-                    'class' => MappingDriverChain::class,
+                'orm_default'         => [
+                    'class'   => MappingDriverChain::class,
                     'drivers' => [
                         'Organisation\Entity' => 'organisation_entity',
                     ],
@@ -73,12 +72,12 @@ class ConfigProvider
      *
      * @return array
      */
-    public function getAccessFilter() : array
+    public function getAccessFilter(): array
     {
         return [
             'routes' => [
                 'organisation' => [
-                    ['allow' => '@']
+                    ['allow' => '@'],
                 ],
             ],
         ];
@@ -87,12 +86,12 @@ class ConfigProvider
     /**
      * Returns the templates configuration
      */
-    public function getTemplates() : array
+    public function getTemplates(): array
     {
         return [
             'paths' => [
                 'organisation' => [
-                    __DIR__ . '/../templates/'
+                    __DIR__ . '/../templates/',
                 ],
             ],
         ];

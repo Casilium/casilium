@@ -10,20 +10,20 @@ use Mezzio\Application;
 
 class ConfigProvider
 {
-    public function __invoke() : array
+    public function __invoke(): array
     {
         return [
-            'dependencies' => $this->getDependencies(),
-            'templates' => $this->getTemplates(),
+            'dependencies'  => $this->getDependencies(),
+            'templates'     => $this->getTemplates(),
             'access_filter' => $this->getAccessFilter(),
-            'doctrine' => $this->getDoctrineConfiguration(),
+            'doctrine'      => $this->getDoctrineConfiguration(),
         ];
     }
 
     /**
      * Returns the container dependencies
      */
-    public function getDependencies() : array
+    public function getDependencies(): array
     {
         return [
             'delegators' => [
@@ -31,15 +31,14 @@ class ConfigProvider
                     RouteDelegator::class,
                 ],
             ],
-            'invokables' => [
-            ],
+            'invokables' => [],
             'factories'  => [
                 Handler\CreateContactHandler::class => Handler\Factory\CreateContactHandlerFactory::class,
                 Handler\DeleteContactHandler::class => Handler\Factory\DeleteContactHandlerFactory::class,
-                Handler\EditContactHandler::class => Handler\Factory\EditContactHandlerFactory::class,
-                Handler\ListContactHandler::class => Handler\Factory\ListContactHandlerFactory::class,
-                Handler\ViewContactHandler::class => Handler\Factory\ViewContactHandlerFactory::class,
-                Service\ContactService::class => Service\Factory\ContactServiceFactory::class,
+                Handler\EditContactHandler::class   => Handler\Factory\EditContactHandlerFactory::class,
+                Handler\ListContactHandler::class   => Handler\Factory\ListContactHandlerFactory::class,
+                Handler\ViewContactHandler::class   => Handler\Factory\ViewContactHandlerFactory::class,
+                Service\ContactService::class       => Service\Factory\ContactServiceFactory::class,
             ],
         ];
     }
@@ -49,12 +48,12 @@ class ConfigProvider
      *
      * @return array
      */
-    public function getDoctrineConfiguration() : array
+    public function getDoctrineConfiguration(): array
     {
         return [
             'driver' => [
-                'orm_default' => [
-                    'class' => MappingDriverChain::class,
+                'orm_default'          => [
+                    'class'   => MappingDriverChain::class,
                     'drivers' => [
                         'OrganisationContact\Entity' => 'organisation_contact',
                     ],
@@ -73,12 +72,12 @@ class ConfigProvider
      *
      * @return array
      */
-    public function getAccessFilter() : array
+    public function getAccessFilter(): array
     {
         return [
             'routes' => [
                 'contact' => [
-                    ['allow' => '@']
+                    ['allow' => '@'],
                 ],
             ],
         ];
@@ -87,12 +86,12 @@ class ConfigProvider
     /**
      * Returns the templates configuration
      */
-    public function getTemplates() : array
+    public function getTemplates(): array
     {
         return [
             'paths' => [
                 'contact' => [
-                    __DIR__ . '/../templates/'
+                    __DIR__ . '/../templates/',
                 ],
             ],
         ];

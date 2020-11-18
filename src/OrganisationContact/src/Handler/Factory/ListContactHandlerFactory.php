@@ -14,9 +14,9 @@ class ListContactHandlerFactory
 {
     public function __invoke(ContainerInterface $container)
     {
-        $service = $container->get(ContactService::class);
+        $service  = $container->get(ContactService::class);
         $renderer = $container->get(TemplateRendererInterface::class);
-        $helper = $container->get(UrlHelper::class);
+        $helper   = $container->get(UrlHelper::class);
 
         return new ListContactHandler($service, $renderer, $helper);
     }

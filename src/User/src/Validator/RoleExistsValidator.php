@@ -1,8 +1,11 @@
 <?php
+
 namespace User\Validator;
 
 use Laminas\Validator\AbstractValidator;
 use User\Entity\Role;
+use function is_array;
+use function is_scalar;
 
 /**
  * This validator class is designed for checking if there is an existing role
@@ -12,11 +15,12 @@ class RoleExistsValidator extends AbstractValidator
 {
     /**
      * Available validator options.
+     *
      * @var array
      */
     protected $options = [
         'entityManager' => null,
-        'role' => null
+        'role'          => null,
     ];
 
     // Validation failure message IDs.
@@ -25,18 +29,18 @@ class RoleExistsValidator extends AbstractValidator
 
     /**
      * Validation failure messages.
+     *
      * @var array
      */
     protected $messageTemplates = [
         self::NOT_SCALAR  => "The email must be a scalar value",
-        self::ROLE_EXISTS  => "Another role with such name already exists"
+        self::ROLE_EXISTS => "Another role with such name already exists",
     ];
 
     /**
-     * RoleExistsValidator constructor.
      * @param array|null $options
      */
-    public function __construct(array $options = null)
+    public function __construct(?array $options = null)
     {
         // Set filter options (if provided).
         if (is_array($options)) {
@@ -54,7 +58,6 @@ class RoleExistsValidator extends AbstractValidator
 
     /**
      * @param mixed $value
-     * @return bool
      */
     public function isValid($value): bool
     {
@@ -70,7 +73,7 @@ class RoleExistsValidator extends AbstractValidator
             ->findOneByName($value);
 
         if ($this->options['role'] == null) {
-            $isValid = ($role == null);
+            $isValid = $role == null;
         } else {
             if ($this->options['role']->getName() != $value && $role != null) {
                 $isValid = false;

@@ -17,12 +17,12 @@ class TicketServiceFactory
 {
     public function __invoke(ContainerInterface $container)
     {
-        $entityManager = $container->get(EntityManager::class);
+        $entityManager       = $container->get(EntityManager::class);
         $organisationManager = $container->get(OrganisationManager::class);
-        $siteManager = $container->get(SiteManager::class);
-        $contactManager = $container->get(ContactService::class);
-        $queueManager = $container->get(QueueManager::class);
-        $userManager = $container->get(UserManager::class);
+        $siteManager         = $container->get(SiteManager::class);
+        $contactManager      = $container->get(ContactService::class);
+        $queueManager        = $container->get(QueueManager::class);
+        $userManager         = $container->get(UserManager::class);
 
         return new TicketService(
             $entityManager,

@@ -14,9 +14,9 @@ class TicketCreateHandlerFactory
     public function __invoke(ContainerInterface $container)
     {
         $ticketService = $container->get(TicketService::class);
-        $hydrator = $container->get(TicketHydrator::class);
-        $renderer = $container->get(TemplateRendererInterface::class);
-        $urlHelper = $container->get(UrlHelper::class);
+        $hydrator      = $container->get(TicketHydrator::class);
+        $renderer      = $container->get(TemplateRendererInterface::class);
+        $urlHelper     = $container->get(UrlHelper::class);
 
         return new CreateTicketHandler($ticketService, $hydrator, $renderer, $urlHelper);
     }

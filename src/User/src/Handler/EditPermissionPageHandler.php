@@ -5,12 +5,7 @@ namespace User\Handler;
 
 use App\Traits\CsrfTrait;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use User\Entity\Permission;
-use User\Form\PermissionForm;
-use User\Service\PermissionManager;
+use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Csrf\CsrfMiddleware;
@@ -18,29 +13,30 @@ use Mezzio\Csrf\SessionCsrfGuard;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use User\Entity\Permission;
+use User\Form\PermissionForm;
+use User\Service\PermissionManager;
+use function gettype;
+use function is_array;
+use function sprintf;
 
 class EditPermissionPageHandler implements RequestHandlerInterface
 {
     use CsrfTrait;
 
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var PermissionManager
-     */
+    /** @var PermissionManager */
     private $permissionManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     private $urlHelper;
 
     public function __construct(
@@ -49,10 +45,10 @@ class EditPermissionPageHandler implements RequestHandlerInterface
         TemplateRendererInterface $renderer,
         UrlHelper $helper
     ) {
-        $this->entityManager = $entityManager;
+        $this->entityManager     = $entityManager;
         $this->permissionManager = $permissionManager;
-        $this->renderer = $renderer;
-        $this->urlHelper = $helper;
+        $this->renderer          = $renderer;
+        $this->urlHelper         = $helper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -76,8 +72,6 @@ class EditPermissionPageHandler implements RequestHandlerInterface
         $guard = $request->getAttribute(CsrfMiddleware::GUARD_ATTRIBUTE);
         $token = $this->getToken($session, $guard);
 
-
-
         $form = new PermissionForm($guard, 'update', $this->entityManager, $permission);
 
         if ($request->getMethod() === 'POST') {
@@ -87,9 +81,8 @@ class EditPermissionPageHandler implements RequestHandlerInterface
                 // get filtered and validated form data
                 $data = $form->getData();
                 if (! is_array($data)) {
-                    throw new \Exception(sprintf('Expected array return type, got %s', gettype($data)));
+                    throw new Exception(sprintf('Expected array return type, got %s', gettype($data)));
                 }
-
 
                 $this->permissionManager->updatePermission($permission, $data);
                 return new RedirectResponse($this->urlHelper->generate('admin.permission.list'));
@@ -98,14 +91,14 @@ class EditPermissionPageHandler implements RequestHandlerInterface
             $token = $this->getToken($session, $guard);
         } else {
             $form->setData([
-                'name' => $permission->getName(),
+                'name'        => $permission->getName(),
                 'description' => $permission->getDescription(),
             ]);
         }
 
         return new HtmlResponse($this->renderer->render('permission::edit', [
-            'token' => $token,
-            'form' => $form,
+            'token'      => $token,
+            'form'       => $form,
             'permission' => $permission,
         ]));
     }

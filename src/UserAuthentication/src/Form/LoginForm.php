@@ -12,9 +12,7 @@ use Mezzio\Csrf\SessionCsrfGuard;
 
 class LoginForm extends Form implements InputFilterProviderInterface
 {
-    /**
-     * @var SessionCsrfGuard
-     */
+    /** @var SessionCsrfGuard */
     private $guard;
 
     public function __construct(SessionCsrfGuard $guard)
@@ -22,20 +20,20 @@ class LoginForm extends Form implements InputFilterProviderInterface
         parent::__construct('login-form');
         $this->guard = $guard;
 
-        $this->addElements();;
+        $this->addElements();
     }
 
     /**
      * Add form elements
      */
-    public function addElements() : void
+    public function addElements(): void
     {
         $element = new Element\Text('username');
         $element->setLabel('Username')
             ->setAttributes([
-                'id' => 'username',
-                'class' => 'form-control',
-                'placeholder' => 'Username',
+                'id'           => 'username',
+                'class'        => 'form-control',
+                'placeholder'  => 'Username',
                 'autocomplete' => 'off',
             ]);
         $this->add($element);
@@ -43,9 +41,9 @@ class LoginForm extends Form implements InputFilterProviderInterface
         $element = new Element\Password('password');
         $element->setLabel('Password')
             ->setAttributes([
-                'id' => 'password',
-                'class' => 'form-control',
-                'placeholder' => 'Password',
+                'id'           => 'password',
+                'class'        => 'form-control',
+                'placeholder'  => 'Password',
                 'autocomplete' => 'off',
             ]);
         $this->add($element);
@@ -61,42 +59,43 @@ class LoginForm extends Form implements InputFilterProviderInterface
 
     /**
      * Define input filter specification
+     *
      * @return array[]
      */
-    public function getInputFilterSpecification() : array
+    public function getInputFilterSpecification(): array
     {
         return [
             [
-                'name' => 'username',
+                'name'     => 'username',
                 'required' => true,
-                'filters' => [
+                'filters'  => [
                     ['name' => Filter\StripTags::class],
                     ['name' => Filter\StringTrim::class],
                 ],
             ],
             [
-                'name' => 'password',
+                'name'     => 'password',
                 'required' => true,
-                'filters' => [
+                'filters'  => [
                     ['name' => Filter\StripTags::class],
                     ['name' => Filter\StringTrim::class],
                 ],
             ],
             [
-                'name' => 'csrf',
-                'required' => true,
+                'name'       => 'csrf',
+                'required'   => true,
                 'validators' => [
                     [
-                        'name' => 'callback',
+                        'name'    => 'callback',
                         'options' => [
                             'callback' => function ($value) {
                                 return $this->guard->validateToken($value);
                             },
                             'messages' => [
-                                'callbackValue' => 'The form submitted did not originate from the expected site'
+                                'callbackValue' => 'The form submitted did not originate from the expected site',
                             ],
                         ],
-                    ]
+                    ],
                 ],
             ],
         ];

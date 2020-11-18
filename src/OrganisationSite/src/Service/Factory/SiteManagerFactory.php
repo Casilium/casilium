@@ -13,7 +13,6 @@ class SiteManagerFactory
     /**
      * Factory for SiteManager
      *
-     * @param ContainerInterface $container
      * @return SiteManager
      */
     public function __invoke(ContainerInterface $container)

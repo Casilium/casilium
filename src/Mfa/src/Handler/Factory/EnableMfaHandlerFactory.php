@@ -4,22 +4,16 @@ declare(strict_types=1);
 namespace Mfa\Handler\Factory;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mfa\Handler;
-use Psr\Container\ContainerInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
+use Mfa\Handler;
+use Psr\Container\ContainerInterface;
 
 /**
  * Displays the form to enable MFA
- *
- * @package Mfa\Handler\Factory
  */
 class EnableMfaHandlerFactory
 {
-    /**
-     * @param ContainerInterface $container
-     * @return Handler\EnableMfaHandler
-     */
     public function __invoke(ContainerInterface $container): Handler\EnableMfaHandler
     {
         // get mfa config

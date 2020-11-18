@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace UserAuthentication\Handler;
 
 use App\Traits\CsrfTrait;
+use Exception;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
@@ -25,19 +26,13 @@ class LoginPageHandler implements MiddlewareInterface
 {
     use CsrfTrait;
 
-    /**
-     * @var $session
-     */
+    /** @var $session */
     protected $session;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $helper;
 
     /** @var StorageInterface */
@@ -46,8 +41,8 @@ class LoginPageHandler implements MiddlewareInterface
     public function __construct(TemplateRendererInterface $renderer, UrlHelper $helper, $cache)
     {
         $this->renderer = $renderer;
-        $this->helper = $helper;
-        $this->cache = $cache;
+        $this->helper   = $helper;
+        $this->cache    = $cache;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
@@ -70,7 +65,7 @@ class LoginPageHandler implements MiddlewareInterface
         $guard = $request->getAttribute(CsrfMiddleware::GUARD_ATTRIBUTE);
         $token = $this->getToken($session, $guard);
 
-        $form = new LoginForm($guard);
+        $form  = new LoginForm($guard);
         $error = null;
         if ('POST' === $request->getMethod()) {
             $form->setData($request->getParsedBody());
@@ -80,15 +75,15 @@ class LoginPageHandler implements MiddlewareInterface
                 if ($response->getStatusCode() !== 302) {
                     $user = $session->get(UserInterface::class);
                     if (null === $user) {
-                        throw new \Exception('User not found during login?');
+                        throw new Exception('User not found during login?');
                     }
 
-                    $status = (int) $user['details']['status'] ?? 0;
-                    $user_id = (int) $user['details']['id'] ?? null;
+                    $status      = (int) $user['details']['status'] ?? 0;
+                    $user_id     = (int) $user['details']['id'] ?? null;
                     $mfa_enabled = (int) $user['details']['mfa_enabled'] ?? 0;
 
                     if ($status === 1) {
-                        if ($mfa_enabled  > 0) {
+                        if ($mfa_enabled > 0) {
                             $this->cache->addItem('auth:cached_user:' . $user_id, $user);
                             $session->unset(UserInterface::class);
                             $session->set('mfa:user:id', $user_id);
@@ -100,10 +95,9 @@ class LoginPageHandler implements MiddlewareInterface
 
                     $session->clear();
                     $error = 'User is not inactive';
-                }  else {
+                } else {
                     $error = 'Invalid username and/or password.';
                 }
-
             }
             // regenerate csrf on failure
             $token = $this->getToken($session, $guard);
@@ -111,9 +105,9 @@ class LoginPageHandler implements MiddlewareInterface
 
         $form->get('csrf')->setValue($token);
         return new HtmlResponse($this->renderer->render('user_auth::login-page', [
-            'form' => $form,
-            'error' => $error,
-            'layout'     => 'layout::clean',
+            'form'   => $form,
+            'error'  => $error,
+            'layout' => 'layout::clean',
         ]));
     }
 }

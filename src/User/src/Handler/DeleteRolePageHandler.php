@@ -4,37 +4,32 @@ declare(strict_types=1);
 namespace User\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
+use Exception;
+use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
+use Mezzio\Helper\UrlHelper;
+use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use User\Entity\Role;
 use User\Service\RoleManager;
-use Laminas\Diactoros\Response\HtmlResponse;
-use Laminas\Diactoros\Response\RedirectResponse;
-use Mezzio\Helper\UrlHelper;
-use Mezzio\Template\TemplateRendererInterface;
+use function array_key_exists;
 
 class DeleteRolePageHandler implements RequestHandlerInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     private $helper;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
-    /**
-     * @var RoleManager
-     */
+    /** @var RoleManager */
     private $roleManager;
 
     public function __construct(
@@ -43,17 +38,15 @@ class DeleteRolePageHandler implements RequestHandlerInterface
         TemplateRendererInterface $renderer,
         UrlHelper $urlHelper
     ) {
-        $this->roleManager = $roleManager;
+        $this->roleManager   = $roleManager;
         $this->entityManager = $entityManager;
-        $this->renderer = $renderer;
-        $this->helper = $urlHelper;
+        $this->renderer      = $renderer;
+        $this->helper        = $urlHelper;
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -71,9 +64,9 @@ class DeleteRolePageHandler implements RequestHandlerInterface
         }
 
         $params = $request->getQueryParams();
-        if (array_key_exists('confirm', $params) && (bool)$params['confirm'] == true) {
+        if (array_key_exists('confirm', $params) && (bool) $params['confirm'] == true) {
             if ($role->getId() == 1) {
-                throw new \Exception('The Administrator role cannot be deleted!');
+                throw new Exception('The Administrator role cannot be deleted!');
             }
 
             $this->roleManager->deleteRole($role);

@@ -6,5 +6,4 @@ namespace OrganisationContact\Exception;
 
 interface ExceptionInterface
 {
-
 }

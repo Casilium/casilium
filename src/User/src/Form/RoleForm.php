@@ -1,11 +1,11 @@
 <?php
+
 namespace User\Form;
 
 use Doctrine\ORM\EntityManagerInterface;
-use User\Entity\Role;
-use Mezzio\Csrf\SessionCsrfGuard;
 use Laminas\Form\Form;
-use Laminas\InputFilter\InputFilter;
+use Mezzio\Csrf\SessionCsrfGuard;
+use User\Entity\Role;
 use User\Validator\RoleExistsValidator;
 
 /**
@@ -13,41 +13,28 @@ use User\Validator\RoleExistsValidator;
  */
 class RoleForm extends Form
 {
-    /**
-     * @var string
-     */
+    /** @var string */
     private $scenario;
 
-    /**
-     * @var EntityManagerInterface|null
-     */
+    /** @var EntityManagerInterface|null */
     private $entityManager;
 
     /** @var SessionCsrfGuard $guard */
     private $guard;
 
-    /**
-     * @var Role|null
-     */
+    /** @var Role|null */
     private $role;
 
-    /**
-     * RoleForm constructor.
-     * @param SessionCsrfGuard $guard
-     * @param string $scenario
-     * @param null|EntityManagerInterface $entityManager
-     * @param Role|null $role
-     */
     public function __construct(
         SessionCsrfGuard $guard,
         string $scenario = 'create',
-        EntityManagerInterface $entityManager = null,
-        Role $role = null
+        ?EntityManagerInterface $entityManager = null,
+        ?Role $role = null
     ) {
-        $this->guard = $guard;
-        $this->scenario = $scenario;
+        $this->guard         = $guard;
+        $this->scenario      = $scenario;
         $this->entityManager = $entityManager;
-        $this->role = $role;
+        $this->role          = $role;
 
         // Define form name
         parent::__construct('role-form');
@@ -66,52 +53,52 @@ class RoleForm extends Form
     {
         // Add "name" field
         $this->add([
-            'type'  => 'text',
-            'name' => 'name',
+            'type'       => 'text',
+            'name'       => 'name',
             'attributes' => [
                 'class' => 'form-control',
-                'id' => 'name',
+                'id'    => 'name',
             ],
-            'options' => [
+            'options'    => [
                 'label' => 'Role Name',
             ],
         ]);
 
         // Add "description" field
         $this->add([
-            'type'  => 'textarea',
-            'name' => 'description',
+            'type'       => 'textarea',
+            'name'       => 'description',
             'attributes' => [
                 'class' => 'form-control',
-                'id' => 'description',
+                'id'    => 'description',
             ],
-            'options' => [
+            'options'    => [
                 'label' => 'Description',
             ],
         ]);
 
         // Add "inherit_roles" field
         $this->add([
-            'type'  => 'select',
-            'name' => 'inherit_roles',
+            'type'       => 'select',
+            'name'       => 'inherit_roles',
             'attributes' => [
-                'class' => 'form-control',
-                'id' => 'inherit_roles',
+                'class'    => 'form-control',
+                'id'       => 'inherit_roles',
                 'multiple' => 'multiple',
             ],
-            'options' => [
-                'label' => 'Optionally inherit permissions from these role(s)'
+            'options'    => [
+                'label' => 'Optionally inherit permissions from these role(s)',
             ],
         ]);
 
         // Add the Submit button
         $this->add([
-            'type'  => 'submit',
-            'name' => 'submit',
+            'type'       => 'submit',
+            'name'       => 'submit',
             'attributes' => [
                 'class' => 'btn btn-primary',
                 'value' => 'Create',
-                'id' => 'submit',
+                'id'    => 'submit',
             ],
         ]);
 
@@ -132,9 +119,9 @@ class RoleForm extends Form
 
         // Add input for "name" field
         $inputFilter->add([
-            'name'     => 'name',
-            'required' => true,
-            'filters'  => [
+            'name'       => 'name',
+            'required'   => true,
+            'filters'    => [
                 ['name' => 'StringTrim'],
             ],
             'validators' => [
@@ -142,14 +129,14 @@ class RoleForm extends Form
                     'name'    => 'StringLength',
                     'options' => [
                         'min' => 1,
-                        'max' => 128
+                        'max' => 128,
                     ],
                 ],
                 [
-                    'name' => RoleExistsValidator::class,
+                    'name'    => RoleExistsValidator::class,
                     'options' => [
                         'entityManager' => $this->entityManager,
-                        'role' => $this->role
+                        'role'          => $this->role,
                     ],
                 ],
             ],
@@ -157,9 +144,9 @@ class RoleForm extends Form
 
         // Add input for "description" field
         $inputFilter->add([
-            'name'     => 'description',
-            'required' => true,
-            'filters'  => [
+            'name'       => 'description',
+            'required'   => true,
+            'filters'    => [
                 ['name' => 'StringTrim'],
             ],
             'validators' => [
@@ -167,40 +154,36 @@ class RoleForm extends Form
                     'name'    => 'StringLength',
                     'options' => [
                         'min' => 0,
-                        'max' => 1024
+                        'max' => 1024,
                     ],
                 ],
             ],
         ]);
 
         $inputFilter->add([
-            'name' => 'csrf',
-            'required' => true,
+            'name'       => 'csrf',
+            'required'   => true,
             'validators' => [
                 [
-                    'name' => 'callback',
+                    'name'    => 'callback',
                     'options' => [
                         'callback' => function ($value) {
                             return $this->guard->validateToken($value);
                         },
                         'messages' => [
-                            'callbackValue' => 'The form submitted did not originate from the expected site'
+                            'callbackValue' => 'The form submitted did not originate from the expected site',
                         ],
                     ],
-                ]
+                ],
             ],
         ]);
 
         // Add input for "inherit_roles" field
         $inputFilter->add([
-            'name'     => 'inherit_roles',
-            'required' => false,
-            'filters'  => [
-
-            ],
-            'validators' => [
-
-            ],
+            'name'       => 'inherit_roles',
+            'required'   => false,
+            'filters'    => [],
+            'validators' => [],
         ]);
     }
 }

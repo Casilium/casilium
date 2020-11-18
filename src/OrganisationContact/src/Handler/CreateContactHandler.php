@@ -17,22 +17,17 @@ use OrganisationContact\Service\ContactService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use function sprintf;
 
 class CreateContactHandler implements RequestHandlerInterface
 {
-    /**
-     * @var ContactService
-     */
+    /** @var ContactService */
     protected $contactService;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
     public function __construct(
@@ -41,8 +36,8 @@ class CreateContactHandler implements RequestHandlerInterface
         UrlHelper $helper
     ) {
         $this->contactService = $service;
-        $this->renderer = $renderer;
-        $this->urlHelper = $helper;
+        $this->renderer       = $renderer;
+        $this->urlHelper      = $helper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -72,8 +67,11 @@ class CreateContactHandler implements RequestHandlerInterface
                 $result = $this->contactService->createContact($contact);
 
                 $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
-                $flashMessages->flash('info', sprintf('Contact "%s %s" created',
-                    $contact->getFirstName(),$contact->getLastName()));
+                $flashMessages->flash('info', sprintf(
+                    'Contact "%s %s" created',
+                    $contact->getFirstName(),
+                    $contact->getLastName()
+                ));
 
                 return new RedirectResponse($this->urlHelper->generate('organisation.list', [
                     'id' => $contact->getOrganisation()->getUuid(),
@@ -81,10 +79,8 @@ class CreateContactHandler implements RequestHandlerInterface
             }
         }
 
-
-
         return new HtmlResponse($this->renderer->render('contact::create', [
-            'form' => $form,
+            'form'         => $form,
             'organisation' => $organisation,
         ]));
     }

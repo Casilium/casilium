@@ -13,9 +13,7 @@ use Ticket\Service\TicketService;
 
 class TicketHydrator extends AbstractHydrator
 {
-    /**
-     * @var TicketService
-     */
+    /** @var TicketService */
     private $ticketService;
 
     public function __construct(TicketService $ticketService)
@@ -54,8 +52,8 @@ class TicketHydrator extends AbstractHydrator
         $object->setStatus($status);
 
         // Get urgency and impact
-        $object->setImpact((int)$data['impact']);
-        $object->setUrgency((int)$data['urgency']);
+        $object->setImpact((int) $data['impact']);
+        $object->setUrgency((int) $data['urgency']);
 
         // Set priority (impact + urgency)
         $priority = new Priority();

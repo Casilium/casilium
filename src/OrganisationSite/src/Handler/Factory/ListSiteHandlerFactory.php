@@ -15,8 +15,8 @@ class ListSiteHandlerFactory
     public function __invoke(ContainerInterface $container)
     {
         $siteManager = $container->get(SiteManager::class);
-        $renderer = $container->get(TemplateRendererInterface::class);
-        $urlHelper = $container->get(UrlHelper::class);
+        $renderer    = $container->get(TemplateRendererInterface::class);
+        $urlHelper   = $container->get(UrlHelper::class);
         return new ListSiteHandler($siteManager, $renderer, $urlHelper);
     }
 }

@@ -11,38 +11,26 @@ use OrganisationContact\Entity\Contact;
 
 class ContactService
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     protected $entityManager;
 
-    /**
-     * @var OrganisationManager
-     */
+    /** @var OrganisationManager */
     protected $organisationService;
 
     public function __construct(EntityManagerInterface $entityManager, OrganisationManager $organisationService)
     {
-        $this->entityManager = $entityManager;
+        $this->entityManager       = $entityManager;
         $this->organisationService = $organisationService;
     }
 
     /**
      * Find organisation by UUID
-     *
-     * @param string $uuid
-     * @return Organisation|null
      */
     public function getOrganisationByUuid(string $uuid): ?Organisation
     {
         return $this->organisationService->findOrganisationByUuid($uuid);
     }
 
-    /**
-     * @param Contact $contact
-     *
-     * @return Contact|null
-     */
     public function createContact(Contact $contact): ?Contact
     {
         // if contact has an id then it already exists
@@ -60,7 +48,6 @@ class ContactService
     /**
      * Fetch contacts for an organisation
      *
-     * @param int $id
      * @return array
      */
     public function fetchContactsByOrganisationId(int $id): ?array
@@ -71,9 +58,6 @@ class ContactService
 
     /**
      * Get contact by id
-     *
-     * @param int $id
-     * @return null|Contact
      */
     public function findContactById(int $id): ?Contact
     {
@@ -83,8 +67,6 @@ class ContactService
 
     /**
      * Update contact details
-     *
-     * @param Contact $updatedContact
      */
     public function updateContact(Contact $updatedContact)
     {
@@ -108,8 +90,6 @@ class ContactService
 
     /**
      * Remove contact from database
-     *
-     * @param Contact $contact
      */
     public function deleteContact(Contact $contact): void
     {

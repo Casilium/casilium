@@ -5,25 +5,20 @@ namespace User\View\Helper;
 
 use Auth\Entity\Identity;
 use Doctrine\ORM\EntityManagerInterface;
-use User\Entity\User;
+use Exception;
 use Laminas\View\Helper\AbstractHelper;
+use User\Entity\User;
+use function array_key_exists;
+use function is_object;
 
 class GetUserNameFromId extends AbstractHelper
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $users = [];
 
-    /**
-     * Identity constructor.
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -31,13 +26,13 @@ class GetUserNameFromId extends AbstractHelper
 
     /**
      * Return this class so methods are accessible from view
+     *
      * @var int $id
      * @return Identity
-     * @throws \Exception
+     * @throws Exception
      */
     public function __invoke(int $id): ?string
     {
-
         if (array_key_exists($id, $this->users)) {
             return $this->users[$id];
         }
@@ -49,7 +44,6 @@ class GetUserNameFromId extends AbstractHelper
             $this->users[$id] = $user->getFullName();
             return $this->users[$id];
         }
-
 
         return null;
     }

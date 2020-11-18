@@ -4,52 +4,35 @@ declare(strict_types=1);
 namespace User\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\EventManager\EventManagerInterface;
 use Mezzio\Authentication\UserInterface;
 use Mezzio\Session\Session;
 use Mezzio\Session\SessionMiddleware;
+use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use User\Entity\User;
-use Laminas\Diactoros\Response\HtmlResponse;
-use Mezzio\Template\TemplateRendererInterface;
-
-use Laminas\EventManager\EventManagerInterface;
 
 class ViewUserPageHandler implements RequestHandlerInterface
 {
-
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
-    /**
-     * @var EventManagerInterface
-     */
+    /** @var EventManagerInterface */
     private $events;
 
-    /**
-     * ViewUserPageHandler constructor.
-     * @param EntityManagerInterface $entityManager
-     * @param TemplateRendererInterface $renderer
-     */
     public function __construct(EntityManagerInterface $entityManager, TemplateRendererInterface $renderer, $events)
     {
         $this->entityManager = $entityManager;
-        $this->renderer = $renderer;
-        $this->events = $events;
+        $this->renderer      = $renderer;
+        $this->events        = $events;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         /** @var Session $session */
@@ -58,7 +41,7 @@ class ViewUserPageHandler implements RequestHandlerInterface
         // get current user to pass to log
         $currentUser = $session->get(UserInterface::class);
 
-        $id = (int)$request->getAttribute('id', -1);
+        $id = (int) $request->getAttribute('id', -1);
         if ($id < 1) {
             return new HtmlResponse($this->renderer->render('error::404'));
         }
@@ -69,9 +52,9 @@ class ViewUserPageHandler implements RequestHandlerInterface
         }
 
         $this->events->trigger('user.view', $this, [
-            'user_id' => $currentUser['details']['id'],
-            'view_user_id' => $user->getId()]
-        );
+            'user_id'      => $currentUser['details']['id'],
+            'view_user_id' => $user->getId(),
+        ]);
 
         return new HtmlResponse($this->renderer->render('user::view', [
             'user' => $user,

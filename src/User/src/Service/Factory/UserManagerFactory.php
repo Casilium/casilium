@@ -4,9 +4,9 @@ declare(strict_types=1);
 namespace User\Service\Factory;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Mezzio\Template\TemplateRendererInterface;
 use Psr\Container\ContainerInterface;
 use User\Service;
-use Mezzio\Template\TemplateRendererInterface;
 
 class UserManagerFactory
 {

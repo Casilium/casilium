@@ -5,11 +5,10 @@ declare(strict_types=1);
 namespace Organisation\Validator;
 
 use Laminas\Validator\AbstractValidator;
+use function preg_match;
 
 /**
  * Class OrganisationNameValidator - does what it says on the tin
- *
- * @package Organisation\Validator
  */
 class OrganisationNameValidator extends AbstractValidator
 {
@@ -23,10 +22,10 @@ class OrganisationNameValidator extends AbstractValidator
 
     /**
      * Validates an organisation name
+     *
      * @param string $value
-     * @return bool
      */
-    public function isValid($value) : bool
+    public function isValid($value): bool
     {
         $this->setValue($value);
 

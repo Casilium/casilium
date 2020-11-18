@@ -4,32 +4,26 @@ declare(strict_types=1);
 
 namespace Organisation\Handler;
 
+use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
+use Mezzio\Helper\UrlHelper;
+use Mezzio\Template\TemplateRendererInterface;
 use Organisation\Exception\OrganisationNotFoundException;
 use Organisation\Form\OrganisationForm;
 use Organisation\Service\OrganisationManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Laminas\Diactoros\Response\HtmlResponse;
-use Laminas\Diactoros\Response\RedirectResponse;
-use Mezzio\Helper\UrlHelper;
-use Mezzio\Template\TemplateRendererInterface;
 
 class OrganisationEditHandler implements RequestHandlerInterface
 {
-    /**
-     * @var OrganisationManager
-     */
+    /** @var OrganisationManager */
     protected $organisationManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
     public function __construct(
@@ -38,8 +32,8 @@ class OrganisationEditHandler implements RequestHandlerInterface
         UrlHelper $urlHelper
     ) {
         $this->organisationManager = $organisationManager;
-        $this->renderer = $renderer;
-        $this->urlHelper = $urlHelper;
+        $this->renderer            = $renderer;
+        $this->urlHelper           = $urlHelper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -76,7 +70,7 @@ class OrganisationEditHandler implements RequestHandlerInterface
 
         return new HtmlResponse($this->renderer->render('organisation::edit', [
             'form' => $form,
-            'id' => $organisation->getUuid(),
+            'id'   => $organisation->getUuid(),
         ]));
     }
 }

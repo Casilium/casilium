@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace App;
 
-use ContainerInteropDoctrine\EntityManagerFactory;
+use containerinteropdoctrine\entitymanagerfactory;
 use Doctrine\ORM\EntityManager;
 use Laminas\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory;
 use Laminas\ServiceManager\Factory\InvokableFactory;
@@ -41,11 +41,9 @@ class ConfigProvider
                 Command\TestCommand::class,
             ],
             'factories'  => [
-                EntityManager::class => EntityManagerFactory::class,
-
-                Handler\HomePageHandler::class => Handler\Factory\HomePageHandlerFactory::class,
-                Handler\AdminPageHandler::class => Handler\Factory\AdminPageHandlerFactory::class,
-
+                EntityManager::class                               => entitymanagerfactory::class,
+                Handler\HomePageHandler::class                     => Handler\Factory\HomePageHandlerFactory::class,
+                Handler\AdminPageHandler::class                    => Handler\Factory\AdminPageHandlerFactory::class,
                 Middleware\XMLHttpRequestTemplateMiddleware::class => ReflectionBasedAbstractFactory::class,
             ],
         ];
@@ -75,10 +73,10 @@ class ConfigProvider
     public function getViewHelperConfig(): array
     {
         return [
-            'factories' => [
+            'factories'  => [
                 View\Helper\Breadcrumbs::class => InvokableFactory::class,
             ],
-            'aliases' => [
+            'aliases'    => [
                 'pageBreadcrumbs' => View\Helper\Breadcrumbs::class,
             ],
             'invokables' => [

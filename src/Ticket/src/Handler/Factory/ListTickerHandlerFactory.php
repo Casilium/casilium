@@ -14,7 +14,7 @@ class ListTickerHandlerFactory
     public function __invoke(ContainerInterface $container)
     {
         $ticketService = $container->get(TicketService::class);
-        $renderer = $container->get(TemplateRendererInterface::class);
+        $renderer      = $container->get(TemplateRendererInterface::class);
 
         return new ListTicketHandler($ticketService, $renderer);
     }

@@ -32,7 +32,7 @@ class AdminPageHandlerFactoryTest extends TestCase
         $this->container->get(TemplateRendererInterface::class)
             ->willReturn($this->prophesize(TemplateRendererInterface::class));
 
-        $factory = new AdminPageHandlerFactory();
+        $factory   = new AdminPageHandlerFactory();
         $adminPage = $factory($this->container->reveal());
 
         $this->assertInstanceOf(AdminPageHandler::class, $adminPage);

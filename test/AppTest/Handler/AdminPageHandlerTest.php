@@ -33,7 +33,7 @@ class AdminPageHandlerTest extends TestCase
             ->willReturn('');
 
         $adminPage = new AdminPageHandler($renderer->reveal());
-        $response = $adminPage->handle($this->prophesize(ServerRequestInterface::class)->reveal());
+        $response  = $adminPage->handle($this->prophesize(ServerRequestInterface::class)->reveal());
 
         self::assertInstanceOf(HtmlResponse::class, $response);
     }

@@ -3,43 +3,31 @@ declare(strict_types=1);
 
 namespace User\Service;
 
-use User\Entity\Role;
-use User\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
+use Exception;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Permissions\Rbac\Rbac;
+use User\Entity\Role;
+use User\Entity\User;
+use function sprintf;
 
 class RbacManager
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     private $assertionManagers = [];
 
-    /**
-     * @var StorageInterface
-     */
+    /** @var StorageInterface */
     private $cache;
 
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var Rbac
-     */
+    /** @var Rbac */
     private $rbac;
 
-    /**
-     * RbacManager constructor.
-     *
-     * @param StorageInterface $cache
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(StorageInterface $cache, EntityManagerInterface $entityManager)
     {
-        $this->cache = $cache;
+        $this->cache         = $cache;
         $this->entityManager = $entityManager;
     }
 
@@ -47,7 +35,6 @@ class RbacManager
      * Initialize the RBAC container
      *
      * @param bool $forceCreate Force creation if already initialized
-     * @return bool
      */
     public function init(bool $forceCreate = false): bool
     {
@@ -61,7 +48,7 @@ class RbacManager
         }
 
         // try to load Rbac container from cache
-        $result = false;
+        $result     = false;
         $this->rbac = $this->cache->getItem('rbac_container', $result);
         if (! $result) {
             $this->rbac = new Rbac();
@@ -93,13 +80,9 @@ class RbacManager
     /**
      * Check if user access access to resource
      *
-     * @param string $identity
-     * @param string $permission
-     * @param string|null $params
-     * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
-    public function isGranted(string $identity, string $permission, string $params = null): bool
+    public function isGranted(string $identity, string $permission, ?string $params = null): bool
     {
         if ($this->rbac === null) {
             $this->init();
@@ -109,7 +92,7 @@ class RbacManager
         $user = $this->entityManager->getRepository(User::class)->findOneByEmail($identity);
 
         if ($user === null) {
-            throw new \Exception(sprintf('No such user "%s"', $identity));
+            throw new Exception(sprintf('No such user "%s"', $identity));
         }
 
         $roles = $user->getRoles();

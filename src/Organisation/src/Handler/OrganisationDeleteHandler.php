@@ -17,19 +17,13 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class OrganisationDeleteHandler implements RequestHandlerInterface
 {
-    /**
-     * @var OrganisationManager
-     */
+    /** @var OrganisationManager */
     protected $organisationManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
     public function __construct(
@@ -38,14 +32,14 @@ class OrganisationDeleteHandler implements RequestHandlerInterface
         UrlHelper $helper
     ) {
         $this->organisationManager = $organisationManager;
-        $this->renderer = $renderer;
-        $this->urlHelper = $helper;
+        $this->renderer            = $renderer;
+        $this->urlHelper           = $helper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // get organisation uuid from url and find organisation
-        $id = $request->getAttribute('id');
+        $id           = $request->getAttribute('id');
         $organisation = $this->organisationManager->findOrganisationByUuid($id);
 
         if ($request->getMethod() === 'POST') {
@@ -61,7 +55,7 @@ class OrganisationDeleteHandler implements RequestHandlerInterface
         }
 
         return new HtmlResponse($this->renderer->render('organisation::delete', [
-            'organisation' => $organisation]
-        ));
+            'organisation' => $organisation,
+        ]));
     }
 }

@@ -1,38 +1,27 @@
 <?php
+
 namespace User\Form;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Mezzio\Csrf\SessionCsrfGuard;
-use Laminas\Form\Form;
 use Laminas\Form\Fieldset;
-use Laminas\InputFilter\InputFilter;
-use Laminas\InputFilter\ArrayInput;
-use User\Validator\PermissionExistsValidator;
+use Laminas\Form\Form;
+use Mezzio\Csrf\SessionCsrfGuard;
 
 /**
  * The form for collecting information about permissions assigned to a role.
  */
 class RolePermissionsForm extends Form
 {
-    /**
-     * @var SessionCsrfGuard
-     */
+    /** @var SessionCsrfGuard */
     private $guard;
 
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * RolePermissionsForm constructor.
-     * @param EntityManagerInterface $entityManager
-     * @param SessionCsrfGuard $guard
-     */
     public function __construct(EntityManagerInterface $entityManager, SessionCsrfGuard $guard)
     {
         $this->entityManager = $entityManager;
-        $this->guard = $guard;
+        $this->guard         = $guard;
 
         // Define form name
         parent::__construct('role-permissions-form');
@@ -55,12 +44,12 @@ class RolePermissionsForm extends Form
 
         // Add the Submit button
         $this->add([
-            'type'  => 'submit',
-            'name' => 'submit',
+            'type'       => 'submit',
+            'name'       => 'submit',
             'attributes' => [
                 'class' => 'btn btn-primary',
                 'value' => 'Save',
-                'id' => 'submit',
+                'id'    => 'submit',
             ],
         ]);
 
@@ -75,24 +64,23 @@ class RolePermissionsForm extends Form
     {
         // Add a permission field
         $this->get('permissions')->add([
-            'type'  => 'checkbox',
-            'name' => $name,
+            'type'       => 'checkbox',
+            'name'       => $name,
             'attributes' => [
-                'class' => 'form-control',
-                'id' => $name,
-                'disabled' => $isDisabled
+                'class'    => 'form-control',
+                'id'       => $name,
+                'disabled' => $isDisabled,
             ],
-            'options' => [
-                'label' => $label
+            'options'    => [
+                'label' => $label,
             ],
         ]);
 
         // Add input
         $this->getInputFilter()->get('permissions')->add([
-            'name'     => $name,
-            'required' => false,
-            'filters'  => [
-            ],
+            'name'       => $name,
+            'required'   => false,
+            'filters'    => [],
             'validators' => [
                 ['name' => 'IsInt'],
             ],
@@ -108,20 +96,20 @@ class RolePermissionsForm extends Form
         $inputFilter = $this->getInputFilter();
 
         $inputFilter->add([
-            'name' => 'csrf',
-            'required' => true,
+            'name'       => 'csrf',
+            'required'   => true,
             'validators' => [
                 [
-                    'name' => 'callback',
+                    'name'    => 'callback',
                     'options' => [
                         'callback' => function ($value) {
                             return $this->guard->validateToken($value);
                         },
                         'messages' => [
-                            'callbackValue' => 'The form submitted did not originate from the expected site'
+                            'callbackValue' => 'The form submitted did not originate from the expected site',
                         ],
                     ],
-                ]
+                ],
             ],
         ]);
     }

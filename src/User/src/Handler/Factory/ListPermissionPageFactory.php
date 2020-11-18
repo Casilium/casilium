@@ -3,15 +3,16 @@ declare(strict_types=1);
 
 namespace User\Handler\Factory;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Mezzio\Template\TemplateRendererInterface;
 use Psr\Container\ContainerInterface;
 use User\Handler\ListPermissionPageHandler;
-use Mezzio\Template\TemplateRendererInterface;
 
 class ListPermissionPageFactory
 {
     public function __invoke(ContainerInterface $container): ListPermissionPageHandler
     {
-        /** @var \Doctrine\ORM\EntityManagerInterface $em */
+        /** @var EntityManagerInterface $em */
         $em = $container->get('doctrine.entity_manager.orm_default');
 
         /** @var TemplateRendererInterface $render */

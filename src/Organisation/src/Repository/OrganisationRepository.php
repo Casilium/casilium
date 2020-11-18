@@ -3,14 +3,13 @@ declare(strict_types=1);
 
 namespace Organisation\Repository;
 
-use Organisation\Entity\Organisation;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
-use Ramsey\Uuid\Uuid;
+use Organisation\Entity\Organisation;
 
 class OrganisationRepository extends EntityRepository
 {
-    public function findOneByUuid(string $uuid) : ?Organisation
+    public function findOneByUuid(string $uuid): ?Organisation
     {
         $organisation = $this->getEntityManager()->createQueryBuilder()
             ->select('o')

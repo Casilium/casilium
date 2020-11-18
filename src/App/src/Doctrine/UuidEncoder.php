@@ -5,20 +5,24 @@ declare(strict_types=1);
 namespace App\Doctrine;
 
 use Ramsey\Uuid\UuidInterface;
+use Throwable;
+use function array_reduce;
+use function str_pad;
+use function str_replace;
+use function substr_replace;
+use const STR_PAD_LEFT;
 
 /**
  * Class UuidEncoder used for encoding uuid to make user friendly URL
+ *
  * @see https://medium.com/@galopintitouan/auto-increment-is-the-devil-using-uuids-in-symfony-and-doctrine-71763721b9a9
- * @package App\Doctrine
  */
 class UuidEncoder
 {
     /**
      * Encode uuid to friendly
-     * @param UuidInterface $uuid
-     * @return string
      */
-    public function encode(UuidInterface $uuid) : string
+    public function encode(UuidInterface $uuid): string
     {
         return gmp_strval(
             gmp_init(
@@ -31,8 +35,6 @@ class UuidEncoder
 
     /**
      * Decode from friendly to uuid
-     * @param string $encoded
-     * @return UuidInterface|null
      */
     public function decode(string $encoded): ?UuidInterface
     {
@@ -52,7 +54,7 @@ class UuidEncoder
                     STR_PAD_LEFT
                 )
             ));
-        } catch (\Throwable $e) {
+        } catch (Throwable $e) {
             return null;
         }
     }

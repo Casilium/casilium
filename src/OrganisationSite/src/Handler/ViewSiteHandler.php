@@ -15,45 +15,29 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class ViewSiteHandler implements RequestHandlerInterface
 {
-    /**
-     * @var SiteManager
-     */
+    /** @var SiteManager */
     protected $siteManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
-    /**
-     * ViewSiteHandler constructor.
-     *
-     * @param SiteManager $siteManager
-     * @param TemplateRendererInterface $renderer
-     * @param UrlHelper $urlHelper
-     */
     public function __construct(SiteManager $siteManager, TemplateRendererInterface $renderer, UrlHelper $urlHelper)
     {
         $this->siteManager = $siteManager;
-        $this->renderer = $renderer;
-        $this->urlHelper = $urlHelper;
+        $this->renderer    = $renderer;
+        $this->urlHelper   = $urlHelper;
     }
 
     /**
      * Render HTML
-     *
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $siteId = $request->getAttribute('id');
-        $site = $this->siteManager->fetchSiteByUuid($siteId);
+        $site   = $this->siteManager->fetchSiteByUuid($siteId);
         if (null === $site) {
             throw SiteNotFoundException::whenSearchingByUuid($siteId);
         }

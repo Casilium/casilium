@@ -4,17 +4,17 @@ declare(strict_types=1);
 
 namespace Organisation;
 
+use Mezzio\Application;
 use Organisation\Handler\OrganisationCreateHandler;
 use Organisation\Handler\OrganisationDeleteHandler;
 use Organisation\Handler\OrganisationEditHandler;
 use Organisation\Handler\OrganisationListHandler;
 use Organisation\Handler\OrganisationReadHandler;
 use Psr\Container\ContainerInterface;
-use Mezzio\Application;
 
 class RouteDelegator
 {
-    public function __invoke(ContainerInterface $container, string $serviceName, callable $callback) : Application
+    public function __invoke(ContainerInterface $container, string $serviceName, callable $callback): Application
     {
         /** @var Application $app */
         $app = $callback();
@@ -45,7 +45,8 @@ class RouteDelegator
             'organisation.view'
         );
 
-        $app->route('/organisation/delete/{id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}[/]',
+        $app->route(
+            '/organisation/delete/{id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}[/]',
             OrganisationDeleteHandler::class,
             ['GET', 'POST'],
             'organisation.delete'

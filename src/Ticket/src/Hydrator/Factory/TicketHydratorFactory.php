@@ -15,5 +15,4 @@ class TicketHydratorFactory
         $ticketService = $container->get(TicketService::class);
         return new TicketHydrator($ticketService);
     }
-
 }

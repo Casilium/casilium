@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace User\Exception;
 
-class PasswordMismatchException extends \RuntimeException implements ExceptionInterface
+use RuntimeException;
+use function sprintf;
+
+class PasswordMismatchException extends RuntimeException implements ExceptionInterface
 {
     public static function whenVerifying(): self
     {

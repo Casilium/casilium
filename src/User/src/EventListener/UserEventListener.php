@@ -17,7 +17,7 @@ class UserEventListener
 
     public function onViewUser(Event $event)
     {
-        $name = $event->getName();
+        $name   = $event->getName();
         $target = $event->getTarget();
         $params = $event->getParams();
     }

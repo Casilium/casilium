@@ -4,45 +4,40 @@ declare(strict_types=1);
 namespace User\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\OptimisticLockException;
+use Doctrine\ORM\ORMException;
+use Exception;
 use User\Entity\Permission;
 use User\Entity\Role;
+use function count;
+use function date;
 
 class RoleManager
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var RbacManager
-     */
+    /** @var RbacManager */
     private $rbacManager;
 
-    /**
-     * RoleManager constructor.
-     *
-     * @param EntityManagerInterface $entityManager
-     * @param RbacManager $rbacManager
-     */
     public function __construct(EntityManagerInterface $entityManager, RbacManager $rbacManager)
     {
         $this->entityManager = $entityManager;
-        $this->rbacManager = $rbacManager;
+        $this->rbacManager   = $rbacManager;
     }
 
     /**
      * Add new role to database
      *
      * @param array $data
-     * @throws \Exception
+     * @throws Exception
      */
     public function addRole(array $data): void
     {
         $existingRole = $this->entityManager->getRepository(Role::class)
             ->findOneByName($data['name']);
         if ($existingRole != null) {
-            throw new \Exception('Role with such name already exists');
+            throw new Exception('Role with such name already exists');
         }
 
         $role = new Role();
@@ -58,7 +53,7 @@ class RoleManager
                     ->findOneById($roleId);
 
                 if ($parentRole === null) {
-                    throw new \Exception('Role to inherit not found');
+                    throw new Exception('Role to inherit not found');
                 }
 
                 if (! $role->getParentRoles()->contains($parentRole)) {
@@ -77,10 +72,9 @@ class RoleManager
     /**
      * Update an existing role
      *
-     * @param Role $role
      * @param array $data
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function updateRole(Role $role, array $data): void
     {
@@ -88,7 +82,7 @@ class RoleManager
             ->findOneByName($data['name']);
 
         if ($existingRole !== null && $existingRole !== $role) {
-            throw new \Exception('Another role with such name already exists');
+            throw new Exception('Another role with such name already exists');
         }
 
         $role->setName($data['name']);
@@ -105,7 +99,7 @@ class RoleManager
                     ->findOneById($roleId);
 
                 if ($parentRole == null) {
-                    throw new \Exception('Role to inherit not found');
+                    throw new Exception('Role to inherit not found');
                 }
 
                 if (! $role->getParentRoles()->contains($parentRole)) {
@@ -123,9 +117,8 @@ class RoleManager
     /**
      * Delete a role from DB
      *
-     * @param Role $role
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function deleteRole(Role $role): void
     {
@@ -137,7 +130,6 @@ class RoleManager
     /**
      * Retrieves all the permissions from the given role and its child roles
      *
-     * @param Role $role
      * @return array
      */
     public function getEffectivePermissions(Role $role): array
@@ -161,10 +153,9 @@ class RoleManager
     }
 
     /**
-     * @param Role $role
      * @param array $data
-     * @throws \Doctrine\ORM\ORMException
-     * @throws \Doctrine\ORM\OptimisticLockException
+     * @throws ORMException
+     * @throws OptimisticLockException
      */
     public function updateRolePermissions(Role $role, array $data): void
     {
@@ -179,7 +170,7 @@ class RoleManager
 
             $permission = $this->entityManager->getRepository(Permission::class)->findOneByName($name);
             if ($permission == null) {
-                throw new \Exception('Permission with such name does not exist');
+                throw new Exception('Permission with such name does not exist');
             }
 
             $role->getPermissions()->add($permission);

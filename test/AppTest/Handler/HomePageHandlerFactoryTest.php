@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace AppTest\Handler;
 
-use App\Handler\HomePageHandler;
 use App\Handler\Factory\HomePageHandlerFactory;
+use App\Handler\HomePageHandler;
 use Mezzio\Template\TemplateRendererInterface;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -18,7 +18,6 @@ class HomePageHandlerFactoryTest extends TestCase
 
     /** @var ContainerInterface|ObjectProphecy */
     protected $container;
-
 
     protected $renderer;
 

@@ -16,19 +16,13 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class ListContactHandler implements RequestHandlerInterface
 {
-    /**
-     * @var ContactService
-     */
+    /** @var ContactService */
     protected $contactService;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
     public function __construct(
@@ -37,8 +31,8 @@ class ListContactHandler implements RequestHandlerInterface
         UrlHelper $helper
     ) {
         $this->contactService = $service;
-        $this->renderer = $renderer;
-        $this->urlHelper = $helper;
+        $this->renderer       = $renderer;
+        $this->urlHelper      = $helper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -55,9 +49,8 @@ class ListContactHandler implements RequestHandlerInterface
         $contacts = $this->contactService->fetchContactsByOrganisationId($organisation->getId());
 
         return new HtmlResponse($this->renderer->render('contact::list', [
-            'contacts' => $contacts,
+            'contacts'     => $contacts,
             'organisation' => $organisation,
         ]));
     }
-
 }

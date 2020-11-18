@@ -5,61 +5,51 @@ namespace Mfa\Handler;
 
 use App\Traits\CsrfTrait;
 use Doctrine\ORM\EntityManagerInterface;
-use Mezzio\Flash\FlashMessageMiddleware;
-use Mezzio\Flash\FlashMessagesInterface;
-use Mfa\Form\GoogleMfaForm;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use User\Entity\User;
+use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Authentication\UserInterface;
 use Mezzio\Csrf\CsrfMiddleware;
+use Mezzio\Flash\FlashMessageMiddleware;
+use Mezzio\Flash\FlashMessagesInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\Session;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
+use Mfa\Form\GoogleMfaForm;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 use Sonata\GoogleAuthenticator\GoogleAuthenticator;
 use Sonata\GoogleAuthenticator\GoogleQrUrl;
+use User\Entity\User;
+use function array_key_exists;
+use function gettype;
+use function is_array;
+use function sprintf;
 
 /**
  * Enable MFA Handler
  *
  * Used to allow the user to enable MFA, displays form/qr-code and verifies validation code
- *
- * @package Mfa\Handler
  */
 class EnableMfaHandler implements RequestHandlerInterface
 {
     use CsrfTrait;
 
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     private $helper;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     private $config;
 
     /**
-     * EnableMfaHandler constructor.
-     *
-     * @param EntityManagerInterface $entityManager
-     * @param TemplateRendererInterface $renderer
-     * @param UrlHelper $helper
      * @param array $config
      */
     public function __construct(
@@ -69,19 +59,17 @@ class EnableMfaHandler implements RequestHandlerInterface
         array $config
     ) {
         $this->entityManager = $entityManager;
-        $this->renderer = $renderer;
-        $this->helper = $helper;
-        $this->config = $config;
+        $this->renderer      = $renderer;
+        $this->helper        = $helper;
+        $this->config        = $config;
 
         if (! array_key_exists('issuer', $this->config)) {
-            throw new \Exception('mfa issuer key not found in configuration');
+            throw new Exception('mfa issuer key not found in configuration');
         }
     }
 
     /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     * @throws \Exception
+     * @throws Exception
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -103,13 +91,13 @@ class EnableMfaHandler implements RequestHandlerInterface
         // get user id
         $user_id = $user['details']['id'] ?? null;
         if (! $user_id) {
-            throw new \Exception('User ID not found');
+            throw new Exception('User ID not found');
         }
 
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->find($user_id);
         if ($user == null) {
-            throw new \Exception('User not found');
+            throw new Exception('User not found');
         }
 
         // retrieve users stored secret key
@@ -124,7 +112,7 @@ class EnableMfaHandler implements RequestHandlerInterface
         }
 
         $error = null;
-        $form = new GoogleMfaForm($guard);
+        $form  = new GoogleMfaForm($guard);
 
         if ($request->getMethod() === 'POST') {
             // populate form from POST vars
@@ -133,13 +121,13 @@ class EnableMfaHandler implements RequestHandlerInterface
                 // grab form data
                 $data = $form->getData();
                 if (! is_array($data)) {
-                    throw new \Exception(sprintf(
+                    throw new Exception(sprintf(
                         'Expected return type from form was array, got %s',
                         gettype($data)
                     ));
                 }
                 $secret_key = $data['secret_key'];
-                $pin = $data['pin'];
+                $pin        = $data['pin'];
 
                 $authenticator = new GoogleAuthenticator();
                 // verify code

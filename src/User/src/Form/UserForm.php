@@ -1,14 +1,15 @@
 <?php
+
 namespace User\Form;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
-use User\Entity\User;
-use Mezzio\Csrf\SessionCsrfGuard;
 use Laminas\Form\Form;
-use Laminas\Form\Fieldset;
-use Laminas\InputFilter\InputFilter;
-use Laminas\Validator;
 use Laminas\InputFilter\ArrayInput;
+use Laminas\Validator;
+use Laminas\Validator\Hostname;
+use Mezzio\Csrf\SessionCsrfGuard;
+use User\Entity\User;
 use User\Validator\UserExistsValidator;
 
 /**
@@ -18,37 +19,36 @@ use User\Validator\UserExistsValidator;
  */
 class UserForm extends Form
 {
-    /**
-     * @var SessionCsrfGuard
-     */
+    /** @var SessionCsrfGuard */
     private $guard;
 
     /**
      * Entity manager.
-     * @var \Doctrine\ORM\EntityManager
+     *
+     * @var EntityManager
      */
-    private $entityManager = null;
+    private $entityManager;
 
     /**
      * Scenario ('create' or 'update').
+     *
      * @var string
      */
     private $scenario;
 
     /**
      * Current user.
-     * @var \User\Entity\User
+     *
+     * @var User
      */
-    private $user = null;
-
+    private $user;
 
     public function __construct(
         SessionCsrfGuard $guard,
         string $scenario = 'create',
-        EntityManagerInterface $entityManager = null,
-        User $user = null
+        ?EntityManagerInterface $entityManager = null,
+        ?User $user = null
     ) {
-
         // Define form name
         parent::__construct('user-form');
 
@@ -56,10 +56,10 @@ class UserForm extends Form
         $this->setAttribute('method', 'post');
 
         // Save parameters for internal use.
-        $this->scenario = $scenario;
+        $this->scenario      = $scenario;
         $this->entityManager = $entityManager;
-        $this->user = $user;
-        $this->guard = $guard;
+        $this->user          = $user;
+        $this->guard         = $guard;
 
         $this->addElements();
         $this->addInputFilter();
@@ -72,24 +72,24 @@ class UserForm extends Form
     {
         // Add "email" field
         $this->add([
-            'type'  => 'text',
-            'name' => 'email',
+            'type'       => 'text',
+            'name'       => 'email',
             'attributes' => [
                 'class' => 'form-control',
             ],
-            'options' => [
+            'options'    => [
                 'label' => 'E-mail',
             ],
         ]);
 
         // Add "full_name" field
         $this->add([
-            'type'  => 'text',
-            'name' => 'full_name',
+            'type'       => 'text',
+            'name'       => 'full_name',
             'attributes' => [
                 'class' => 'form-control',
             ],
-            'options' => [
+            'options'    => [
                 'label' => 'Full Name',
             ],
         ]);
@@ -97,26 +97,26 @@ class UserForm extends Form
         if ($this->scenario == 'create') {
             // Add "password" field
             $this->add([
-                'type'  => 'password',
-                'name' => 'password',
+                'type'       => 'password',
+                'name'       => 'password',
                 'attributes' => [
-                    'id' => 'password',
+                    'id'    => 'password',
                     'class' => 'form-control',
                 ],
-                'options' => [
+                'options'    => [
                     'label' => 'Password',
                 ],
             ]);
 
             // Add "confirm_password" field
             $this->add([
-                'type'  => 'password',
-                'name' => 'confirm_password',
+                'type'       => 'password',
+                'name'       => 'confirm_password',
                 'attributes' => [
-                    'id' => 'confirm_password',
+                    'id'    => 'confirm_password',
                     'class' => 'form-control',
                 ],
-                'options' => [
+                'options'    => [
                     'label' => 'Confirm password',
                 ],
             ]);
@@ -124,40 +124,40 @@ class UserForm extends Form
 
         // Add "status" field
         $this->add([
-            'type'  => 'select',
-            'name' => 'status',
+            'type'       => 'select',
+            'name'       => 'status',
             'attributes' => [
                 'class' => 'form-control',
             ],
-            'options' => [
-                'label' => 'Status',
+            'options'    => [
+                'label'         => 'Status',
                 'value_options' => [
                     1 => 'Active',
                     2 => 'Retired',
-                ]
+                ],
             ],
         ]);
 
         // Add "roles" field
         $this->add([
-            'type'  => 'select',
-            'name' => 'roles',
+            'type'       => 'select',
+            'name'       => 'roles',
             'attributes' => [
-                'class' => 'form-control',
+                'class'    => 'form-control',
                 'multiple' => 'multiple',
             ],
-            'options' => [
+            'options'    => [
                 'label' => 'Role(s)',
             ],
         ]);
 
         $this->add([
-            'type' => 'checkbox',
-            'name' => 'mfa_enabled',
+            'type'    => 'checkbox',
+            'name'    => 'mfa_enabled',
             'options' => [
-                'label' => 'MFA Enabled',
-                'checked_value' => 1,
-                'unchecked_value' => 0,
+                'label'              => 'MFA Enabled',
+                'checked_value'      => 1,
+                'unchecked_value'    => 0,
                 'use_hidden_element' => true,
             ],
         ]);
@@ -170,11 +170,11 @@ class UserForm extends Form
 
         // Add the Submit button
         $this->add([
-            'type'  => 'submit',
-            'name' => 'submit',
+            'type'       => 'submit',
+            'name'       => 'submit',
             'attributes' => [
                 'class' => 'btn btn-primary',
-                'value' => 'Create'
+                'value' => 'Create',
             ],
         ]);
     }
@@ -189,9 +189,9 @@ class UserForm extends Form
 
         // Add input for "email" field
         $inputFilter->add([
-            'name'     => 'email',
-            'required' => true,
-            'filters'  => [
+            'name'       => 'email',
+            'required'   => true,
+            'filters'    => [
                 ['name' => 'StringTrim'],
             ],
             'validators' => [
@@ -199,21 +199,21 @@ class UserForm extends Form
                     'name'    => 'StringLength',
                     'options' => [
                         'min' => 1,
-                        'max' => 128
+                        'max' => 128,
                     ],
                 ],
                 [
-                    'name' => 'EmailAddress',
+                    'name'    => 'EmailAddress',
                     'options' => [
-                        'allow' => \Laminas\Validator\Hostname::ALLOW_DNS,
-                        'useMxCheck'    => false,
+                        'allow'      => Hostname::ALLOW_DNS,
+                        'useMxCheck' => false,
                     ],
                 ],
                 [
-                    'name' => UserExistsValidator::class,
+                    'name'    => UserExistsValidator::class,
                     'options' => [
                         'entityManager' => $this->entityManager,
-                        'user' => $this->user
+                        'user'          => $this->user,
                     ],
                 ],
             ],
@@ -221,9 +221,9 @@ class UserForm extends Form
 
         // Add input for "full_name" field
         $inputFilter->add([
-            'name'     => 'full_name',
-            'required' => true,
-            'filters'  => [
+            'name'       => 'full_name',
+            'required'   => true,
+            'filters'    => [
                 ['name' => 'StringTrim'],
             ],
             'validators' => [
@@ -231,56 +231,55 @@ class UserForm extends Form
                     'name'    => 'StringLength',
                     'options' => [
                         'min' => 1,
-                        'max' => 512
+                        'max' => 512,
                     ],
                 ],
             ],
         ]);
 
         $inputFilter->add([
-            'name' => 'mfa_enabled',
-            'required' => true,
+            'name'       => 'mfa_enabled',
+            'required'   => true,
             'validators' => [
                 [
-                    'name' => Validator\InArray::class,
+                    'name'    => Validator\InArray::class,
                     'options' => [
-                        'haystack' => [ true, false ]
+                        'haystack' => [true, false],
                     ],
                 ],
             ],
         ]);
 
         $inputFilter->add([
-            'name' => 'csrf',
-            'required' => true,
+            'name'       => 'csrf',
+            'required'   => true,
             'validators' => [
                 [
-                    'name' => 'callback',
+                    'name'    => 'callback',
                     'options' => [
                         'callback' => function ($value) {
                             return $this->guard->validateToken($value);
                         },
                         'messages' => [
-                            'callbackValue' => 'The form submitted did not originate from the expected site'
+                            'callbackValue' => 'The form submitted did not originate from the expected site',
                         ],
                     ],
-                ]
+                ],
             ],
         ]);
 
         if ($this->scenario == 'create') {
             // Add input for "password" field
             $inputFilter->add([
-                'name'     => 'password',
-                'required' => true,
-                'filters'  => [
-                ],
+                'name'       => 'password',
+                'required'   => true,
+                'filters'    => [],
                 'validators' => [
                     [
                         'name'    => 'StringLength',
                         'options' => [
                             'min' => 6,
-                            'max' => 64
+                            'max' => 64,
                         ],
                     ],
                 ],
@@ -288,10 +287,9 @@ class UserForm extends Form
 
             // Add input for "confirm_password" field
             $inputFilter->add([
-                'name'     => 'confirm_password',
-                'required' => true,
-                'filters'  => [
-                ],
+                'name'       => 'confirm_password',
+                'required'   => true,
+                'filters'    => [],
                 'validators' => [
                     [
                         'name'    => 'Identical',
@@ -305,26 +303,26 @@ class UserForm extends Form
 
         // Add input for "status" field
         $inputFilter->add([
-            'name'     => 'status',
-            'required' => true,
-            'filters'  => [
+            'name'       => 'status',
+            'required'   => true,
+            'filters'    => [
                 ['name' => 'ToInt'],
             ],
             'validators' => [
-                ['name' => 'InArray', 'options' => ['haystack' => [1, 2]]]
+                ['name' => 'InArray', 'options' => ['haystack' => [1, 2]]],
             ],
         ]);
 
         // Add input for "roles" field
         $inputFilter->add([
-            'class'    => ArrayInput::class,
-            'name'     => 'roles',
-            'required' => true,
-            'filters'  => [
+            'class'      => ArrayInput::class,
+            'name'       => 'roles',
+            'required'   => true,
+            'filters'    => [
                 ['name' => 'ToInt'],
             ],
             'validators' => [
-                ['name' => 'GreaterThan', 'options' => ['min' => 0]]
+                ['name' => 'GreaterThan', 'options' => ['min' => 0]],
             ],
         ]);
     }

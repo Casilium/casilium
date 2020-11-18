@@ -1,11 +1,11 @@
 <?php
+
 namespace User\Form;
 
 use Doctrine\ORM\EntityManagerInterface;
-use User\Entity\Permission;
-use Mezzio\Csrf\SessionCsrfGuard;
 use Laminas\Form\Form;
-use Laminas\InputFilter\InputFilter;
+use Mezzio\Csrf\SessionCsrfGuard;
+use User\Entity\Permission;
 use User\Validator\PermissionExistsValidator;
 
 /**
@@ -13,44 +13,28 @@ use User\Validator\PermissionExistsValidator;
  */
 class PermissionForm extends Form
 {
-    /**
-     * @var SessionCsrfGuard
-     */
+    /** @var SessionCsrfGuard */
     private $guard;
 
-    /**
-     * @var EntityManagerInterface|null
-     */
+    /** @var EntityManagerInterface|null */
     private $entityManager;
 
-    /**
-     * @var Permission|null
-     */
+    /** @var Permission|null */
     private $permission;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     private $scenario;
 
-    /**
-     * PermissionForm constructor.
-     * @param SessionCsrfGuard $guard
-     * @param string $scenario
-     * @param EntityManagerInterface | null $entityManager
-     * @param Permission|null $permission
-     */
     public function __construct(
         SessionCsrfGuard $guard,
         string $scenario = 'create',
-        EntityManagerInterface $entityManager = null,
-        Permission $permission = null
+        ?EntityManagerInterface $entityManager = null,
+        ?Permission $permission = null
     ) {
-
-        $this->guard = $guard;
-        $this->scenario = $scenario;
+        $this->guard         = $guard;
+        $this->scenario      = $scenario;
         $this->entityManager = $entityManager;
-        $this->permission = $permission;
+        $this->permission    = $permission;
 
         // Define form name
         parent::__construct('permission-form');
@@ -69,40 +53,40 @@ class PermissionForm extends Form
     {
         // Add "name" field
         $this->add([
-            'type'  => 'text',
-            'name' => 'name',
+            'type'       => 'text',
+            'name'       => 'name',
             'attributes' => [
-                'class' => 'form-control',
-                'id' => 'name',
+                'class'       => 'form-control',
+                'id'          => 'name',
                 'placeholder' => 'Enter name',
             ],
-            'options' => [
+            'options'    => [
                 'label' => 'Permission Name',
             ],
         ]);
 
         // Add "description" field
         $this->add([
-            'type'  => 'textarea',
-            'name' => 'description',
+            'type'       => 'textarea',
+            'name'       => 'description',
             'attributes' => [
-                'class' => 'form-control'
-        ,                'id' => 'description',
-                'placeholder' => 'Enter description'
+                'class'       => 'form-control',
+                'id'          => 'description',
+                'placeholder' => 'Enter description',
             ],
-            'options' => [
+            'options'    => [
                 'label' => 'Description',
             ],
         ]);
 
         // Add the Submit button
         $this->add([
-            'type'  => 'submit',
-            'name' => 'submit',
+            'type'       => 'submit',
+            'name'       => 'submit',
             'attributes' => [
                 'class' => 'btn btn-primary',
                 'value' => 'Create',
-                'id' => 'submit',
+                'id'    => 'submit',
             ],
         ]);
 
@@ -123,9 +107,9 @@ class PermissionForm extends Form
 
         // Add input for "name" field
         $inputFilter->add([
-            'name'     => 'name',
-            'required' => true,
-            'filters'  => [
+            'name'       => 'name',
+            'required'   => true,
+            'filters'    => [
                 ['name' => 'StringTrim'],
             ],
             'validators' => [
@@ -133,14 +117,14 @@ class PermissionForm extends Form
                     'name'    => 'StringLength',
                     'options' => [
                         'min' => 1,
-                        'max' => 128
+                        'max' => 128,
                     ],
                 ],
                 [
-                    'name' => PermissionExistsValidator::class,
+                    'name'    => PermissionExistsValidator::class,
                     'options' => [
                         'entityManager' => $this->entityManager,
-                        'permission' => $this->permission
+                        'permission'    => $this->permission,
                     ],
                 ],
             ],
@@ -148,9 +132,9 @@ class PermissionForm extends Form
 
         // Add input for "description" field
         $inputFilter->add([
-            'name'     => 'description',
-            'required' => true,
-            'filters'  => [
+            'name'       => 'description',
+            'required'   => true,
+            'filters'    => [
                 ['name' => 'StringTrim'],
             ],
             'validators' => [
@@ -158,27 +142,27 @@ class PermissionForm extends Form
                     'name'    => 'StringLength',
                     'options' => [
                         'min' => 1,
-                        'max' => 1024
+                        'max' => 1024,
                     ],
                 ],
             ],
         ]);
 
         $inputFilter->add([
-            'name' => 'csrf',
-            'required' => true,
+            'name'       => 'csrf',
+            'required'   => true,
             'validators' => [
                 [
-                    'name' => 'callback',
+                    'name'    => 'callback',
                     'options' => [
                         'callback' => function ($value) {
                             return $this->guard->validateToken($value);
                         },
                         'messages' => [
-                            'callbackValue' => 'The form submitted did not originate from the expected site'
+                            'callbackValue' => 'The form submitted did not originate from the expected site',
                         ],
                     ],
-                ]
+                ],
             ],
         ]);
     }

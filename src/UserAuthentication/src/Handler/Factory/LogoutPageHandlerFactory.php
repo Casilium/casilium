@@ -10,7 +10,7 @@ use UserAuthentication\Handler\LogoutPageHandler;
 
 class LogoutPageHandlerFactory
 {
-    public function __invoke(ContainerInterface $container) : LogoutPageHandler
+    public function __invoke(ContainerInterface $container): LogoutPageHandler
     {
         $helper = $container->get(UrlHelper::class);
         return new LogoutPageHandler($helper);

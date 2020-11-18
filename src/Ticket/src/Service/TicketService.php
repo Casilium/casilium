@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ticket\Service;
 
 use Doctrine\ORM\EntityManager;
-use Laminas\Validator\Timezone;
 use Organisation\Entity\Organisation;
 use Organisation\Service\OrganisationManager;
 use OrganisationContact\Entity\Contact;
@@ -22,34 +21,22 @@ use User\Service\UserManager;
 
 class TicketService
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $entityManager;
 
-    /**
-     * @var OrganisationManager
-     */
+    /** @var OrganisationManager */
     protected $organisationManager;
 
-    /**
-     * @var SiteManager
-     */
+    /** @var SiteManager */
     protected $siteManager;
 
-    /**
-     * @var ContactService
-     */
+    /** @var ContactService */
     protected $contactManager;
 
-    /**
-     * @var QueueManager
-     */
+    /** @var QueueManager */
     protected $queueManager;
 
-    /**
-     * @var UserManager
-     */
+    /** @var UserManager */
     protected $userManager;
 
     public function __construct(
@@ -60,19 +47,16 @@ class TicketService
         QueueManager $queueManager,
         UserManager $userManager
     ) {
-        $this->entityManager = $entityManager;
+        $this->entityManager       = $entityManager;
         $this->organisationManager = $organisationManager;
-        $this->siteManager = $siteManager;
-        $this->contactManager = $contactService;
-        $this->queueManager = $queueManager;
-        $this->userManager = $userManager;
+        $this->siteManager         = $siteManager;
+        $this->contactManager      = $contactService;
+        $this->queueManager        = $queueManager;
+        $this->userManager         = $userManager;
     }
 
     /**
      * Find organisation by uuid
-     *
-     * @param string $uuid
-     * @return Organisation
      */
     public function getOrganisationByUuid(string $uuid): Organisation
     {
@@ -81,9 +65,6 @@ class TicketService
 
     /**
      * Find organisation by id
-     *
-     * @param int $id
-     * @return Organisation
      */
     public function getOrganisationById(int $id): Organisation
     {
@@ -92,9 +73,6 @@ class TicketService
 
     /**
      * Find site by id
-     *
-     * @param int $id
-     * @return SiteEntity
      */
     public function findSiteById(int $id): SiteEntity
     {
@@ -104,7 +82,6 @@ class TicketService
     /**
      * Find sites by organisation id (sites belonging to organisation)
      *
-     * @param int $id
      * @return array|null
      */
     public function getSitesByOrganisationId(int $id): ?array
@@ -115,7 +92,6 @@ class TicketService
     /**
      * Return contacts by organisation id (contacts belonging to organisation)
      *
-     * @param int $id
      * @return array
      */
     public function getContactsByOrganisationId(int $id): array
@@ -125,9 +101,6 @@ class TicketService
 
     /**
      * Find contact by id
-     *
-     * @param int $id
-     * @return Contact|null
      */
     public function findContactById(int $id): ?Contact
     {
@@ -136,9 +109,6 @@ class TicketService
 
     /**
      * Find queue by id
-     *
-     * @param int $id
-     * @return Queue
      */
     public function findQueueById(int $id): Queue
     {
@@ -147,9 +117,6 @@ class TicketService
 
     /**
      * Find user by id
-     *
-     * @param int $id
-     * @return User
      */
     public function findUserById(int $id): User
     {
@@ -158,9 +125,6 @@ class TicketService
 
     /**
      * Find ticket priority by id
-     *
-     * @param int $id
-     * @return Priority
      */
     public function findPriorityById(int $id): Priority
     {
@@ -169,9 +133,6 @@ class TicketService
 
     /**
      * Return ticket type by id
-     *
-     * @param int $id
-     * @return Type
      */
     public function findTypeById(int $id): Type
     {
@@ -198,7 +159,6 @@ class TicketService
      * Save ticket
      *
      * @param array $data
-     * @return Ticket
      */
     public function save(array $data): Ticket
     {
@@ -210,12 +170,11 @@ class TicketService
         $ticket->setUrgency($data['urgency']);
         $ticket->setSource($data['source']);
 
-        $priority = $this->findPriorityById(($ticket->getImpact() + $ticket->getUrgency()));
+        $priority = $this->findPriorityById($ticket->getImpact() + $ticket->getUrgency());
         $ticket->setPriority($priority);
 
         $queue = $this->findQueueById($data['queue_id']);
         $ticket->setQueue($queue);
-
 
         $organisation = $this->getOrganisationById($data['organisation_id']);
         $ticket->setOrganisation($organisation);

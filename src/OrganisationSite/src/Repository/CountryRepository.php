@@ -6,7 +6,6 @@ namespace OrganisationSite\Repository;
 
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
-use OrganisationSite\Entity\CountryEntity;
 
 class CountryRepository extends EntityRepository
 {
@@ -15,5 +14,4 @@ class CountryRepository extends EntityRepository
         $result = $this->createQueryBuilder('c')->getQuery();
         return $result->getResult(Query::HYDRATE_OBJECT);
     }
-
 }

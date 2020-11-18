@@ -4,46 +4,41 @@ declare(strict_types=1);
 namespace User\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use User\Entity\Role;
-use User\Entity\User;
+use Exception;
 use Laminas\Crypt\Password\Bcrypt;
 use Mezzio\Template\TemplateRendererInterface;
+use User\Entity\Role;
+use User\Entity\User;
 use User\Exception\PasswordMismatchException;
+use function bin2hex;
+use function date;
+use function password_hash;
+use function password_verify;
+use function random_bytes;
+use function sprintf;
+use function strcmp;
+use function strtotime;
+use function time;
+use const PASSWORD_BCRYPT;
 
 class UserManager
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     protected $entityManager;
 
-    /**
-     * @var RoleManager
-     */
+    /** @var RoleManager */
     protected $roleManager;
 
-    /**
-     * @var PermissionManager
-     */
+    /** @var PermissionManager */
     protected $permissionManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $config;
 
     /**
-     * UserManager constructor.
-     *
-     * @param EntityManagerInterface $entityManager
-     * @param RoleManager $roleManager
-     * @param PermissionManager $permissionManager
-     * @param TemplateRendererInterface $renderer
      * @param array $config
      */
     public function __construct(
@@ -53,24 +48,23 @@ class UserManager
         TemplateRendererInterface $renderer,
         array $config
     ) {
-        $this->entityManager = $entityManager;
-        $this->roleManager = $roleManager;
+        $this->entityManager     = $entityManager;
+        $this->roleManager       = $roleManager;
         $this->permissionManager = $permissionManager;
-        $this->renderer = $renderer;
-        $this->config = $config;
+        $this->renderer          = $renderer;
+        $this->config            = $config;
     }
 
     /**
      * Add new user to database
      *
      * @param array $data
-     * @return User|null
-     * @throws \Exception
+     * @throws Exception
      */
     public function addUser(array $data): ?User
     {
         if ($this->checkUserExists($data['email'])) {
-            throw new \Exception(sprintf("User with email address %s already exists", $data['email']));
+            throw new Exception(sprintf("User with email address %s already exists", $data['email']));
         }
 
         $user = new User();
@@ -91,9 +85,6 @@ class UserManager
 
     /**
      * Create Password Hash
-     *
-     * @param string $password
-     * @return string
      */
     public function getPasswordHash(string $password): string
     {
@@ -104,22 +95,20 @@ class UserManager
     /**
      * Update an existing user
      *
-     * @param User $user
      * @param array $data
-     * @return bool
-     * @throws \Exception
+     * @throws Exception
      */
     public function updateUser(User $user, array $data): bool
     {
         // Do not allow to change user email if another user with such email already exits.
         if ($user->getEmail() !== $data['email'] && $this->checkUserExists($data['email'])) {
-            throw new \Exception("Another user with email address " . $data['email'] . " already exists");
+            throw new Exception("Another user with email address " . $data['email'] . " already exists");
         }
 
         $user->setEmail($data['email']);
         $user->setFullName($data['full_name']);
         $user->setStatus($data['status']);
-        $user->setMfaEnabled((bool)$data['mfa_enabled']);
+        $user->setMfaEnabled((bool) $data['mfa_enabled']);
 
         // Assign roles to user.
         $this->assignRoles($user, $data['roles']);
@@ -132,9 +121,8 @@ class UserManager
     /**
      * A helper method which assigns new roles to the user
      *
-     * @param User $user
      * @param array $roleIds
-     * @throws \Exception
+     * @throws Exception
      */
     public function assignRoles(User $user, array $roleIds): void
     {
@@ -147,7 +135,7 @@ class UserManager
             $role = $this->entityManager->getRepository(Role::class)->find($roleId);
 
             if ($role === null) {
-                throw new \Exception('Not found role by ID');
+                throw new Exception('Not found role by ID');
             }
 
             $user->addRole($role);
@@ -156,9 +144,6 @@ class UserManager
 
     /**
      * Checks whether a user with the given email address already exists in the database
-     *
-     * @param string $email
-     * @return bool
      */
     public function checkUserExists(string $email): bool
     {
@@ -171,18 +156,17 @@ class UserManager
     /**
      * Generate password reset token to send to user via email
      *
-     * @param User $user
-     * @throws \Exception
+     * @throws Exception
      */
     public function generatePasswordResetToken(User $user): void
     {
         if ($user->getStatus() !== User::STATUS_ACTIVE) {
-            throw new \Exception('Cannot generate password reset token for inactive user');
+            throw new Exception('Cannot generate password reset token for inactive user');
         }
 
         // generate token
         $selector = bin2hex(random_bytes(8));
-        $token = bin2hex(random_bytes(32));
+        $token    = bin2hex(random_bytes(32));
 
         // encrypt token before storing it in db
         $tokenHash = password_hash($token, PASSWORD_BCRYPT);
@@ -199,10 +183,6 @@ class UserManager
 
     /**
      * Verify password reset token
-     *
-     * @param string $email
-     * @param string $passwordResetToken
-     * @return bool
      */
     public function verifyPasswordResetToken(string $email, string $passwordResetToken): bool
     {
@@ -222,7 +202,7 @@ class UserManager
 
         $currentDate = time();
 
-        return !($currentDate - $tokenCreationDate > 24 * 60 * 60);
+        return ! ($currentDate - $tokenCreationDate > 24 * 60 * 60);
     }
 
     /**
@@ -231,11 +211,10 @@ class UserManager
      * @param int $id user id
      * @param string $current_password current password
      * @param string $new_password the new password
-     * @return bool
      */
     public function changePassword(int $id, string $current_password, string $new_password): bool
     {
-        if (strcmp($current_password,$new_password) === 0) {
+        if (strcmp($current_password, $new_password) === 0) {
             throw PasswordMismatchException::whenPasswordsAreSame();
         }
 
@@ -260,13 +239,9 @@ class UserManager
 
     /**
      * Find user by id
-     *
-     * @param int $id
-     * @return User
      */
     public function findById(int $id): User
     {
         return $this->entityManager->getRepository(User::class)->find($id);
     }
-
 }

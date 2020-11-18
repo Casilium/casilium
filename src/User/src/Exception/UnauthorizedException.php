@@ -3,17 +3,17 @@ declare(strict_types=1);
 
 namespace User\Exception;
 
+use Exception;
 use Throwable;
+use function sprintf;
 
-class UnauthorizedException extends \Exception
+class UnauthorizedException extends Exception
 {
     /**
-     * @param string|null $resource
      * @param int $code
-     * @param Throwable|null $previous
      * @return UnauthorizedException
      */
-    public static function forForbidden(string $resource = null, $code = 401, Throwable $previous = null): self
+    public static function forForbidden(?string $resource = null, $code = 401, ?Throwable $previous = null): self
     {
         $message = 'Access to the requested resource is forbidden';
 
@@ -24,6 +24,6 @@ class UnauthorizedException extends \Exception
             );
         }
 
-        return new static ($message, $code, $previous);
+        return new static($message, $code, $previous);
     }
 }

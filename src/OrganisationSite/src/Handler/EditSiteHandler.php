@@ -20,45 +20,27 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class EditSiteHandler implements RequestHandlerInterface
 {
-    /**
-     * @var SiteManager
-     */
+    /** @var SiteManager */
     protected $siteManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $countries = [];
 
-    /**
-     * EditSiteHandler constructor.
-     *
-     * @param SiteManager $siteManager
-     * @param TemplateRendererInterface $renderer
-     * @param UrlHelper $urlHelper
-     */
     public function __construct(SiteManager $siteManager, TemplateRendererInterface $renderer, UrlHelper $urlHelper)
     {
         $this->siteManager = $siteManager;
-        $this->renderer = $renderer;
-        $this->urlHelper = $urlHelper;
+        $this->renderer    = $renderer;
+        $this->urlHelper   = $urlHelper;
     }
 
     /**
      * Handles edit site requests
-     *
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -72,12 +54,12 @@ class EditSiteHandler implements RequestHandlerInterface
         }
 
         // grab the list of available countries
-        if (empty ($this->countries)) {
+        if (empty($this->countries)) {
             $this->countries = $this->siteManager->getCountries();
         }
 
         // create new site form, set hydrator and bind to SiteEntity object
-        $form = new SiteForm($this->countries);
+        $form     = new SiteForm($this->countries);
         $hydrator = new SiteEntityHydrator($this->siteManager);
         $form->setHydrator($hydrator);
         $form->bind($site);

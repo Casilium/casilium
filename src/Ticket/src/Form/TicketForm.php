@@ -3,16 +3,15 @@ declare(strict_types=1);
 
 namespace Ticket\Form;
 
-use Ticket\Validator\DateTimeValidator;
-use Laminas\Form\Element;
 use Laminas\Filter;
+use Laminas\Form\Element;
 use Laminas\Form\Form;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator;
+use Ticket\Validator\DateTimeValidator;
 
 class TicketForm extends Form implements InputFilterProviderInterface
 {
-
     public function __construct()
     {
         parent::__construct('create-ticket-form');
@@ -29,16 +28,16 @@ class TicketForm extends Form implements InputFilterProviderInterface
             ->setEmptyOption('Please Select');
         $this->add($element);
 
-        $element  = new Element\Text('id');
+        $element = new Element\Text('id');
         $element->setAttributes(['class' => 'form-control', 'required' => false]);
         $this->add($element);
 
         $element = new Element\Textarea('long_description');
         $element->setLabel('Long Description')
             ->setAttributes([
-                'id' => 'long_description',
-                'rows' => 5,
-                'class' => 'form-control',
+                'id'          => 'long_description',
+                'rows'        => 5,
+                'class'       => 'form-control',
                 'placeholder' => 'Enter a more comprehensive description of the problem',
             ]);
         $this->add($element);
@@ -54,7 +53,6 @@ class TicketForm extends Form implements InputFilterProviderInterface
             ]);
         $this->add($element);
 
-
         $element = new Element\Select('queue_id');
         $element->setLabel('Queue')
             ->setEmptyOption('Please Select')
@@ -65,10 +63,10 @@ class TicketForm extends Form implements InputFilterProviderInterface
         $element = new Element\Text('short_description');
         $element->setLabel('Summary')
             ->setAttributes([
-                'id' => 'short_description',
-                'class' => 'form-control',
+                'id'          => 'short_description',
+                'class'       => 'form-control',
                 'placeholder' => 'Ticket summary',
-                'required' => true
+                'required'    => true,
             ]);
         $this->add($element);
 
@@ -96,9 +94,9 @@ class TicketForm extends Form implements InputFilterProviderInterface
         $element = new Element\Text('start_date');
         $element->setLabel('Start Date')
             ->setAttributes([
-                'class' => 'form-control datetimepicker-input',
+                'class'       => 'form-control datetimepicker-input',
                 'data-target' => '#start_date_picker',
-                'id' => 'start_date',
+                'id'          => 'start_date',
             ]);
         $this->add($element);
 
@@ -115,7 +113,6 @@ class TicketForm extends Form implements InputFilterProviderInterface
 
         $this->add($element);
 
-
         $element = new Element\Select('urgency');
         $element->setLabel('Urgency')
             ->setAttributes(['id' => 'urgency', 'class' => 'form-control', 'required' => true])
@@ -127,8 +124,6 @@ class TicketForm extends Form implements InputFilterProviderInterface
             ]);
         $this->add($element);
 
-
-
         $element = new Element\Submit('submit');
         $element->setValue('Save')
             ->setAttributes(['class' => 'btn btn-primary']);
@@ -139,14 +134,14 @@ class TicketForm extends Form implements InputFilterProviderInterface
     {
         return [
             [
-                'name' => 'contact_id',
-                'required' => true,
-                'filters' => [
+                'name'       => 'contact_id',
+                'required'   => true,
+                'filters'    => [
                     ['name' => Filter\ToInt::class],
                 ],
                 'validators' => [
                     [
-                        'name' => Validator\GreaterThan::class,
+                        'name'    => Validator\GreaterThan::class,
                         'options' => [
                             'min' => 0,
                         ],
@@ -154,9 +149,9 @@ class TicketForm extends Form implements InputFilterProviderInterface
                 ],
             ],
             [
-                'name' => 'id',
-                'required' => false,
-                'filters' => [
+                'name'       => 'id',
+                'required'   => false,
+                'filters'    => [
                     ['name' => Filter\StringTrim::class],
                     ['name' => Filter\StripTags::class],
                 ],
@@ -167,9 +162,9 @@ class TicketForm extends Form implements InputFilterProviderInterface
                 ],
             ],
             [
-                'name' => 'agent_id',
-                'required' => false,
-                'filters' => [
+                'name'       => 'agent_id',
+                'required'   => false,
+                'filters'    => [
                     ['name' => Filter\StringTrim::class],
                     ['name' => Filter\StripTags::class],
                     ['name' => Filter\ToInt::class],
@@ -181,14 +176,14 @@ class TicketForm extends Form implements InputFilterProviderInterface
                 ],
             ],
             [
-                'name' => 'impact',
-                'required' => true,
-                'filters' => [
+                'name'       => 'impact',
+                'required'   => true,
+                'filters'    => [
                     ['name' => Filter\ToInt::class],
                 ],
                 'validators' => [
                     [
-                        'name' => Validator\GreaterThan::class,
+                        'name'    => Validator\GreaterThan::class,
                         'options' => [
                             'min' => 0,
                         ],
@@ -196,28 +191,28 @@ class TicketForm extends Form implements InputFilterProviderInterface
                 ],
             ],
             [
-                'name' => 'long_description',
-                'required' => true,
-                'filters' => [
+                'name'       => 'long_description',
+                'required'   => true,
+                'filters'    => [
                     ['name' => Filter\StringTrim::class],
                     ['name' => Filter\StripTags::class],
                 ],
                 'validators' => [
                     [
-                        'name' => Validator\NotEmpty::class,
+                        'name'                   => Validator\NotEmpty::class,
                         'break_chain_on_failure' => true,
                     ],
                 ],
             ],
             [
-                'name' => 'queue_id',
-                'required' => true,
-                'filters' => [
+                'name'       => 'queue_id',
+                'required'   => true,
+                'filters'    => [
                     ['name' => Filter\ToInt::class],
                 ],
                 'validators' => [
                     [
-                        'name' => Validator\GreaterThan::class,
+                        'name'    => Validator\GreaterThan::class,
                         'options' => [
                             'min' => 0,
                         ],
@@ -225,35 +220,35 @@ class TicketForm extends Form implements InputFilterProviderInterface
                 ],
             ],
             [
-                'name' => 'short_description',
-                'required' => true,
-                'filters' => [
+                'name'       => 'short_description',
+                'required'   => true,
+                'filters'    => [
                     ['name' => Filter\StringTrim::class],
                     ['name' => Filter\StripTags::class],
                 ],
                 'validators' => [
                     [
-                        'name' => Validator\NotEmpty::class,
+                        'name'                   => Validator\NotEmpty::class,
                         'break_chain_on_failure' => true,
                     ],
                     [
-                        'name' => Validator\StringLength::class,
+                        'name'    => Validator\StringLength::class,
                         'options' => [
                             'min' => 3,
                             'max' => 255,
                         ],
-                    ]
+                    ],
                 ],
             ],
             [
-                'name' => 'site_id',
-                'required' => true,
-                'filters' => [
+                'name'       => 'site_id',
+                'required'   => true,
+                'filters'    => [
                     ['name' => Filter\ToInt::class],
                 ],
                 'validators' => [
                     [
-                        'name' => Validator\GreaterThan::class,
+                        'name'    => Validator\GreaterThan::class,
                         'options' => [
                             'min' => 0,
                         ],
@@ -261,14 +256,14 @@ class TicketForm extends Form implements InputFilterProviderInterface
                 ],
             ],
             [
-                'name' => 'source',
-                'required' => true,
-                'filters' => [
+                'name'       => 'source',
+                'required'   => true,
+                'filters'    => [
                     ['name' => Filter\ToInt::class],
                 ],
                 'validators' => [
                     [
-                        'name' => Validator\GreaterThan::class,
+                        'name'    => Validator\GreaterThan::class,
                         'options' => [
                             'min' => 0,
                         ],
@@ -276,9 +271,9 @@ class TicketForm extends Form implements InputFilterProviderInterface
                 ],
             ],
             [
-                'name' => 'start_date',
-                'required' => false,
-                'filters' => [
+                'name'       => 'start_date',
+                'required'   => false,
+                'filters'    => [
                     ['name' => Filter\StringTrim::class],
                     ['name' => Filter\StripTags::class],
                 ],
@@ -287,14 +282,14 @@ class TicketForm extends Form implements InputFilterProviderInterface
                 ],
             ],
             [
-                'name' => 'type_id',
-                'required' => true,
-                'filters' => [
+                'name'       => 'type_id',
+                'required'   => true,
+                'filters'    => [
                     ['name' => Filter\ToInt::class],
                 ],
                 'validators' => [
                     [
-                        'name' => Validator\GreaterThan::class,
+                        'name'    => Validator\GreaterThan::class,
                         'options' => [
                             'min' => 0,
                         ],
@@ -302,14 +297,14 @@ class TicketForm extends Form implements InputFilterProviderInterface
                 ],
             ],
             [
-                'name' => 'urgency',
-                'required' => true,
-                'filters' => [
+                'name'       => 'urgency',
+                'required'   => true,
+                'filters'    => [
                     ['name' => Filter\ToInt::class],
                 ],
                 'validators' => [
                     [
-                        'name' => Validator\GreaterThan::class,
+                        'name'    => Validator\GreaterThan::class,
                         'options' => [
                             'min' => 0,
                         ],

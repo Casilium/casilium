@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Account\Handler;
 
+use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Authentication\UserInterface;
@@ -20,62 +21,44 @@ use User\Service\UserManager;
 
 /**
  * Change user account password
- *
- * Class ChangePasswordHandler
- * @package Account\Handler
  */
 class ChangePasswordHandler implements RequestHandlerInterface
 {
-    /**
-     * @var UserManager
-     */
+    /** @var UserManager */
     protected $userManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
-    /**
-     * ChangePasswordHandler constructor.
-     *
-     * @param UserManager $userManager
-     * @param TemplateRendererInterface $renderer
-     * @param UrlHelper $urlHelper
-     */
     public function __construct(
         UserManager $userManager,
-        TemplateRendererInterface  $renderer,
+        TemplateRendererInterface $renderer,
         UrlHelper $urlHelper
-    )
-    {
+    ) {
         $this->userManager = $userManager;
-        $this->renderer = $renderer;
-        $this->urlHelper = $urlHelper;
+        $this->renderer    = $renderer;
+        $this->urlHelper   = $urlHelper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         /** @var Session $session */
-        $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
+        $session       = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
         $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
 
         // get user from session
-        $user = $session->get(UserInterface::class);
-        $user_id = (int)$user['details']['id'];
+        $user    = $session->get(UserInterface::class);
+        $user_id = (int) $user['details']['id'];
         if (null === 0) {
-            throw new \Exception('User not logged!?');
+            throw new Exception('User not logged!?');
         }
 
         $form = new PasswordChangeForm('change');
 
         if ($request->getMethod() === 'POST') {
-
             // set form data from POST vars
             $form->setData($request->getParsedBody());
             if ($form->isValid()) {
@@ -83,7 +66,7 @@ class ChangePasswordHandler implements RequestHandlerInterface
 
                 try {
                     $this->userManager->changePassword($user_id, $data['current_password'], $data['new_password']);
-                } catch (\Exception $exception) {
+                } catch (Exception $exception) {
                     $form->get('current_password')->setMessages([$exception->getMessage()]);
                     return new HtmlResponse($this->renderer->render('account::change-password', ['form' => $form]));
                 }

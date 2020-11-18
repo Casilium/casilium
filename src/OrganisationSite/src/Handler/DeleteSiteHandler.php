@@ -16,43 +16,28 @@ use OrganisationSite\Service\SiteManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use function strcmp;
 
 class DeleteSiteHandler implements RequestHandlerInterface
 {
-    /**
-     * @var SiteManager
-     */
+    /** @var SiteManager */
     protected $siteManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
-    /**
-     * DeleteSiteHandler constructor.
-     *
-     * @param SiteManager $siteManager
-     * @param TemplateRendererInterface $renderer
-     * @param UrlHelper $urlHelper
-     */
     public function __construct(SiteManager $siteManager, TemplateRendererInterface $renderer, UrlHelper $urlHelper)
     {
         $this->siteManager = $siteManager;
-        $this->renderer = $renderer;
-        $this->urlHelper = $urlHelper;
+        $this->renderer    = $renderer;
+        $this->urlHelper   = $urlHelper;
     }
 
     /**
      * Delete site
-     *
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -76,7 +61,6 @@ class DeleteSiteHandler implements RequestHandlerInterface
                 return new RedirectResponse($this->urlHelper->generate('organisation_site.list', [
                     'id' => $site->getOrganisation()->getUuid(),
                 ]));
-
             }
         }
 

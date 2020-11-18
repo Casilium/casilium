@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace OrganisationSite\Hydrator;
 
-
 use Laminas\Hydrator\AbstractHydrator;
 use OrganisationSite\Entity\SiteEntity;
 use OrganisationSite\Service\SiteManager;
@@ -12,14 +11,10 @@ use Ramsey\Uuid\Uuid;
 
 class SiteEntityHydrator extends AbstractHydrator
 {
-    /**
-     * @var SiteManager
-     */
+    /** @var SiteManager */
     protected $siteManager;
 
     /**
-     * SiteEntityHydrator constructor.
-     *
      * @param SiteManager $siteManager Site manager instance to inject
      */
     public function __construct(SiteManager $siteManager)
@@ -31,8 +26,6 @@ class SiteEntityHydrator extends AbstractHydrator
      * Hydrate SiteEntity object with array data
      *
      * @param array $data
-     * @param object $object
-     * @return object
      */
     public function hydrate(array $data, object $object): object
     {
@@ -41,7 +34,7 @@ class SiteEntityHydrator extends AbstractHydrator
         }
 
         if ($id = $data['id'] ?? null) {
-            $object->setId((int)$id);
+            $object->setId((int) $id);
         }
 
         if (($uuid = $data['uuid'] ?? null) && (Uuid::isValid($data['uuid']))) {

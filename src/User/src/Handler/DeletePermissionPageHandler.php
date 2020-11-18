@@ -4,64 +4,45 @@ declare(strict_types=1);
 namespace User\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
+use Mezzio\Helper\UrlHelper;
+use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use User\Entity\Permission;
 use User\Service\PermissionManager;
-use Laminas\Diactoros\Response\HtmlResponse;
-use Laminas\Diactoros\Response\RedirectResponse;
-use Mezzio\Helper\UrlHelper;
-use Mezzio\Template\TemplateRendererInterface;
 
 class DeletePermissionPageHandler implements RequestHandlerInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     private $helper;
 
-    /**
-     * @var PermissionManager
-     */
+    /** @var PermissionManager */
     private $permissionManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
-    /**
-     * DeletePermissionPageHandler constructor.
-     * @param EntityManagerInterface $entityManager
-     * @param PermissionManager $permissionManager
-     * @param TemplateRendererInterface $renderer
-     * @param UrlHelper $helper
-     */
     public function __construct(
         EntityManagerInterface $entityManager,
         PermissionManager $permissionManager,
         TemplateRendererInterface $renderer,
         UrlHelper $helper
     ) {
-        $this->entityManager = $entityManager;
-        $this->renderer = $renderer;
+        $this->entityManager     = $entityManager;
+        $this->renderer          = $renderer;
         $this->permissionManager = $permissionManager;
-        $this->helper = $helper;
+        $this->helper            = $helper;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $id = (int)$request->getAttribute('id', -1);
+        $id = (int) $request->getAttribute('id', -1);
         if ($id < 1) {
             return new HtmlResponse($this->renderer->render('error::404'), 404);
         }

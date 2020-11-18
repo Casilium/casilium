@@ -3,27 +3,20 @@ declare(strict_types=1);
 
 namespace UserAuthentication\View\Helper;
 
-use UserAuthentication\Entity\Identity;
 use Doctrine\ORM\EntityManagerInterface;
-use User\Entity\User;
+use Exception;
 use Laminas\View\Helper\AbstractHelper;
+use User\Entity\User;
+use UserAuthentication\Entity\Identity;
 
 class IdentityViewHelper extends AbstractHelper
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var Identity
-     */
+    /** @var Identity */
     private $user;
 
-    /**
-     * Identity constructor.
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -31,8 +24,8 @@ class IdentityViewHelper extends AbstractHelper
 
     /**
      * Return this class so methods are accessible from view
-     * @return Identity
-     * @throws \Exception
+     *
+     * @throws Exception
      */
     public function __invoke(): ?Identity
     {

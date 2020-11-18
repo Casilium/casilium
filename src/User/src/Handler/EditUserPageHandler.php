@@ -5,13 +5,7 @@ namespace User\Handler;
 
 use App\Traits\CsrfTrait;
 use Doctrine\ORM\EntityManagerInterface;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use User\Entity\Role;
-use User\Entity\User;
-use User\Form\UserForm;
-use User\Service\UserManager;
+use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Csrf\CsrfMiddleware;
@@ -20,29 +14,31 @@ use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\Session;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use User\Entity\Role;
+use User\Entity\User;
+use User\Form\UserForm;
+use User\Service\UserManager;
+use function gettype;
+use function is_array;
+use function sprintf;
 
 class EditUserPageHandler implements RequestHandlerInterface
 {
     use CsrfTrait;
 
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var UserManager
-     */
+    /** @var UserManager */
     private $userManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     private $urlHelper;
 
     public function __construct(
@@ -52,14 +48,14 @@ class EditUserPageHandler implements RequestHandlerInterface
         UrlHelper $urlHelper
     ) {
         $this->entityManager = $entityManager;
-        $this->userManager = $userManager;
-        $this->renderer = $renderer;
-        $this->urlHelper = $urlHelper;
+        $this->userManager   = $userManager;
+        $this->renderer      = $renderer;
+        $this->urlHelper     = $urlHelper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $id = (int)$request->getAttribute('id', -1);
+        $id = (int) $request->getAttribute('id', -1);
         if ($id < 1) {
             return new HtmlResponse($this->renderer->render('error::404'), 404);
         }
@@ -96,13 +92,13 @@ class EditUserPageHandler implements RequestHandlerInterface
             if ($form->isValid()) {
                 $data = $form->getData();
                 if (! is_array($data)) {
-                    throw new \Exception(sprintf('Expected array return type, got %s', gettype($data)));
+                    throw new Exception(sprintf('Expected array return type, got %s', gettype($data)));
                 }
 
                 $this->userManager->updateUser($user, $data);
 
                 return new RedirectResponse($this->urlHelper->generate('admin.user.view', [
-                    'id' => $user->getId()
+                    'id' => $user->getId(),
                 ]));
             }
             $token = $this->getToken($session, $guard);
@@ -113,17 +109,17 @@ class EditUserPageHandler implements RequestHandlerInterface
             }
 
             $form->setData([
-                'full_name' => $user->getFullName(),
-                'email' => $user->getEmail(),
-                'status' => $user->getStatus(),
-                'roles' => $userRoleIds,
+                'full_name'   => $user->getFullName(),
+                'email'       => $user->getEmail(),
+                'status'      => $user->getStatus(),
+                'roles'       => $userRoleIds,
                 'mfa_enabled' => $user->isMfaEnabled(),
             ]);
         }
 
         return new HtmlResponse($this->renderer->render('user::edit', [
-            'user' => $user,
-            'form' => $form,
+            'user'  => $user,
+            'form'  => $form,
             'token' => $token,
         ]));
     }

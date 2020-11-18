@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace OrganisationContact\Exception;
 
-class ContactNotFoundException extends \RuntimeException implements ExceptionInterface
+use RuntimeException;
+use function sprintf;
+
+class ContactNotFoundException extends RuntimeException implements ExceptionInterface
 {
     public static function whenSearchingById(int $id): self
     {

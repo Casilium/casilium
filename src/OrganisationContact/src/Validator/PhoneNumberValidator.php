@@ -4,6 +4,9 @@ declare(strict_types=1);
 namespace OrganisationContact\Validator;
 
 use Laminas\Validator\AbstractValidator;
+use function is_scalar;
+use function is_string;
+use function preg_match;
 
 class PhoneNumberValidator extends AbstractValidator
 {
@@ -14,6 +17,7 @@ class PhoneNumberValidator extends AbstractValidator
 
     /**
      * Validation failure messages
+     *
      * @var array
      */
     protected $messageTemplates = [
@@ -23,7 +27,6 @@ class PhoneNumberValidator extends AbstractValidator
     ];
 
     /**
-     * PhoneNumberValidator constructor.
      * @param null $options
      */
     public function __construct($options = null)
@@ -33,8 +36,8 @@ class PhoneNumberValidator extends AbstractValidator
 
     /**
      * Check if phone number is valid
+     *
      * @param mixed $value
-     * @return bool
      */
     public function isValid($value): bool
     {

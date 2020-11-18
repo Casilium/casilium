@@ -13,7 +13,7 @@ class ContactServiceFactory
 {
     public function __invoke(ContainerInterface $container)
     {
-        $entityManager = $container->get(EntityManager::class);
+        $entityManager       = $container->get(EntityManager::class);
         $organisationService = $container->get(OrganisationManager::class);
 
         return new ContactService($entityManager, $organisationService);

@@ -12,59 +12,39 @@ use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Organisation\Entity\Organisation;
 use OrganisationSite\Entity\SiteEntity;
+use OrganisationSite\Form\SiteForm;
 use OrganisationSite\Hydrator\SiteEntityHydrator;
+use OrganisationSite\Service\SiteManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use OrganisationSite\Form\SiteForm;
-use OrganisationSite\Service\SiteManager;
 
 class CreateSiteHandler implements RequestHandlerInterface
 {
-    /**
-     * @var SiteManager
-     */
+    /** @var SiteManager */
     protected $siteManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $countries = [];
 
-    /**
-     * @var Organisation
-     */
+    /** @var Organisation */
     protected $organisation;
 
-    /**
-     * CreateSiteHandler constructor.
-     *
-     * @param SiteManager $siteManager
-     * @param TemplateRendererInterface $renderer
-     * @param UrlHelper $urlHelper
-     */
     public function __construct(SiteManager $siteManager, TemplateRendererInterface $renderer, UrlHelper $urlHelper)
     {
         $this->siteManager = $siteManager;
-        $this->renderer = $renderer;
-        $this->urlHelper = $urlHelper;
+        $this->renderer    = $renderer;
+        $this->urlHelper   = $urlHelper;
     }
 
     /**
      * Handle request to create new site
-     *
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -72,7 +52,7 @@ class CreateSiteHandler implements RequestHandlerInterface
         $flashMessenger = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
 
         // grab the list of available countries
-        if (empty ($this->countries)) {
+        if (empty($this->countries)) {
             $this->countries = $this->siteManager->getCountries();
         }
 
@@ -113,7 +93,7 @@ class CreateSiteHandler implements RequestHandlerInterface
         }
 
         return new HtmlResponse($this->renderer->render('site::create-site', [
-            'form' => $form,
+            'form'         => $form,
             'organisation' => $this->organisation,
         ]));
     }

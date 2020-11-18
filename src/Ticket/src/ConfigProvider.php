@@ -6,7 +6,7 @@ namespace Ticket;
 
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
+use Mezzio\Application;
 
 class ConfigProvider
 {
@@ -18,12 +18,12 @@ class ConfigProvider
      *
      * @returns array
      */
-    public function __invoke() : array
+    public function __invoke(): array
     {
         return [
-            'dependencies' => $this->getDependencies(),
-            'templates' => $this->getTemplates(),
-            'doctrine' => $this->getDoctrineEntities(),
+            'dependencies'  => $this->getDependencies(),
+            'templates'     => $this->getTemplates(),
+            'doctrine'      => $this->getDoctrineEntities(),
             'access_filter' => $this->getAccessFilter(),
         ];
     }
@@ -33,34 +33,35 @@ class ConfigProvider
      *
      * @return array
      */
-    public function getDependencies() : array
+    public function getDependencies(): array
     {
         return [
             'delegators' => [
-                \Mezzio\Application::class => [
+                Application::class => [
                     RoutesDelegator::class,
                 ],
             ],
-            'factories' => [
+            'factories'  => [
                 Handler\CreateTicketHandler::class => Handler\Factory\TicketCreateHandlerFactory::class,
-                Handler\ListTicketHandler::class => Handler\Factory\ListTickerHandlerFactory::class,
-                Hydrator\TicketHydrator::class => Hydrator\Factory\TicketHydratorFactory::class,
-                Service\TicketService::class => Service\Factory\TicketServiceFactory::class,
-                Service\QueueManager::class => Service\Factory\QueueManagerFactory::class,
+                Handler\ListTicketHandler::class   => Handler\Factory\ListTickerHandlerFactory::class,
+                Hydrator\TicketHydrator::class     => Hydrator\Factory\TicketHydratorFactory::class,
+                Service\TicketService::class       => Service\Factory\TicketServiceFactory::class,
+                Service\QueueManager::class        => Service\Factory\QueueManagerFactory::class,
             ],
         ];
     }
 
     /**
      * Configure doctrine entities
+     *
      * @return array
      */
-    public function getDoctrineEntities() : array
+    public function getDoctrineEntities(): array
     {
         return [
             'driver' => [
-                'orm_default' => [
-                    'class' => MappingDriverChain::class,
+                'orm_default'   => [
+                    'class'   => MappingDriverChain::class,
                     'drivers' => [
                         'Ticket\Entity' => 'ticket_entity',
                     ],
@@ -79,12 +80,12 @@ class ConfigProvider
      *
      * @return array
      */
-    public function getAccessFilter() : array
+    public function getAccessFilter(): array
     {
         return [
             'routes' => [
                 'ticket' => [
-                    ['allow' => '@']
+                    ['allow' => '@'],
                 ],
             ],
         ];
@@ -95,11 +96,11 @@ class ConfigProvider
      *
      * @returns array
      */
-    public function getTemplates() : array
+    public function getTemplates(): array
     {
         return [
             'paths' => [
-                'ticket'    => [__DIR__ . '/../templates/'],
+                'ticket' => [__DIR__ . '/../templates/'],
             ],
         ];
     }

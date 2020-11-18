@@ -3,19 +3,17 @@ declare(strict_types=1);
 
 namespace UserAuthentication\Handler;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\RequestHandlerInterface;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Authentication\UserInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\SessionMiddleware;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\RequestHandlerInterface;
 
 class LogoutPageHandler implements RequestHandlerInterface
 {
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     private $helper;
 
     public function __construct(UrlHelper $helper)

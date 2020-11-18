@@ -5,27 +5,16 @@ declare(strict_types=1);
 namespace OrganisationSite\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Laminas\Form\Annotation\Hydrator;
-use Laminas\Hydrator\Aggregate\AggregateHydrator;
-use Laminas\View\Resolver\AggregateResolver;
 use Organisation\Entity\Organisation;
 use OrganisationSite\Entity\CountryEntity;
 use OrganisationSite\Entity\SiteEntity;
-use OrganisationSite\Hydrator\SiteEntityHydrator;
 use Ramsey\Uuid\Uuid;
 
 class SiteManager
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     protected $entityManager;
 
-    /**
-     * SiteManager constructor.
-     *
-     * @param EntityManagerInterface $entityManager
-     */
     public function __construct(EntityManagerInterface $entityManager)
     {
         $this->entityManager = $entityManager;
@@ -34,7 +23,6 @@ class SiteManager
     /**
      * Find an organisation by its uuid
      *
-     * @param string $uuid
      * @return Organisation|Object|null
      */
     public function getOrganisationByUuid(string $uuid): ?Organisation
@@ -50,7 +38,7 @@ class SiteManager
      */
     public function getCountries(): ?array
     {
-        $result =  $this->entityManager->getRepository(CountryEntity::class)
+        $result = $this->entityManager->getRepository(CountryEntity::class)
             ->findAll();
 
         $countries = [];
@@ -62,9 +50,6 @@ class SiteManager
 
     /**
      * Fetch specific country
-     *
-     * @param int $id
-     * @return CountryEntity|null
      */
     public function getCountry(int $id): ?CountryEntity
     {
@@ -73,9 +58,6 @@ class SiteManager
 
     /**
      * Insert site into database
-     *
-     * @param SiteEntity $site
-     * @return int|null
      */
     public function createSite(SiteEntity $site): ?int
     {
@@ -88,8 +70,6 @@ class SiteManager
 
     /**
      * Update site
-     *
-     * @param SiteEntity $entity
      */
     public function updateSite(SiteEntity $entity): void
     {
@@ -113,7 +93,6 @@ class SiteManager
     /**
      * Fetch organisation's sites from id
      *
-     * @param int $id
      * @return array
      */
     public function fetchSitesByOrganisationId(int $id): ?array
@@ -125,7 +104,6 @@ class SiteManager
     /**
      * Find site by uuid
      *
-     * @param string $uuid
      * @return SiteEntity|Object|null
      */
     public function fetchSiteByUuid(string $uuid): ?SiteEntity
@@ -134,11 +112,9 @@ class SiteManager
             ->findOneBy(['uuid' => $uuid]);
     }
 
-
     /**
      * Find site by id
      *
-     * @param int $id
      * @return SiteEntity|Object|null
      */
     public function fetchSiteById(int $id): ?SiteEntity
@@ -149,13 +125,10 @@ class SiteManager
 
     /**
      * Remove site from database
-     *
-     * @param SiteEntity $site
      */
     public function deleteSite(SiteEntity $site): void
     {
         $this->entityManager->remove($site);
         $this->entityManager->flush();
     }
-
 }

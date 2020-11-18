@@ -4,32 +4,33 @@ declare(strict_types=1);
 
 namespace Mfa;
 
-use Psr\Container\ContainerInterface;
 use Mezzio\Application;
+use Mezzio\Csrf\CsrfMiddleware;
+use Psr\Container\ContainerInterface;
 
 class RouterDelegator
 {
-    public function __invoke(ContainerInterface $container, string $serviceName, callable $callback) : Application
+    public function __invoke(ContainerInterface $container, string $serviceName, callable $callback): Application
     {
         /** @var Application $app */
         $app = $callback();
         $app->route(
             '/mfa/enable',
             [
-                \Mezzio\Csrf\CsrfMiddleware::class,
+                CsrfMiddleware::class,
                 Handler\EnableMfaHandler::class,
             ],
-            ['GET','POST'],
+            ['GET', 'POST'],
             'mfa.enable'
         );
 
         $app->route(
             '/mfa/validate',
             [
-                \Mezzio\Csrf\CsrfMiddleware::class,
+                CsrfMiddleware::class,
                 Handler\ValidateMfaHandler::class,
             ],
-            ['GET','POST'],
+            ['GET', 'POST'],
             'mfa.validate'
         );
 

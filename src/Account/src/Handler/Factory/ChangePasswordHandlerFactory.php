@@ -15,8 +15,8 @@ class ChangePasswordHandlerFactory
     public function __invoke(ContainerInterface $container)
     {
         $userManager = $container->get(UserManager::class);
-        $renderer = $container->get(TemplateRendererInterface::class);
-        $urlHelper = $container->get(UrlHelper::class);
+        $renderer    = $container->get(TemplateRendererInterface::class);
+        $urlHelper   = $container->get(UrlHelper::class);
 
         return new ChangePasswordHandler($userManager, $renderer, $urlHelper);
     }

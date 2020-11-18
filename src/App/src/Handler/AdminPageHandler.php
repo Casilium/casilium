@@ -12,31 +12,19 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 /**
  * Displays the admin page
- *
- * @package App\Handler
  */
 class AdminPageHandler implements RequestHandlerInterface
 {
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
-    /**
-     * AdminPageHandler constructor.
-     * @param TemplateRendererInterface $renderer
-     */
     public function __construct(TemplateRendererInterface $renderer)
     {
         $this->renderer = $renderer;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return new HtmlResponse($this->renderer->render('app::admin-page',[]));
+        return new HtmlResponse($this->renderer->render('app::admin-page', []));
     }
 }

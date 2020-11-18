@@ -4,7 +4,10 @@ declare(strict_types=1);
 
 namespace OrganisationSite\Exception;
 
-class SiteNotFoundException extends \RuntimeException implements ExceptionInterface
+use RuntimeException;
+use function sprintf;
+
+class SiteNotFoundException extends RuntimeException implements ExceptionInterface
 {
     public static function whenSearchingByName(string $name): self
     {

@@ -3,9 +3,9 @@ declare(strict_types=1);
 
 namespace UserAuthentication\View\Helper\Factory;
 
-use UserAuthentication\View\Helper\IdentityViewHelper;
 use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
+use UserAuthentication\View\Helper\IdentityViewHelper;
 
 class IdentityViewHelperFactory
 {

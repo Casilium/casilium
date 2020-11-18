@@ -14,7 +14,7 @@ class OrganisationManagerFactory
     public function __invoke(ContainerInterface $container)
     {
         $entityManager = $container->get(EntityManager::class);
-        $siteManager = $container->get(SiteManager::class);
+        $siteManager   = $container->get(SiteManager::class);
         return new OrganisationManager($entityManager, $siteManager);
     }
 }

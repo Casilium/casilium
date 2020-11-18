@@ -3,12 +3,6 @@ declare(strict_types=1);
 
 namespace User\Middleware;
 
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
-use Psr\Http\Server\MiddlewareInterface;
-use Psr\Http\Server\RequestHandlerInterface;
-use User\Service\AuthManager;
-use User\Service\RbacManager;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Authentication\UserInterface;
@@ -17,32 +11,28 @@ use Mezzio\Router\RouterInterface;
 use Mezzio\Session\SessionInterface;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
+use Psr\Http\Message\ResponseInterface;
+use Psr\Http\Message\ServerRequestInterface;
+use Psr\Http\Server\MiddlewareInterface;
+use Psr\Http\Server\RequestHandlerInterface;
+use User\Service\AuthManager;
+use User\Service\RbacManager;
 
 class AuthorisationMiddleware implements MiddlewareInterface
 {
-    /**
-     * @var AuthManager
-     */
+    /** @var AuthManager */
     private $authManager;
 
-    /**
-     * @var RbacManager
-     */
+    /** @var RbacManager */
     private $rbac;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
-    /**
-     * @var RouterInterface
-     */
+    /** @var RouterInterface */
     private $router;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     private $urlHelper;
 
     public function __construct(
@@ -52,23 +42,23 @@ class AuthorisationMiddleware implements MiddlewareInterface
         AuthManager $authManager,
         TemplateRendererInterface $renderer
     ) {
-        $this->router = $router;
-        $this->rbac = $rbac;
-        $this->urlHelper = $helper;
+        $this->router      = $router;
+        $this->rbac        = $rbac;
+        $this->urlHelper   = $helper;
         $this->authManager = $authManager;
-        $this->renderer = $renderer;
+        $this->renderer    = $renderer;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $routeResult = $this->router->match($request);
+        $routeResult      = $this->router->match($request);
         $matchedRouteName = $routeResult->getMatchedRouteName();
         if ($matchedRouteName == null) {
             return $handler->handle($request);
         }
 
         /** @var SessionInterface $session */
-        $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
+        $session  = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
         $identity = $session->has(UserInterface::class) ? $session->get(UserInterface::class) : null;
         $username = $identity['username'] ?? null;
 

@@ -12,30 +12,19 @@ use Ticket\Service\TicketService;
 
 class ListTicketHandler implements RequestHandlerInterface
 {
-    /**
-     * @var TicketService
-     */
+    /** @var TicketService */
     private $ticketService;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     private $urlHelper;
 
-    /**
-     * ListTicketHandler constructor.
-     *
-     * @param TicketService $ticketService
-     */
     public function __construct(TicketService $ticketService, TemplateRendererInterface $renderer)
     {
         $this->ticketService = $ticketService;
-        $this->renderer = $renderer;
+        $this->renderer      = $renderer;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface

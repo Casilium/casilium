@@ -4,30 +4,24 @@ declare(strict_types=1);
 namespace User\Handler;
 
 use Doctrine\ORM\EntityManagerInterface;
+use Laminas\Diactoros\Response\HtmlResponse;
+use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use User\Entity\Permission;
 use User\Entity\Role;
 use User\Service\RoleManager;
-use Laminas\Diactoros\Response\HtmlResponse;
-use Mezzio\Template\TemplateRendererInterface;
 
 class ViewRolePageHandler implements RequestHandlerInterface
 {
-    /**
-     * @var EntityManagerInterface
-     */
+    /** @var EntityManagerInterface */
     private $entityManager;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     private $renderer;
 
-    /**
-     * @var RoleManager
-     */
+    /** @var RoleManager */
     private $roleManager;
 
     public function __construct(
@@ -36,8 +30,8 @@ class ViewRolePageHandler implements RequestHandlerInterface
         TemplateRendererInterface $renderer
     ) {
         $this->entityManager = $entityManager;
-        $this->roleManager = $roleManager;
-        $this->renderer = $renderer;
+        $this->roleManager   = $roleManager;
+        $this->renderer      = $renderer;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -64,8 +58,8 @@ class ViewRolePageHandler implements RequestHandlerInterface
         $effectivePermisions = $this->roleManager->getEffectivePermissions($role);
 
         return new HtmlResponse($this->renderer->render('role::view', [
-            'role' => $role,
-            'allPermissions' => $allPermissions,
+            'role'                 => $role,
+            'allPermissions'       => $allPermissions,
             'effectivePermissions' => $effectivePermisions,
         ]));
     }

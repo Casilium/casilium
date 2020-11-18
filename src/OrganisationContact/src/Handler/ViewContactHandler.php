@@ -15,48 +15,32 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class ViewContactHandler implements RequestHandlerInterface
 {
-    /**
-     * @var ContactService
-     */
+    /** @var ContactService */
     protected $contactService;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
-    /**
-     * ViewContactHandler constructor.
-     *
-     * @param ContactService $service
-     * @param TemplateRendererInterface $renderer
-     * @param UrlHelper $helper
-     */
     public function __construct(
         ContactService $service,
         TemplateRendererInterface $renderer,
         UrlHelper $helper
     ) {
         $this->contactService = $service;
-        $this->renderer = $renderer;
-        $this->urlHelper = $helper;
+        $this->renderer       = $renderer;
+        $this->urlHelper      = $helper;
     }
 
     /**
      * Render contact html page
-     *
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $contactId = (int)$request->getAttribute('contact_id');
-        $contact = $this->contactService->findContactById($contactId);
+        $contactId = (int) $request->getAttribute('contact_id');
+        $contact   = $this->contactService->findContactById($contactId);
         if ($contact === 0) {
             throw ContactNotFoundException::whenSearchingById($contactId);
         }

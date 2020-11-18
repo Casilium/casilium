@@ -9,8 +9,6 @@ use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
-use Organisation\Entity\Organisation;
-use Organisation\Exception\OrganisationNotFoundException;
 use OrganisationContact\Exception\ContactNotFoundException;
 use OrganisationContact\Form\ContactForm;
 use OrganisationContact\Service\ContactService;
@@ -20,19 +18,13 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class EditContactHandler implements RequestHandlerInterface
 {
-    /**
-     * @var ContactService
-     */
+    /** @var ContactService */
     protected $contactService;
 
-    /**
-     * @var TemplateRendererInterface
-     */
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
     public function __construct(
@@ -41,8 +33,8 @@ class EditContactHandler implements RequestHandlerInterface
         UrlHelper $helper
     ) {
         $this->contactService = $service;
-        $this->renderer = $renderer;
-        $this->urlHelper = $helper;
+        $this->renderer       = $renderer;
+        $this->urlHelper      = $helper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -50,8 +42,8 @@ class EditContactHandler implements RequestHandlerInterface
         // get organisation uuid from url
         $orgId = $request->getAttribute('id');
 
-        $contact_id = (int)$request->getAttribute('contact_id');
-        $contact = $this->contactService->findContactById($contact_id);
+        $contact_id = (int) $request->getAttribute('contact_id');
+        $contact    = $this->contactService->findContactById($contact_id);
         if (null == $contact) {
             throw ContactNotFoundException::whenSearchingById($contact_id);
         }
@@ -76,7 +68,7 @@ class EditContactHandler implements RequestHandlerInterface
 
         return new HtmlResponse($this->renderer->render('contact::create', [
             'contact' => $contact,
-            'form' => $form,
+            'form'    => $form,
         ]));
     }
 }
