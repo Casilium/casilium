@@ -9,6 +9,15 @@ use Ticket\Entity\Ticket;
 
 class TicketRepository extends EntityRepository
 {
+    /**
+     * @param string $uuid
+     * @return Ticket
+     */
+    public function findTicketByUuid(string $uuid): Ticket
+    {
+        return $this->findOneBy(['uuid' => $uuid]);
+    }
+
     public function save(Ticket $ticket): Ticket
     {
         $this->getEntityManager()->persist($ticket);

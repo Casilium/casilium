@@ -1,0 +1,103 @@
+<?php
+    /** @var \Ticket\Entity\Ticket $ticket */
+    $ticket = $this->ticket;
+?>
+
+    <div class="row">
+        <div class="col-md-8">
+            <div class="card bg-dark mb-2">
+                <div class="card-header">
+                    <h1>Ticket #<?= $ticket->getId() ?></h1>
+                </div>
+                <div class="card-body">
+                    <p>
+                        <?= $this->escapeHtml($ticket->getShortDescription()) ?>
+                    </p>
+                    <hr class="bg-light">
+                    <p>
+                        <strong>
+                            <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>
+                            <?= $this->escapeHtml($ticket->getContact()->getLastName()) ?>
+                        </strong>
+                        Reported via <?= $ticket::getSourceTextFromCode($ticket->getSource()) ?>
+                        <span class="text-muted"> (<?= $ticket->getQueue()->getName() ?> Queue)</span>
+                    </p>
+                </div>
+            </div>
+
+            <div class="row mb-2 mt-2">
+                <div class="col">
+                    <span class="text-muted">Status:</span>
+                    <?= $ticket->getStatus()->getDescription() ?>
+                </div>
+                <div class="col">
+                    <span class="text-muted">Impact:</span>
+                    <?= $ticket::getImpactUrgencyText($ticket->getImpact()) ?>
+                </div>
+                <div class="col">
+                    <span class="text-muted">Urgency:</span>
+                    <?= $ticket::getImpactUrgencyText($ticket->getUrgency()) ?>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-header">
+                    <strong>Issue</strong>
+                </div>
+                <div class="card-body">
+                    <?= $this->escapeHtml($ticket->getLongDescription()) ?>
+                    <hr class="bg-light">
+                </div>
+            </div>
+
+
+        </div> <!-- // col -->
+
+        <div class="col-md-4">
+            <div class="card mb-2">
+                <div class="card-header">Contact Info</div>
+                <div class="card-body">
+                    <p>
+                        <small class="text-light">Name:</small><br/>
+                        <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>
+                        <?= $this->escapeHtml($ticket->getContact()->getLastName()) ?>
+                    </p>
+
+                    <?php if (!empty($ticket->getContact()->getWorkTelephone())): ?>
+                        <p>
+                            <small class="text-light">Work Tel:</small><br/>
+                            <a href="tel:<?= $this->escapeHtml($ticket->getContact()->getWorkTelephone()) ?>">
+                                <?= $this->escapeHtml($ticket->getContact()->getWorkTelephone()) ?>
+                            </a>
+                        </p>
+                    <?php endif ?>
+
+                    <?php if (!empty($ticket->getContact()->getMobileTelephone())): ?>
+                        <p>
+                            <small class="text-light">Mobile:</small><br/>
+                            <a href="tel:<?= $this->escapeHtml($ticket->getContact()->getMobileTelephone()) ?>">
+                                <?= $this->escapeHtml($ticket->getContact()->getMobileTelephone()) ?>
+                            </a>
+                        </p>
+                    <?php endif ?>
+
+                    <p>
+                        <small class="text-light">E-mail Address:</small><br/>
+                        <a href="mailto:<?= $this->escapeHtml($ticket->getContact()->getWorkEmail()) ?>">
+                            <?= $this->escapeHtml($ticket->getContact()->getWorkEmail()) ?>
+                        </a>
+                    </p>
+                </div>
+            </div>
+
+            <div class="card mb-2">
+                <div class="card-header">Recent Tickets</div>
+                <div class="card-body">
+                    ...
+                </div>
+            </div>
+
+        </div> <!-- // col -->
+
+    </div>
+

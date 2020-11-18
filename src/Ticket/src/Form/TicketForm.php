@@ -154,6 +154,7 @@ class TicketForm extends Form implements InputFilterProviderInterface
                 'filters'    => [
                     ['name' => Filter\StringTrim::class],
                     ['name' => Filter\StripTags::class],
+                    ['name' => Filter\ToInt::class],
                 ],
                 'validators' => [
                     [

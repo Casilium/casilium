@@ -44,9 +44,9 @@ class Ticket
     public const URGENCY_DEFAULT = self::URGENCY_LOW;
 
     private const IMPACT_URGENCY_TEXT = [
-        1 => 'High',
-        2 => 'Medium',
-        3 => 'Low',
+        self::IMPACT_HIGH => 'High',
+        self::IMPACT_MEDIUM => 'Medium',
+        self::IMPACT_LOW => 'Low',
     ];
 
     private const SOURCE_TEXT = [
@@ -435,7 +435,7 @@ class Ticket
         return self::STATUS_TEXT[$code];
     }
 
-    public static function getImpactUrgencyTextFromCode(int $code): string
+    public static function getImpactUrgencyText(int $code): string
     {
         return self::IMPACT_URGENCY_TEXT[$code];
     }

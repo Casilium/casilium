@@ -6,7 +6,9 @@ namespace Ticket;
 use Mezzio\Application;
 use Psr\Container\ContainerInterface;
 use Ticket\Handler\CreateTicketHandler;
+use Ticket\Handler\EditTickerHandler;
 use Ticket\Handler\ListTicketHandler;
+use Ticket\Handler\ViewTicketHandler;
 
 class RoutesDelegator
 {
@@ -21,6 +23,21 @@ class RoutesDelegator
             ['GET', 'POST'],
             'ticket.create'
         );
+
+        $app->route(
+            '/ticket/{ticket_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}/edit',
+            EditTickerHandler::class,
+            ['GET', 'POST'],
+            'ticket.edit'
+        );
+
+        $app->route(
+            '/ticket/{ticket_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}',
+            ViewTicketHandler::class,
+            ['GET'],
+            'ticket.view'
+        );
+
 
         $app->get('/ticket/list', ListTicketHandler::class, 'ticket.list');
 

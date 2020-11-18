@@ -238,7 +238,10 @@ class UserManager
     }
 
     /**
-     * Find user by id
+     * Find user by ID
+     *
+     * @param int $id
+     * @return User|object
      */
     public function findById(int $id): User
     {

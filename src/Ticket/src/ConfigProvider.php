@@ -43,7 +43,9 @@ class ConfigProvider
             ],
             'factories'  => [
                 Handler\CreateTicketHandler::class => Handler\Factory\TicketCreateHandlerFactory::class,
+                Handler\EditTickerHandler::class   => Handler\Factory\TicketEditHandlerFactory::class,
                 Handler\ListTicketHandler::class   => Handler\Factory\ListTickerHandlerFactory::class,
+                Handler\ViewTicketHandler::class   => Handler\Factory\ViewTicketHandlerFactory::class,
                 Hydrator\TicketHydrator::class     => Hydrator\Factory\TicketHydratorFactory::class,
                 Service\TicketService::class       => Service\Factory\TicketServiceFactory::class,
                 Service\QueueManager::class        => Service\Factory\QueueManagerFactory::class,

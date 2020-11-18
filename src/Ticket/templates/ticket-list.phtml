@@ -20,7 +20,9 @@
 
     <div class="row mb-1">
         <div class="col">
+            <a href="<?= $this->url('ticket.view', ['ticket_id' => $ticket->getUuid()]) ?>">
             TK:<?= $this->escapehtml($ticket->getId()) ?>
+            </a>
         </div>
         <div class="col">
             <?= $this->escapeHtml($ticket->getShortDescription()) ?>

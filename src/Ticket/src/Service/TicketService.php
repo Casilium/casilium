@@ -144,6 +144,10 @@ class TicketService
         return $this->entityManager->getRepository(Status::class)->find($id);
     }
 
+    public function findTicketById(int $id) {
+        return $this->entityManager->getRepository(Ticket::class)->find($id);
+    }
+
     /**
      * Retrieve ticket list
      *
@@ -162,6 +166,12 @@ class TicketService
      */
     public function save(array $data): Ticket
     {
+        $id = $data['id'] ?? 0;
+        if (null === 0) {
+            $ticket = new Ticket();
+        } else {
+            $ticket = $this->findTicketById($id);
+        }
         $ticket = new Ticket();
 
         $ticket->setShortDescription($data['short_description']);
@@ -182,9 +192,9 @@ class TicketService
         $site = $this->findSiteById($data['site_id']);
         $ticket->setSite($site);
 
-        $agent = $this->entityManager->getRepository(User::class)
-            ->find($data['agent_id']);
+        $agent = $this->entityManager->getRepository(User::class)->find($data['agent_id']);
         $ticket->setAgent($agent);
+
 
         $contact = $this->contactManager->findContactById($data['contact_id']);
         $ticket->setContact($contact);
@@ -213,5 +223,10 @@ class TicketService
     public function getQueues(): array
     {
         return $this->queueManager->findAll();
+    }
+
+    public function getTicketByUuid(string $uuid): Ticket
+    {
+        return $this->entityManager->getRepository(Ticket::class)->findTicketByUuid($uuid);
     }
 }
