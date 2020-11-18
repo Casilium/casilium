@@ -12,7 +12,7 @@ and it's completely free.
 Requirements
 ------------
   * HTTP server running Apache / Nginx / IIS
-  * PHP Version 7.2 or higher with the following exensions:
+  * PHP Version 7.2 or higher with the following extensions:
     * curl
     * gd
     * iconv
@@ -54,7 +54,7 @@ Currently, there is gui installer until the project is more complete.
     
 **Database Setup**
 
-Calsium uses Doctrine for database and migrations which enables easy
+Casilium uses Doctrine for database and migrations which enables easy
 modification and setup of the databases. To run the database migration
 tool, from the project root run:
 
@@ -75,10 +75,10 @@ Files should be served from the "public" directory:
 
 License
 -------
-Calisium os released under the GPL2 license. See the included LICENSE.txt
+Calisium is released under the GPL2 license. See the included LICENSE.txt
 file for details of the General Public License.
 
-Calsium is uses several open source projects, including
+Casilium is uses several open source projects, including
 [Laminas](https://getlaminas.org/),
 [Mezzio](https://docs.mezzio.dev/),
 [Doctrine](https://www.doctrine-project.org/),
