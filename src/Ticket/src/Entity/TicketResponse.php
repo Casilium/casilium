@@ -4,13 +4,15 @@ declare(strict_types=1);
 namespace Ticket\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use OrganisationContact\Entity\Contact;
 use Ticket\Entity\Ticket;
+use User\Entity\User;
 use function date;
 use function get_object_vars;
 use function time;
 
 /**
- * @ORM\Entity(repositoryClass="Ticket\Entity\Repository\TicketResponseRepository")
+ * @ORM\Entity(repositoryClass="Ticket\Repository\TicketResponseRepository")
  * @ORM\Table(name="ticket_response")
  */
 class TicketResponse
@@ -25,18 +27,20 @@ class TicketResponse
     private $id;
 
     /**
-     * @ORM\Column(name="agent_id", type="integer", nullable=true)
+     * @ORM\OneToOne(targetEntity="Agent")
+     * @ORM\JoinColumn(name="agent_id", referencedColumnName="id", nullable=true)
      *
-     * @var int
+     * @var Agent
      */
-    private $agent_id;
+    private $agent;
 
     /**
-     * @ORM\Column(name="contact_id", type="integer", nullable=true)
+     * @ORM\OneToOne(targetEntity="\OrganisationContact\Entity\Contact")
+     * @ORM\JoinColumn(name="contact_id", referencedColumnName="id")
      *
-     * @var int
+     * @var Contact
      */
-    private $contact_id;
+    private $contact;
 
     /**
      * @ORM\Column(name="response", type="string")
@@ -81,25 +85,25 @@ class TicketResponse
         $this->is_public     = 1;
     }
 
-    public function getAgentId(): ?int
+    public function getAgent(): ?Agent
     {
-        return $this->agent_id;
+        return $this->agent;
     }
 
-    public function setAgentId(int $user_id): TicketResponse
+    public function setAgent(Agent $user): TicketResponse
     {
-        $this->agent_id = $user_id;
+        $this->agent = $user;
         return $this;
     }
 
-    public function getEmployeeId(): ?int
+    public function getContact(): ?Contact
     {
-        return $this->contact_id;
+        return $this->contact;
     }
 
-    public function setEmployeeId(int $contact_id): TicketResponse
+    public function setContact(Contact $contact): TicketResponse
     {
-        $this->contact_id = $contact_id;
+        $this->contact = $contact;
         return $this;
     }
 
@@ -158,7 +162,7 @@ class TicketResponse
         return $this;
     }
 
-    public function getisPublic(): int
+    public function getIsPublic(): int
     {
         return $this->is_public;
     }
@@ -181,8 +185,8 @@ class TicketResponse
     {
         $this->id         = isset($data['id']) ? (int) $data['id'] : null;
         $this->response   = isset($data['response']) ? (string) $data['response'] : null;
-        $this->agent_id   = isset($data['agent_id']) ? (int) $data['agent_id'] : null;
-        $this->contact_id = isset($data['contact_id']) ? (int) $data['contact_id'] : null;
+        $this->agent      = isset($data['agent_id']) ? (int) $data['agent_id'] : null;
+        $this->contact    = isset($data['contact_id']) ? (int) $data['contact_id'] : null;
         $this->ticket     = $data['ticket'] ?? null;
         $this->is_public  = isset($data['is_public']) ? (int) $data['is_public'] : 0;
         return $this;

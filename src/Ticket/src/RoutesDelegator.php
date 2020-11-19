@@ -34,12 +34,16 @@ class RoutesDelegator
         $app->route(
             '/ticket/{ticket_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}',
             ViewTicketHandler::class,
-            ['GET'],
+            ['GET', 'POST'],
             'ticket.view'
         );
 
 
-        $app->get('/ticket/list', ListTicketHandler::class, 'ticket.list');
+        $app->get(
+            '/ticket/list[/organisation/{org_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}]',
+            ListTicketHandler::class,
+            'ticket.list'
+        );
 
         return $app;
     }

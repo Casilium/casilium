@@ -1,6 +1,16 @@
 <?php
-    /** @var \Ticket\Entity\Ticket $ticket */
+
+    $this->inlineScript()->appendFile('/js/timeago.js');
+
+
+/** @var \Ticket\Entity\Ticket $ticket */
     $ticket = $this->ticket;
+
+    /** @var \Ticket\Entity\TicketResponse[] $responses */
+    $responses = $this->responses;
+
+    $responseForm = $this->responseForm->prepare();
+    $recentTickets = $this->recentTickets;
 ?>
 
     <div class="row">
@@ -51,6 +61,71 @@
             </div>
 
 
+            <div class="card mb-2">
+                <div class="card-header">
+                    Last Responses
+                </div>
+                <div class="card-body">
+                    <small>
+                    <?php foreach ($responses as $response): ?>
+                        <span class="text-muted">
+                            <time class="timeago " datetime="<?= $this->escapeHtml($response->getResponseDate()) ?>">
+                                <?= $this->escapeHtml($response->getResponseDate()) ?>
+                            </time>
+                            by <?= $this->escapeHtml($response->getAgent()->getFullName()) ?>
+                        </span>
+                        <br>
+                        <?= $this->escapeHtml($response->getResponse()) ?>
+                    <hr>
+                    <?php endforeach; ?>
+                    </small>
+                </div>
+            </div>
+
+                <div class="card mb-2">
+                <div class="card-header">
+                    Add Response
+                </div>
+                <div class="card-body">
+
+                    <?= $this->form()->openTag($responseForm) ?>
+
+                    <div class="form-group">
+                        <?= $this->formLabel($responseForm->get('response')); ?>
+                        <?= $this->formElement($responseForm->get('response')); ?>
+                        <?= $this->formElementErrors()->render($responseForm->get('response'), [
+                                'class' => 'help-block' ]); ?>
+                    </div>
+                    <div class="custom-control custom-checkbox text-right">
+                        <?= $this->formCheckbox($responseForm->get('is_public')); ?>
+                        <?= $this->formLabel($responseForm->get('is_public')); ?>
+                        <?= $this->formElementErrors()->render($responseForm->get('is_public'), ['class' => 'help-block']); ?>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary" name="submit" value="save">
+                        <i class="fas fa-save fa-fw"></i> Save
+                    </button>
+
+                    <?php if ($ticket->getStatus()->getId() !== $ticket::STATUS_ON_HOLD): ?>
+                    <button type="submit" class="btn btn-warning" name="submit" value="save_hold">
+                        <i class="fas fa-hand-paper fa-fw"></i> Save + Hold
+                    </button>
+                    <?php elseif ($ticket->getStatus()->getId() === $ticket::STATUS_ON_HOLD): ?>
+                        <button type="submit" class="btn btn-warning" name="submit" value="save_hold">
+                            <i class="fas fa-hand-paper fa-fw"></i> Save (remove hold)
+                        </button>
+                    <?php endif ?>
+
+                    <button id="submit" type="submit" class="btn btn-success" name="submit" value="save_resolve">
+                        <i class="fas fa-check fa-fw"></i> Save + Resolve
+                    </button>
+
+                    <?= $this->formElementErrors($responseForm->get('submit')) ?>
+                    <?= $this->form()->closeTag() ?>
+
+                </div>
+            </div>
+
         </div> <!-- // col -->
 
         <div class="col-md-4">
@@ -93,7 +168,27 @@
             <div class="card mb-2">
                 <div class="card-header">Recent Tickets</div>
                 <div class="card-body">
-                    ...
+                    <?php
+                    /** @var \Ticket\Entity\Ticket $recentTicket */
+                    foreach ($recentTickets as $recentTicket) {
+
+                            if ($recentTicket->getId() === $ticket->getId()) {
+                                continue;
+                            }
+                    ?>
+                        <p>
+                            <small class="text-muted">
+                                <?php
+                                    $recentTicketDate = $recentTicket->getCreatedAt();
+                                    $dt = new \DateTime($recentTicketDate);
+                                    echo sprintf('%s:', $dt->format('d/m/Y @ H:i'));
+                                ?>
+                            </small><br/>
+                            <a href="<?= $this->url('ticket.view', ['ticket_id' => $recentTicket->getUuid()]) ?>">
+                                <?= $this->escapeHtml($recentTicket->getShortDescription()) ?>
+                            </a>
+                        </p>
+                    <?php } ?>
                 </div>
             </div>
 
@@ -101,3 +196,16 @@
 
     </div>
 
+<?php
+$this->inlineScript()->captureStart();
+echo <<<JS
+// <script>
+    $(document).ready(function() {
+        $(function() {
+            $('.timeago').timeago();
+        });
+    });
+// </script>
+JS;
+$this->inlineScript()->captureEnd();
+?>

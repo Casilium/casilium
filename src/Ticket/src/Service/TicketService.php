@@ -11,10 +11,12 @@ use OrganisationContact\Entity\Contact;
 use OrganisationContact\Service\ContactService;
 use OrganisationSite\Entity\SiteEntity;
 use OrganisationSite\Service\SiteManager;
+use Ticket\Entity\Agent;
 use Ticket\Entity\Priority;
 use Ticket\Entity\Queue;
 use Ticket\Entity\Status;
 use Ticket\Entity\Ticket;
+use Ticket\Entity\TicketResponse;
 use Ticket\Entity\Type;
 use User\Entity\User;
 use User\Service\UserManager;
@@ -151,12 +153,16 @@ class TicketService
     /**
      * Retrieve ticket list
      *
-     * @param array $options
      * @return array
      */
-    public function fetchAllTickets($options = []): array
+    public function fetchAllTickets(): array
     {
         return $this->entityManager->getRepository(Ticket::class)->findAll();
+    }
+
+    public function findTicketsByOrganisationUuid(string $uuid)
+    {
+        return $this->entityManager->getRepository(Ticket::class)->findByOrganisationUuid($uuid);
     }
 
     /**
@@ -192,9 +198,8 @@ class TicketService
         $site = $this->findSiteById($data['site_id']);
         $ticket->setSite($site);
 
-        $agent = $this->entityManager->getRepository(User::class)->find($data['agent_id']);
+        $agent = $this->entityManager->getRepository(Agent::class)->find($data['agent_id']);
         $ticket->setAgent($agent);
-
 
         $contact = $this->contactManager->findContactById($data['contact_id']);
         $ticket->setContact($contact);
@@ -215,6 +220,20 @@ class TicketService
         return $this->entityManager->getRepository(Ticket::class)->save($ticket);
     }
 
+    public function updateStatus(int $id, int $state): Status
+    {
+        /** @var Status $status */
+        $status = $this->findStatusById($state);
+
+        /** @var Ticket $ticket */
+        $ticket = $this->findTicketById($id);
+        $ticket->setStatus($status);
+
+        $this->entityManager->flush();
+
+        return $status;
+    }
+
     /**
      * Return list of queues
      *
@@ -228,5 +247,72 @@ class TicketService
     public function getTicketByUuid(string $uuid): Ticket
     {
         return $this->entityManager->getRepository(Ticket::class)->findTicketByUuid($uuid);
+    }
+
+    /**
+     * Save ticket response
+     *
+     * @param Ticket $ticket Ticket related to response
+     * @param array $data response data
+     * @return TicketResponse
+     */
+    public function saveResponse(Ticket $ticket, array $data): TicketResponse
+    {
+        // update ticket
+        $ticketStatus = $ticket->getStatus();
+        switch ($data['submit']) {
+            case 'save_hold':
+                if ($ticket->getStatus()->getId() !== Status::STATUS_ON_HOLD) {
+                    // if not on hold, place on hold
+                    $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_ON_HOLD);
+                } else {
+                    // if on hold, place in progress.
+                    $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_IN_PROGRESS);
+                }
+                break;
+            case 'save_resolve':
+                $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_RESOLVED);
+                break;
+            default:
+                break;
+        }
+
+        $ticket->setStatus($ticketStatus);
+
+        //die(var_dump($data));
+        $response = new TicketResponse();
+
+        $response->setTicket($ticket);
+        $response->setResponse($data['response']);
+        $response->setIsPublic($data['is_public']);
+        $response->setContact($ticket->getContact());
+        $response->setTicketStatus($ticket->getStatus());
+
+        // find current user and set as agent responding to ticket
+        $agent = $this->entityManager->getRepository(Agent::class)->find($data['agent_id']);
+        $response->setAgent($agent);
+
+        // save ticket response;
+        $this->entityManager->persist($response);
+        $this->entityManager->flush();
+
+
+        return $response;
+    }
+
+    public function findTicketResponses(int $id): array
+    {
+        return $this->entityManager->getRepository(TicketResponse::class)
+            ->findTicketResponsesByTicketId($id);
+    }
+
+    public function findRecentTicketsByContact(int $id): array
+    {
+        return $this->entityManager->getRepository(Ticket::class)->findRecentTicketsByContact($id);
+    }
+
+    public function findAgentFromId(int $id): Agent
+    {
+        return $this->entityManager->getRepository(Agent::class)->find($id);
     }
 }

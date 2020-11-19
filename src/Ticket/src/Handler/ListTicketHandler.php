@@ -29,7 +29,13 @@ class ListTicketHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $tickets = $this->ticketService->fetchAllTickets();
+        $options = [];
+
+        if ($organisation_id = $request->getAttribute('org_id')) {
+            $tickets = $this->ticketService->findTicketsByOrganisationUuid($organisation_id);
+        } else {
+            $tickets = $this->ticketService->fetchAllTickets();
+        }
 
         return new HtmlResponse($this->renderer->render('ticket::ticket-list', ['tickets' => $tickets]));
     }

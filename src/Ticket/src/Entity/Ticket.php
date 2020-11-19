@@ -79,10 +79,10 @@ class Ticket
     private $createdAt;
 
     /**
-     * @ORM\OneToOne(targetEntity="User\Entity\User")
+     * @ORM\OneToOne(targetEntity="Agent", cascade={"all"})
      * @ORM\JoinColumn(name="agent_id", referencedColumnName="id", nullable=true)
      *
-     * @var User
+     * @var Agent
      */
     private $agent;
 
@@ -236,12 +236,12 @@ class Ticket
         return $this;
     }
 
-    public function getAgent(): ?User
+    public function getAgent(): ?Agent
     {
         return $this->agent;
     }
 
-    public function setAgent(User $user): Ticket
+    public function setAgent(Agent $user): Ticket
     {
         $this->agent = $user;
         return $this;
