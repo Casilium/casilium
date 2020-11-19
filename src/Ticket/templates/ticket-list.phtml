@@ -17,18 +17,24 @@
                     <?= $this->escapeHtml($ticket->getOrganisation()->getName()) ?><br>
 
                 <span class="text-muted">
+                    <small>
+                    Due
+                    <time class="timeago" datetime="<?= $ticket->getStartDate() ?>">
+                    <?= $ticket->getStartDate() ?>
+                    </time>,
                     created
                     <time class="timeago" datetime="<?= $ticket->getCreatedAt() ?>">
                         <?= $ticket->getCreatedAt() ?>
                     </time>
                     by <?= $this->escapeHtml($ticket->getAgent()->getFullName()) ?>
+                    </small>
                 </span>
             </div>
             <div class="col-sm-2">
                 <span class="text-muted">Last Response</span>
                 <small>Response Date</small>
                 <br>
-                <small>Due</small>
+                <small>SLA_STATE</small>
             </div>
             <div class="col-sm-1">
                 &nbsp;
