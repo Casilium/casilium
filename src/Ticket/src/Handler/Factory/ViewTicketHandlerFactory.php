@@ -18,7 +18,8 @@ class ViewTicketHandlerFactory
         $ticketService = $container->get(TicketService::class);
         $hydrator      = $container->get(TicketHydrator::class);
         $renderer      = $container->get(TemplateRendererInterface::class);
+        $urlHelper     = $container->get(UrlHelper::class);
 
-        return new ViewTicketHandler($ticketService, $hydrator, $renderer);
+        return new ViewTicketHandler($ticketService, $hydrator, $renderer, $urlHelper);
     }
 }

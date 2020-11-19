@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ticket\Handler;
 
 use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Authentication\UserInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\SessionMiddleware;
@@ -27,14 +28,21 @@ class ViewTicketHandler implements RequestHandlerInterface
     /** @var TemplateRendererInterface */
     protected $renderer;
 
+    /**
+     * @var UrlHelper
+     */
+    protected $urlHelper;
+
     public function __construct(
         TicketService $ticketService,
         TicketHydrator $ticketHydrator,
-        TemplateRendererInterface $renderer
+        TemplateRendererInterface $renderer,
+        UrlHelper $urlHelper
     ) {
         $this->ticketService = $ticketService;
         $this->hydrator      = $ticketHydrator;
         $this->renderer      = $renderer;
+        $this->urlHelper     = $urlHelper;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -66,6 +74,7 @@ class ViewTicketHandler implements RequestHandlerInterface
                 $data['agent_id'] = $agent_id;
 
                 $response = $this->ticketService->saveResponse($ticket, $data);
+                return new RedirectResponse($this->urlHelper->generate('ticket.list'));
 
             }
         }
