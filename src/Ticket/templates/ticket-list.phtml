@@ -14,7 +14,15 @@
                 <span class="text-muted">Raised by</span>
                     <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>
                     <?= $this->escapeHtml($ticket->getContact()->getLastName()) ?> /
-                    <?= $this->escapeHtml($ticket->getOrganisation()->getName()) ?><br>
+                    <a href="<?= $this->url('ticket.list',
+                        [ 'org_id' => $ticket->getOrganisation()->getUuid() ],
+                        [],
+                        null,
+                        [ 'reuse_result_params' => false] ) ?>">
+                    <?= $this->escapeHtml($ticket->getOrganisation()->getName()) ?>
+                    </a>
+
+                <br>
 
                 <span class="text-muted">
                     <small>

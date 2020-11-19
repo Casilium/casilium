@@ -12,10 +12,12 @@
             <a href="#" class="list-group-item list-group-item-action bg-dark">
                 <i class="fas fa-tachometer-alt fa-fw mr-2"></i> Dashboard
             </a>
-            <a href="<?= $this->url('organisation.list') ?>" class="list-group-item list-group-item-action bg-dark">
+            <a href="<?= $this->url('organisation.list') ?>"
+               class="list-group-item list-group-item-action bg-dark">
                 <i class="fas fa-users fa-fw mr-2"></i> Organisations
             </a>
-            <a href="<?= $this->url('ticket.list') ?>" class="list-group-item list-group-item-action bg-dark">
+            <a href="<?= $this->url('ticket.list', [], [], null, ['reuse_result_params' => false]) ?>"
+               class="list-group-item list-group-item-action bg-dark">
                 <i class="fas fa-ticket-alt fa-fw mr-2"></i> Tickets
             </a>
         </div>
