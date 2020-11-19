@@ -43,7 +43,7 @@ class TicketRepository extends EntityRepository
 
     }
 
-    public function fetchAll() {
+    public function findAll() {
         $qb = $this->createQueryBuilder('q');
         return $qb->select('t')
             ->from(Ticket::class, 't')
