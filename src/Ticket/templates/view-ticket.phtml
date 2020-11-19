@@ -12,7 +12,6 @@
     $responseForm = $this->responseForm->prepare();
     $recentTickets = $this->recentTickets;
 ?>
-
     <div class="row">
         <div class="col-md-8">
             <div class="card bg-dark mb-2">
@@ -59,7 +58,6 @@
                     <hr class="bg-light">
                 </div>
             </div>
-
 
             <div class="card mb-2">
                 <div class="card-header">
@@ -166,7 +164,9 @@
             </div>
 
             <div class="card mb-2">
-                <div class="card-header">Recent Tickets</div>
+                <div class="card-header">
+                    <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>'s recent tickets
+                </div>
                 <div class="card-body">
                     <?php
                     /** @var \Ticket\Entity\Ticket $recentTicket */
