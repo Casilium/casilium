@@ -24,4 +24,17 @@ class TicketRepository extends EntityRepository
         $this->getEntityManager()->flush();
         return $ticket;
     }
+
+    public function findAll() {
+        $qb = $this->createQueryBuilder('qb');
+
+        $qb->select('t')
+            ->from(Ticket::class, 't')
+            ->orderBy('t.priority')
+            ->addOrderBy('t.start_date')
+            ->getQuery()
+            ->getResult();
+
+        return $qb->getQuery()->getResult();
+    }
 }

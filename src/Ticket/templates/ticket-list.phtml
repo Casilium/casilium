@@ -1,46 +1,92 @@
+<?php
+    $this->inlineScript()->appendFile('/js/timeago.js');
+?>
 <div class="container-fluid">
-    <div class="row">
-        <div class="col">
-            <h1>Ticket List</h1>
-        </div>
-    </div>
-
-    <div class="row ticket-list">
-            <div class="col header">ID</div>
-            <div class="col header">Description</div>
-            <div class="col header">Contact</div>
-            <div class="col header">Status</div>
-            <div class="col header">Priority</div>
-        </div>
-    </div>
-
     <?php
     /** @var \Ticket\Entity\Ticket $ticket */
     foreach ($this->tickets as $ticket): ?>
+        <div class="row ticket-list-item bg-dark">
+            <div class="col-sm-6 ">
+                <a href="<?= $this->url('ticket.view', ['ticket_id' => $ticket->getUuid()]) ?>">
+                    <?= $this->escapeHtml($ticket->getShortDescription()) ?>
+                </a>
+                <span class="text-muted">#<?= $this->escapehtml($ticket->getId()) ?><br></span>
+                <span class="text-muted">Raised by</span>
+                    <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>
+                    <?= $this->escapeHtml($ticket->getContact()->getLastName()) ?> /
+                    <?= $this->escapeHtml($ticket->getOrganisation()->getName()) ?><br>
 
-    <div class="row mb-1">
-        <div class="col">
-            <a href="<?= $this->url('ticket.view', ['ticket_id' => $ticket->getUuid()]) ?>">
-            TK:<?= $this->escapehtml($ticket->getId()) ?>
-            </a>
-        </div>
-        <div class="col">
-            <?= $this->escapeHtml($ticket->getShortDescription()) ?>
-        </div>
-        <div class="col">
-            <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>
-            <?= $this->escapeHtml($ticket->getContact()->getLastName()) ?>
-        </div>
-        <div class="col">
-            <?= $this->escapeHtml($ticket->getStatus()->getDescription()) ?>
-        </div>
-        <div class="col priority">
-            <div class="<?= strtolower($this->escapeHtml($ticket->getPriority()->getName())) ?>">
-                <?= $this->escapeHtml($ticket->getPriority()->getName()) ?>
+                <span class="text-muted">
+                    created
+                    <time class="timeago" datetime="<?= $ticket->getCreatedAt() ?>">
+                        <?= $ticket->getCreatedAt() ?>
+                    </time>
+                    by <?= $this->escapeHtml($ticket->getAgent()->getFullName()) ?>
+                </span>
+            </div>
+            <div class="col-sm-2">
+                <span class="text-muted">Last Response</span>
+                <small>Response Date</small>
+                <br>
+                <small>Due</small>
+            </div>
+            <div class="col-sm-1">
+                &nbsp;
+            </div>
+            <div class="col-sm-3">
+                <div class="row">
+                <div class="col-sm-12">
+                    <div class="row">
+                        <div class="col-4">
+                            <small>
+                                <span class="text-muted">Assigned</span>
+                            </small>
+                        </div>
+                        <div class="col text-center">
+                            <small>
+                                <?= $ticket->getQueue()->getName() ?>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="row status text-center">
+                        <div class="col-4 text-muted text-left">
+                            <small>Status</small>
+                        </div>
+                        <div class="col">
+                            <small>
+                            <span class="<?= strtolower($this->escapeHtml($ticket->getStatus()->getDescription())) ?>">
+                                <?= $this->escapeHtml($ticket->getStatus()->getDescription()) ?>
+                            </span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="row priority text-center">
+                        <div class="col-4 text-muted text-left">Priority</div>
+                        <div class="col <?= $this->escapeHtml(strtolower($ticket->getPriority()->getName())) ?>">
+                            <?= $this->escapeHtml($ticket->getPriority()->getName()) ?>
+                        </div>
+                    </div>
+                </div>
+                </div>
             </div>
         </div>
-    </div>
 
     <?php endforeach; ?>
-
 </div>
+<?php
+$this->inlineScript()->captureStart();
+echo <<<JS
+// <script>
+    $(document).ready(function() {
+        $(function() {
+            $('.timeago').timeago();
+        });
+    });
+// </script>
+JS;
+$this->inlineScript()->captureEnd();
+?>

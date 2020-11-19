@@ -1,3 +1,20 @@
+/* BOX SHADOW
+- usage: @include box-shadow; or @include box-shadow(0, 2px, 2px, #333);
+*/
+@mixin box-shadow($x-axis: 0, $y-axis: 1px, $blur: 2px, $color: #333) {
+  box-shadow: $x-axis $y-axis $blur $color;
+}
+
+.box-shadow {
+  width: 100px;
+  height: 100px;
+  background: #333;
+  margin: 50px;
+  @include box-shadow(5px, 5px, 5px, #333)
+}
+
+/*****************************************/
+
 h1 {
   /* Extra small devices (phones, less than 768px) */
   font-size: 14px;
@@ -18,36 +35,67 @@ h1 {
   }
 }
 
-.ticket-list {
-  .header {
-    background: #666666;
-    font-weight: bold;
-    border-bottom: 1px solid #ffffff;
-  }
-  margin-bottom: 5px;
+@mixin rounded($radius: 0.5em) {
+  -webkit-border-radius: $radius;
+  -moz-border-radius: $radius;
+  border-radius: $radius;
 }
 
-.priority {
-  .low {
-    background-color: #494c15 !important;
+.ticket-list-item {
+  margin-bottom: 3px;
+  @include rounded();
+
+  .status {
+    .open {
+      color: #c5c5c5;
+    }
+    .in-progress {
+      color: #63e7e2;
+    }
+    .on-hold {
+      color: #dabbf6;
+    }
+    .resolved {
+      color: #00efb2;
+    }
+    .closed {
+      color: #00ff00;
+    }
   }
 
-  .medium {
-    background-color: #1d754b;
+  .priority {
+    margin-right: 1px;
+    margin-bottom: 3px;
+
+    .low {
+      @include rounded();
+      background-color: #494c15 !important;
+    }
+
+    .medium {
+      @include rounded();
+      background-color: #1d754b;
+    }
+
+    .high {
+      @include rounded();
+      background-color: #e9a627;
+    }
+
+    .urgent {
+      @include rounded();
+      background-color: #ea6e2d;
+    }
+
+    .critical {
+      @include rounded();
+      background-color: #f13c3c;
+    }
   }
 
-  .high {
-    background-color: #e9a627;
-  }
-
-  .urgent {
-    background-color: #ea6e2d;
-  }
-
-  .critical {
-    background-color: #f13c3c;
-  }
 }
+
+
 
 /*!
  * Start Bootstrap - Simple Sidebar (https://startbootstrap.com/template/simple-sidebar)
