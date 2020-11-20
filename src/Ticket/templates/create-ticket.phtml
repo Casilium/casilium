@@ -1,4 +1,8 @@
 <?php
+
+    $this->inlineScript()->appendFile('/js/moment.js');
+    $this->inlineScript()->appendFile('/js/tempusdominus-bootstrap-4.min.js');
+    $this->headLink()->appendStylesheet('/css/tempusdominus-bootstrap-4.min.css');
     $form = $this->form->prepare();
 ?>
 <h1><i class="fas fa-ticket-alt"></i> Create New Ticket</h1>
@@ -133,13 +137,24 @@ $(document).ready(function() {
           $('#start_date').prop("readonly", true);
           $('#start_date').val("");
       } else {
-          $('#start_date').prop("readonly", false);
+        //  $('#start_date').prop("readonly", false);
       }  
     }
     
     $('#type_id').change(function() {
       toggleStartDate();
     });
+    
+    $('#start_date_picker').datetimepicker({
+                icons: {
+                    time: "fas fa-clock",
+                    date: "fa fa-calendar",
+                    up: "fa fa-arrow-up",
+                    down: "fa fa-arrow-down"
+                },
+                format: 'YYYY-MM-DD HH:mm:ss'
+            });
+    
     updatePriority();
     toggleStartDate();
     
