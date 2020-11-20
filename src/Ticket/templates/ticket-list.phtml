@@ -105,6 +105,7 @@ echo <<<JS
 // <script>
     $(document).ready(function() {
         $(function() {
+            jQuery.timeago.settings.allowFuture = true;
             $('.timeago').timeago();
         });
     });
