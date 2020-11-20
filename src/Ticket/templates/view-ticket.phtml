@@ -178,11 +178,9 @@
                     ?>
                         <p>
                             <small class="text-muted">
-                                <?php
-                                    $recentTicketDate = $recentTicket->getCreatedAt();
-                                    $dt = new \DateTime($recentTicketDate);
-                                    echo sprintf('%s:', $dt->format('d/m/Y @ H:i'));
-                                ?>
+                                <time class="timeago" datetime="<?= $ticket->getLastResponseDate() ?>">
+                                    <?= $ticket->getLastResponseDate() ?>
+                                </time>
                             </small><br/>
                             <a href="<?= $this->url('ticket.view', ['ticket_id' => $recentTicket->getUuid()]) ?>">
                                 <?= $this->escapeHtml($recentTicket->getShortDescription()) ?>
