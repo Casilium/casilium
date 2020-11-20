@@ -173,7 +173,7 @@ class TicketService
     public function save(array $data): Ticket
     {
         $id = $data['id'] ?? 0;
-        if (null === 0) {
+        if ($id === 0) {
             $ticket = new Ticket();
         } else {
             $ticket = $this->findTicketById($id);
