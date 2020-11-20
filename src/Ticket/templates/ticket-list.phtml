@@ -50,7 +50,17 @@
                 <small class="text-muted">No response</small>
                 <?php endif ?>
                 <br>
-                <small>SLA_STATE</small>
+                <?php
+                    $dt = new \DateTime('now');
+                    $dtDue = new \DateTime($ticket->getStartDate());
+
+                    if ($dt->getTimestamp() >  $dtDue->getTimestamp()
+                        && $ticket->getStatus()->getId() < \Ticket\Entity\Status::STATUS_RESOLVED) : ?>
+                        <span class="badge badge-danger">Overdue</span>
+                    <?php endif
+                ?>
+
+
             </div>
             <div class="col-sm-1">
                 &nbsp;
