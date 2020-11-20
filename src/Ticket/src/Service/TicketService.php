@@ -178,7 +178,6 @@ class TicketService
         } else {
             $ticket = $this->findTicketById($id);
         }
-        $ticket = new Ticket();
 
         $ticket->setShortDescription($data['short_description']);
         $ticket->setLongDescription($data['long_description']);

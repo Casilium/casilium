@@ -75,6 +75,7 @@ class EditTickerHandler implements RequestHandlerInterface
                 /** @var Ticket $ticket */
                 $data = $form->getData();
 
+                $data['id']              = $ticket->getId();
                 $data['agent_id']        = $ticket->getAgent()->getId();
                 $data['organisation_id'] = $ticket->getOrganisation()->getId();
                 $ticket                  = $this->ticketService->save($data);
