@@ -47,7 +47,8 @@ class TicketRepository extends EntityRepository
         $qb = $this->createQueryBuilder('q');
         return $qb->select('t')
             ->from(Ticket::class, 't')
-            ->orderBy('t.priority')
+            ->orderBy('t.status')
+            ->addOrderBy('t.priority')
             ->addOrderBy('t.start_date')
             ->getQuery()->getResult();
     }
@@ -61,7 +62,8 @@ class TicketRepository extends EntityRepository
             ->where('o.uuid = :uuid')
             ->setParameter('uuid', $uuid)
             ->leftJoin('t.organisation', 'o')
-            ->orderBy('t.priority')
+            ->orderBy('t.status')
+            ->addOrderBy('t.priority')
             ->addOrderBy('t.start_date');
 
         return $qb->getQuery()->getResult();
