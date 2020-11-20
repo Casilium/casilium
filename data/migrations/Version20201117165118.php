@@ -134,6 +134,7 @@ final class Version20201117165118 extends AbstractMigration
         $table->addColumn('close_date', 'datetime', ['notnull' => false, 'default' => NULL]);
         $table->addColumn('resolve_date', 'datetime', ['notnull' => false, 'default' => NULL]);
         $table->addColumn('waiting_date', 'datetime', ['notnull' => false, 'default' => NULL]);
+        $table->addColumn('last_response_date', 'datetime', ['notnull' => false, 'default' => NULL]);
         $table->addColumn('first_response_date', 'datetime', ['notnull' => false, 'default' => NULL]);
 
 

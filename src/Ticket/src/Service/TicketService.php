@@ -219,7 +219,7 @@ class TicketService
         return $this->entityManager->getRepository(Ticket::class)->save($ticket);
     }
 
-    public function updateStatus(int $id, int $state): Status
+    public function updateStatus(int $id, int $state, $fromResponse = true): Status
     {
         /** @var Status $status */
         $status = $this->findStatusById($state);
@@ -227,6 +227,9 @@ class TicketService
         /** @var Ticket $ticket */
         $ticket = $this->findTicketById($id);
         $ticket->setStatus($status);
+
+        $dt = new \DateTime('now');
+        $ticket->setLastResponseDate($dt->format('Y-m-d H:i:s'));
 
         $this->entityManager->flush();
 
@@ -276,11 +279,8 @@ class TicketService
                 break;
         }
 
-        $ticket->setStatus($ticketStatus);
-
-        //die(var_dump($data));
         $response = new TicketResponse();
-
+        $ticket->setStatus($ticketStatus);
         $response->setTicket($ticket);
         $response->setResponse($data['response']);
         $response->setIsPublic($data['is_public']);
@@ -294,7 +294,6 @@ class TicketService
         // save ticket response;
         $this->entityManager->persist($response);
         $this->entityManager->flush();
-
 
         return $response;
     }

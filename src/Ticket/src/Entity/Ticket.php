@@ -202,6 +202,14 @@ class Ticket
      */
     private $uuid;
 
+    /**
+     * @ORM\Column(name="last_response_date", type="string")
+     *
+     * @var string|null
+     */
+    private $lastResponseDate;
+
+
     public function __construct()
     {
         $this->impact  = self::IMPACT_DEFAULT;
@@ -412,6 +420,17 @@ class Ticket
         return $this;
     }
 
+    public function getLastResponseDate(): ?string
+    {
+        return $this->lastResponseDate;
+    }
+
+    public function setLastResponseDate(string $date): Ticket
+    {
+        $this->lastResponseDate = $date;
+        return $this;
+    }
+
     public function getArrayCopy(): array
     {
         return get_object_vars($this);
@@ -426,6 +445,7 @@ class Ticket
         $this->short_description = isset($data['short_description']) ? (string) $data['short_description'] : null;
         $this->start_date        = isset($data['start_date']) && strlen($data['start_date']) > 1 ? (string) $data['start_date'] : date('Y-m-d H:i:s');
         $this->long_description  = isset($data['long_description']) ? (string) $data['long_description'] : null;
+        $this->start_date        = isset($data['last_response_date']) && strlen($data['last_response_date']) > 1 ? (string) $data['last_response_date'] : date('Y-m-d H:i:s');
         $this->organisation      = $data['organisation'] ?? null;
         return $this;
     }
