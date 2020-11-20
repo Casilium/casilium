@@ -27,7 +27,7 @@ class TicketRepository extends EntityRepository
         return $ticket;
     }
 
-    public function findRecentTicketsByContact(int $contactId): array
+    public function findRecentTicketsByContact(int $contactId, $limit = 5): array
     {
         $qb = $this->createQueryBuilder('qb');
 
@@ -36,7 +36,7 @@ class TicketRepository extends EntityRepository
             ->where('t.contact = :contact_id')
             ->orderBy('t.id', 'DESC')
             ->setParameter('contact_id', $contactId)
-            ->getQuery()
+            ->getQuery()->setMaxResults($limit)
             ->getResult();
 
         return $qb->getQuery()->getResult();
