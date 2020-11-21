@@ -6,10 +6,12 @@ namespace Organisation\Handler;
 
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
+use Laminas\Form\FormInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Organisation\Exception\OrganisationNotFoundException;
 use Organisation\Form\OrganisationForm;
+use Organisation\Hydrator\OrganisationHydrator;
 use Organisation\Service\OrganisationManager;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -26,6 +28,13 @@ class OrganisationEditHandler implements RequestHandlerInterface
     /** @var UrlHelper */
     protected $urlHelper;
 
+    /**
+     * OrganisationEditHandler constructor.
+     *
+     * @param OrganisationManager $organisationManager
+     * @param TemplateRendererInterface $renderer
+     * @param UrlHelper $urlHelper
+     */
     public function __construct(
         OrganisationManager $organisationManager,
         TemplateRendererInterface $renderer,
@@ -36,6 +45,11 @@ class OrganisationEditHandler implements RequestHandlerInterface
         $this->urlHelper           = $urlHelper;
     }
 
+    /**
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
+     * @throws \Exception
+     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // get id from url (must be valid uuid)
@@ -49,17 +63,15 @@ class OrganisationEditHandler implements RequestHandlerInterface
 
         // bind organisation to form
         $form = new OrganisationForm('edit');
+        $form->setHydrator(new OrganisationHydrator());
         $form->bind($organisation);
 
         if ('POST' === $request->getMethod()) {
-            // set form data
+
             $form->setData($request->getParsedBody());
             if ($form->isValid()) {
-                // get filtered results
-                $data = $form->getData();
-
-                // update the organisation
-                $organisation = $this->organisationManager->updateOrganisation($organisation, $data->getArrayCopy());
+                $this->organisationManager->updateOrganisation(
+                    $organisation->getId(), $form->getData(FormInterface::VALUES_AS_ARRAY));
 
                 // redirect to organisation view
                 return new RedirectResponse($this->urlHelper->generate('organisation.view', [

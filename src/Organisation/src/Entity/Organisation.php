@@ -5,18 +5,14 @@ namespace Organisation\Entity;
 
 use DateTime;
 use DateTimeZone;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
-use Laminas\Filter;
-use Laminas\InputFilter\Factory as InputFilterFactory;
-use Laminas\InputFilter\InputFilterInterface;
-use Laminas\InputFilter\InputFilterProviderInterface;
-use Laminas\Validator;
 use Organisation\Exception\OrganisationNameException;
 use Organisation\Validator\OrganisationNameValidator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
-use function is_string;
 
 /**
  * https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/basic-mapping.html
@@ -24,8 +20,16 @@ use function is_string;
  * @ORM\Entity(repositoryClass="Organisation\Repository\OrganisationRepository")
  * @ORM\Table(name="organisation")
  */
-class Organisation implements InputFilterProviderInterface, OrganisationInterface
+class Organisation implements OrganisationInterface
 {
+    public const STATE_INACTIVE = 0;
+    public const STATE_ACTIVE = 1;
+    public const STATE_DISABLED = 2;
+
+    public const TYPE_CLIENT = 1;
+    public const TYPE_SUPPLIER = 2;
+    public const TYPE_BOTH = 3;
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer", name="id", unique=true)
@@ -77,16 +81,44 @@ class Organisation implements InputFilterProviderInterface, OrganisationInterfac
      */
     protected $type_id;
 
+    /**
+     * @ORM\OneToMany(targetEntity="Domain", mappedBy="organisation", orphanRemoval=true, cascade={"persist", "remove"})
+     *
+     * @var Domain[]
+     */
+    protected $domains;
+
+    /**
+     * Organisation constructor.
+     *
+     * @throws Exception
+     */
     public function __construct()
     {
-        $this->type_id = 1;
+        $this->domains = new ArrayCollection();
+
+        $this->is_active = self::STATE_ACTIVE;
+        $this->type_id = self::TYPE_CLIENT;
+
+        $this->uuid = Uuid::uuid4();
+        $now = new \DateTime('UTC', new \DateTimeZone('UTC'));
+        $this->created = $now;
+        $this->modified = $now;
+
     }
 
+    /**
+     * @return int|null
+     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
+    /**
+     * @param int $id
+     * @return $this
+     */
     public function setId(int $id): Organisation
     {
         $this->id = $id;
@@ -102,11 +134,17 @@ class Organisation implements InputFilterProviderInterface, OrganisationInterfac
         return $this;
     }
 
+    /**
+     * @return UuidInterface
+     */
     public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
 
+    /**
+     * @return DateTime
+     */
     public function getCreated(): DateTime
     {
         return $this->created;
@@ -126,11 +164,18 @@ class Organisation implements InputFilterProviderInterface, OrganisationInterfac
         return $this;
     }
 
+    /**
+     * @return int|null
+     */
     public function getIsActive(): ?int
     {
         return $this->is_active;
     }
 
+    /**
+     * @param int $is_active
+     * @return $this
+     */
     public function setIsActive(int $is_active): Organisation
     {
         if (null === $this->is_active) {
@@ -142,6 +187,9 @@ class Organisation implements InputFilterProviderInterface, OrganisationInterfac
         return $this;
     }
 
+    /**
+     * @return DateTime|null
+     */
     public function getModified(): ?DateTime
     {
         return $this->modified;
@@ -161,11 +209,18 @@ class Organisation implements InputFilterProviderInterface, OrganisationInterfac
         return $this;
     }
 
+    /**
+     * @return string|null
+     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
+    /**
+     * @param string $name
+     * @return $this
+     */
     public function setName(string $name): Organisation
     {
         $validator = new OrganisationNameValidator();
@@ -188,112 +243,54 @@ class Organisation implements InputFilterProviderInterface, OrganisationInterfac
         return $this;
     }
 
+    /**
+     * Get organisation type
+     *
+     * @return int|null
+     */
     public function getTypeId(): ?int
     {
         return $this->type_id;
     }
 
     /**
-     * Build array from object vars
+     * Get domain name
      *
-     * @return array
+     * @return ArrayCollection
      */
-    public function getArrayCopy(): array
+    public function getDomains(): Collection
     {
-        return [
-            'id'        => $this->getId(),
-            'uuid'      => $this->getUuid(),
-            'created'   => $this->getCreated()->format('Y-m-d H:i:s'),
-            'is_active' => $this->getIsActive(),
-            'modified'  => $this->getModified()->format('Y-m-d H:i:s'),
-            'name'      => $this->getName(),
-            'type_id'   => $this->type_id,
-        ];
+        return $this->domains;
     }
 
     /**
-     * Exchange array values (alias for setValues)
+     * Add domain to organisation
      *
-     * @param array $data
-     * @throws Exception
+     * @param Domain $domain
      */
-    public function exchangeArray(array $data): Organisation
+    public function addDomain(Domain $domain)
     {
-        return $this->setValues($data);
+        $this->domains[] = $domain;
     }
 
     /**
-     * Populate object vars from array
+     * Check if organisation has domain
      *
-     * @param array $data
-     * @throws Exception
+     * @param Domain $domain
+     * @return bool
      */
-    public function setValues(array $data): Organisation
+    public function hasDomain(Domain $domain)
     {
-        $this->id = isset($data['id']) ? (int) $data['id'] : null;
-
-        if (! isset($this->uuid)) {
-            $this->uuid = Uuid::uuid4();
-        } elseif (isset($data['uuid']) && is_string($data['uuid']) && Uuid::isValid($data['uuid'])) {
-            $this->setUuid(Uuid::fromString($data['uuid']));
-        }
-
-        if (! isset($this->created)) {
-            $this->setCreated(new DateTime('now'));
-        }
-
-        if (isset($data['is_active'])) {
-            $this->setIsActive($data['is_active']);
-        } else {
-            $this->setIsActive(1);
-        }
-
-        $this->setModified(new DateTime('now'));
-
-        if (isset($data['name'])) {
-            $this->setName($data['name']);
-        }
-
-        if (isset($data['type_id'])) {
-            $this->type_id = (int) $data['type_id'];
-        }
-
-        return $this;
+        return $this->getDomains()->contains($domain);
     }
 
     /**
-     * Input filter and validation
+     * Remove domain
+     *
+     * @param Domain $domain
      */
-    public function getInputFilterSpecification(): InputFilterInterface
+    public function removeDomain(Domain $domain)
     {
-        $factory = new InputFilterFactory();
-
-        return $factory->createInputFilter([
-            'id'        => [
-                'required'   => false,
-                'validators' => [
-                    ['name' => Validator\Digits::class],
-                ],
-            ],
-            'uuid'      => [
-                'required'   => false,
-                'validators' => [
-                    ['name' => Validator\Uuid::class],
-                ],
-            ],
-            'name'      => [
-                'required' => true,
-                'filters'  => [
-                    ['name' => Filter\StringTrim::class],
-                    ['name' => Filter\StripTags::class],
-                ],
-            ],
-            'is_active' => [
-                'required'   => false,
-                'validators' => [
-                    ['name' => Validator\Digits::class],
-                ],
-            ],
-        ]);
+        $this->domains->removeElement($domain);
     }
 }

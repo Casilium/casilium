@@ -8,16 +8,10 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
 /**
- * Auto-generated Migration: Please modify to your needs!
+ * Create database schema for Organisations
  */
 final class Version20191203101745 extends AbstractMigration
 {
-    /**
-     * Name of our organisation table
-     * @var string
-     */
-    protected $table_name = 'organisation';
-
     /**
      * {@inheritDoc}
      *
@@ -35,8 +29,20 @@ final class Version20191203101745 extends AbstractMigration
      */
     public function up(Schema $schema) : void
     {
+        // create domains table
+        $table = $schema->createTable('organisation_domain');
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement'=>true]);
+        $table->addColumn('organisation_id', 'integer', ['unsigned' => true]);
+        $table->addColumn('name', 'string', ['notnull' => true]);
+        $table->setPrimaryKey(['id']);
+        $table->addUniqueIndex(['name'], 'domain_index', []);
+        $table->addOption('engine', 'InnoDB');
+
+        $table->addForeignKeyConstraint('organisation',['organisation_id'], ['id'],
+            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'org_domain_fk');
+
         // organisation
-        $table = $schema->createTable($this->table_name);
+        $table = $schema->createTable('organisation');
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement'=>true]);
         $table->addColumn('uuid', 'uuid');
         $table->addColumn('created', 'datetime');
@@ -47,6 +53,7 @@ final class Version20191203101745 extends AbstractMigration
         $table->addUniqueIndex(['name']);
         $table->setPrimaryKey(['id']);
         $table->addOption('engine', 'InnoDB');
+
     }
 
     /**
@@ -56,6 +63,7 @@ final class Version20191203101745 extends AbstractMigration
      */
     public function down(Schema $schema) : void
     {
-        $schema->dropTable($this->table_name);
+        $schema->dropTable('organisation');
+        $schema->dropTable('organisation_domain');
     }
 }

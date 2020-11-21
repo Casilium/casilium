@@ -37,7 +37,8 @@ class OrganisationCreateHandler implements RequestHandlerInterface
     }
 
     /**
-     * @throws Exception
+     * @param ServerRequestInterface $request
+     * @return ResponseInterface
      */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
@@ -53,10 +54,10 @@ class OrganisationCreateHandler implements RequestHandlerInterface
                 $data = $form->getData();
 
                 $organisation = $this->organisationManager->createOrganisationFromArray($data);
-
                 if (! $organisation) {
                     return new HtmlResponse($this->renderer->render('organisation::create', ['form' => $form]));
                 }
+
                 return new RedirectResponse($this->urlHelper->generate('organisation.view', [
                     'id' => $organisation->getUuid(),
                 ]));

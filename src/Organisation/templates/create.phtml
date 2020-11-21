@@ -8,6 +8,10 @@ $this->pageBreadcrumbs()->setItems([
 ]);
 
 $form = $this->form->prepare();
+/** @var \Laminas\Form\Fieldset $domainFieldset */
+
+;
+
 ?>
 <div class="container">
     <h1>Create Organisation</h1>
@@ -16,6 +20,11 @@ $form = $this->form->prepare();
         <?= $this->formLabel($form->get('name')) ?>
         <?= $this->formElement($form->get('name')) ?>
         <?= $this->formElementErrors($form->get('name', ['class' => 'help-block'])) ?>
+    </div>
+    <div class="form-group">
+        <?= $this->formLabel($form->get('domain')) ?>
+        <?= $this->formElement($form->get('domain')) ?>
+        <?= $this->formElementErrors($form->get('domain')) ?>
     </div>
     <div class="form-group">
         <?= $this->formElement($form->get('submit')) ?>

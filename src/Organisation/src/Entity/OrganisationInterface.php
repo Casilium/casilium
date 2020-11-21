@@ -2,9 +2,11 @@
 
 namespace Organisation\Entity;
 
+
 use DateTime;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Exception;
-use Laminas\InputFilter\InputFilterInterface;
 use Ramsey\Uuid\UuidInterface;
 
 /**
@@ -15,8 +17,15 @@ use Ramsey\Uuid\UuidInterface;
  */
 interface OrganisationInterface
 {
+    /**
+     * @return int|null
+     */
     public function getId(): ?int;
 
+    /**
+     * @param int $id
+     * @return Organisation
+     */
     public function setId(int $id): Organisation;
 
     /**
@@ -24,8 +33,14 @@ interface OrganisationInterface
      */
     public function setUuid(UuidInterface $uuid): Organisation;
 
+    /**
+     * @return UuidInterface
+     */
     public function getUuid(): UuidInterface;
 
+    /**
+     * @return DateTime
+     */
     public function getCreated(): DateTime;
 
     /**
@@ -33,10 +48,20 @@ interface OrganisationInterface
      */
     public function setCreated(DateTime $created): Organisation;
 
+    /**
+     * @return int|null
+     */
     public function getIsActive(): ?int;
 
+    /**
+     * @param int $is_active
+     * @return Organisation
+     */
     public function setIsActive(int $is_active): Organisation;
 
+    /**
+     * @return DateTime|null
+     */
     public function getModified(): ?DateTime;
 
     /**
@@ -44,36 +69,57 @@ interface OrganisationInterface
      */
     public function setModified(?DateTime $modified = null): Organisation;
 
+    /**
+     * @return string|null
+     */
     public function getName(): ?string;
 
+    /**
+     * @param string $name
+     * @return Organisation
+     */
     public function setName(string $name): Organisation;
 
     /**
      * Set organisation type
      *
-     * @return $this
+     * @return Organisation
      */
     public function setTypeId(int $type_id): Organisation;
 
+    /**
+     * Get organisation type
+     *
+     * @return int|null
+     */
     public function getTypeId(): ?int;
 
     /**
-     * Build array from object vars
+     * Get domain name
      *
-     * @return array
+     * @return ArrayCollection
      */
-    public function getArrayCopy(): array;
+    public function getDomains(): Collection;
 
     /**
-     * Populate object vars from array
+     * Add domain to organisation
      *
-     * @param array $data
-     * @throws Exception
+     * @param Domain $domain
      */
-    public function setValues(array $data): Organisation;
+    public function addDomain(Domain $domain);
 
     /**
-     * Input filter and validation
+     * Check if organisation has domain
+     *
+     * @param Domain $domain
+     * @return bool
      */
-    public function getInputFilterSpecification(): InputFilterInterface;
+    public function hasDomain(Domain $domain);
+
+    /**
+     * Remove domain
+     *
+     * @param Domain $domain
+     */
+    public function removeDomain(Domain $domain);
 }

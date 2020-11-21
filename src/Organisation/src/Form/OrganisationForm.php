@@ -9,6 +9,10 @@ use Laminas\Form\Element;
 use Laminas\Form\Form;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator;
+use Organisation\Filter\ToArray;
+use Organisation\Form\Fieldset\DomainFieldset;
+use Organisation\Hydrator\OrganisationHydrator;
+use Organisation\Validator\DomainValidator;
 
 /**
  * Organisation form for modifying organisation details
@@ -23,8 +27,21 @@ class OrganisationForm extends Form implements InputFilterProviderInterface
         $this->addElements($action);
     }
 
+    /**
+     * Add elements to form
+     *
+     * @param string $action
+     */
     public function addElements($action = 'create'): void
     {
+        $element = new Element\Text('domain');
+        $element->setLabel('Domain(s)')->setAttributes([
+            'id' => 'domain',
+            'class' => 'form-control',
+            'placeholder' => 'example.com',
+        ]);
+        $this->add($element);
+
         $element = new Element\Text();
         $element->setName('name')
             ->setLabel('Name')
@@ -34,6 +51,7 @@ class OrganisationForm extends Form implements InputFilterProviderInterface
                 'placeholder'  => 'Name of Organisation',
             ]);
         $this->add($element);
+
 
         if ($action === 'edit') {
             $element = new Element\Select('is_active');
@@ -83,6 +101,18 @@ class OrganisationForm extends Form implements InputFilterProviderInterface
                     ],
                 ],
             ], // name
+            [
+                'name'       => 'domain',
+                'required'   => true,
+                'filters'    => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                    ['name' => ToArray::class],
+                ],
+                'validators' => [
+                    ['name' => DomainValidator::class]
+                ],
+            ],
             [
                 'name'     => 'is_active',
                 'required' => false,

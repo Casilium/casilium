@@ -21,6 +21,11 @@ $form->get('submit')->setValue('Update Organisation');
                 <?= $this->formElementErrors($form->get('name', ['class' => 'help-block'])) ?>
             </div>
             <div class="form-group">
+                <?= $this->formLabel($form->get('domain')) ?>
+                <?= $this->formElement($form->get('domain')) ?>
+                <?= $this->formElementErrors($form->get('domain')) ?>
+            </div>
+            <div class="form-group">
                 <?= $this->formLabel($form->get('is_active')) ?>
                 <?= $this->formElement($form->get('is_active')) ?>
                 <?= $this->formElementErrors($form->get('is_active', ['class' => 'help-block'])) ?>
