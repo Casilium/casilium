@@ -39,6 +39,7 @@ class ConfigProvider
         return [
             'invokables' => [
                 Command\TestCommand::class,
+                Command\CreateSodiumKey::class,
             ],
             'factories'  => [
                 EntityManager::class                               => entitymanagerfactory::class,
