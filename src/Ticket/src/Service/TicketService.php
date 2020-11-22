@@ -4,7 +4,9 @@ declare(strict_types=1);
 
 namespace Ticket\Service;
 
+use DateTime;
 use Doctrine\ORM\EntityManager;
+use Laminas\EventManager\EventManagerInterface;
 use Organisation\Entity\Organisation;
 use Organisation\Service\OrganisationManager;
 use OrganisationContact\Entity\Contact;
@@ -23,6 +25,9 @@ use User\Service\UserManager;
 
 class TicketService
 {
+    /** @var EventManagerInterface */
+    protected $eventManager;
+
     /** @var EntityManager */
     protected $entityManager;
 
@@ -42,6 +47,7 @@ class TicketService
     protected $userManager;
 
     public function __construct(
+        EventManagerInterface $eventManager,
         EntityManager $entityManager,
         OrganisationManager $organisationManager,
         SiteManager $siteManager,
@@ -49,6 +55,7 @@ class TicketService
         QueueManager $queueManager,
         UserManager $userManager
     ) {
+        $this->eventManager        = $eventManager;
         $this->entityManager       = $entityManager;
         $this->organisationManager = $organisationManager;
         $this->siteManager         = $siteManager;
@@ -57,9 +64,6 @@ class TicketService
         $this->userManager         = $userManager;
     }
 
-    /**
-     * Find organisation by uuid
-     */
     public function getOrganisationByUuid(string $uuid): Organisation
     {
         return $this->organisationManager->findOrganisationByUuid($uuid);
@@ -146,7 +150,8 @@ class TicketService
         return $this->entityManager->getRepository(Status::class)->find($id);
     }
 
-    public function findTicketById(int $id) {
+    public function findTicketById(int $id): Ticket
+    {
         return $this->entityManager->getRepository(Ticket::class)->find($id);
     }
 
@@ -160,7 +165,7 @@ class TicketService
         return $this->entityManager->getRepository(Ticket::class)->findAll();
     }
 
-    public function findTicketsByOrganisationUuid(string $uuid)
+    public function findTicketsByOrganisationUuid(string $uuid): array
     {
         return $this->entityManager->getRepository(Ticket::class)->findByOrganisationUuid($uuid);
     }
@@ -203,9 +208,9 @@ class TicketService
         $contact = $this->contactManager->findContactById($data['contact_id']);
         $ticket->setContact($contact);
 
-        $start_date = $data['start_date'] ?? null;
-        if (! empty($start_date)) {
-            $ticket->setStartDate($start_date);
+        $startDate = $data['start_date'] ?? null;
+        if (! empty($startDate)) {
+            $ticket->setStartDate($startDate);
         }
 
         $type = $this->findTypeById($data['type_id']);
@@ -216,19 +221,19 @@ class TicketService
             $ticket->setStatus($this->findStatusById(1));
         }
 
-        return $this->entityManager->getRepository(Ticket::class)->save($ticket);
+        $this->entityManager->getRepository(Ticket::class)->save($ticket);
+        $this->eventManager->trigger('ticket.created', $this, ['id' => $ticket->getId()]);
+
+        return $ticket;
     }
 
-    public function updateStatus(int $id, int $state, $fromResponse = true): Status
+    public function updateStatus(int $id, int $state): Status
     {
-        /** @var Status $status */
         $status = $this->findStatusById($state);
-
-        /** @var Ticket $ticket */
         $ticket = $this->findTicketById($id);
         $ticket->setStatus($status);
 
-        $dt = new \DateTime('now');
+        $dt = new DateTime('now');
         $ticket->setLastResponseDate($dt->format('Y-m-d H:i:s'));
 
         $this->entityManager->flush();
@@ -256,7 +261,6 @@ class TicketService
      *
      * @param Ticket $ticket Ticket related to response
      * @param array $data response data
-     * @return TicketResponse
      */
     public function saveResponse(Ticket $ticket, array $data): TicketResponse
     {
@@ -288,6 +292,7 @@ class TicketService
         $response->setTicketStatus($ticket->getStatus());
 
         // find current user and set as agent responding to ticket
+        /** @var Agent $agent */
         $agent = $this->entityManager->getRepository(Agent::class)->find($data['agent_id']);
         $response->setAgent($agent);
 
@@ -295,6 +300,7 @@ class TicketService
         $this->entityManager->persist($response);
         $this->entityManager->flush();
 
+        $this->eventManager->trigger('ticket.reply', $this, ['id' => $response->getId()]);
         return $response;
     }
 

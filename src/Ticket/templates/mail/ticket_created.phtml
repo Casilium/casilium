@@ -1,0 +1,23 @@
+<?php
+/** @var \Ticket\Entity\Ticket $ticket */
+$ticket = $this->ticket;
+$created = new \DateTime($ticket->getCreatedAt(), new \DateTimeZone('Europe/London'));
+?>
+<p>
+    <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>,
+</p>
+<p>
+    Thank you for contacting Sheridan Support - a support case has been opened for you. We will review the
+    details you provided and get back to you as soon as possible.
+</p>
+<p>
+    For you reference:
+</p>
+<ul>
+    <li>Case #: <?= $this->escapeHtml($ticket->getId()) ?></li>
+    <li>Create on: <?= $created->format('F j, Y g:i A') ?></li>
+    <li>Description: <?= $this->escapeHtml($ticket->getLongDescription()) ?></li>
+</ul>
+<p>
+    Tracking ID: <?= $this->escapeHtml($ticket->getUuid()); ?>
+</p>

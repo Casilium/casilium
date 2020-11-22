@@ -1,0 +1,25 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+// SMTP transport options for sending mail out
+    'mail' => [
+        // is mail service enabled?
+        'enabled'      => true,
+        // sender email address
+        'sender'       => 'helpdesk@example.com',
+        // smtp server options
+        'smtp_options' => [
+            'name'              => 'localhost',
+            'host'              => '127.0.0.1',
+            'port'              => 25,
+            'connection_class'  => 'plain',
+            'connection_config' => [
+                'username' => 'helpdesk@example.com',
+                'password' => 's3cr3tP4ssw0rd',
+                //'ssl'       => 'tls',
+            ],
+        ],
+    ],
+];

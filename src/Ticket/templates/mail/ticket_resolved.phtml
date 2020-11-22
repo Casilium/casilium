@@ -1,0 +1,26 @@
+<?php
+    /** @var \Ticket\Entity\TicketResponse $response */
+    $response = $this->response;
+?>
+<p>
+    Your case #<?= $response->getTicket()->getId() ?>
+    (<?= $this->escapeHtml($response->getTicket()->getShortDescription()) ?>)
+    has been updated.
+</p>
+<p>
+    <strong>Comments:</strong>
+</p>
+<p>
+    <?= $this->escapeHtml($response->getContact()->getFirstName()) ?>,
+</p>
+<p>
+    Our team has indicated that your ticket has been <strong>resolved</strong>.
+</p>
+<p>
+    There is no need to respond to this e-mail unless you believe the ticket has not been resolved. If there
+    is no response from you, we will assume that the ticket has been resolved and the ticket will be
+    automatically closed after 48 hours.
+</p>
+<p>
+    Thank you for choosing Sheridan Computers!
+</p>

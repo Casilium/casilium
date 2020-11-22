@@ -48,6 +48,7 @@
         "laminas/laminas-i18n": "^2.11",
         "laminas/laminas-math": "^3.1",
         "laminas/laminas-session": "^2.10",
+        "laminas/laminas-mail": "^2.10",
         "mezzio/mezzio-session": "^1.4",
         "mezzio/mezzio-session-ext": "^1.10",
         "mezzio/mezzio-csrf": "^1.0",
@@ -62,7 +63,9 @@
         "laminas/laminas-log": "^2.12",
         "ramsey/uuid-doctrine": "^1.6",
         "laminas/laminas-paginator": "^2.9",
-        "laminas/laminas-hydrator": "^3.2"
+        "laminas/laminas-hydrator": "^3.2",
+        "monolog/monolog": "^1.24",
+        "nesbot/carbon": "^2.41.5"
     },
     "require-dev": {
         "laminas/laminas-development-mode": "^3.2",
@@ -86,7 +89,9 @@
             "Organisation\\": "src/Organisation/src",
             "OrganisationSite\\": "src/OrganisationSite/src",
             "OrganisationContact\\": "src/OrganisationContact/src",
-            "Ticket\\": "src/Ticket/src"
+            "Ticket\\": "src/Ticket/src",
+            "MailService\\": "src/MailService/src",
+            "Logger\\": "src/Logger/src"
         }
     },
     "autoload-dev": {

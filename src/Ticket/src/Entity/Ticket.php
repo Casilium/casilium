@@ -13,6 +13,7 @@ use Ramsey\Uuid\Uuid;
 use User\Entity\User;
 use function date;
 use function get_object_vars;
+use function is_string;
 use function strlen;
 
 /**
@@ -44,9 +45,9 @@ class Ticket
     public const URGENCY_DEFAULT = self::URGENCY_LOW;
 
     private const IMPACT_URGENCY_TEXT = [
-        self::IMPACT_HIGH => 'High',
+        self::IMPACT_HIGH   => 'High',
         self::IMPACT_MEDIUM => 'Medium',
-        self::IMPACT_LOW => 'Low',
+        self::IMPACT_LOW    => 'Low',
     ];
 
     private const SOURCE_TEXT = [
@@ -208,7 +209,6 @@ class Ticket
      * @var string|null
      */
     private $lastResponseDate;
-
 
     public function __construct()
     {
@@ -400,7 +400,10 @@ class Ticket
 
     public function getUuid(): string
     {
-        return $this->uuid;
+        if (is_string($this->uuid)) {
+            return $this->uuid;
+        }
+        return $this->uuid->toString();
     }
 
     public function setUuid(string $uuid): Ticket

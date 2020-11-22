@@ -1,0 +1,22 @@
+<?php
+    /** @var \Ticket\Entity\TicketResponse $response */
+    $response = $this->response;
+?>
+<p>
+    Your case #<?= $response->getTicket()->getId() ?>
+    (<?= $this->escapeHtml($response->getTicket()->getShortDescription()) ?>)
+    has been updated.
+</p>
+<p>
+    <strong>Comments:</strong>
+</p>
+<p>
+    Hi <?= $this->escapeHtml($response->getContact()->getFirstName()) ?>,
+</p>
+<p>
+    <?= $this->escapeHtml($response->getResponse()) ?>
+</p>
+<p>
+    Regards<br>
+    <?= $this->escapeHtml($response->getAgent()->getFullName()) ?>
+</p>

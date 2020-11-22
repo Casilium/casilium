@@ -13,6 +13,7 @@ $cacheConfig = [
 ];
 
 $aggregator = new ConfigAggregator([
+    \Laminas\Mail\ConfigProvider::class,
     \Laminas\Paginator\ConfigProvider::class,
     \Laminas\Log\ConfigProvider::class,
     \Mezzio\Authorization\Rbac\ConfigProvider::class,
@@ -46,7 +47,8 @@ $aggregator = new ConfigAggregator([
     \UserAuthentication\ConfigProvider::class,
     // user account preferences
     \Account\ConfigProvider::class,
-    // organisation access
+    \Logger\ConfigProvider::class,
+    \MailService\ConfigProvider::class,
     \Organisation\ConfigProvider::class,
     \OrganisationContact\ConfigProvider::class,
     \OrganisationSite\ConfigProvider::class,
