@@ -25,6 +25,7 @@ class ConfigProvider
             'templates'     => $this->getTemplates(),
             'doctrine'      => $this->getDoctrineEntities(),
             'access_filter' => $this->getAccessFilter(),
+            'console'       => $this->getConsoleCommands(),
         ];
     }
 
@@ -42,6 +43,7 @@ class ConfigProvider
                 ],
             ],
             'factories'  => [
+                Command\CreateTicketsFromEmail::class    => Command\Factory\CreateTicketsFromEmailFactory::class,
                 EventListener\TicketEventListener::class => EventListener\TicketEventListener::class,
                 Handler\CreateTicketHandler::class       => Handler\Factory\TicketCreateHandlerFactory::class,
                 Handler\EditTickerHandler::class         => Handler\Factory\TicketEditHandlerFactory::class,
@@ -90,6 +92,15 @@ class ConfigProvider
                 'ticket' => [
                     ['allow' => '@'],
                 ],
+            ],
+        ];
+    }
+
+    public function getConsoleCommands(): array
+    {
+        return [
+            'commands' => [
+                Command\CreateTicketsFromEmail::class,
             ],
         ];
     }

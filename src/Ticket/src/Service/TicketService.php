@@ -266,6 +266,7 @@ class TicketService
     {
         // update ticket
         $ticketStatus = $ticket->getStatus();
+
         switch ($data['submit']) {
             case 'save_hold':
                 if ($ticket->getStatus()->getId() !== Status::STATUS_ON_HOLD) {

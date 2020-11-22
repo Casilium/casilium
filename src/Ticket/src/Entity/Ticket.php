@@ -448,7 +448,7 @@ class Ticket
         $this->short_description = isset($data['short_description']) ? (string) $data['short_description'] : null;
         $this->start_date        = isset($data['start_date']) && strlen($data['start_date']) > 1 ? (string) $data['start_date'] : date('Y-m-d H:i:s');
         $this->long_description  = isset($data['long_description']) ? (string) $data['long_description'] : null;
-        $this->start_date        = isset($data['last_response_date']) && strlen($data['last_response_date']) > 1 ? (string) $data['last_response_date'] : date('Y-m-d H:i:s');
+        $this->lastResponseDate  = isset($data['last_response_date']) && strlen($data['last_response_date']) > 1 ? (string) $data['last_response_date'] : date('Y-m-d H:i:s');
         $this->organisation      = $data['organisation'] ?? null;
         return $this;
     }
