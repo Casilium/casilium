@@ -21,9 +21,10 @@ $this->pageBreadcrumbs()->setItems([
                 <div class="tab-pane fade show active" id="list-account" role="tabpanel" aria-labelledby="list-account-list">
                     <ul class="list-group">
                         <li class="list-group-item">
-                            <a href="<?= $this->url('admin.queue_create') ?>">
-                                Create Ticket Queue
-                            </a>
+                            <a href="<?= $this->url('admin.queue_create') ?>">Create Queue</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="<?= $this->url('admin.queue_list') ?>">List Queues</a>
                         </li>
                     </ul>
                 </div>

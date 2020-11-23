@@ -15,7 +15,7 @@ use Ticket\Entity\Queue;
 use Ticket\Form\QueueForm;
 use Ticket\Service\QueueManager;
 
-class CreateQueueHandler implements RequestHandlerInterface
+class EditQueueHandler implements RequestHandlerInterface
 {
     /** @var QueueManager */
     protected $queueManager;
@@ -38,8 +38,11 @@ class CreateQueueHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $queueId = (int) $request->getAttribute('id');
+        $queue   = $this->queueManager->findQueueById($queueId);
+
         $form = new QueueForm();
-        $form->bind(new Queue());
+        $form->bind($queue);
 
         if ($request->getMethod() === 'POST') {
             $form->setData($request->getParsedBody());

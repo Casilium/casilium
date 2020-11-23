@@ -7,7 +7,9 @@ use Mezzio\Application;
 use Psr\Container\ContainerInterface;
 use Ticket\Handler\CreateQueueHandler;
 use Ticket\Handler\CreateTicketHandler;
+use Ticket\Handler\EditQueueHandler;
 use Ticket\Handler\EditTickerHandler;
+use Ticket\Handler\ListQueueHandler;
 use Ticket\Handler\ListTicketHandler;
 use Ticket\Handler\ViewTicketHandler;
 
@@ -54,6 +56,16 @@ class RoutesDelegator
             ['GET', 'POST'],
             'admin.queue_create'
         );
+        $app->route(
+            '/admin/ticket/queue/edit/{id:\d}',
+            [
+                EditQueueHandler::class,
+            ],
+            ['GET', 'POST'],
+            'admin.queue_edit'
+        );
+
+        $app->get('/admin/ticket/queue/list', ListQueueHandler::class, 'admin.queue_list');
 
 
         return $app;

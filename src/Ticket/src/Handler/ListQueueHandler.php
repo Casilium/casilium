@@ -5,17 +5,14 @@ declare(strict_types=1);
 namespace Ticket\Handler;
 
 use Laminas\Diactoros\Response\HtmlResponse;
-use Laminas\Form\FormInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Ticket\Entity\Queue;
-use Ticket\Form\QueueForm;
 use Ticket\Service\QueueManager;
 
-class CreateQueueHandler implements RequestHandlerInterface
+class ListQueueHandler implements RequestHandlerInterface
 {
     /** @var QueueManager */
     protected $queueManager;
@@ -38,19 +35,10 @@ class CreateQueueHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $form = new QueueForm();
-        $form->bind(new Queue());
+        $queues = $this->queueManager->findAll();
 
-        if ($request->getMethod() === 'POST') {
-            $form->setData($request->getParsedBody());
-
-            if ($form->isValid()) {
-                $this->queueManager->save($form->getData(FormInterface::VALUES_AS_ARRAY));
-            }
-        }
-
-        return new HtmlResponse($this->renderer->render('ticket::create-queue', [
-            'form' => $form,
+        return new HtmlResponse($this->renderer->render('ticket::list-queue', [
+            'queues' => $queues,
         ]));
     }
 }
