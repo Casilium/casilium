@@ -7,6 +7,7 @@ use Mezzio\Application;
 use Psr\Container\ContainerInterface;
 use Ticket\Handler\CreateQueueHandler;
 use Ticket\Handler\CreateTicketHandler;
+use Ticket\Handler\DeleteQueueHandler;
 use Ticket\Handler\EditQueueHandler;
 use Ticket\Handler\EditTickerHandler;
 use Ticket\Handler\ListQueueHandler;
@@ -41,7 +42,6 @@ class RoutesDelegator
             'ticket.view'
         );
 
-
         $app->get(
             '/ticket/list[/organisation/{org_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}]',
             ListTicketHandler::class,
@@ -65,9 +65,13 @@ class RoutesDelegator
             'admin.queue_edit'
         );
 
+        $app->get(
+            '/admin/ticket/queue/delete/{id:\d}[/confirm/{confirm}]',
+            DeleteQueueHandler::class,
+            'admin.queue_delete'
+        );
+
         $app->get('/admin/ticket/queue/list', ListQueueHandler::class, 'admin.queue_list');
-
-
         return $app;
     }
 }

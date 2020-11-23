@@ -1,0 +1,35 @@
+<?php
+
+/** @var \Ticket\Entity\Queue $queue */
+$queue = $this->queue;
+
+$this->headTitle('Delete Queue');
+?>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h1><?= $this->escapeHtml($queue->getName()) ?></h1>
+            <div class="alert alert-danger">
+                <h2><i class="fas fa-exclamation-triangle fa-fw"></i> Delete Queue</h2>
+                <p>
+                    Are you sure you want to delete the queue "<?= $queue->getName() ?>"?
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <a class="btn btn-primary" href="<?= $this->url('admin.queue_list') ?>">
+                No!
+            </a>
+        </div>
+        <div class="col-sm-6 text-right">
+            <a class="btn btn-danger" href="<?= $this->url('admin.queue_delete', [
+                'id' => $queue->getId(),
+                'confirm' => 'true']) ?>">
+                Yes, I know what I am doing!
+            </a>
+        </div>
+    </div>
+</div>
+

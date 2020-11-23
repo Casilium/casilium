@@ -41,6 +41,13 @@ class QueueManager
         return $this->entityManager->getRepository(Queue::class)->findAll();
     }
 
+    public function delete(int $queueId): void
+    {
+        $queue = $this->findQueueById($queueId);
+        $this->entityManager->remove($queue);
+        $this->entityManager->flush();
+    }
+
     /**
      * Save/update Queue;
      *
