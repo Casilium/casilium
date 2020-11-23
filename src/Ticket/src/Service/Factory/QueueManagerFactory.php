@@ -12,6 +12,8 @@ class QueueManagerFactory
 {
     public function __invoke(ContainerInterface $container)
     {
-        return new QueueManager($container->get(EntityManager::class));
+        $config        = $container->get('config')['encryption'] ?? [];
+        $entityManager = $container->get(EntityManager::class);
+        return new QueueManager($entityManager, $config);
     }
 }

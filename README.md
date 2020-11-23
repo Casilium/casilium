@@ -73,6 +73,11 @@ Files should be served from the "public" directory:
         DocumentRoot /usr/local/www/casilium/public
     </VirtualHost>     
 
+php.ini
+-------
+
+    apc.enable_cli = 1
+
 License
 -------
 Calisium is released under the GPL2 license. See the included LICENSE.txt

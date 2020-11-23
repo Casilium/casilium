@@ -45,6 +45,7 @@ class ConfigProvider
             'factories'  => [
                 Command\CreateTicketsFromEmail::class    => Command\Factory\CreateTicketsFromEmailFactory::class,
                 EventListener\TicketEventListener::class => EventListener\TicketEventListener::class,
+                Handler\CreateQueueHandler::class        => Handler\Factory\CreateQueueHandlerFactory::class,
                 Handler\CreateTicketHandler::class       => Handler\Factory\TicketCreateHandlerFactory::class,
                 Handler\EditTickerHandler::class         => Handler\Factory\TicketEditHandlerFactory::class,
                 Handler\ListTicketHandler::class         => Handler\Factory\ListTickerHandlerFactory::class,

@@ -1,0 +1,95 @@
+<?php
+$this->headTitle('Create Queue');
+
+/** @var \Laminas\Form\Form $form */
+$form = $this->form->prepare();
+?>
+    <div class="row">
+        <div class="col-md-6 mx-auto">
+            <?= $this->form()->openTag($form); ?>
+            <div class="widget">
+                <h1>Create Queue</h1>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('name')); ?>
+                    <?= $this->formElement($form->get('name')); ?>
+                    <?= $this->formElementErrors($form->get('name')); ?>
+                </div>
+                <div class="form-group">
+                    <div class="form-check form-check-inline">
+                        <?= $this->formElement($form->get('fetch_from_mail')); ?>
+                        <?= $this->formLabel($form->get('fetch_from_mail')); ?>
+                        <?= $this->formElementErrors($form->get('fetch_from_mail')); ?>
+                    </div>
+                </div>
+            </div>
+            <div id="mail-settings" class="widget">
+                <h2>E-Mail Settings</h2>
+                <p class="text-muted">
+                    If you would like tickets to be automatically created for this queue when an email is received
+                    to please complete the following details.
+                </p>
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('email')); ?>
+                    <?= $this->formElement($form->get('email')); ?>
+                    <?= $this->formElementErrors($form->get('email')); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('host')); ?>
+                    <?= $this->formElement($form->get('host')); ?>
+                    <?= $this->formElementErrors($form->get('host')); ?>
+                </div>
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('user')); ?>
+                    <?= $this->formElement($form->get('user')); ?>
+                    <?= $this->formElementErrors($form->get('user')); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('password')); ?>
+                    <?= $this->formElement($form->get('password')); ?>
+                    <?= $this->formElementErrors($form->get('password')); ?>
+                </div>
+
+                <div class="form-group">
+                    <?= $this->formLabel($form->get('confirm_password')); ?>
+                    <?= $this->formElement($form->get('confirm_password')); ?>
+                    <?= $this->formElementErrors($form->get('confirm_password')); ?>
+                </div>
+
+                <div class="form-group">
+                    <div class="form-check form-check-inline">
+                        <?= $this->formElement($form->get('use_ssl')); ?>
+                        <?= $this->formLabel($form->get('use_ssl')); ?>
+                        <?= $this->formElementErrors($form->get('use_ssl')); ?>
+                    </div>
+                </div>
+
+            </div>
+            <div class="form-group">
+                <?= $this->formElement($form->get('submit')); ?>
+                <?= $this->formElementErrors($form->get('submit')); ?>
+            </div>
+            <?= $this->form()->closeTag(); ?>
+        </div>
+    </div>
+<?php
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(document).ready(function() {
+    $('#email').focusout(function () {
+        var email_address = $(this).val();
+        $('#user').val(email_address);
+    });
+    
+    $(function () {
+        $('#fetch').change(function () {                
+            $('#mail-settings').toggle(this.checked);
+        }).change(); //ensure visible state matches initially
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();
+
+

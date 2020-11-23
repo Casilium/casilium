@@ -5,6 +5,7 @@ namespace Ticket;
 
 use Mezzio\Application;
 use Psr\Container\ContainerInterface;
+use Ticket\Handler\CreateQueueHandler;
 use Ticket\Handler\CreateTicketHandler;
 use Ticket\Handler\EditTickerHandler;
 use Ticket\Handler\ListTicketHandler;
@@ -44,6 +45,16 @@ class RoutesDelegator
             ListTicketHandler::class,
             'ticket.list'
         );
+
+        $app->route(
+            '/admin/ticket/queue/create',
+            [
+                CreateQueueHandler::class,
+            ],
+            ['GET', 'POST'],
+            'admin.queue_create'
+        );
+
 
         return $app;
     }

@@ -202,8 +202,11 @@ class TicketService
         $site = $this->findSiteById($data['site_id']);
         $ticket->setSite($site);
 
-        $agent = $this->entityManager->getRepository(Agent::class)->find($data['agent_id']);
-        $ticket->setAgent($agent);
+        $agentId = $data['agent_id'] ?? null;
+        if (null !== $agentId) {
+            $agent = $this->entityManager->getRepository(Agent::class)->find($data['agent_id']);
+            $ticket->setAgent($agent);
+        }
 
         $contact = $this->contactManager->findContactById($data['contact_id']);
         $ticket->setContact($contact);
@@ -221,8 +224,9 @@ class TicketService
             $ticket->setStatus($this->findStatusById(1));
         }
 
-        $this->entityManager->getRepository(Ticket::class)->save($ticket);
+        $ticket = $this->entityManager->getRepository(Ticket::class)->save($ticket);
         $this->eventManager->trigger('ticket.created', $this, ['id' => $ticket->getId()]);
+
 
         return $ticket;
     }
@@ -264,24 +268,30 @@ class TicketService
      */
     public function saveResponse(Ticket $ticket, array $data): TicketResponse
     {
-        // update ticket
+
+        $this->entityManager->clear();
+
+        $ticket = $this->findTicketById($ticket->getId());
         $ticketStatus = $ticket->getStatus();
 
-        switch ($data['submit']) {
-            case 'save_hold':
-                if ($ticket->getStatus()->getId() !== Status::STATUS_ON_HOLD) {
-                    // if not on hold, place on hold
-                    $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_ON_HOLD);
-                } else {
-                    // if on hold, place in progress.
-                    $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_IN_PROGRESS);
-                }
-                break;
-            case 'save_resolve':
-                $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_RESOLVED);
-                break;
-            default:
-                break;
+        $submitType = $data['submit'] ?? null;
+        if ($submitType !== null) {
+            switch ($data['submit']) {
+                case 'save_hold':
+                    if ($ticket->getStatus()->getId() !== Status::STATUS_ON_HOLD) {
+                        // if not on hold, place on hold
+                        $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_ON_HOLD);
+                    } else {
+                        // if on hold, place in progress.
+                        $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_IN_PROGRESS);
+                    }
+                    break;
+                case 'save_resolve':
+                    $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_RESOLVED);
+                    break;
+                default:
+                    break;
+            }
         }
 
         $response = new TicketResponse();
@@ -292,10 +302,12 @@ class TicketService
         $response->setContact($ticket->getContact());
         $response->setTicketStatus($ticket->getStatus());
 
-        // find current user and set as agent responding to ticket
-        /** @var Agent $agent */
-        $agent = $this->entityManager->getRepository(Agent::class)->find($data['agent_id']);
-        $response->setAgent($agent);
+        $agentId = $data['agent_id'] ?? null;
+        if (null !== $agentId) {
+            /** @var Agent $agent */
+            $agent = $this->entityManager->getRepository(Agent::class)->find($agentId);
+            $response->setAgent($agent);
+        }
 
         // save ticket response;
         $this->entityManager->persist($response);

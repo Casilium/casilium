@@ -21,9 +21,7 @@
                         [ 'reuse_result_params' => false] ) ?>">
                     <?= $this->escapeHtml($ticket->getOrganisation()->getName()) ?>
                     </a>
-
                 <br>
-
                 <span class="text-muted">
                     <small>
                     Due
@@ -34,7 +32,17 @@
                     <time class="timeago" datetime="<?= $ticket->getCreatedAt() ?>">
                         <?= $ticket->getCreatedAt() ?>
                     </time>
-                    by <?= $this->escapeHtml($ticket->getAgent()->getFullName()) ?>
+                        by
+                        <?php
+                            if (! empty($ticket->getAgent())) {
+                                echo $this->escapeHtml($ticket->getAgent()->getFullName());
+                            } elseif (empty($ticket->getAgent()) && !empty($ticket->getContact())) {
+                                echo sprintf('%s %s',
+                                $this->escapeHtml($ticket->getContact()->getFirstName()),
+                                $this->escapeHtml($ticket->getContact()->getLastName())
+                                );
+                            }
+                        ?>
                     </small>
                 </span>
             </div>

@@ -174,9 +174,11 @@ class Queue
     {
         $this->id              = $data['id'] ?? null;
         $this->name            = $data['name'] ?? null;
+        $this->email           = $data['email'] ?? null;
+        $this->password        = $data['password'] ?? null;
         $this->host            = $data['host'] ?? null;
         $this->user            = $data['user'] ?? null;
-        $this->use_ssl         = $data['ssl'] ?? null;
+        $this->use_ssl         = $data['use_ssl'] ?? null;
         $this->fetch_from_mail = $data['fetch_from_mail'] ?? null;
         return $this;
     }

@@ -255,16 +255,16 @@ class CreateTicketsFromEmail extends Command
             throw new Exception(sprintf('Ticket with UUID %s not found', $uuid));
         }
 
-        /** @var Contact $employee */
+        /** @var Contact $contact */
         $contact = $this->entityManager->getRepository(Contact::class)->findOneBy([
             'work_email' => $message['from'],
         ]);
-        if ($employee === null) {
+        if ($contact === null) {
             throw new Exception(sprintf('Employee not found with email: %s', $message['from']));
         }
 
         $data = [
-            'contact_id'    => $employee->getId(),
+            'contact_id'    => $contact->getId(),
             'ticket_status' => $ticket->getStatus()->getId(),
             'is_public'     => 1,
             'response'      => $this->stripSignature($message['body']),
@@ -308,7 +308,7 @@ class CreateTicketsFromEmail extends Command
     {
         $pattern = '/Tracking ID: ([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/';
         preg_match($pattern, $content, $matches);
-        if ($matches !== null) {
+        if (! empty($matches)) {
             return $matches[1];
         }
         return null;

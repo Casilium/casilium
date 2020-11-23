@@ -54,7 +54,7 @@
                     <strong>Issue</strong>
                 </div>
                 <div class="card-body">
-                    <?= $this->escapeHtml($ticket->getLongDescription()) ?>
+                    <?= nl2br($this->escapeHtml($ticket->getLongDescription())) ?>
                     <hr class="bg-light">
                 </div>
             </div>
@@ -70,10 +70,17 @@
                             <time class="timeago " datetime="<?= $this->escapeHtml($response->getResponseDate()) ?>">
                                 <?= $this->escapeHtml($response->getResponseDate()) ?>
                             </time>
-                            by <?= $this->escapeHtml($response->getAgent()->getFullName()) ?>
+                            by
+                            <?php if (null !== $response->getAgent()) {
+                                echo $this->escapeHtml($response->getAgent()->getFullName());
+                            } elseif ((null === $response->getAgent()) && ($response->getContact() !== null)) {
+                                echo sprintf('%s %s', $this->escapeHtml($response->getContact()->getFirstName()),
+                                $this->escapeHtml($response->getContact()->getLastName()));
+                            }
+                            ?>
                         </span>
                         <br>
-                        <?= $this->escapeHtml($response->getResponse()) ?>
+                        <?= nl2br($this->escapeHtml($response->getResponse())) ?>
                     <hr>
                     <?php endforeach; ?>
                     </small>
@@ -178,8 +185,8 @@
                     ?>
                         <p>
                             <small class="text-muted">
-                                <time class="timeago" datetime="<?= $ticket->getLastResponseDate() ?>">
-                                    <?= $ticket->getLastResponseDate() ?>
+                                <time class="timeago" datetime="<?= $recentTicket->getCreatedAt() ?>">
+                                    <?= $recentTicket->getCreatedAt() ?>
                                 </time>
                             </small><br/>
                             <a href="<?= $this->url('ticket.view', ['ticket_id' => $recentTicket->getUuid()]) ?>">

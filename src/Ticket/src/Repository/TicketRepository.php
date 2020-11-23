@@ -5,45 +5,45 @@ declare(strict_types=1);
 namespace Ticket\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\Query\Expr;
 use Organisation\Entity\Organisation;
 use Ticket\Entity\Ticket;
 
 class TicketRepository extends EntityRepository
 {
-    /**
-     * @param string $uuid
-     * @return Ticket
-     */
-    public function findTicketByUuid(string $uuid): Ticket
+    public function findTicketByUuid(string $uuid): ?Ticket
     {
-        return $this->findOneBy(['uuid' => $uuid]);
+        return $this->getEntityManager()
+            ->createQuery('SELECT t FROM Ticket\Entity\Ticket t WHERE t.uuid = ?1')
+            ->setParameter(1, $uuid)
+            ->getSingleResult();
     }
 
     public function save(Ticket $ticket): Ticket
     {
         $this->getEntityManager()->persist($ticket);
         $this->getEntityManager()->flush();
+
         return $ticket;
     }
 
+    /**
+     * @param int $contactId Contact ID
+     * @param int $limit number of recent tickets to fetch
+     * @return array
+     */
     public function findRecentTicketsByContact(int $contactId, $limit = 5): array
     {
-        $qb = $this->createQueryBuilder('qb');
+        $sql   = 'SELECT t FROM Ticket\Entity\Ticket t where t.contact = ?1';
+        $query = $this->getEntityManager()
+            ->createQuery($sql)
+            ->setParameter(1, $contactId)
+            ->setMaxResults($limit);
 
-        $qb->select('t')
-            ->from(Ticket::class, 't')
-            ->where('t.contact = :contact_id')
-            ->orderBy('t.id', 'DESC')
-            ->setParameter('contact_id', $contactId)
-            ->getQuery()->setMaxResults($limit)
-            ->getResult();
-
-        return $qb->getQuery()->getResult();
-
+        return $query->getResult();
     }
 
-    public function findAll() {
+    public function findAll(): array
+    {
         $qb = $this->createQueryBuilder('q');
         return $qb->select('t')
             ->from(Ticket::class, 't')
@@ -53,7 +53,7 @@ class TicketRepository extends EntityRepository
             ->getQuery()->getResult();
     }
 
-    public function findByOrganisationUuid(string $uuid)
+    public function findByOrganisationUuid(string $uuid): ?Organisation
     {
         $qb = $this->createQueryBuilder('q');
 
@@ -68,5 +68,4 @@ class TicketRepository extends EntityRepository
 
         return $qb->getQuery()->getResult();
     }
-
 }

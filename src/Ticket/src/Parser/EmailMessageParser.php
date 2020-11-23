@@ -62,8 +62,10 @@ class EmailMessageParser
         }
         if ($body !== null) {
             $body = strip_tags($body);
+            $body = self::stripImages($body);
             $body = self::sanitiseLineBreaks($body);
             $body = self::stripSignature($body);
+
             return filter_var($body, FILTER_SANITIZE_STRING);
         }
 
@@ -128,6 +130,13 @@ class EmailMessageParser
         }
 
         //$body = preg_replace('/\s*(.+)\s*[\r\n]--\s+.*/s', '$1', $body);
+        return $body;
+    }
+
+    public static function stripImages(string $body): string
+    {
+        $body = preg_replace('/<img\b[^>]*\bsrc\s*=\s*[\'"]cid[^>]*>/im', '', $body);
+        $body = preg_replace('/\[cid\:.*\]/im', '', $body);
         return $body;
     }
 }

@@ -58,7 +58,7 @@ class MailReader
         ];
 
         $uniqueIds = [];
-        $messages = [];
+        $messages  = [];
 
         $cnt = 0;
         foreach ($this->getConnection() as $index => $message) {
@@ -77,8 +77,8 @@ class MailReader
             if (is_array($messageUniqueId)) {
                 throw new \Exception('Expected single result received array');
             }
-            $uniqueIds[] = $messageUniqueId;
 
+            $uniqueIds[] = $messageUniqueId;
             $messages[$messageUniqueId] = [
                 'from'      => EmailMessageParser::getEmail($message->from),
                 'to'        => EmailMessageParser::getEmail($message->to),

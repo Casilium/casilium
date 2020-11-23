@@ -63,7 +63,9 @@ class ViewTicketHandler implements RequestHandlerInterface
         $recentTickets = $this->ticketService->findRecentTicketsByContact($ticket->getContact()->getId());
 
         $responseForm = new TicketResponseForm();
+
         if ($request->getMethod() === 'POST') {
+
             $responseForm->setData($request->getParsedBody());
 
             if ($responseForm->isValid()) {
@@ -74,6 +76,7 @@ class ViewTicketHandler implements RequestHandlerInterface
                 $data['agent_id'] = $agent_id;
 
                 $response = $this->ticketService->saveResponse($ticket, $data);
+
                 return new RedirectResponse($this->urlHelper->generate('ticket.list'));
 
             }
