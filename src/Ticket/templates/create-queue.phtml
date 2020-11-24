@@ -79,11 +79,6 @@ $form = $this->form->prepare();
 $this->inlineScript()->captureStart();
 echo <<<JS
 $(document).ready(function() {
-    $('#email').focusout(function () {
-        var email_address = $(this).val();
-        $('#user').val(email_address);
-    });
-    
     $(function () {
         $('#fetch').change(function () {                
             $('#mail-settings').toggle(this.checked);
