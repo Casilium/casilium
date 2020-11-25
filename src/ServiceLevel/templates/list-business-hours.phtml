@@ -3,6 +3,7 @@
     $businessHours = $this->businessHours;
 ?>
 <div class="container-fluid">
+    <h1>Business Hours List</h1>
     <?php if (! empty($businessHours)): ?>
         <ul class="list-group">
         <?php foreach ($businessHours as $businessHour): ?>
@@ -13,5 +14,7 @@
             </li>
         <?php endforeach ?>
         </ul>
+    <?php else: ?>
+    <p class="text-info">No business hours have been defined.</p>
     <?php endif ?>
 </div>

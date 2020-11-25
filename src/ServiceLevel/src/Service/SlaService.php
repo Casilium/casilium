@@ -20,7 +20,7 @@ class SlaService
     public function saveBusinessHours(array $data): BusinessHours
     {
         $id = $data['id'] ?? null;
-        if (null === $id) {
+        if (empty($id)) {
             $businessHours = new BusinessHours();
         } else {
             $businessHours = $this->findBusinessHoursById((int) $id);
@@ -28,13 +28,20 @@ class SlaService
 
         $businessHours->exchangeArray($data);
 
-        if (null === $id) {
+        if (empty($id)) {
             $this->entityManager->persist($businessHours);
         }
 
         $this->entityManager->flush();
 
         return $businessHours;
+    }
+
+    public function deleteBusinessHours(int $id): void
+    {
+        $businessHours = $this->findBusinessHoursById($id);
+        $this->entityManager->remove($businessHours);
+        $this->entityManager->flush();
     }
 
     public function findBusinessHoursById(int $id): BusinessHours

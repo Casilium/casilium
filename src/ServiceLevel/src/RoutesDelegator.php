@@ -6,6 +6,7 @@ namespace ServiceLevel;
 use Mezzio\Application;
 use Psr\Container\ContainerInterface;
 use ServiceLevel\Handler\CreateBusinessHoursHandler;
+use ServiceLevel\Handler\DeleteBusinessHoursHandler;
 use ServiceLevel\Handler\EditBusinessHoursHandler;
 use ServiceLevel\Handler\ListBusinessHoursHandler;
 
@@ -24,7 +25,7 @@ class RoutesDelegator
         );
 
         $app->route(
-            '/admin/sla/business-hours/edit/{id}',
+            '/admin/sla/business-hours/edit/{id:\d}',
             EditBusinessHoursHandler::class,
             ['GET', 'POST'],
             'admin.sla_edit_business_hours'
@@ -34,6 +35,12 @@ class RoutesDelegator
             '/admin/sla/business-hours/list',
             ListBusinessHoursHandler::class,
             'admin.sla_list_business_hours'
+        );
+
+        $app->get(
+            '/admin/sla/business-hours/delete/{id:\d}[/confirm/{confirm}]',
+            DeleteBusinessHoursHandler::class,
+            'admin.sla_delete_business_hours'
         );
 
         return $app;

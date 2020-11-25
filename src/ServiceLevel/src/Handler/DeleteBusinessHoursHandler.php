@@ -6,17 +6,14 @@ namespace ServiceLevel\Handler;
 
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
-use Laminas\Form\FormInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use ServiceLevel\Entity\BusinessHours;
-use ServiceLevel\Form\BusinessHoursForm;
 use ServiceLevel\Service\SlaService;
 
-class CreateBusinessHoursHandler implements RequestHandlerInterface
+class DeleteBusinessHoursHandler implements RequestHandlerInterface
 {
     /** @var SlaService */
     protected $slaService;
@@ -36,23 +33,17 @@ class CreateBusinessHoursHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $form = new BusinessHoursForm();
-        $form->bind(new BusinessHours());
+        $id            = (int) $request->getAttribute('id');
+        $businessHours = $this->slaService->findBusinessHoursById($id);
+        $confirm       = (bool) $request->getAttribute('confirm');
 
-        if ($request->getMethod() === 'POST') {
-            $form->setData($request->getParsedBody());
-
-            if ($form->isValid()) {
-                $businessHours = $this->slaService->saveBusinessHours(
-                    $form->getData(FormInterface::VALUES_AS_ARRAY)
-                );
-
-                return new RedirectResponse($this->urlHelper->generate('admin.sla_list_business_hours'));
-            }
+        if (true === $confirm) {
+            $this->slaService->deleteBusinessHours($id);
+            return new RedirectResponse($this->urlHelper->generate('admin.sla_list_business_hours'));
         }
 
-        return new HtmlResponse($this->renderer->render('sla::create-business-hours', [
-            'form' => $form,
+        return new HtmlResponse($this->renderer->render('sla::delete-business-hours', [
+            'businessHours' => $businessHours,
         ]));
     }
 }

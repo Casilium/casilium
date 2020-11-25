@@ -44,6 +44,7 @@ class ConfigProvider
             'invokables' => [],
             'factories'  => [
                 Handler\CreateBusinessHoursHandler::class => Handler\Factory\CreateBusinessHoursHandlerFactory::class,
+                Handler\DeleteBusinessHoursHandler::class => Handler\Factory\DeleteBusinessHoursHandlerFactory::class,
                 Handler\EditBusinessHoursHandler::class   => Handler\Factory\EditBusinessHoursHandlerFactory::class,
                 Handler\ListBusinessHoursHandler::class   => Handler\Factory\ListBusinessHoursHandlerFactory::class,
                 Service\SlaService::class                 => Service\Factory\SlaServiceFactory::class,

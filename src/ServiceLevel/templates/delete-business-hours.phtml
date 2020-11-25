@@ -1,0 +1,32 @@
+<?php
+    /** @var \ServiceLevel\Entity\BusinessHours $businessHours */
+    $businessHours = $this->businessHours;
+?>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h1>Delete Business Hours</h1>
+            <div class="alert alert-danger">
+                <h2><i class="fas fa-exclamation-triangle fa-fw"></i> Delete?</h2>
+                <p>
+                    Are you sure you want to delete the following
+                    business ours entry:<br>"<?= $this->escapeHtml($businessHours->getName()) ?>"?
+                </p>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-6">
+            <a class="btn btn-primary" href="<?= $this->url('admin.sla_list_business_hours', []) ?>">
+                No!
+            </a>
+        </div>
+        <div class="col-sm-6 text-right">
+            <a class="btn btn-danger" href="<?= $this->url('admin.sla_delete_business_hours', [
+                'id' => $businessHours->getId(), 'confirm' => 'true']) ?>">
+                Yes, I know what I am doing!
+            </a>
+        </div>
+    </div>
+</div>
+

@@ -1,6 +1,8 @@
 <?php
     /** @var \Laminas\Form\FormInterface $form */
     $form = $this->form->prepare();
+
+    $action = $this->action ?? null;
 ?>
 <h1>Business Hours</h1>
 <div class="container-fluid">
@@ -164,10 +166,18 @@
     </div>
 
     <div class="form-group row">
-        <div class="col">
+        <div class="col-6">
             <?= $this->formHidden($form->get('id')) ?>
             <?= $this->formElement($form->get('submit')) ?>
             <?= $this->formElementErrors($form->get('submit')) ?>
+        </div>
+        <div class="col-6 text-right">
+            <?php if ($action === 'edit'): ?>
+                <a href="<?= $this->url('admin.sla_delete_business_hours', ['id' => $form->get('id')->getValue()]) ?>"
+                class="btn btn-danger">
+                    Delete
+                </a>
+            <?php endif; ?>
         </div>
     </div>
 

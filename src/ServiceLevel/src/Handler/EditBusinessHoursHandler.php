@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ServiceLevel\Handler;
 
 use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\Form\FormInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
@@ -47,11 +48,14 @@ class EditBusinessHoursHandler implements RequestHandlerInterface
                 $businessHours = $this->slaService->saveBusinessHours(
                     $form->getData(FormInterface::VALUES_AS_ARRAY)
                 );
+
+                return new RedirectResponse($this->urlHelper->generate('admin.sla_list_business_hours'));
             }
         }
 
         return new HtmlResponse($this->renderer->render('sla::create-business-hours', [
-            'form' => $form,
+            'form'   => $form,
+            'action' => 'edit',
         ]));
     }
 }
