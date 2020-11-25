@@ -1,0 +1,267 @@
+<?php
+    /** @var \Laminas\Form\FormInterface $form */
+    $form = $this->form->prepare();
+?>
+<h1>Business Hours</h1>
+<div class="container-fluid">
+    <?= $this->form()->openTag($form) ?>
+    <div class="form-group row">
+        <div class="col-sm-4 my-auto">
+            <?= $this->formLabel($form->get('name')) ?>
+        </div>
+        <div class="col-sm-8">
+            <?= $this->formElement($form->get('name')) ?>
+            <?= $this->formElementErrors($form->get('name')) ?>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-4 my-auto">
+            <?= $this->formLabel($form->get('timezone')) ?>
+        </div>
+        <div class="col-sm-8">
+            <?= $this->formElement($form->get('timezone')) ?>
+            <?= $this->formElementErrors($form->get('timezone')) ?>
+        </div>
+    </div>
+    <div class="form-group row">
+        <div class="col-sm-1 text-right">
+            <?= $this->formElement($form->get('mon_active')) ?>
+        </div>
+        <div class="col-sm-3 my-auto">
+            <?= $this->formLabel($form->get('mon_start')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('mon_start')) ?>
+            <?= $this->formElementErrors($form->get('mon_start')) ?>
+        </div>
+        <div class="col-sm-2 text-right">
+            <?= $this->formLabel($form->get('mon_end')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('mon_end')) ?>
+            <?= $this->formElementErrors($form->get('mon_end')) ?>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-1 text-right">
+            <?= $this->formElement($form->get('tue_active')) ?>
+        </div>
+        <div class="col-sm-3 my-auto">
+            <?= $this->formLabel($form->get('tue_start')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('tue_start')) ?>
+            <?= $this->formElementErrors($form->get('tue_start')) ?>
+        </div>
+        <div class="col-sm-2 text-right">
+            <?= $this->formLabel($form->get('tue_end')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('tue_end')) ?>
+            <?= $this->formElementErrors($form->get('tue_end')) ?>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-1 text-right">
+            <?= $this->formElement($form->get('wed_active')) ?>
+        </div>
+        <div class="col-sm-3 my-auto">
+            <?= $this->formLabel($form->get('wed_start')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('wed_start')) ?>
+            <?= $this->formElementErrors($form->get('wed_start')) ?>
+        </div>
+        <div class="col-sm-2 text-right">
+            <?= $this->formLabel($form->get('wed_end')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('wed_end')) ?>
+            <?= $this->formElementErrors($form->get('wed_end')) ?>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-1 text-right">
+            <?= $this->formElement($form->get('thu_active')) ?>
+        </div>
+        <div class="col-sm-3 my-auto">
+            <?= $this->formLabel($form->get('thu_start')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('thu_start')) ?>
+            <?= $this->formElementErrors($form->get('thu_start')) ?>
+        </div>
+        <div class="col-sm-2 text-right">
+            <?= $this->formLabel($form->get('thu_end')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('thu_end')) ?>
+            <?= $this->formElementErrors($form->get('thu_end')) ?>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-1 text-right">
+            <?= $this->formElement($form->get('fri_active')) ?>
+        </div>
+        <div class="col-sm-3 my-auto">
+            <?= $this->formLabel($form->get('fri_start')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('fri_start')) ?>
+            <?= $this->formElementErrors($form->get('fri_start')) ?>
+        </div>
+        <div class="col-sm-2 text-right">
+            <?= $this->formLabel($form->get('fri_end')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('fri_end')) ?>
+            <?= $this->formElementErrors($form->get('fri_end')) ?>
+        </div>
+    </div>
+<hr class="border-bottom">
+    <div class="form-group row">
+        <div class="col-sm-1 text-right">
+            <?= $this->formElement($form->get('sat_active')) ?>
+        </div>
+        <div class="col-sm-3 my-auto">
+            <?= $this->formLabel($form->get('sat_start')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('sat_start')) ?>
+            <?= $this->formElementErrors($form->get('sat_start')) ?>
+        </div>
+        <div class="col-sm-2 text-right">
+            <?= $this->formLabel($form->get('sat_end')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('sat_end')) ?>
+            <?= $this->formElementErrors($form->get('sat_end')) ?>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col-sm-1 text-right">
+            <?= $this->formElement($form->get('sun_active')) ?>
+        </div>
+        <div class="col-sm-3 my-auto">
+            <?= $this->formLabel($form->get('sun_start')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('sun_start')) ?>
+            <?= $this->formElementErrors($form->get('sun_start')) ?>
+        </div>
+        <div class="col-sm-2 text-right">
+            <?= $this->formLabel($form->get('sun_end')) ?>
+        </div>
+        <div class="col-sm-3">
+            <?= $this->formElement($form->get('sun_end')) ?>
+            <?= $this->formElementErrors($form->get('sun_end')) ?>
+        </div>
+    </div>
+
+    <div class="form-group row">
+        <div class="col">
+            <?= $this->formHidden($form->get('id')) ?>
+            <?= $this->formElement($form->get('submit')) ?>
+            <?= $this->formElementErrors($form->get('submit')) ?>
+        </div>
+    </div>
+
+    <?= $this->form()->closeTag() ?>
+</div>
+<?php
+$this->inlineScript()->captureStart();
+echo <<<JS
+$(document).ready(function() {
+    $(function () {
+        $('input[name="mon_active"').change(function () {                
+            $('input[name="mon_start"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+            
+            $('input[name="mon_end"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+        });
+        
+        $('input[name="tue_active"').change(function () {                
+            $('input[name="tue_start"]')            
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+
+            $('input[name="tue_end"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+        });
+        
+        $('input[name="wed_active"').change(function () {                
+            $('input[name="wed_start"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+
+            $('input[name="wed_end"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+        });
+        
+        $('input[name="thu_active"').change(function () {                
+            $('input[name="thu_start"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+            
+            $('input[name="thu_end"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+        });
+        
+        $('input[name="fri_active"').change(function () {                
+            $('input[name="fri_start"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+            
+            $('input[name="fri_end"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+        }); 
+        
+        $('input[name="sat_active"').change(function () {                
+            $('input[name="sat_start"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+            
+            $('input[name="sat_end"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+        });
+        
+        $('input[name="sun_active"').change(function () {                
+            $('input[name="sun_start"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+            
+            $('input[name="sun_end"]')
+            .attr('disabled', !this.checked)
+            .attr('readonly', !this.checked)
+            .val('');
+        });
+    });
+});
+JS;
+$this->inlineScript()->captureEnd();

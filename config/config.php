@@ -52,6 +52,7 @@ $aggregator = new ConfigAggregator([
     \Organisation\ConfigProvider::class,
     \OrganisationContact\ConfigProvider::class,
     \OrganisationSite\ConfigProvider::class,
+    \ServiceLevel\ConfigProvider::class,
     \Ticket\ConfigProvider::class,
     // Swoole config to overwrite some services (if installed)
    // class_exists(\Mezzio\Swoole\ConfigProvider::class)

@@ -1,0 +1,17 @@
+<?php
+    /** @var \ServiceLevel\Entity\BusinessHours[] $businessHours */
+    $businessHours = $this->businessHours;
+?>
+<div class="container-fluid">
+    <?php if (! empty($businessHours)): ?>
+        <ul class="list-group">
+        <?php foreach ($businessHours as $businessHour): ?>
+            <li class="list-group-item">
+                <a href="<?= $this->url('admin.sla_edit_business_hours', ['id' => $businessHour->getId()]) ?>">
+                    <?= $businessHour->getName() ?>
+                </a>
+            </li>
+        <?php endforeach ?>
+        </ul>
+    <?php endif ?>
+</div>

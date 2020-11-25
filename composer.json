@@ -90,6 +90,7 @@
             "Organisation\\": "src/Organisation/src",
             "OrganisationSite\\": "src/OrganisationSite/src",
             "OrganisationContact\\": "src/OrganisationContact/src",
+            "ServiceLevel\\": "src/ServiceLevel/src",
             "Ticket\\": "src/Ticket/src",
             "MailService\\": "src/MailService/src",
             "Logger\\": "src/Logger/src"

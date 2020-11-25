@@ -12,13 +12,21 @@ $this->pageBreadcrumbs()->setItems([
     <div class="row">
         <div class="col-4">
             <div class="list-group" id="list-tab" role="tablist">
-                <a class="list-group-item list-group-item-action active" id="list-account-list" data-toggle="list" href="#list-account" role="tab" aria-controls="home">Queues</a>
+                <a class="list-group-item list-group-item-action active" id="list-business-hours-list" data-toggle="list" href="#list-business-hours" role="tab" aria-controls="home">Business Hours</a>
+                <a class="list-group-item list-group-item-action" id="list-account-list" data-toggle="list" href="#list-account" role="tab" aria-controls="home">Queues</a>
                 <a class="list-group-item list-group-item-action" id="list-user-list" data-toggle="list" href="#list-user" role="tab" aria-controls="profile">Users</a>
             </div>
         </div>
         <div class="col-8">
             <div class="tab-content" id="nav-tabContent">
-                <div class="tab-pane fade show active" id="list-account" role="tabpanel" aria-labelledby="list-account-list">
+                <div class="tab-pane fade show active" id="list-business-hours" role="tabpanel" aria-labelledby="list-business-hours-list">
+                    <ul class="list-group">
+                        <li class="list-group-item"><a href="<?= $this->url('admin.sla_create_business_hours'); ?>">Create Business Hours</a></li>
+                        <li class="list-group-item"><a href="<?= $this->url('admin.sla_list_business_hours') ?>">List Business Hours</a></li>
+                    </ul>
+                </div>
+
+                <div class="tab-pane fade" id="list-account" role="tabpanel" aria-labelledby="list-account-list">
                     <ul class="list-group">
                         <li class="list-group-item">
                             <a href="<?= $this->url('admin.queue_create') ?>">Create Queue</a>
