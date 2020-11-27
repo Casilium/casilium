@@ -6,6 +6,7 @@ namespace ServiceLevel\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Organisation\Entity\Organisation;
 use ServiceLevel\Entity\BusinessHours;
 use ServiceLevel\Entity\Sla;
 use ServiceLevel\Entity\SlaTarget;
@@ -231,5 +232,24 @@ class SlaService
     public function findPriorityById(int $id): Priority
     {
         return $this->entityManager->getRepository(Priority::class)->find($id);
+    }
+
+    public function assignOrganisationSla(int $orgId, int $slaId): void
+    {
+        if ($orgId === 0) {
+            throw new \Exception('Client ID not passed');
+        }
+
+        if ($slaId === 0) {
+            throw new \Exception('Invalid SLA ID');
+        }
+
+        /** @var Organisation $organisation */
+        $organisation = $this->entityManager->getRepository(Organisation::class)->find($orgId);
+
+        /** @var Sla $sla */
+        $sla = $this->findSlaById($slaId);
+        $organisation->setSla($sla);
+        $this->entityManager->flush();
     }
 }

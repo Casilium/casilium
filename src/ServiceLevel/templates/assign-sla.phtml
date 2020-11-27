@@ -1,0 +1,39 @@
+<?php
+$action = $this->action ?? 'New';
+$this->headTitle(sprintf('%s SLA', $action));
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Admin' => $this->url('admin'),
+    'SLA' => $this->url('admin.sla_list'),
+    'Assign' => '',
+]);
+
+/** @var \Laminas\Form\FormInterface $form */
+$form = $this->form;
+
+/** @var \Organisation\Entity\Organisation $organisation */
+$organisation = $this->organisation;
+?>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h1><?= $this->escapeHtml($organisation->getName()) ?></h1>
+            <h2>Assign SLA</h2>
+            <p>
+                Please select the SLA to assign.
+            </p>
+            <?= $this->form()->openTag($form) ?>
+            <div class="form-group">
+                <?= $this->formLabel($form->get('sla_id')) ?>
+                <?= $this->formElement($form->get('sla_id')) ?>
+                <?= $this->formElementErrors($form->get('sla_id')) ?>
+            </div>
+            <div class="form-group">
+                <?= $this->formElement($form->get('submit')) ?>
+                <?= $this->formElementErrors($form->get('submit')) ?>
+            </div>
+            <?= $this->form()->closeTag($form) ?>
+        </div>
+    </div>
+</div>

@@ -13,6 +13,7 @@ use Organisation\Exception\OrganisationNameException;
 use Organisation\Validator\OrganisationNameValidator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
+use ServiceLevel\Entity\Sla;
 
 /**
  * https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/basic-mapping.html
@@ -61,6 +62,14 @@ class Organisation implements OrganisationInterface
     protected $is_active;
 
     /**
+     * @ORM\OneToOne(targetEntity="ServiceLevel\Entity\Sla")
+     * @ORM\JoinColumn(name="sla_id", referencedColumnName="id", nullable=true)
+     *
+     * @var Sla|null
+     */
+    protected $sla;
+
+    /**
      * @ORM\Column(type="utcdatetime", nullable=false)
      *
      * @var DateTime
@@ -104,7 +113,6 @@ class Organisation implements OrganisationInterface
         $now = new \DateTime('UTC', new \DateTimeZone('UTC'));
         $this->created = $now;
         $this->modified = $now;
-
     }
 
     /**
@@ -292,5 +300,23 @@ class Organisation implements OrganisationInterface
     public function removeDomain(Domain $domain)
     {
         $this->domains->removeElement($domain);
+    }
+
+    /**
+     * @return Sla
+     */
+    public function getSla(): ?Sla
+    {
+        return $this->sla;
+    }
+
+    /**
+     * @param Sla $sla
+     * @return Organisation
+     */
+    public function setSla(Sla $sla): Organisation
+    {
+        $this->sla = $sla;
+        return $this;
     }
 }

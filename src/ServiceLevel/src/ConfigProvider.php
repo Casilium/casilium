@@ -47,6 +47,7 @@ class ConfigProvider
                 Handler\DeleteBusinessHoursHandler::class => Handler\Factory\DeleteBusinessHoursHandlerFactory::class,
                 Handler\EditBusinessHoursHandler::class   => Handler\Factory\EditBusinessHoursHandlerFactory::class,
                 Handler\ListBusinessHoursHandler::class   => Handler\Factory\ListBusinessHoursHandlerFactory::class,
+                Handler\AssignSlaHandler::class           => Handler\Factory\AssignSlaHandlerFactory::class,
                 Handler\CreateSlaHandler::class           => Handler\Factory\CreateSlaHandlerFactory::class,
                 Handler\EditSlaHandler::class             => Handler\Factory\EditSlaHandlerFactory::class,
                 Handler\ListSlaHandler::class             => Handler\Factory\ListSlaHandlerFactory::class,

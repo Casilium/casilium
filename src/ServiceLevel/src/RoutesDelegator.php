@@ -5,6 +5,7 @@ namespace ServiceLevel;
 
 use Mezzio\Application;
 use Psr\Container\ContainerInterface;
+use ServiceLevel\Handler\AssignSlaHandler;
 use ServiceLevel\Handler\CreateBusinessHoursHandler;
 use ServiceLevel\Handler\CreateSlaHandler;
 use ServiceLevel\Handler\DeleteBusinessHoursHandler;
@@ -71,6 +72,13 @@ class RoutesDelegator
             '/admin/sla/view/{id:\d}',
             ViewSlaHandler::class,
             'admin.sla_view',
+        );
+
+        $app->route(
+            '/admin/sla/assign/{org_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}[/]',
+            AssignSlaHandler::class,
+            ['GET', 'POST'],
+            'admin.sla_assign'
         );
 
         return $app;

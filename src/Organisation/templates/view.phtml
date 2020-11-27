@@ -32,6 +32,23 @@ $this->pageBreadcrumbs()->setItems([
     <p>
         Is active: <span class="text-info"><?= $organisation->getIsActive() === 1 ? 'true' : 'false' ?></span>
     </p>
+    <p>
+        SLA:
+        <?php if ($organisation->getSla() === null): ?>
+            <span class="text-info">
+                No SLA assigned
+                <a href="<?= $this->url('admin.sla_assign', ['org_id' => $organisation->getUuid()]) ?>">
+                    (assign SLA)
+                </a>
+            </span>
+        <?php else: ?>
+            <span class="text-info">
+                <a href="<?= $this->url('admin.sla_view', ['id' => $organisation->getSla()->getId()]) ?>">
+                <?= $this->escapeHtml($organisation->getSla()->getName()) ?>
+                </a>
+            </span>
+        <?php endif ?>
+    </p>
     <a class="btn btn-sm btn-primary" href="<?= $this->url('organisation.list') ?>">Organisation List</a>
     <a class="btn btn-sm btn-info" href="<?= $this->url('organisation.edit', ['id' => $organisation->getUuid()]) ?>">
         Edit Organisation

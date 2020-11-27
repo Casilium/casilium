@@ -81,11 +81,27 @@ final class Version20201125142408 extends AbstractMigration
         $table->addOption('engine', 'InnoDB');
     }
 
+    /**
+     * Add SLA column to client table
+     *
+     * @param Schema $schema
+     * @throws \Doctrine\DBAL\Schema\SchemaException
+     */
+    protected function addSlaToClientTable(Schema $schema)
+    {
+        $table = $schema->getTable('organisation');
+        $table->addColumn('sla_id', 'integer', ['notnull' => false, 'unsigned' => true]);
+
+        $table->addForeignKeyConstraint('sla',['sla_id'], ['id'],
+            ['onDelete'=>'RESTRICT', 'onUpdate'=>'RESTRICT'], 'org_sla_fk');
+    }
+
     public function up(Schema $schema): void
     {
         $this->generateBusinessHours($schema);
         $this->generateSlaTables($schema);
         $this->generateSlaTargets($schema);
+        $this->addSlaToClientTable($schema);
     }
 
     public function down(Schema $schema): void
