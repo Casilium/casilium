@@ -34,8 +34,8 @@ final class Version20201125142408 extends AbstractMigration
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('sla_id', 'integer', ['notnull' => true, 'unsigned' => true]);
         $table->addColumn('priority_id', 'string', ['notnull' => true, 'unsigned' => true]);
-        $table->addColumn('response_time', 'string', ['notnull' => true, 'unsigned' => true]);
-        $table->addColumn('resolve_time', 'string', ['notnull' => true, 'unsigned' => true]);
+        $table->addColumn('response_time', 'string', ['notnull' => false, 'length' => 5]);
+        $table->addColumn('resolve_time', 'string', ['notnull' => false, 'length' => 5]);
 
         $table->addForeignKeyConstraint(
             'sla',

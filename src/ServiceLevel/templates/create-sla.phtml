@@ -1,8 +1,7 @@
 <?php
-/** @var \Laminas\Form\FormInterface $form */
+
 
 $action = $this->action ?? 'New';
-
 $this->headTitle(sprintf('%s SLA', $action));
 
 $this->pageBreadcrumbs()->setItems([
@@ -12,6 +11,7 @@ $this->pageBreadcrumbs()->setItems([
     $action => '',
 ]);
 
+/** @var \Laminas\Form\FormInterface $form */
 $form = $this->form->prepare();
 ?>
 <h1>SLA Policies</h1>

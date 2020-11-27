@@ -35,33 +35,33 @@ class SlaHydrator extends AbstractHydrator
 
         $slaTarget = new SlaTarget();
         $slaTarget->setPriority($this->slaService->findPriorityById(Priority::PRIORITY_LOW));
-        $slaTarget->setResolveTime((int) $data['p_low_response_time']);
-        $slaTarget->setResolveTime((int) $data['p_low_resolve_time']);
+        $slaTarget->setResolveTime($data['p_low_response_time']);
+        $slaTarget->setResolveTime($data['p_low_resolve_time']);
         $slaTarget->setSla($object);
         $object->addSlaTarget($slaTarget);
 
         $slaTarget = new SlaTarget();
         $slaTarget->setPriority($this->slaService->findPriorityById(Priority::PRIORITY_LOW));
-        $slaTarget->setResolveTime((int) $data['p_medium_response_time']);
-        $slaTarget->setResolveTime((int) $data['p_medium_resolve_time']);
+        $slaTarget->setResolveTime($data['p_medium_response_time']);
+        $slaTarget->setResolveTime($data['p_medium_resolve_time']);
         $object->addSlaTarget($slaTarget);
 
         $slaTarget = new SlaTarget();
         $slaTarget->setPriority($this->slaService->findPriorityById(Priority::PRIORITY_LOW));
-        $slaTarget->setResolveTime((int) $data['p_high_response_time']);
-        $slaTarget->setResolveTime((int) $data['p_high_resolve_time']);
+        $slaTarget->setResolveTime($data['p_high_response_time']);
+        $slaTarget->setResolveTime($data['p_high_resolve_time']);
         $object->addSlaTarget($slaTarget);
 
         $slaTarget = new SlaTarget();
         $slaTarget->setPriority($this->slaService->findPriorityById(Priority::PRIORITY_LOW));
-        $slaTarget->setResolveTime((int) $data['p_urgent_response_time']);
-        $slaTarget->setResolveTime((int) $data['p_urgent_resolve_time']);
+        $slaTarget->setResolveTime($data['p_urgent_response_time']);
+        $slaTarget->setResolveTime($data['p_urgent_resolve_time']);
         $object->addSlaTarget($slaTarget);
 
         $slaTarget = new SlaTarget();
         $slaTarget->setPriority($this->slaService->findPriorityById(Priority::PRIORITY_LOW));
-        $slaTarget->setResolveTime((int) $data['p_critical_response_time']);
-        $slaTarget->setResolveTime((int) $data['p_critical_resolve_time']);
+        $slaTarget->setResolveTime($data['p_critical_response_time']);
+        $slaTarget->setResolveTime($data['p_critical_resolve_time']);
         $object->addSlaTarget($slaTarget);
 
         return $object;

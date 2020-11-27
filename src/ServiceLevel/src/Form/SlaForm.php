@@ -41,9 +41,9 @@ class SlaForm extends Form implements InputFilterProviderInterface
         $this->add($element);
 
         $element = new Element\Select('business_hours');
-        $element->setLabel('Applies to')
+        $element->setLabel('Business Hours')
             ->setAttributes([
-                'id'       => 'applies_to',
+                'id'       => 'business_hours',
                 'class'    => 'form-control',
                 'required' => true,
             ])
@@ -58,73 +58,83 @@ class SlaForm extends Form implements InputFilterProviderInterface
             ]);
         $this->add($element);
 
-        $element = new Element\Number('p_low_response_time');
+        $element = new Element\Text('p_low_response_time');
         $element->setLabel('Respond Time (low priority)')
             ->setAttributes([
                 'class' => 'form_control',
+                'placeholder' => 'hh:mm',
             ]);
         $this->add($element);
 
-        $element = new Element\Number('p_low_resolve_time');
+        $element = new Element\Text('p_low_resolve_time');
         $element->setLabel('Resolve time (low priority)')
             ->setAttributes([
                 'class' => 'form_control',
+                'placeholder' => 'hh:mm',
             ]);
         $this->add($element);
 
-        $element = new Element\Number('p_medium_response_time');
+        $element = new Element\Text('p_medium_response_time');
         $element->setLabel('Respond Time (medium priority)')
             ->setAttributes([
                 'class' => 'form_control',
+                'placeholder' => 'hh:mm',
             ]);
         $this->add($element);
 
-        $element = new Element\Number('p_medium_resolve_time');
+        $element = new Element\Text('p_medium_resolve_time');
         $element->setLabel('Resolve time (medium priority)')
             ->setAttributes([
                 'class' => 'form_control',
+                'placeholder' => 'hh:mm',
             ]);
         $this->add($element);
 
-        $element = new Element\Number('p_high_response_time');
+        $element = new Element\Text('p_high_response_time');
         $element->setLabel('Respond Time (high priority)')
             ->setAttributes([
                 'class' => 'form_control',
+                'placeholder' => 'hh:mm',
             ]);
         $this->add($element);
 
-        $element = new Element\Number('p_high_resolve_time');
+        $element = new Element\Text('p_high_resolve_time');
         $element->setLabel('Resolve time (high priority)')
             ->setAttributes([
                 'class' => 'form_control',
+                'placeholder' => 'hh:mm',
             ]);
         $this->add($element);
 
-        $element = new Element\Number('p_urgent_response_time');
+        $element = new Element\Text('p_urgent_response_time');
         $element->setLabel('Respond Time (urgent priority)')
             ->setAttributes([
                 'class' => 'form_control',
+                'placeholder' => 'hh:mm',
             ]);
         $this->add($element);
 
-        $element = new Element\Number('p_urgent_resolve_time');
+        $element = new Element\Text('p_urgent_resolve_time');
         $element->setLabel('Resolve time (urgent priority)')
             ->setAttributes([
                 'class' => 'form_control',
+                'placeholder' => 'hh:mm',
             ]);
         $this->add($element);
 
-        $element = new Element\Number('p_critical_response_time');
+        $element = new Element\Text('p_critical_response_time');
         $element->setLabel('Respond Time (critical priority)')
             ->setAttributes([
                 'class' => 'form_control',
+                'placeholder' => 'hh:mm',
             ]);
         $this->add($element);
 
-        $element = new Element\Number('p_critical_resolve_time');
+        $element = new Element\Text('p_critical_resolve_time');
         $element->setLabel('Resolve time (critical priority)')
             ->setAttributes([
                 'class' => 'form_control',
+                'placeholder' => 'hh:mm',
             ]);
         $this->add($element);
     }
@@ -150,6 +160,167 @@ class SlaForm extends Form implements InputFilterProviderInterface
                     ['name' => Filter\StringTrim::class],
                 ],
             ],
+            [
+                'name'       => 'p_low_response_time',
+                'required'   => false,
+                'filters'    => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\Regex::class,
+                        'options' => [
+                            'pattern' => '/^\d{2}:\d{2}$/',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name'       => 'p_low_resolve_time',
+                'required'   => false,
+                'filters'    => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\Regex::class,
+                        'options' => [
+                            'pattern' => '/^\d{2}:\d{2}$/',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name'       => 'p_medium_response_time',
+                'required'   => false,
+                'filters'    => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\Regex::class,
+                        'options' => [
+                            'pattern' => '/^\d{2}:\d{2}$/',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name'       => 'p_medium_resolve_time',
+                'required'   => false,
+                'filters'    => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\Regex::class,
+                        'options' => [
+                            'pattern' => '/^\d{2}:\d{2}$/',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name'       => 'p_high_response_time',
+                'required'   => false,
+                'filters'    => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\Regex::class,
+                        'options' => [
+                            'pattern' => '/^\d{2}:\d{2}$/',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name'       => 'p_high_resolve_time',
+                'required'   => false,
+                'filters'    => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\Regex::class,
+                        'options' => [
+                            'pattern' => '/^\d{2}:\d{2}$/',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name'       => 'p_urgent_response_time',
+                'required'   => false,
+                'filters'    => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\Regex::class,
+                        'options' => [
+                            'pattern' => '/^\d{2}:\d{2}$/',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name'       => 'p_urgent_resolve_time',
+                'required'   => false,
+                'filters'    => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\Regex::class,
+                        'options' => [
+                            'pattern' => '/^\d{2}:\d{2}$/',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name'       => 'p_critical_response_time',
+                'required'   => false,
+                'filters'    => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\Regex::class,
+                        'options' => [
+                            'pattern' => '/^\d{2}:\d{2}$/',
+                        ],
+                    ],
+                ],
+            ],
+            [
+                'name'       => 'p_critical_resolve_time',
+                'required'   => false,
+                'filters'    => [
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
+                ],
+                'validators' => [
+                    [
+                        'name'    => Validator\Regex::class,
+                        'options' => [
+                            'pattern' => '/^\d{2}:\d{2}$/',
+                        ],
+                    ],
+                ],
+            ],
+
         ];
     }
 }

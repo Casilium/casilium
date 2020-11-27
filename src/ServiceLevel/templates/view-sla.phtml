@@ -76,12 +76,14 @@ function humanReadableTime($seconds) {
             <div class="row">
                 <div class="col-6">
                     <div class="list-group-item">
-                        <?= $this->escapeHtml(humanReadableTime($target->getResponseTime())) ?>
+                        <?= $this->escapeHtml(humanReadableTime(
+                                $target->getTimeInSeconds($target->getResponseTime()))) ?>
                     </div>
                 </div>
                 <div class="col-6">
                     <div class="list-group-item">
-                        <?= $this->escapeHtml(humanReadableTime($target->getResolveTime())) ?>
+                        <?= $this->escapeHtml(humanReadableTime(
+                                $target->getTimeInSeconds($target->getResolveTime()))) ?>
                     </div>
                 </div>
             </div>

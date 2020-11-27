@@ -146,36 +146,36 @@ class SlaService
 
         $target = new SlaTarget();
         $target->setPriority($this->findPriorityById(Priority::PRIORITY_LOW));
-        $target->setResponseTime((int) $data['p_low_response_time']);
-        $target->setResolveTime((int) $data['p_low_resolve_time']);
+        $target->setResponseTime($data['p_low_response_time']);
+        $target->setResolveTime($data['p_low_resolve_time']);
         $target->setSla($sla);
         $sla->addSlaTarget($target);
 
         $target = new SlaTarget();
         $target->setPriority($this->findPriorityById(Priority::PRIORITY_MEDIUM));
-        $target->setResponseTime((int) $data['p_medium_response_time']);
-        $target->setResolveTime((int) $data['p_medium_resolve_time']);
+        $target->setResponseTime($data['p_medium_response_time']);
+        $target->setResolveTime($data['p_medium_resolve_time']);
         $target->setSla($sla);
         $sla->addSlaTarget($target);
 
         $target = new SlaTarget();
         $target->setPriority($this->findPriorityById(Priority::PRIORITY_HIGH));
-        $target->setResponseTime((int) $data['p_high_response_time']);
-        $target->setResolveTime((int) $data['p_high_resolve_time']);
+        $target->setResponseTime($data['p_high_response_time']);
+        $target->setResolveTime($data['p_high_resolve_time']);
         $target->setSla($sla);
         $sla->addSlaTarget($target);
 
         $target = new SlaTarget();
         $target->setPriority($this->findPriorityById(Priority::PRIORITY_URGENT));
-        $target->setResponseTime((int) $data['p_urgent_response_time']);
-        $target->setResolveTime((int) $data['p_urgent_resolve_time']);
+        $target->setResponseTime($data['p_urgent_response_time']);
+        $target->setResolveTime($data['p_urgent_resolve_time']);
         $target->setSla($sla);
         $sla->addSlaTarget($target);
 
         $target = new SlaTarget();
         $target->setPriority($this->findPriorityById(Priority::PRIORITY_CRITICAL));
-        $target->setResponseTime((int) $data['p_critical_response_time']);
-        $target->setResolveTime((int) $data['p_critical_resolve_time']);
+        $target->setResponseTime($data['p_critical_response_time']);
+        $target->setResolveTime($data['p_critical_resolve_time']);
         $target->setSla($sla);
         $sla->addSlaTarget($target);
 

@@ -38,14 +38,14 @@ class SlaTarget
     protected $priority;
 
     /**
-     * @ORM\Column(name="response_time", type="integer")
-     * @var int
+     * @ORM\Column(name="response_time", type="string", nullable=true)
+     * @var string
      */
     protected $responseTime;
 
     /**
-     * @ORM\Column(name="resolve_time", type="integer")
-     * @var int
+     * @ORM\Column(name="resolve_time", type="string", nullable=true)
+     * @var string
      */
     protected $resolveTime;
 
@@ -77,33 +77,44 @@ class SlaTarget
         return $this;
     }
 
-    public function getResponseTime(): int
+    public function getResponseTime(): string
     {
         return $this->responseTime;
     }
 
-    public function setResponseTime(int $responseTime): SlaTarget
+    public function setResponseTime(string $responseTime): SlaTarget
     {
         $this->responseTime = $responseTime;
         return $this;
     }
 
-    public function getResolveTime(): int
+    public function getResolveTime(): string
     {
         return $this->resolveTime;
     }
 
-    public function setResolveTime(int $resolveTime): SlaTarget
+    public function setResolveTime(string $resolveTime): SlaTarget
     {
         $this->resolveTime = $resolveTime;
         return $this;
     }
 
+    public function getTimeInSeconds(string $string): int
+    {
+        if (! preg_match('/^(\d{2}):(\d{2})$/', $string, $matches)) {
+            throw new \Exception('Invalid duration');
+        }
+
+        $hours = (int) $matches[1] * 60 * 60;
+        $minutes = (int) $matches[2] * 60;
+        return $hours + $minutes;
+    }
+
     public function exchangeArray(array $data)
     {
         $this->id           = $data['id'] ?? null;
-        $this->responseTime = (int) $data['response_time'];
-        $this->resolveTime  = (int) $data['resolve_time'];
+        $this->responseTime = $data['response_time'];
+        $this->resolveTime  = $data['resolve_time'];
         $this->priority     = $data['priority'];
         $this->sla          = $data['sla'];
     }
@@ -112,8 +123,8 @@ class SlaTarget
     {
         return [
             'id'            => (int) $this->id,
-            'response_time' => (int) $this->responseTime,
-            'resolve_time'  => (int) $this->resolveTime,
+            'response_time' => $this->responseTime,
+            'resolve_time'  => $this->resolveTime,
             'priority'      => (int) $this->getPriority()->getId(),
             'sla'           => (int) $this->sla->getId(),
         ];
