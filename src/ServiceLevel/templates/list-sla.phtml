@@ -1,0 +1,38 @@
+<?php
+$this->headTitle('List SLA Policies');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Admin' => $this->url('admin'),
+    'SLA' => $this->url('admin.sla_list'),
+]);
+
+/** @var \ServiceLevel\Entity\Sla[] $policies */
+$policies = $this->policies;
+?>
+<div class="row">
+    <div class="col">
+        <h1>SLA Policies</h1>
+        <?php if (! empty($policies)): ?>
+        <ul class="list-group">
+            <?php foreach ($policies as $policy): ?>
+            <li class="list-group-item">
+                <div class="sla-policy-list-item">
+                    <a href="<?= $this->url('admin.sla_view', ['id' => $policy->getId()]); ?>">
+                        <?= $this->escapeHtml($policy->getName()) ?>
+                    </a>
+                </div>
+                <small class="text-muted">
+                    Business Hours:
+                    <?= $this->escapeHtml($policy->getBusinessHours()->getName()) ?>
+                </small>
+            <?php endforeach ?>
+        </ul>
+        <?php else: ?>
+        <p class="text-info">
+            No SLA policies exist, click <a href="<?= $this->url('admin.sla_create') ?>">here</a> to create
+            a new SLA policy.
+        </p>
+        <?php endif ?>
+    </div>
+</div>

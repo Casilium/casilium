@@ -1,8 +1,17 @@
 <?php
-    /** @var \Laminas\Form\FormInterface $form */
-    $form = $this->form->prepare();
+$this->headTitle('New Business Hours');
 
-    $action = $this->action ?? null;
+$action = $this->action ?? null;
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Admin' => $this->url('admin'),
+    'Business Hours' => $this->url('admin.sla_list_business_hours'),
+    $action => '',
+]);
+
+/** @var \Laminas\Form\FormInterface $form */
+$form = $this->form->prepare();
 ?>
 <h1>Business Hours</h1>
 <div class="container-fluid">
@@ -172,7 +181,7 @@
             <?= $this->formElementErrors($form->get('submit')) ?>
         </div>
         <div class="col-6 text-right">
-            <?php if ($action === 'edit'): ?>
+            <?php if ($action === 'Edit'): ?>
                 <a href="<?= $this->url('admin.sla_delete_business_hours', ['id' => $form->get('id')->getValue()]) ?>"
                 class="btn btn-danger">
                     Delete
@@ -192,85 +201,71 @@ $(document).ready(function() {
             $('input[name="mon_start"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
             
             $('input[name="mon_end"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
-        });
+        }).change();
         
         $('input[name="tue_active"').change(function () {                
             $('input[name="tue_start"]')            
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
 
             $('input[name="tue_end"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
-        });
+        }).change();
         
         $('input[name="wed_active"').change(function () {                
             $('input[name="wed_start"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
 
             $('input[name="wed_end"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
-        });
+        }).change();
         
         $('input[name="thu_active"').change(function () {                
             $('input[name="thu_start"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
             
             $('input[name="thu_end"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
-        });
+        }).change();
         
         $('input[name="fri_active"').change(function () {                
             $('input[name="fri_start"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
             
             $('input[name="fri_end"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
-        }); 
+        }).change(); 
         
         $('input[name="sat_active"').change(function () {                
             $('input[name="sat_start"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
             
             $('input[name="sat_end"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
-        });
+        }).change();
         
         $('input[name="sun_active"').change(function () {                
             $('input[name="sun_start"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
             
             $('input[name="sun_end"]')
             .attr('disabled', !this.checked)
             .attr('readonly', !this.checked)
-            .val('');
-        });
+        }).change();
     });
 });
 JS;

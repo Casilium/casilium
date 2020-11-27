@@ -14,6 +14,7 @@ $this->pageBreadcrumbs()->setItems([
             <div class="list-group" id="list-tab" role="tablist">
                 <a class="list-group-item list-group-item-action active" id="list-business-hours-list" data-toggle="list" href="#list-business-hours" role="tab" aria-controls="home">Business Hours</a>
                 <a class="list-group-item list-group-item-action" id="list-account-list" data-toggle="list" href="#list-account" role="tab" aria-controls="home">Queues</a>
+                <a class="list-group-item list-group-item-action" id="list-sla-list" data-toggle="list" href="#list-sla" role="tab" aria-controls="profile">Service Level Agreements</a>
                 <a class="list-group-item list-group-item-action" id="list-user-list" data-toggle="list" href="#list-user" role="tab" aria-controls="profile">Users</a>
             </div>
         </div>
@@ -37,7 +38,14 @@ $this->pageBreadcrumbs()->setItems([
                     </ul>
                 </div>
 
-                <div class="tab-pane fade" id="list-user" role="tabpanel" aria-labelledby="list-user-list">
+                <div class="tab-pane fade" id="list-sla" role="tabpanel" aria-labelledby="list-sla-list">
+                    <ul class="list-group">
+                        <li class="list-group-item"><a href="<?= $this->url('admin.sla_list') ?>">List SLAs</a></li>
+                        <li class="list-group-item"><a href="<?= $this->url('admin.sla_create') ?>">New SLA</a></li>
+                    </ul>
+                </div>
+
+                    <div class="tab-pane fade" id="list-user" role="tabpanel" aria-labelledby="list-user-list">
                     <ul class="list-group">
                         <li class="list-group-item"><a href="<?= $this->url('admin.user.list'); ?>">User Manager</a></li>
                         <li class="list-group-item"><a href="<?= $this->url('admin.role.list'); ?>">Role Manager</a></li>

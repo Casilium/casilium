@@ -47,6 +47,11 @@ class ConfigProvider
                 Handler\DeleteBusinessHoursHandler::class => Handler\Factory\DeleteBusinessHoursHandlerFactory::class,
                 Handler\EditBusinessHoursHandler::class   => Handler\Factory\EditBusinessHoursHandlerFactory::class,
                 Handler\ListBusinessHoursHandler::class   => Handler\Factory\ListBusinessHoursHandlerFactory::class,
+                Handler\CreateSlaHandler::class           => Handler\Factory\CreateSlaHandlerFactory::class,
+                Handler\EditSlaHandler::class             => Handler\Factory\EditSlaHandlerFactory::class,
+                Handler\ListSlaHandler::class             => Handler\Factory\ListSlaHandlerFactory::class,
+                Handler\ViewSlaHandler::class             => Handler\Factory\ViewSlaHandlerFactory::class,
+                Hydrator\SlaHydrator::class               => Hydrator\Factory\SlaHydratorFactory::class,
                 Service\SlaService::class                 => Service\Factory\SlaServiceFactory::class,
             ],
         ];

@@ -29,9 +29,9 @@ class BusinessHours
     protected $name;
 
     /**
-     * @ORM\Column(type="integer", name="timezone", nullable=false)
+     * @ORM\Column(type="string", name="timezone", nullable=false)
      *
-     * @var int
+     * @var string
      */
     protected $timezone;
 
@@ -136,51 +136,68 @@ class BusinessHours
     /**
      * @ORM\Column(type="integer", name="mon_active", nullable=false)
      *
-     * @var int
+     * @var bool
      */
     protected $monActive;
 
     /**
      * @ORM\Column(type="integer", name="tue_active", nullable=false)
      *
-     * @var int
+     * @var bool
      */
     protected $tueActive;
 
     /**
      * @ORM\Column(type="integer", name="wed_active", nullable=false)
      *
-     * @var int
+     * @var bool
      */
     protected $wedActive;
 
     /**
      * @ORM\Column(type="integer", name="thu_active", nullable=false)
      *
-     * @var int
+     * @var bool
      */
     protected $thuActive;
 
     /**
      * @ORM\Column(type="integer", name="fri_active", nullable=false)
      *
-     * @var int
+     * @var bool
      */
     protected $friActive;
 
     /**
      * @ORM\Column(type="integer", name="sat_active", nullable=false)
      *
-     * @var int
+     * @var bool
      */
     protected $satActive;
 
     /**
      * @ORM\Column(type="integer", name="sun_active", nullable=false)
      *
-     * @var int
+     * @var bool
      */
     protected $sunActive;
+
+    public function __construct()
+    {
+        // define default timezone and active days
+        $this->setTimezone('Europe/London')
+             ->setMonActive(true)
+             ->setTueActive(true)
+             ->setWedActive(true)
+             ->setThuActive(true)
+             ->setFriActive(true);
+
+        $this->setMonStart('09:00')->setMonEnd('17:00');
+        $this->setTueStart('09:00')->setTueEnd('17:00');
+        $this->setWedStart('09:00')->setWedEnd('17:00');
+        $this->setThuStart('09:00')->setThuEnd('17:00');
+        $this->setFriStart('09:00')->setFriEnd('17:00');
+    }
 
     /**
      * @return int|null
@@ -221,7 +238,7 @@ class BusinessHours
     /**
      * @return int
      */
-    public function getTimezone(): int
+    public function getTimezone(): string
     {
         return $this->timezone;
     }
@@ -230,7 +247,7 @@ class BusinessHours
      * @param int $timezone
      * @return BusinessHours
      */
-    public function setTimezone(int $timezone): BusinessHours
+    public function setTimezone(string $timezone): BusinessHours
     {
         $this->timezone = $timezone;
         return $this;
@@ -622,7 +639,7 @@ class BusinessHours
         $this->monStart = $data['mon_start'] ?? null;
         $this->monEnd   = $data['mon_end'] ?? null;
         $this->tueStart = $data['tue_start'] ?? null;
-        $this->tueEnd   = $data['tue_emd'] ?? null;
+        $this->tueEnd   = $data['tue_end'] ?? null;
         $this->wedStart = $data['wed_start'] ?? null;
         $this->wedEnd   = $data['wed_end'] ?? null;
         $this->thuStart = $data['thu_start'] ?? null;

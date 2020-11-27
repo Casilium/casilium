@@ -1,6 +1,16 @@
 <?php
-    /** @var \ServiceLevel\Entity\BusinessHours $businessHours */
-    $businessHours = $this->businessHours;
+/** @var \ServiceLevel\Entity\BusinessHours $businessHours */
+$businessHours = $this->businessHours;
+
+$this->headTitle('Delete Business Hours');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Admin' => $this->url('admin'),
+    'Business Hours' => $this->url('admin.sla_list_business_hours'),
+    'Delete' => '',
+]);
+
 ?>
 <div class="container-fluid">
     <div class="row">
@@ -29,4 +39,3 @@
         </div>
     </div>
 </div>
-

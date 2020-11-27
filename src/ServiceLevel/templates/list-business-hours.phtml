@@ -1,6 +1,14 @@
 <?php
-    /** @var \ServiceLevel\Entity\BusinessHours[] $businessHours */
-    $businessHours = $this->businessHours;
+$this->headTitle('SLA Business Hours');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'Admin' => $this->url('admin'),
+    'Business Hours' => $this->url('admin.sla_list_business_hours'),
+]);
+
+/** @var \ServiceLevel\Entity\BusinessHours[] $businessHours */
+$businessHours = $this->businessHours;
 ?>
 <div class="container-fluid">
     <h1>Business Hours List</h1>
@@ -16,5 +24,6 @@
         </ul>
     <?php else: ?>
     <p class="text-info">No business hours have been defined.</p>
+    <a href="<?= $this->url('admin.sla_create_business_hours') ?>" class="btn btn-primary">Create New</a>
     <?php endif ?>
 </div>

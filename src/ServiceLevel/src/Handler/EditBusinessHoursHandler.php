@@ -55,7 +55,7 @@ class EditBusinessHoursHandler implements RequestHandlerInterface
 
         return new HtmlResponse($this->renderer->render('sla::create-business-hours', [
             'form'   => $form,
-            'action' => 'edit',
+            'action' => 'Edit',
         ]));
     }
 }

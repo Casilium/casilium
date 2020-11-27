@@ -12,7 +12,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use ServiceLevel\Service\SlaService;
 
-class ListBusinessHoursHandler implements RequestHandlerInterface
+class ViewSlaHandler implements RequestHandlerInterface
 {
     /** @var SlaService */
     protected $slaService;
@@ -23,8 +23,11 @@ class ListBusinessHoursHandler implements RequestHandlerInterface
     /** @var UrlHelper */
     protected $urlHelper;
 
-    public function __construct(SlaService $slaService, TemplateRendererInterface $renderer, UrlHelper $urlHelper)
-    {
+    public function __construct(
+        SlaService $slaService,
+        TemplateRendererInterface $renderer,
+        UrlHelper $urlHelper
+    ) {
         $this->slaService = $slaService;
         $this->renderer   = $renderer;
         $this->urlHelper  = $urlHelper;
@@ -32,10 +35,15 @@ class ListBusinessHoursHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $businessHours = $this->slaService->findAllBusinessHours();
+        $slaId = (int) $request->getAttribute('id');
+        if ($slaId === 0) {
+            throw new \Exception('SLA not found');
+        }
 
-        return new HtmlResponse($this->renderer->render('sla::list-business-hours', [
-            'businessHours' => $businessHours,
+        $sla = $this->slaService->findSlaById($slaId);
+
+        return new HtmlResponse($this->renderer->render('sla::view-sla', [
+            'sla' => $sla,
         ]));
     }
 }

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ServiceLevel\Form;
 
+use DateTime;
 use DateTimeZone;
 use Laminas\Filter;
 use Laminas\Form\Element;
@@ -11,6 +12,11 @@ use Laminas\Form\Form;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator;
 use ServiceLevel\Form\Element\Time;
+use function abs;
+use function array_keys;
+use function array_merge;
+use function gmdate;
+use function ksort;
 
 class BusinessHoursForm extends Form implements InputFilterProviderInterface
 {
@@ -48,7 +54,7 @@ class BusinessHoursForm extends Form implements InputFilterProviderInterface
                 'id'    => 'timezone',
                 'class' => 'custom-select',
             ])
-            ->setValueOptions(DateTimeZone::listIdentifiers(DateTimeZone::ALL))
+            ->setValueOptions($this->generateTimezoneList())
             ->setValue(341);
         $this->add($element);
 
@@ -154,8 +160,8 @@ class BusinessHoursForm extends Form implements InputFilterProviderInterface
             ->setUseHiddenElement(true)
             ->setAttributes([
                 'class' => 'form-check-input',
-                'value' => 1,
-            ]);
+            ])
+            ->setValue(1);
         $this->add($element);
 
         $element = new Element\Checkbox('sat_active');
@@ -211,10 +217,16 @@ class BusinessHoursForm extends Form implements InputFilterProviderInterface
                 'name'       => 'timezone',
                 'required'   => true,
                 'filters'    => [
-                    ['name' => Filter\ToInt::class],
+                    ['name' => Filter\StripTags::class],
+                    ['name' => Filter\StringTrim::class],
                 ],
                 'validators' => [
-                    ['name' => Validator\Digits::class],
+                    [
+                        'name'    => Validator\InArray::class,
+                        'options' => [
+                            'haystack' => array_keys($this->generateTimezoneList()),
+                        ],
+                    ],
                 ],
             ],
             [
@@ -442,5 +454,44 @@ class BusinessHoursForm extends Form implements InputFilterProviderInterface
                 ],
             ],
         ];
+    }
+
+    protected function generateTimezoneList(): array
+    {
+        static $regions = [
+            DateTimeZone::AFRICA,
+            DateTimeZone::AMERICA,
+            DateTimeZone::ANTARCTICA,
+            DateTimeZone::ASIA,
+            DateTimeZone::ATLANTIC,
+            DateTimeZone::AUSTRALIA,
+            DateTimeZone::EUROPE,
+            DateTimeZone::INDIAN,
+            DateTimeZone::PACIFIC,
+        ];
+
+        $timezones = [];
+        foreach ($regions as $region) {
+            $timezones = array_merge($timezones, DateTimeZone::listIdentifiers($region));
+        }
+
+        $timezoneOffsets = [];
+        foreach ($timezones as $timezone) {
+            $tz                         = new DateTimeZone($timezone);
+            $timezoneOffsets[$timezone] = $tz->getOffset(new DateTime());
+        }
+
+        // sort timezone by offset
+        ksort($timezoneOffsets);
+
+        $timezoneList = [];
+        foreach ($timezoneOffsets as $timezone => $offset) {
+            $offsetPrefix            = $offset < 0 ? '-' : '+';
+            $offsetFormatted         = gmdate('H:i', abs($offset));
+            $prettyOffset            = "UTC${offsetPrefix}${offsetFormatted}";
+            $timezoneList[$timezone] = "$timezone (${prettyOffset}) ";
+        }
+
+        return $timezoneList;
     }
 }

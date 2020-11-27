@@ -10,9 +10,10 @@ use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use ServiceLevel\Hydrator\SlaHydrator;
 use ServiceLevel\Service\SlaService;
 
-class ListBusinessHoursHandler implements RequestHandlerInterface
+class ListSlaHandler implements RequestHandlerInterface
 {
     /** @var SlaService */
     protected $slaService;
@@ -23,8 +24,11 @@ class ListBusinessHoursHandler implements RequestHandlerInterface
     /** @var UrlHelper */
     protected $urlHelper;
 
-    public function __construct(SlaService $slaService, TemplateRendererInterface $renderer, UrlHelper $urlHelper)
-    {
+    public function __construct(
+        SlaService $slaService,
+        TemplateRendererInterface $renderer,
+        UrlHelper $urlHelper
+    ) {
         $this->slaService = $slaService;
         $this->renderer   = $renderer;
         $this->urlHelper  = $urlHelper;
@@ -32,10 +36,21 @@ class ListBusinessHoursHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $businessHours = $this->slaService->findAllBusinessHours();
+        $policies = $this->slaService->findAllSlaPolicies();
 
-        return new HtmlResponse($this->renderer->render('sla::list-business-hours', [
-            'businessHours' => $businessHours,
+        return new HtmlResponse($this->renderer->render('sla::list-sla', [
+            'policies' => $policies,
         ]));
+    }
+
+    public function populateBusinessHours(): array
+    {
+        $result = $this->slaService->findAllBusinessHours();
+
+        $businessHours = [];
+        foreach ($result as $businessHour) {
+            $businessHours[$businessHour->getId()] = $businessHour->getName();
+        }
+        return $businessHours;
     }
 }

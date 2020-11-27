@@ -1,0 +1,97 @@
+<?php
+
+$this->headTitle('View SLA');
+
+$this->pageBreadcrumbs()->setItems([
+    'Home' => $this->url('home'),
+    'SLA' => $this->url('admin.sla_list'),
+    'View' => '',
+]);
+
+/** @var \ServiceLevel\Entity\Sla $sla */
+$sla = $this->sla;
+
+$targets = [];
+/** @var \ServiceLevel\Entity\SlaTarget[] $slaTargets */
+$slaTargets = $sla->getSlaTarget();
+foreach ($slaTargets as $target) {
+    $targets[$target->getPriority()->getId()] = $target;
+}
+ksort($targets);
+
+function humanReadableTime($seconds) {
+
+    if (empty($seconds) || ! is_numeric($seconds)) {
+        return false;
+    }
+
+    $minutes = round($seconds / 60);
+    $hours = floor($minutes / 60);
+    $remainMinutes = ($minutes % 60);
+
+    $result = '';
+    $result .= ($hours > 0)
+        ? ($hours > 1 ? sprintf('%s Hours ', $hours) : sprintf('%s Hour', $hours))
+        : null;
+
+    $result .= ($remainMinutes > 0)
+        ? ($remainMinutes > 1 ? sprintf(' %s Minutes', $remainMinutes) : sprintf(' %s Minute', $remainMinutes))
+        : null;
+
+    return $result;
+}
+?>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h1>View SLA Policy</h1>
+            <h2><?= $this->escapeHtml($sla->getName()) ?></h2>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <div class="list-group-item list-group-item-primary">Priority</div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="row">
+                <div class="col-6">
+                    <div class="list-group-item  list-group-item-primary">Respond Within</div>
+                </div>
+                <div class="col-6">
+                    <div class="list-group-item  list-group-item-primary">Resolve Within</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <?php foreach ($targets as $priorityId => $target): ?>
+    <div class="row">
+        <div class="col-md-6 mb-2">
+            <div class="list-group-item">
+                <?= $this->escapeHtml(\Ticket\Entity\Priority::getPriorityDescription($priorityId)) ?>
+            </div>
+        </div>
+        <div class="col-md-6 mb-2">
+            <div class="row">
+                <div class="col-6">
+                    <div class="list-group-item">
+                        <?= $this->escapeHtml(humanReadableTime($target->getResponseTime())) ?>
+                    </div>
+                </div>
+                <div class="col-6">
+                    <div class="list-group-item">
+                        <?= $this->escapeHtml(humanReadableTime($target->getResolveTime())) ?>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <?php endforeach; ?>
+    <div class="row">
+        <div class="col">
+            <p class="text-info">Response and resolution time are specified in working hours.</p>
+        </div>
+    </div>
+    <a href="<?= $this->url('admin.sla_edit', ['id' => $sla->getId()]) ?>" class="btn btn-primary">Edit SLA</a>
+</div>
