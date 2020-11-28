@@ -58,7 +58,7 @@ class QueueManager
     {
         $queueId = (int) $data['id'] ?? 0;
 
-        if ($queueId > 0) {
+        if ($queueId === 0) {
             $q = new Queue();
         } else {
             $q = $this->findQueueById($queueId);
@@ -75,13 +75,10 @@ class QueueManager
         $q->setUseSsl((bool) $data['use_ssl'] ?? null);
         $q->setFetchFromMail((bool) $data['fetch_from_mail'] ?? null);
 
-        if (! empty($q->getPassword())) {
-            $q->setPassword(Sodium::encrypt($q->getPassword(), $this->config['key']));
-        }
-
-        if (null === $queueId) {
+        if ($queueId === 0) {
             $this->entityManager->persist($q);
         }
+
         $this->entityManager->flush();
 
         return $q;
