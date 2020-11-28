@@ -53,7 +53,7 @@ class TicketRepository extends EntityRepository
             ->getQuery()->getResult();
     }
 
-    public function findByOrganisationUuid(string $uuid): ?Organisation
+    public function findByOrganisationUuid(string $uuid): array
     {
         $qb = $this->createQueryBuilder('q');
 
