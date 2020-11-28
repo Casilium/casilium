@@ -105,7 +105,6 @@
 <?php
 $this->inlineScript()->captureStart();
 echo <<<JS
-
 function updatePriority()
 {
     var priority = [];
@@ -126,18 +125,22 @@ function updatePriority()
 
 $(document).ready(function() {
     $('#urgency').change(function(){
-        updatePriority()
+        updatePriority();
+        updateDue();
     });
     $('#impact').change(function(){
-        updatePriority()
+        updatePriority();
+        updateDue();
     });
     
     function toggleStartDate() {
       if ($('#type_id').val() === "2") {
           $('#start_date').prop("readonly", true);
           $('#start_date').val("");
+          updateDue();
       } else {
-          $('#start_date').prop("readonly", false);
+          $('#start_date').prop("readonly", false).val('');
+          
       }  
     }
     
@@ -155,9 +158,33 @@ $(document).ready(function() {
                 format: 'YYYY-MM-DD HH:mm:ss'
             });
     
+    function updateDue()
+    {
+        if ($('#type_id').val() !== "2") {
+            return;       
+        }
+        
+        var urgency = parseInt($('#urgency').val()) || 0;
+        var impact = parseInt($('#impact').val()) || 0;
+        var weight = urgency + impact;
+          
+        //var clientId = $('#clientId').val();
+        $.ajax({
+            type : 'get',
+            url: '/sla/due/org/$this->org_id/priority/' + weight + '/resolve',
+            success: function(n) {
+                $('#start_date').val(n);
+            },
+            error: function(n) {
+                alert('Set due manually, error calculating');
+            }
+        });
+
+    }
+    
     updatePriority();
     toggleStartDate();
-    
+    updateDue();
 });
 JS;
 $this->inlineScript()->captureEnd();

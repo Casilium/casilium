@@ -43,6 +43,7 @@ class ConfigProvider
             ],
             'invokables' => [],
             'factories'  => [
+                Handler\CalculateDueHandler::class        => Handler\Factory\CalculateDueHandlerFactory::class,
                 Handler\CreateBusinessHoursHandler::class => Handler\Factory\CreateBusinessHoursHandlerFactory::class,
                 Handler\DeleteBusinessHoursHandler::class => Handler\Factory\DeleteBusinessHoursHandlerFactory::class,
                 Handler\EditBusinessHoursHandler::class   => Handler\Factory\EditBusinessHoursHandlerFactory::class,

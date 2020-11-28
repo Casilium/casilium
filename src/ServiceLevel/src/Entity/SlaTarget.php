@@ -110,6 +110,7 @@ class SlaTarget
         return $hours + $minutes;
     }
 
+
     public function exchangeArray(array $data)
     {
         $this->id           = $data['id'] ?? null;

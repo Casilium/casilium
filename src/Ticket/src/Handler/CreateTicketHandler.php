@@ -87,7 +87,8 @@ class CreateTicketHandler implements RequestHandlerInterface
         $this->setFormQueueOptions($form, $queues);
 
         return new HtmlResponse($this->renderer->render('ticket::create-ticket', [
-            'form' => $form,
+            'form'   => $form,
+            'org_id' => $organisation->getUuid(),
         ]));
     }
 
