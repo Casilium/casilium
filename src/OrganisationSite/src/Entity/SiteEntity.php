@@ -81,7 +81,7 @@ class SiteEntity
      *
      * @ORM\Column(name="county", type="string", length=64)
      *
-     * @var string
+     * @var string|null
      */
     protected $county;
 
@@ -167,7 +167,7 @@ class SiteEntity
         return $this;
     }
 
-    public function getCounty(): string
+    public function getCounty(): ?string
     {
         return $this->county;
     }
