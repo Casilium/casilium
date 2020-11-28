@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ticket\Service;
 
+use Carbon\Carbon;
 use DateTime;
 use Doctrine\ORM\EntityManager;
 use Laminas\EventManager\EventManagerInterface;
@@ -22,6 +23,7 @@ use Ticket\Entity\TicketResponse;
 use Ticket\Entity\Type;
 use User\Entity\User;
 use User\Service\UserManager;
+use function var_dump;
 
 class TicketService
 {
@@ -227,7 +229,6 @@ class TicketService
         $ticket = $this->entityManager->getRepository(Ticket::class)->save($ticket);
         $this->eventManager->trigger('ticket.created', $this, ['id' => $ticket->getId()]);
 
-
         return $ticket;
     }
 
@@ -268,10 +269,9 @@ class TicketService
      */
     public function saveResponse(Ticket $ticket, array $data): TicketResponse
     {
-
         $this->entityManager->clear();
 
-        $ticket = $this->findTicketById($ticket->getId());
+        $ticket       = $this->findTicketById($ticket->getId());
         $ticketStatus = $ticket->getStatus();
 
         $submitType = $data['submit'] ?? null;
@@ -293,6 +293,13 @@ class TicketService
                     break;
             }
         }
+        /** @var TicketResponse[] $responses */
+        $responses = $this->findTicketResponses($ticket->getId());
+        if (empty($responses)) {
+            $ticket->setFirstResponseDate(Carbon::now()->format('Y-m-d H:i:s'));
+        }
+
+        $ticket->setLastResponseDate(Carbon::now()->format('Y-m-d H:i:s'));
 
         $response = new TicketResponse();
         $ticket->setStatus($ticketStatus);
@@ -317,6 +324,10 @@ class TicketService
         return $response;
     }
 
+    /**
+     * @param int $id Ticket ID
+     * @return array array of responses
+     */
     public function findTicketResponses(int $id): array
     {
         return $this->entityManager->getRepository(TicketResponse::class)
