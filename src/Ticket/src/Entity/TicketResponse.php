@@ -6,7 +6,6 @@ namespace Ticket\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use OrganisationContact\Entity\Contact;
 use Ticket\Entity\Ticket;
-use User\Entity\User;
 use function date;
 use function get_object_vars;
 use function time;
@@ -183,12 +182,12 @@ class TicketResponse
 
     public function exchangeArray(array $data): TicketResponse
     {
-        $this->id         = isset($data['id']) ? (int) $data['id'] : null;
-        $this->response   = isset($data['response']) ? (string) $data['response'] : null;
-        $this->agent      = isset($data['agent_id']) ? (int) $data['agent_id'] : null;
-        $this->contact    = isset($data['contact_id']) ? (int) $data['contact_id'] : null;
-        $this->ticket     = $data['ticket'] ?? null;
-        $this->is_public  = isset($data['is_public']) ? (int) $data['is_public'] : 0;
+        $this->id        = isset($data['id']) ? (int) $data['id'] : null;
+        $this->response  = isset($data['response']) ? (string) $data['response'] : null;
+        $this->agent     = isset($data['agent_id']) ? (int) $data['agent_id'] : null;
+        $this->contact   = isset($data['contact_id']) ? (int) $data['contact_id'] : null;
+        $this->ticket    = $data['ticket'] ?? null;
+        $this->is_public = isset($data['is_public']) ? (int) $data['is_public'] : 0;
         return $this;
     }
 }

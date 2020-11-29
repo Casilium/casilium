@@ -6,14 +6,11 @@ namespace Ticket\Handler;
 
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
-use Laminas\Form\FormInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Ticket\Entity\Queue;
-use Ticket\Form\QueueForm;
 use Ticket\Service\QueueManager;
 
 class DeleteQueueHandler implements RequestHandlerInterface

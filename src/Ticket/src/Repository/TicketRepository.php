@@ -5,7 +5,6 @@ declare(strict_types=1);
 namespace Ticket\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Organisation\Entity\Organisation;
 use Ticket\Entity\Ticket;
 
 class TicketRepository extends EntityRepository

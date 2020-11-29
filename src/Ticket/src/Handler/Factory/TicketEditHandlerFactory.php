@@ -5,7 +5,6 @@ namespace Ticket\Handler\Factory;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Container\ContainerInterface;
-use Ticket\Handler\CreateTicketHandler;
 use Ticket\Handler\EditTickerHandler;
 use Ticket\Hydrator\TicketHydrator;
 use Ticket\Service\TicketService;

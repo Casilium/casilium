@@ -23,7 +23,6 @@ use Ticket\Entity\TicketResponse;
 use Ticket\Entity\Type;
 use User\Entity\User;
 use User\Service\UserManager;
-use function var_dump;
 
 class TicketService
 {

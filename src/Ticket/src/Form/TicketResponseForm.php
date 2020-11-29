@@ -3,8 +3,8 @@ declare(strict_types=1);
 
 namespace Ticket\Form;
 
-use Laminas\Form\Element;
 use Laminas\Filter;
+use Laminas\Form\Element;
 use Laminas\Form\Form;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator;
@@ -32,14 +32,14 @@ class TicketResponseForm extends Form implements InputFilterProviderInterface
         $element
             ->setLabel('Public')
             ->setAttributes([
-                'id' => 'is_public',
+                'id'    => 'is_public',
                 'class' => 'custom-control-input',
             ])
             ->setLabelAttributes([
                 'class' => 'custom-control-label',
             ])
             ->setOptions([
-                'check_value' => 1,
+                'check_value'     => 1,
                 'unchecked_value' => 0,
             ])
             ->setValue(1);
@@ -57,9 +57,9 @@ class TicketResponseForm extends Form implements InputFilterProviderInterface
     {
         return [
             [
-                'name' => 'id',
-                'required' => false,
-                'filters' => [
+                'name'       => 'id',
+                'required'   => false,
+                'filters'    => [
                     ['name' => Filter\StringTrim::class],
                     ['name' => Filter\StripTags::class],
                 ],
@@ -70,19 +70,19 @@ class TicketResponseForm extends Form implements InputFilterProviderInterface
                 ],
             ],
             [
-                'name' => 'response',
-                'required' => true,
-                'filters' => [
+                'name'       => 'response',
+                'required'   => true,
+                'filters'    => [
                     ['name' => Filter\StringTrim::class],
                     ['name' => Filter\StripTags::class],
                 ],
                 'validators' => [
                     [
-                        'name' => Validator\NotEmpty::class,
+                        'name'                   => Validator\NotEmpty::class,
                         'break_chain_on_failure' => true,
                     ],
                     [
-                        'name' => Validator\StringLength::class,
+                        'name'    => Validator\StringLength::class,
                         'options' => [
                             'min' => 8,
                         ],
@@ -90,34 +90,34 @@ class TicketResponseForm extends Form implements InputFilterProviderInterface
                 ],
             ],
             [
-                'name' => 'is_public',
-                'required' => false,
-                'filters' => [
+                'name'       => 'is_public',
+                'required'   => false,
+                'filters'    => [
                     ['name' => Filter\ToInt::class],
                 ],
                 'validators' => [
                     [
-                        'name' => Validator\Between::class,
+                        'name'    => Validator\Between::class,
                         'options' => [
-                            'min' => 0,
-                            'max' => 1,
+                            'min'       => 0,
+                            'max'       => 1,
                             'inclusive' => true,
                         ],
                     ],
                 ],
             ],
             [
-                'name' => 'submit',
-                'required' => true,
-                'filters' => [
+                'name'       => 'submit',
+                'required'   => true,
+                'filters'    => [
                     ['name' => Filter\StringTrim::class],
                     ['name' => Filter\StripTags::class],
                 ],
                 'validators' => [
                     [
-                        'name' => Validator\Regex::class,
+                        'name'    => Validator\Regex::class,
                         'options' => [
-                            'pattern' => '/^(save|save_hold|save_resolve)$/',
+                            'pattern'  => '/^(save|save_hold|save_resolve)$/',
                             'messages' => [
                                 Validator\Regex::NOT_MATCH => 'Invalid submit value',
                             ],

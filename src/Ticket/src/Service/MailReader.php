@@ -3,9 +3,11 @@ declare(strict_types=1);
 
 namespace Ticket\Service;
 
+use Exception;
 use Laminas\Mail\Storage;
 use Laminas\Mail\Storage\Imap;
 use Ticket\Parser\EmailMessageParser;
+use function is_array;
 
 class MailReader
 {
@@ -32,9 +34,6 @@ class MailReader
         $this->ssl      = $ssl;
     }
 
-    /**
-     * @return Imap
-     */
     public function getConnection(): Imap
     {
         if ($this->connection == null) {
@@ -52,9 +51,9 @@ class MailReader
     public function processMessages(): array
     {
         $data = [
-            'messages'  => $this->getConnection()->countMessages(),
-            'unread'    => $this->getConnection()->countMessages(\Laminas\Mail\Storage::FLAG_UNSEEN),
-            'read'      => $this->getConnection()->countMessages(\Laminas\Mail\Storage::FLAG_SEEN),
+            'messages' => $this->getConnection()->countMessages(),
+            'unread'   => $this->getConnection()->countMessages(Storage::FLAG_UNSEEN),
+            'read'     => $this->getConnection()->countMessages(Storage::FLAG_SEEN),
         ];
 
         $uniqueIds = [];
@@ -75,10 +74,10 @@ class MailReader
 
             $messageUniqueId = $this->getConnection()->getUniqueId($index);
             if (is_array($messageUniqueId)) {
-                throw new \Exception('Expected single result received array');
+                throw new Exception('Expected single result received array');
             }
 
-            $uniqueIds[] = $messageUniqueId;
+            $uniqueIds[]                = $messageUniqueId;
             $messages[$messageUniqueId] = [
                 'from'      => EmailMessageParser::getEmail($message->from),
                 'to'        => EmailMessageParser::getEmail($message->to),

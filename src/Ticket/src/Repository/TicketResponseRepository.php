@@ -22,6 +22,5 @@ class TicketResponseRepository extends EntityRepository
             ->getResult();
 
         return $qb->getQuery()->getResult();
-
     }
 }

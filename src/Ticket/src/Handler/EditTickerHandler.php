@@ -7,10 +7,8 @@ namespace Ticket\Handler;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\Form\FormInterface;
-use Mezzio\Authentication\UserInterface;
 use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\UrlHelper;
-use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -20,7 +18,6 @@ use Ticket\Entity\Ticket;
 use Ticket\Form\TicketForm;
 use Ticket\Hydrator\TicketHydrator;
 use Ticket\Service\TicketService;
-use function count;
 use function sprintf;
 
 class EditTickerHandler implements RequestHandlerInterface
@@ -52,7 +49,7 @@ class EditTickerHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $ticketUuid = $request->getAttribute('ticket_id');
-        $ticket = $this->ticketService->getTicketByUuid($ticketUuid);
+        $ticket     = $this->ticketService->getTicketByUuid($ticketUuid);
 
         $form = new TicketForm();
         $form->get('agent_id')->setValue($ticket->getAgent()->getId());

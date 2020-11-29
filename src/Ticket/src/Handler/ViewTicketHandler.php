@@ -28,9 +28,7 @@ class ViewTicketHandler implements RequestHandlerInterface
     /** @var TemplateRendererInterface */
     protected $renderer;
 
-    /**
-     * @var UrlHelper
-     */
+    /** @var UrlHelper */
     protected $urlHelper;
 
     public function __construct(
@@ -54,7 +52,7 @@ class ViewTicketHandler implements RequestHandlerInterface
 
         // get ticket uuid from URL and find ticket
         $ticketUuid = $request->getAttribute('ticket_id');
-        $ticket = $this->ticketService->getTicketByUuid($ticketUuid);
+        $ticket     = $this->ticketService->getTicketByUuid($ticketUuid);
 
         // get ticket responses
         $responses = $this->ticketService->findTicketResponses($ticket->getId());
@@ -65,7 +63,6 @@ class ViewTicketHandler implements RequestHandlerInterface
         $responseForm = new TicketResponseForm();
 
         if ($request->getMethod() === 'POST') {
-
             $responseForm->setData($request->getParsedBody());
 
             if ($responseForm->isValid()) {
@@ -78,16 +75,14 @@ class ViewTicketHandler implements RequestHandlerInterface
                 $response = $this->ticketService->saveResponse($ticket, $data);
 
                 return new RedirectResponse($this->urlHelper->generate('ticket.list'));
-
             }
         }
 
         return new HtmlResponse($this->renderer->render('ticket::view-ticket', [
-            'ticket' => $ticket,
+            'ticket'        => $ticket,
             'recentTickets' => $recentTickets,
-            'responseForm' => $responseForm,
-            'responses' => $responses,
+            'responseForm'  => $responseForm,
+            'responses'     => $responses,
         ]));
     }
-
 }

@@ -3,7 +3,22 @@ declare(strict_types=1);
 
 namespace Ticket\Parser;
 
+use Exception;
 use Laminas\Mail\Storage\Message;
+use RecursiveIteratorIterator;
+use function base64_decode;
+use function filter_var;
+use function gettype;
+use function is_string;
+use function preg_match_all;
+use function preg_replace;
+use function sprintf;
+use function strip_tags;
+use function strrpos;
+use function strtok;
+use function substr;
+use const FILTER_SANITIZE_STRING;
+use const FILTER_VALIDATE_EMAIL;
 
 class EmailMessageParser
 {
@@ -39,11 +54,11 @@ class EmailMessageParser
         $body = null;
 
         /** @var Message $part */
-        foreach (new \RecursiveIteratorIterator($message) as $part) {
+        foreach (new RecursiveIteratorIterator($message) as $part) {
             try {
                 $contentType = $part->getHeaderField('content-type');
                 if (! is_string($contentType)) {
-                    throw new \Exception(sprintf(
+                    throw new Exception(sprintf(
                         'Expected string, received %s',
                         gettype($contentType)
                     ));
@@ -56,7 +71,7 @@ class EmailMessageParser
                     }
                     break;
                 }
-            } catch (\Exception $e) {
+            } catch (Exception $e) {
                 // ignore
             }
         }
@@ -91,9 +106,6 @@ class EmailMessageParser
     /**
      * Extract e-mail address from recipient string (ie "Test User" <test@example.com) will return
      * "test@example.com"
-     *
-     * @param string $string
-     * @return string|null
      */
     public static function getEmail(string $string): ?string
     {
@@ -110,17 +122,15 @@ class EmailMessageParser
 
     /**
      * Strip multiple new lines
-     * @param string $string
-     * @return string
      */
     public static function sanitiseLineBreaks(string $string): string
     {
-        return  preg_replace("/[\r\n]+\s+/", "\r", $string);
+        return preg_replace("/[\r\n]+\s+/", "\r", $string);
     }
 
     /**
      * Strip signature
-     * @param string $body
+     *
      * @return string|string[]|null
      */
     public static function stripSignature(string $body): string

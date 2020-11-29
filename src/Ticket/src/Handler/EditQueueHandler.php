@@ -11,7 +11,6 @@ use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Ticket\Entity\Queue;
 use Ticket\Form\QueueForm;
 use Ticket\Service\QueueManager;
 
