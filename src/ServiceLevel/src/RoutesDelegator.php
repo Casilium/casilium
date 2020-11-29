@@ -27,66 +27,66 @@ class RoutesDelegator
             '/admin/sla/business-hours/create',
             CreateBusinessHoursHandler::class,
             ['GET', 'POST'],
-            'admin.sla_create_business_hours'
+            'sla.create_business_hours'
         );
 
         $app->route(
             '/admin/sla/business-hours/edit/{id:\d}',
             EditBusinessHoursHandler::class,
             ['GET', 'POST'],
-            'admin.sla_edit_business_hours'
+            'sla.edit_business_hours'
         );
 
         $app->get(
             '/admin/sla/business-hours/list',
             ListBusinessHoursHandler::class,
-            'admin.sla_list_business_hours'
+            'sla.list_business_hours'
         );
 
         $app->get(
             '/admin/sla/business-hours/delete/{id:\d}[/confirm/{confirm}]',
             DeleteBusinessHoursHandler::class,
-            'admin.sla_delete_business_hours'
+            'sla.delete_business_hours'
         );
 
         $app->route(
             '/admin/sla/create',
             CreateSlaHandler::class,
             ['GET', 'POST'],
-            'admin.sla_create'
+            'sla.create'
         );
 
         $app->route(
             '/admin/sla/edit/{id:\d}',
             EditSlaHandler::class,
             ['GET', 'POST'],
-            'admin.sla_edit'
+            'sla.edit'
         );
 
         $app->get(
             '/admin/sla/list',
             ListSlaHandler::class,
-            'admin.sla_list',
+            'sla.list',
         );
 
         $app->get(
             '/admin/sla/view/{id:\d}',
             ViewSlaHandler::class,
-            'admin.sla_view',
+            'sla.view',
         );
 
         $app->route(
             '/admin/sla/assign/{org_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}[/]',
             AssignSlaHandler::class,
             ['GET', 'POST'],
-            'admin.sla_assign'
+            'sla.assign'
         );
 
         $app->get(
             // @codingStandardsIgnoreLine
             '/sla/due/org/{org_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}/priority/{priority:\d}/{type:response|resolve}',
             CalculateDueHandler::class,
-            'admin.sla_due',
+            'sla.due',
         );
 
         return $app;

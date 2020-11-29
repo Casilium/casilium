@@ -4,7 +4,7 @@ $this->headTitle('SLA Business Hours');
 $this->pageBreadcrumbs()->setItems([
     'Home' => $this->url('home'),
     'Admin' => $this->url('admin'),
-    'Business Hours' => $this->url('admin.sla_list_business_hours'),
+    'Business Hours' => $this->url('sla.list_business_hours'),
 ]);
 
 /** @var \ServiceLevel\Entity\BusinessHours[] $businessHours */
@@ -16,7 +16,7 @@ $businessHours = $this->businessHours;
         <ul class="list-group">
         <?php foreach ($businessHours as $businessHour): ?>
             <li class="list-group-item">
-                <a href="<?= $this->url('admin.sla_edit_business_hours', ['id' => $businessHour->getId()]) ?>">
+                <a href="<?= $this->url('sla.edit_business_hours', ['id' => $businessHour->getId()]) ?>">
                     <?= $businessHour->getName() ?>
                 </a>
             </li>
@@ -24,6 +24,6 @@ $businessHours = $this->businessHours;
         </ul>
     <?php else: ?>
     <p class="text-info">No business hours have been defined.</p>
-    <a href="<?= $this->url('admin.sla_create_business_hours') ?>" class="btn btn-primary">Create New</a>
+    <a href="<?= $this->url('sla.create_business_hours') ?>" class="btn btn-primary">Create New</a>
     <?php endif ?>
 </div>

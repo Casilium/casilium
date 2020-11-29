@@ -7,7 +7,7 @@ $this->headTitle('Delete Business Hours');
 $this->pageBreadcrumbs()->setItems([
     'Home' => $this->url('home'),
     'Admin' => $this->url('admin'),
-    'Business Hours' => $this->url('admin.sla_list_business_hours'),
+    'Business Hours' => $this->url('sla.list_business_hours'),
     'Delete' => '',
 ]);
 
@@ -27,12 +27,12 @@ $this->pageBreadcrumbs()->setItems([
     </div>
     <div class="row">
         <div class="col-sm-6">
-            <a class="btn btn-primary" href="<?= $this->url('admin.sla_list_business_hours', []) ?>">
+            <a class="btn btn-primary" href="<?= $this->url('sla.list_business_hours', []) ?>">
                 No!
             </a>
         </div>
         <div class="col-sm-6 text-right">
-            <a class="btn btn-danger" href="<?= $this->url('admin.sla_delete_business_hours', [
+            <a class="btn btn-danger" href="<?= $this->url('sla.delete_business_hours', [
                 'id' => $businessHours->getId(), 'confirm' => 'true']) ?>">
                 Yes, I know what I am doing!
             </a>

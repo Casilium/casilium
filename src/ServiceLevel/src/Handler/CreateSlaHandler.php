@@ -57,7 +57,7 @@ class CreateSlaHandler implements RequestHandlerInterface
             if ($form->isValid()) {
                 $data = $form->getData(FormInterface::VALUES_AS_ARRAY);
                 $this->slaService->createSla($data);
-                return new RedirectResponse($this->urlHelper->generate('admin.sla_list'));
+                return new RedirectResponse($this->urlHelper->generate('sla.list'));
             }
         }
 

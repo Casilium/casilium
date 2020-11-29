@@ -4,7 +4,7 @@ $this->headTitle('View SLA');
 
 $this->pageBreadcrumbs()->setItems([
     'Home' => $this->url('home'),
-    'SLA' => $this->url('admin.sla_list'),
+    'SLA' => $this->url('sla.list'),
     'View' => '',
 ]);
 
@@ -95,5 +95,5 @@ function humanReadableTime($seconds) {
             <p class="text-info">Response and resolution time are specified in working hours.</p>
         </div>
     </div>
-    <a href="<?= $this->url('admin.sla_edit', ['id' => $sla->getId()]) ?>" class="btn btn-primary">Edit SLA</a>
+    <a href="<?= $this->url('sla.edit', ['id' => $sla->getId()]) ?>" class="btn btn-primary">Edit SLA</a>
 </div>

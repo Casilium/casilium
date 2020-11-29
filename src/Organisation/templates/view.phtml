@@ -37,13 +37,13 @@ $this->pageBreadcrumbs()->setItems([
         <?php if ($organisation->getSla() === null): ?>
             <span class="text-info">
                 No SLA assigned
-                <a href="<?= $this->url('admin.sla_assign', ['org_id' => $organisation->getUuid()]) ?>">
+                <a href="<?= $this->url('sla.assign', ['org_id' => $organisation->getUuid()]) ?>">
                     (assign SLA)
                 </a>
             </span>
         <?php else: ?>
             <span class="text-info">
-                <a href="<?= $this->url('admin.sla_view', ['id' => $organisation->getSla()->getId()]) ?>">
+                <a href="<?= $this->url('sla.view', ['id' => $organisation->getSla()->getId()]) ?>">
                 <?= $this->escapeHtml($organisation->getSla()->getName()) ?>
                 </a>
             </span>

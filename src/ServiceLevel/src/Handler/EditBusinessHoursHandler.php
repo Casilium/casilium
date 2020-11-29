@@ -49,7 +49,7 @@ class EditBusinessHoursHandler implements RequestHandlerInterface
                     $form->getData(FormInterface::VALUES_AS_ARRAY)
                 );
 
-                return new RedirectResponse($this->urlHelper->generate('admin.sla_list_business_hours'));
+                return new RedirectResponse($this->urlHelper->generate('sla.list_business_hours'));
             }
         }
 

@@ -4,7 +4,7 @@ $this->headTitle('List SLA Policies');
 $this->pageBreadcrumbs()->setItems([
     'Home' => $this->url('home'),
     'Admin' => $this->url('admin'),
-    'SLA' => $this->url('admin.sla_list'),
+    'SLA' => $this->url('sla.list'),
 ]);
 
 /** @var \ServiceLevel\Entity\Sla[] $policies */
@@ -18,7 +18,7 @@ $policies = $this->policies;
             <?php foreach ($policies as $policy): ?>
             <li class="list-group-item">
                 <div class="sla-policy-list-item">
-                    <a href="<?= $this->url('admin.sla_view', ['id' => $policy->getId()]); ?>">
+                    <a href="<?= $this->url('sla.view', ['id' => $policy->getId()]); ?>">
                         <?= $this->escapeHtml($policy->getName()) ?>
                     </a>
                 </div>
@@ -30,7 +30,7 @@ $policies = $this->policies;
         </ul>
         <?php else: ?>
         <p class="text-info">
-            No SLA policies exist, click <a href="<?= $this->url('admin.sla_create') ?>">here</a> to create
+            No SLA policies exist, click <a href="<?= $this->url('sla.create') ?>">here</a> to create
             a new SLA policy.
         </p>
         <?php endif ?>

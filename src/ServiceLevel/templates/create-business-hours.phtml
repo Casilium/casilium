@@ -6,7 +6,7 @@ $action = $this->action ?? null;
 $this->pageBreadcrumbs()->setItems([
     'Home' => $this->url('home'),
     'Admin' => $this->url('admin'),
-    'Business Hours' => $this->url('admin.sla_list_business_hours'),
+    'Business Hours' => $this->url('sla.list_business_hours'),
     $action => '',
 ]);
 
@@ -182,7 +182,7 @@ $form = $this->form->prepare();
         </div>
         <div class="col-6 text-right">
             <?php if ($action === 'Edit'): ?>
-                <a href="<?= $this->url('admin.sla_delete_business_hours', ['id' => $form->get('id')->getValue()]) ?>"
+                <a href="<?= $this->url('sla.delete_business_hours', ['id' => $form->get('id')->getValue()]) ?>"
                 class="btn btn-danger">
                     Delete
                 </a>

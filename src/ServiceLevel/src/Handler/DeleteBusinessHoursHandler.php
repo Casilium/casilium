@@ -39,7 +39,7 @@ class DeleteBusinessHoursHandler implements RequestHandlerInterface
 
         if (true === $confirm) {
             $this->slaService->deleteBusinessHours($id);
-            return new RedirectResponse($this->urlHelper->generate('admin.sla_list_business_hours'));
+            return new RedirectResponse($this->urlHelper->generate('sla.list_business_hours'));
         }
 
         return new HtmlResponse($this->renderer->render('sla::delete-business-hours', [

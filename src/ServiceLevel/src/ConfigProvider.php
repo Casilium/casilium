@@ -24,9 +24,10 @@ class ConfigProvider
     public function __invoke(): array
     {
         return [
-            'dependencies' => $this->getDependencies(),
-            'templates'    => $this->getTemplates(),
-            'doctrine'     => $this->getDoctrineEntities(),
+            'dependencies'  => $this->getDependencies(),
+            'templates'     => $this->getTemplates(),
+            'doctrine'      => $this->getDoctrineEntities(),
+            'access_filter' => $this->getAccessFilter(),
         ];
     }
 
@@ -78,6 +79,43 @@ class ConfigProvider
                     'class' => AnnotationDriver::class,
                     'cache' => 'array',
                     'paths' => [__DIR__ . '/Entity'],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * Define access filter for accessing organisation
+     *
+     * @return array
+     */
+    public function getAccessFilter(): array
+    {
+        return [
+            'routes' => [
+                'sla' => [
+                    [
+                        // admin actions
+                        'actions' => [
+                            'assign',
+                            'edit',
+                            'create',
+                            'delete_business_hours',
+                            'create_business_hours',
+                            'edit_business_hours',
+                        ],
+                        'allow'   => '@',
+                    ],
+                    [
+                        // general actions
+                        'actions' => [
+                            'due',
+                            'view',
+                            'list',
+                            'list_business_hours',
+                        ],
+                        'allow'   => '@',
+                    ],
                 ],
             ],
         ];
