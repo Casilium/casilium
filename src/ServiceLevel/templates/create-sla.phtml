@@ -39,22 +39,72 @@ $form = $this->form->prepare();
         <div class="col-sm-6">
             <div class="form-group row">
                 <div class="col">
-                    <?= $this->formLabel($form->get('p_low_response_time')) ?>
+                    <?= $this->formLabel($form->get('p_critical_response_time')) ?>
                 </div>
                 <div class="col">
-                    <?= $this->formElement($form->get('p_low_response_time')) ?>
-                    <?= $this->formElementErrors($form->get('p_low_response_time')) ?>
+                    <?= $this->formElement($form->get('p_critical_response_time')) ?>
+                    <?= $this->formElementErrors($form->get('p_critical_response_time')) ?>
                 </div>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group row">
                 <div class="col">
-                    <?= $this->formLabel($form->get('p_low_resolve_time')) ?>
+                    <?= $this->formLabel($form->get('p_critical_resolve_time')) ?>
                 </div>
                 <div class="col">
-                    <?= $this->formElement($form->get('p_low_resolve_time')) ?>
-                    <?= $this->formElementErrors($form->get('p_low_resolve_time')) ?>
+                    <?= $this->formElement($form->get('p_critical_resolve_time')) ?>
+                    <?= $this->formElementErrors($form->get('p_critical_resolve_time')) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group row">
+                <div class="col">
+                    <?= $this->formLabel($form->get('p_urgent_response_time')) ?>
+                </div>
+                <div class="col">
+                    <?= $this->formElement($form->get('p_urgent_response_time')) ?>
+                    <?= $this->formElementErrors($form->get('p_urgent_response_time')) ?>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group row">
+                <div class="col">
+                    <?= $this->formLabel($form->get('p_urgent_resolve_time')) ?>
+                </div>
+                <div class="col">
+                    <?= $this->formElement($form->get('p_urgent_resolve_time')) ?>
+                    <?= $this->formElementErrors($form->get('p_urgent_resolve_time')) ?>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-sm-6">
+            <div class="form-group row">
+                <div class="col">
+                    <?= $this->formLabel($form->get('p_high_response_time')) ?>
+                </div>
+                <div class="col">
+                    <?= $this->formElement($form->get('p_high_response_time')) ?>
+                    <?= $this->formElementErrors($form->get('p_high_response_time')) ?>
+                </div>
+            </div>
+        </div>
+        <div class="col-sm-6">
+            <div class="form-group row">
+                <div class="col">
+                    <?= $this->formLabel($form->get('p_high_resolve_time')) ?>
+                </div>
+                <div class="col">
+                    <?= $this->formElement($form->get('p_high_resolve_time')) ?>
+                    <?= $this->formElementErrors($form->get('p_high_resolve_time')) ?>
                 </div>
             </div>
         </div>
@@ -84,78 +134,32 @@ $form = $this->form->prepare();
             </div>
         </div>
     </div>
+
     <div class="row">
         <div class="col-sm-6">
             <div class="form-group row">
                 <div class="col">
-                    <?= $this->formLabel($form->get('p_high_response_time')) ?>
+                    <?= $this->formLabel($form->get('p_low_response_time')) ?>
                 </div>
                 <div class="col">
-                    <?= $this->formElement($form->get('p_high_response_time')) ?>
-                    <?= $this->formElementErrors($form->get('p_high_response_time')) ?>
+                    <?= $this->formElement($form->get('p_low_response_time')) ?>
+                    <?= $this->formElementErrors($form->get('p_low_response_time')) ?>
                 </div>
             </div>
         </div>
         <div class="col-sm-6">
             <div class="form-group row">
                 <div class="col">
-                    <?= $this->formLabel($form->get('p_high_resolve_time')) ?>
+                    <?= $this->formLabel($form->get('p_low_resolve_time')) ?>
                 </div>
                 <div class="col">
-                    <?= $this->formElement($form->get('p_high_resolve_time')) ?>
-                    <?= $this->formElementErrors($form->get('p_high_resolve_time')) ?>
+                    <?= $this->formElement($form->get('p_low_resolve_time')) ?>
+                    <?= $this->formElementErrors($form->get('p_low_resolve_time')) ?>
                 </div>
             </div>
         </div>
     </div>
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="form-group row">
-                <div class="col">
-                    <?= $this->formLabel($form->get('p_urgent_response_time')) ?>
-                </div>
-                <div class="col">
-                    <?= $this->formElement($form->get('p_urgent_response_time')) ?>
-                    <?= $this->formElementErrors($form->get('p_urgent_response_time')) ?>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="form-group row">
-                <div class="col">
-                    <?= $this->formLabel($form->get('p_urgent_resolve_time')) ?>
-                </div>
-                <div class="col">
-                    <?= $this->formElement($form->get('p_urgent_resolve_time')) ?>
-                    <?= $this->formElementErrors($form->get('p_urgent_resolve_time')) ?>
-                </div>
-            </div>
-        </div>
-    </div>
-    <div class="row">
-        <div class="col-sm-6">
-            <div class="form-group row">
-                <div class="col">
-                    <?= $this->formLabel($form->get('p_critical_response_time')) ?>
-                </div>
-                <div class="col">
-                    <?= $this->formElement($form->get('p_critical_response_time')) ?>
-                    <?= $this->formElementErrors($form->get('p_critical_response_time')) ?>
-                </div>
-            </div>
-        </div>
-        <div class="col-sm-6">
-            <div class="form-group row">
-                <div class="col">
-                    <?= $this->formLabel($form->get('p_critical_resolve_time')) ?>
-                </div>
-                <div class="col">
-                    <?= $this->formElement($form->get('p_critical_resolve_time')) ?>
-                    <?= $this->formElementErrors($form->get('p_critical_resolve_time')) ?>
-                </div>
-            </div>
-        </div>
-    </div>
+
     <div class="row">
         <div class="col">
             <div class="form-group">
