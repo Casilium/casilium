@@ -24,12 +24,12 @@ class AccountPageHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $session     = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
-        $user        = $session->get(UserInterface::class);
-        $mfa_enabled = (int) $user['details']['mfa_enabled'];
+        $session    = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
+        $user       = $session->get(UserInterface::class);
+        $mfaEnabled = (int) $user['details']['mfa_enabled'];
 
         return new HtmlResponse($this->renderer->render('account::account-page', [
-            'mfa_enabled' => $mfa_enabled,
+            'mfa_enabled' => $mfaEnabled,
         ]));
     }
 }

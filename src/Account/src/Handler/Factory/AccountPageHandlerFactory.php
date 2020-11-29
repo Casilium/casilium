@@ -10,7 +10,7 @@ use Mezzio\Template\TemplateRendererInterface;
 
 class AccountPageHandlerFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): AccountPageHandler
     {
         $renderer = $container->get(TemplateRendererInterface::class);
         return new AccountPageHandler($renderer);

@@ -50,8 +50,8 @@ class ChangePasswordHandler implements RequestHandlerInterface
         $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
 
         // get user from session
-        $user    = $session->get(UserInterface::class);
-        $user_id = (int) $user['details']['id'];
+        $user   = $session->get(UserInterface::class);
+        $userId = (int) $user['details']['id'];
         if (null === 0) {
             throw new Exception('User not logged!?');
         }
@@ -65,7 +65,7 @@ class ChangePasswordHandler implements RequestHandlerInterface
                 $data = $form->getData();
 
                 try {
-                    $this->userManager->changePassword($user_id, $data['current_password'], $data['new_password']);
+                    $this->userManager->changePassword($userId, $data['current_password'], $data['new_password']);
                 } catch (Exception $exception) {
                     $form->get('current_password')->setMessages([$exception->getMessage()]);
                     return new HtmlResponse($this->renderer->render('account::change-password', ['form' => $form]));

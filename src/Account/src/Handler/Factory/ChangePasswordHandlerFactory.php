@@ -12,7 +12,7 @@ use User\Service\UserManager;
 
 class ChangePasswordHandlerFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): ChangePasswordHandler
     {
         $userManager = $container->get(UserManager::class);
         $renderer    = $container->get(TemplateRendererInterface::class);
