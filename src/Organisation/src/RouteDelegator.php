@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Organisation;
 
 use Mezzio\Application;
+use Organisation\Handler\ExportHandler;
 use Organisation\Handler\OrganisationCreateHandler;
 use Organisation\Handler\OrganisationDeleteHandler;
 use Organisation\Handler\OrganisationEditHandler;
@@ -51,6 +52,8 @@ class RouteDelegator
             ['GET', 'POST'],
             'organisation.delete'
         );
+
+        $app->get('/organisation/export', ExportHandler::class, 'organisation.export');
 
         return $app;
     }

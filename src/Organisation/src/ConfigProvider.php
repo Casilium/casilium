@@ -39,6 +39,8 @@ class ConfigProvider
                 Handler\OrganisationReadHandler::class   => Handler\Factory\OrganisationReadHandlerFactory::class,
                 Handler\OrganisationDeleteHandler::class => Handler\Factory\OrganisationDeleteHandlerFactory::class,
                 Service\OrganisationManager::class       => Service\Factory\OrganisationManagerFactory::class,
+                Handler\ExportHandler::class             => Handler\Factory\ExportHandlerFactory::class,
+                Service\ImportExportService::class       => Service\Factory\ImportExportServiceFactory::class,
             ],
         ];
     }
