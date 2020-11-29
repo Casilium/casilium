@@ -42,8 +42,11 @@ class Breadcrumbs extends AbstractHelper
         }
 
         // resulting HTML code will be stored in this var
-        $result  = '<div class="container" aria-label="Breadcrumb">';
-        $result .= '<ol class="breadcrumb" style="background-color: transparent" itemscope itemtype="http://schema.org/BreadcrumbList">';
+        $result = <<<HTML
+        <div class="container" aria-label="Breadcrumb">
+        <ol class="breadcrumb" style="background-color: transparent" 
+            itemscope itemtype="http://schema.org/BreadcrumbList">
+        HTML;
 
         // get item count
         $itemCount = count($this->items);
@@ -54,7 +57,7 @@ class Breadcrumbs extends AbstractHelper
         // walk through items
         foreach ($this->items as $label => $link) {
             // make the last item inactive
-            $isActive = $itemNum == $itemCount ? true : false;
+            $isActive = $itemNum === $itemCount;
 
             $result .= $this->renderItem($label, $link, $itemNum, $isActive);
 
