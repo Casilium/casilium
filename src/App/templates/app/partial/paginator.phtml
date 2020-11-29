@@ -1,0 +1,43 @@
+<?php
+if (!isset($this->routeOptions)) {
+    $this->routeOptions = [];
+}
+?>
+<?php if ($this->pageCount): ?>
+<div class="container">
+    <nav aria-label='Page navigation'>
+        <ul class="pagination">
+
+            <li class="<?= isset($this->previous) ? 'page-item' : 'page-item disabled' ?>"
+                <?= isset($this->previous) ? '' : 'aria-hidden="true"' ?>>
+                <a class="page-link" href="<?= $this->url($this->route, $this->routeOptions, ['page'=>$this->previous]); ?>" aria-label="Previous page">
+                    Previous
+                </a>
+            </li>
+
+            <!-- Numbered page links -->
+            <?php foreach ($this->pagesInRange as $page): ?>
+                <li class="page-item <?= $page === $this->current ? 'active' : ''?>">
+                    <?php if ($page !== $this->current): ?>
+                        <a class="page-link" href="<?= $this->url($this->route, $this->routeOptions, ['page'=>$page]) ?>" aria-label="page <?= $page ?>">
+                            <?= $this->escapeHtml($page); ?>
+                        </a>
+                    <?php else: ?>
+                        <span class="page-link"><?= $this->escapeHtml($page) ?></span>
+                        <span aria-label="(current)"></span>
+                    <?php endif ?>
+                </li>
+            <?php endforeach; ?>
+
+            <!-- Next page link -->
+            <li class="page-item <?= isset($this->next) ? '' : 'disabled' ?>"
+                <?= isset($this->previous) ? '' : 'aria-hidden="true"' ?>>
+                <a class="page-link" href="<?php echo $this->url($this->route, $this->routeOptions, ['page'=> $this->next]); ?>" aria-label="Next page">
+                    Next
+                </a>
+            </li>
+
+        </ul>
+    </nav>
+</div>
+<?php endif; ?>

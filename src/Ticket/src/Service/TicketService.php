@@ -7,6 +7,7 @@ namespace Ticket\Service;
 use Carbon\Carbon;
 use DateTime;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Laminas\EventManager\EventManagerInterface;
 use Organisation\Entity\Organisation;
 use Organisation\Service\OrganisationManager;
@@ -341,5 +342,10 @@ class TicketService
     public function findAgentFromId(int $id): Agent
     {
         return $this->entityManager->getRepository(Agent::class)->find($id);
+    }
+
+    public function getEntityManager(): EntityManagerInterface
+    {
+        return $this->entityManager;
     }
 }

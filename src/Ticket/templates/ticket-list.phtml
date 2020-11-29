@@ -113,8 +113,16 @@
                 </div>
             </div>
         </div>
-
     <?php endforeach; ?>
+    <div class="row">
+        <div class="col mt-4">
+            <?php
+                if ($this->pageCount > 1) {
+                    echo $this->paginationControl($this->tickets,'Sliding','app::partial/paginator');
+                }
+            ?>
+        </div>
+    </div>
 </div>
 <?php
 $this->inlineScript()->captureStart();

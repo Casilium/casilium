@@ -2,12 +2,16 @@
 
 namespace Ticket\Handler;
 
+use App\Adapter\DoctrinePaginator as DoctrineAdapter;
+use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Paginator\Paginator;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Ticket\Entity\Ticket;
 use Ticket\Service\TicketService;
 
 class ListTicketHandler implements RequestHandlerInterface
@@ -18,9 +22,6 @@ class ListTicketHandler implements RequestHandlerInterface
     /** @var TemplateRendererInterface */
     private $renderer;
 
-    /** @var UrlHelper */
-    private $urlHelper;
-
     public function __construct(TicketService $ticketService, TemplateRendererInterface $renderer)
     {
         $this->ticketService = $ticketService;
@@ -29,14 +30,26 @@ class ListTicketHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $options = [];
+        $queryParams = $request->getQueryParams();
+        $page        = $queryParams['page'] ?? 1;
 
-        if ($organisation_id = $request->getAttribute('org_id')) {
-            $tickets = $this->ticketService->findTicketsByOrganisationUuid($organisation_id);
+        if ($organisationUuid = $request->getAttribute('org_id')) {
+            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
+                ->findTicketsByPagination(['organisation_uuid' => $organisationUuid]);
         } else {
-            $tickets = $this->ticketService->fetchAllTickets();
+            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
+                ->findTicketsByPagination();
         }
 
-        return new HtmlResponse($this->renderer->render('ticket::ticket-list', ['tickets' => $tickets]));
+        $adapter   = new DoctrineAdapter(new ORMPaginator($query, false));
+        $paginator = new Paginator($adapter);
+
+        $paginator->setItemCountPerPage(25);
+        $paginator->setCurrentPageNumber($page);
+
+        return new HtmlResponse($this->renderer->render('ticket::ticket-list', [
+            'tickets'   => $paginator,
+            'pageCount' => $paginator->count(),
+        ]));
     }
 }
