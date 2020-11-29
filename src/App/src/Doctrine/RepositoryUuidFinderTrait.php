@@ -16,6 +16,10 @@ trait RepositoryUuidFinderTrait
     /** @var UuidEncoder */
     protected $uuidEncoder;
 
+    /**
+     * @param string $encodedUuid encode UUID
+     * @return mixed
+     */
     public function findOneByEncodedUuid(string $encodedUuid)
     {
         return $this->findOneBy([
