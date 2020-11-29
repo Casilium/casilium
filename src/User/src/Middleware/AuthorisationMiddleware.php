@@ -21,19 +21,19 @@ use User\Service\RbacManager;
 class AuthorisationMiddleware implements MiddlewareInterface
 {
     /** @var AuthManager */
-    private $authManager;
+    protected $authManager;
 
     /** @var RbacManager */
-    private $rbac;
+    protected $rbac;
 
     /** @var TemplateRendererInterface */
-    private $renderer;
+    protected $renderer;
 
     /** @var RouterInterface */
-    private $router;
+    protected $router;
 
     /** @var UrlHelper */
-    private $urlHelper;
+    protected $urlHelper;
 
     public function __construct(
         RouterInterface $router,
@@ -53,7 +53,7 @@ class AuthorisationMiddleware implements MiddlewareInterface
     {
         $routeResult      = $this->router->match($request);
         $matchedRouteName = $routeResult->getMatchedRouteName();
-        if ($matchedRouteName == null) {
+        if ($matchedRouteName === null) {
             return $handler->handle($request);
         }
 
@@ -63,10 +63,9 @@ class AuthorisationMiddleware implements MiddlewareInterface
         $username = $identity['username'] ?? null;
 
         $result = $this->authManager->filterAccess($matchedRouteName, $username);
-        if ($result == $this->authManager::AUTH_REQUIRED) {
+        if ($result === AuthManager::AUTH_REQUIRED) {
             return new RedirectResponse($this->urlHelper->generate('login'));
-        } elseif ($result == $this->authManager::ACCESS_DENIED) {
-           // die('x');
+        } elseif ($result === AuthManager::ACCESS_DENIED) {
             return new HtmlResponse($this->renderer->render('error::403', ['layout' => 'layout::clean']), 403);
         }
 
