@@ -6,20 +6,21 @@ namespace Organisation\Validator;
 
 use Laminas\Validator\AbstractValidator;
 use Laminas\Validator\Hostname;
+use function key;
 
 class DomainValidator extends AbstractValidator
 {
-    const CANNOT_DECODE_PUNYCODE  = 'hostnameCannotDecodePunycode';
-    const INVALID                 = 'hostnameInvalid';
-    const INVALID_DASH            = 'hostnameDashCharacter';
-    const INVALID_HOSTNAME        = 'hostnameInvalidHostname';
-    const INVALID_HOSTNAME_SCHEMA = 'hostnameInvalidHostnameSchema';
-    const INVALID_LOCAL_NAME      = 'hostnameInvalidLocalName';
-    const INVALID_URI             = 'hostnameInvalidUri';
-    const IP_ADDRESS_NOT_ALLOWED  = 'hostnameIpAddressNotAllowed';
-    const LOCAL_NAME_NOT_ALLOWED  = 'hostnameLocalNameNotAllowed';
-    const UNDECIPHERABLE_TLD      = 'hostnameUndecipherableTld';
-    const UNKNOWN_TLD             = 'hostnameUnknownTld';
+    protected const CANNOT_DECODE_PUNYCODE  = 'hostnameCannotDecodePunycode';
+    protected const INVALID                 = 'hostnameInvalid';
+    protected const INVALID_DASH            = 'hostnameDashCharacter';
+    protected const INVALID_HOSTNAME        = 'hostnameInvalidHostname';
+    protected const INVALID_HOSTNAME_SCHEMA = 'hostnameInvalidHostnameSchema';
+    protected const INVALID_LOCAL_NAME      = 'hostnameInvalidLocalName';
+    protected const INVALID_URI             = 'hostnameInvalidUri';
+    protected const IP_ADDRESS_NOT_ALLOWED  = 'hostnameIpAddressNotAllowed';
+    protected const LOCAL_NAME_NOT_ALLOWED  = 'hostnameLocalNameNotAllowed';
+    protected const UNDECIPHERABLE_TLD      = 'hostnameUndecipherableTld';
+    protected const UNKNOWN_TLD             = 'hostnameUnknownTld';
 
     // @codingStandardsIgnoreStart
     /**
@@ -40,14 +41,15 @@ class DomainValidator extends AbstractValidator
     ];
     // @codingStandardsIgnoreEnd
 
+    /** @inheritDoc */
     public function isValid($value)
     {
         $validator = new Hostname();
         foreach ($value as $domain) {
             $this->messageTemplates = $validator->getMessageTemplates();
 
-            if (!$validator->isValid($domain)) {
-                $errorMsg = $validator->getMessages();
+            if (! $validator->isValid($domain)) {
+                $errorMsg    = $validator->getMessages();
                 $errorMsgKey = key($errorMsg);
                 $this->error($errorMsgKey, $domain);
                 return false;
@@ -55,6 +57,5 @@ class DomainValidator extends AbstractValidator
         }
 
         return true;
-
     }
 }

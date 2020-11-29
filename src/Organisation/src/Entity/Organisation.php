@@ -24,12 +24,12 @@ use ServiceLevel\Entity\Sla;
 class Organisation implements OrganisationInterface
 {
     public const STATE_INACTIVE = 0;
-    public const STATE_ACTIVE = 1;
+    public const STATE_ACTIVE   = 1;
     public const STATE_DISABLED = 2;
 
-    public const TYPE_CLIENT = 1;
+    public const TYPE_CLIENT   = 1;
     public const TYPE_SUPPLIER = 2;
-    public const TYPE_BOTH = 3;
+    public const TYPE_BOTH     = 3;
 
     /**
      * @ORM\Id
@@ -59,7 +59,7 @@ class Organisation implements OrganisationInterface
      *
      * @var int
      */
-    protected $is_active;
+    protected $isActive;
 
     /**
      * @ORM\OneToOne(targetEntity="ServiceLevel\Entity\Sla")
@@ -88,7 +88,7 @@ class Organisation implements OrganisationInterface
      *
      * @var int
      */
-    protected $type_id;
+    protected $typeId;
 
     /**
      * @ORM\OneToMany(targetEntity="Domain", mappedBy="organisation", orphanRemoval=true, cascade={"persist", "remove"})
@@ -98,69 +98,48 @@ class Organisation implements OrganisationInterface
     protected $domains;
 
     /**
-     * Organisation constructor.
-     *
      * @throws Exception
      */
     public function __construct()
     {
         $this->domains = new ArrayCollection();
 
-        $this->is_active = self::STATE_ACTIVE;
-        $this->type_id = self::TYPE_CLIENT;
+        $this->isActive = self::STATE_ACTIVE;
+        $this->typeId   = self::TYPE_CLIENT;
 
-        $this->uuid = Uuid::uuid4();
-        $now = new \DateTime('UTC', new \DateTimeZone('UTC'));
-        $this->created = $now;
+        $this->uuid     = Uuid::uuid4();
+        $now            = new DateTime('UTC', new DateTimeZone('UTC'));
+        $this->created  = $now;
         $this->modified = $now;
     }
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param int $id
-     * @return $this
-     */
     public function setId(int $id): Organisation
     {
         $this->id = $id;
         return $this;
     }
 
-    /**
-     * Set UUID value
-     */
     public function setUuid(UuidInterface $uuid): Organisation
     {
         $this->uuid = $uuid;
         return $this;
     }
 
-    /**
-     * @return UuidInterface
-     */
     public function getUuid(): UuidInterface
     {
         return $this->uuid;
     }
 
-    /**
-     * @return DateTime
-     */
     public function getCreated(): DateTime
     {
         return $this->created;
     }
 
-    /**
-     * @throws Exception
-     */
     public function setCreated(DateTime $created): Organisation
     {
         if (null === $this->created && null === $this->id) {
@@ -172,40 +151,27 @@ class Organisation implements OrganisationInterface
         return $this;
     }
 
-    /**
-     * @return int|null
-     */
     public function getIsActive(): ?int
     {
-        return $this->is_active;
+        return $this->isActive;
     }
 
-    /**
-     * @param int $is_active
-     * @return $this
-     */
-    public function setIsActive(int $is_active): Organisation
+    public function setIsActive(int $isActive): Organisation
     {
-        if (null === $this->is_active) {
-            $this->is_active = 1;
+        if (null === $this->isActive) {
+            $this->isActive = 1;
         } else {
-            $this->is_active = (int) $is_active;
+            $this->isActive = (int) $isActive;
         }
 
         return $this;
     }
 
-    /**
-     * @return DateTime|null
-     */
     public function getModified(): ?DateTime
     {
         return $this->modified;
     }
 
-    /**
-     * @throws Exception
-     */
     public function setModified(?DateTime $modified = null): Organisation
     {
         if (null === $modified) {
@@ -217,18 +183,11 @@ class Organisation implements OrganisationInterface
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getName(): ?string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     * @return $this
-     */
     public function setName(string $name): Organisation
     {
         $validator = new OrganisationNameValidator();
@@ -240,80 +199,42 @@ class Organisation implements OrganisationInterface
         return $this;
     }
 
-    /**
-     * Set organisation type
-     *
-     * @return $this
-     */
-    public function setTypeId(int $type_id): Organisation
+    public function setTypeId(int $typeId): Organisation
     {
-        $this->type_id = $type_id;
+        $this->typeId = $typeId;
         return $this;
     }
 
-    /**
-     * Get organisation type
-     *
-     * @return int|null
-     */
     public function getTypeId(): ?int
     {
-        return $this->type_id;
+        return $this->typeId;
     }
 
-    /**
-     * Get domain name
-     *
-     * @return ArrayCollection
-     */
     public function getDomains(): Collection
     {
         return $this->domains;
     }
 
-    /**
-     * Add domain to organisation
-     *
-     * @param Domain $domain
-     */
     public function addDomain(Domain $domain)
     {
         $this->domains[] = $domain;
     }
 
-    /**
-     * Check if organisation has domain
-     *
-     * @param Domain $domain
-     * @return bool
-     */
-    public function hasDomain(Domain $domain)
+    public function hasDomain(Domain $domain): bool
     {
         return $this->getDomains()->contains($domain);
     }
 
-    /**
-     * Remove domain
-     *
-     * @param Domain $domain
-     */
     public function removeDomain(Domain $domain)
     {
         $this->domains->removeElement($domain);
     }
 
-    /**
-     * @return Sla
-     */
     public function getSla(): ?Sla
     {
         return $this->sla;
     }
 
-    /**
-     * @param Sla $sla
-     * @return Organisation
-     */
     public function setSla(Sla $sla): Organisation
     {
         $this->sla = $sla;

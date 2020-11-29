@@ -12,19 +12,16 @@ use function preg_match;
  */
 class OrganisationNameValidator extends AbstractValidator
 {
-    // validation failure message IDs
+    /** @var string */
     protected const INVALID_CHARACTERS = 'invalidCharacters';
 
     // validation failure messages
+    /** @var array */
     protected $messageTemplates = [
         self::INVALID_CHARACTERS => 'The name contains invalid characters',
     ];
 
-    /**
-     * Validates an organisation name
-     *
-     * @param string $value
-     */
+    /** @inheritDoc */
     public function isValid($value): bool
     {
         $this->setValue($value);

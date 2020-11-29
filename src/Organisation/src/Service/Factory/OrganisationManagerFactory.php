@@ -11,7 +11,7 @@ use OrganisationSite\Service\SiteManager;
 
 class OrganisationManagerFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): OrganisationManager
     {
         $entityManager = $container->get(EntityManager::class);
         $siteManager   = $container->get(SiteManager::class);

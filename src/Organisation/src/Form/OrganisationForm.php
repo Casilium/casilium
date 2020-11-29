@@ -10,8 +10,6 @@ use Laminas\Form\Form;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator;
 use Organisation\Filter\ToArray;
-use Organisation\Form\Fieldset\DomainFieldset;
-use Organisation\Hydrator\OrganisationHydrator;
 use Organisation\Validator\DomainValidator;
 
 /**
@@ -19,7 +17,7 @@ use Organisation\Validator\DomainValidator;
  */
 class OrganisationForm extends Form implements InputFilterProviderInterface
 {
-    public function __construct($action = 'create')
+    public function __construct(string $action = 'create')
     {
         parent::__construct('organisation-form');
 
@@ -36,8 +34,8 @@ class OrganisationForm extends Form implements InputFilterProviderInterface
     {
         $element = new Element\Text('domain');
         $element->setLabel('Domain(s)')->setAttributes([
-            'id' => 'domain',
-            'class' => 'form-control',
+            'id'          => 'domain',
+            'class'       => 'form-control',
             'placeholder' => 'example.com',
         ]);
         $this->add($element);
@@ -51,7 +49,6 @@ class OrganisationForm extends Form implements InputFilterProviderInterface
                 'placeholder'  => 'Name of Organisation',
             ]);
         $this->add($element);
-
 
         if ($action === 'edit') {
             $element = new Element\Select('is_active');
@@ -110,7 +107,7 @@ class OrganisationForm extends Form implements InputFilterProviderInterface
                     ['name' => ToArray::class],
                 ],
                 'validators' => [
-                    ['name' => DomainValidator::class]
+                    ['name' => DomainValidator::class],
                 ],
             ],
             [

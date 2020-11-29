@@ -4,19 +4,18 @@ declare(strict_types=1);
 
 namespace Organisation\Hydrator;
 
+use DateTime;
 use Laminas\Hydrator\AbstractHydrator;
 use Organisation\Entity\Domain;
 use Organisation\Entity\Organisation;
 use Ramsey\Uuid\Uuid;
+use function array_key_exists;
+use function implode;
+use function is_string;
 
 class OrganisationHydrator extends AbstractHydrator
 {
-    /**
-     * @param array $data
-     * @param object|Organisation $object
-     * @return object|void
-     */
-    public function hydrate(array $data, object $object)
+    public function hydrate(array $data, object $object): object
     {
         if ($this->propertyExists('id', $data)) {
             $id = (int) $data['id'];
@@ -33,24 +32,24 @@ class OrganisationHydrator extends AbstractHydrator
         }
 
         if ($this->propertyExists('created', $data)) {
-            if ($data['created'] instanceof \DateTime) {
+            if ($data['created'] instanceof DateTime) {
                 $object->setCreated($data['created']);
             } elseif (is_string($data['created'])) {
-                if ($dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $data['created'])) {
+                if ($dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $data['created'])) {
                     $object->setCreated($dateTime);
                 }
             }
         }
 
         if ($this->propertyExists('is_active', $data)) {
-            $object->setIsActive((int)$data['is_active']);
+            $object->setIsActive((int) $data['is_active']);
         }
 
         if ($this->propertyExists('modified', $data)) {
-            if ($data['modified'] instanceof \DateTime) {
+            if ($data['modified'] instanceof DateTime) {
                 $object->setCreated($data['modified']);
             } elseif (is_string($data['modified'])) {
-                if ($dateTime = \DateTime::createFromFormat('Y-m-d H:i:s', $data['created'])) {
+                if ($dateTime = DateTime::createFromFormat('Y-m-d H:i:s', $data['created'])) {
                     $object->setCreated($dateTime);
                 }
             }
@@ -61,7 +60,7 @@ class OrganisationHydrator extends AbstractHydrator
         }
 
         if ($this->propertyExists('type_id', $data)) {
-            $object->setTypeId((int)$data['type_id']);
+            $object->setTypeId((int) $data['type_id']);
         }
 
         if ($this->propertyExists('domain', $data)) {
@@ -83,17 +82,17 @@ class OrganisationHydrator extends AbstractHydrator
     public function extract(object $object): array
     {
         $result = [
-            'id' => $object->getId(),
-            'uuid' => $object->getUuid(),
-            'created' => $object->getCreated(),
+            'id'        => $object->getId(),
+            'uuid'      => $object->getUuid(),
+            'created'   => $object->getCreated(),
             'is_active' => $object->getIsActive(),
-            'modified' => $object->getModified(),
-            'name' => $object->getName(),
-            'type_id' => $object->getTypeId(),
+            'modified'  => $object->getModified(),
+            'name'      => $object->getName(),
+            'type_id'   => $object->getTypeId(),
         ];
 
         $domains = [];
-        /** @var Domain$domain */
+        /** @var Domain $domain */
         foreach ($object->getDomains() as $domain) {
             $domains[$domain->getId()] = $domain->getName();
         }
@@ -102,9 +101,9 @@ class OrganisationHydrator extends AbstractHydrator
         return $result;
     }
 
-    protected function propertyExists(string $property, array $data)
+    protected function propertyExists(string $property, array $data): bool
     {
-        if (array_key_exists($property, $data) && !empty($data[$property])) {
+        if (array_key_exists($property, $data) && ! empty($data[$property])) {
             return true;
         }
 

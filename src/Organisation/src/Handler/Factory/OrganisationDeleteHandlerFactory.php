@@ -12,7 +12,7 @@ use Organisation\Service\OrganisationManager;
 
 class OrganisationDeleteHandlerFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): OrganisationDeleteHandler
     {
         $organisationManager = $container->get(OrganisationManager::class);
         $render              = $container->get(TemplateRendererInterface::class);

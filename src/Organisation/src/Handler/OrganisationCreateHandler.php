@@ -4,7 +4,6 @@ declare(strict_types=1);
 
 namespace Organisation\Handler;
 
-use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Helper\UrlHelper;
@@ -36,10 +35,6 @@ class OrganisationCreateHandler implements RequestHandlerInterface
         $this->urlHelper           = $urlHelper;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $form = new OrganisationForm();

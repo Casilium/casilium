@@ -28,13 +28,6 @@ class OrganisationEditHandler implements RequestHandlerInterface
     /** @var UrlHelper */
     protected $urlHelper;
 
-    /**
-     * OrganisationEditHandler constructor.
-     *
-     * @param OrganisationManager $organisationManager
-     * @param TemplateRendererInterface $renderer
-     * @param UrlHelper $urlHelper
-     */
     public function __construct(
         OrganisationManager $organisationManager,
         TemplateRendererInterface $renderer,
@@ -45,11 +38,6 @@ class OrganisationEditHandler implements RequestHandlerInterface
         $this->urlHelper           = $urlHelper;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     * @throws \Exception
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // get id from url (must be valid uuid)
@@ -67,11 +55,12 @@ class OrganisationEditHandler implements RequestHandlerInterface
         $form->bind($organisation);
 
         if ('POST' === $request->getMethod()) {
-
             $form->setData($request->getParsedBody());
             if ($form->isValid()) {
                 $this->organisationManager->updateOrganisation(
-                    $organisation->getId(), $form->getData(FormInterface::VALUES_AS_ARRAY));
+                    $organisation->getId(),
+                    $form->getData(FormInterface::VALUES_AS_ARRAY)
+                );
 
                 // redirect to organisation view
                 return new RedirectResponse($this->urlHelper->generate('organisation.view', [

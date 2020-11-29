@@ -10,12 +10,10 @@ use Organisation\Entity\Domain;
 use Organisation\Entity\Organisation;
 use Organisation\Entity\OrganisationInterface;
 use Organisation\Exception\OrganisationExistsException;
-use Organisation\Exception\OrganisationNameException;
-use Organisation\Exception\OrganisationNotFoundException;
 use Organisation\Exception\OrganisationSitesExistException;
 use Organisation\Hydrator\OrganisationHydrator;
 use OrganisationSite\Service\SiteManager;
-use function strcmp;
+use function in_array;
 
 class OrganisationManager
 {
@@ -31,11 +29,6 @@ class OrganisationManager
         $this->siteManager   = $siteManager;
     }
 
-    /**
-     * Create organisation from object
-     *
-     * @return Organisation|null
-     */
     public function createOrganisation(OrganisationInterface $organisation): ?OrganisationInterface
     {
         // if organisation exists, throw an exception
@@ -51,26 +44,14 @@ class OrganisationManager
         return $organisation;
     }
 
-    /**
-     * Create organisation from array
-     *
-     * @param array $data
-     * @return Organisation|null
-     */
-    public function createOrganisationFromArray(array $data): ?Organisation
+    public function createOrganisationFromArray(array $data): ?OrganisationInterface
     {
-        $hydrator = new OrganisationHydrator();
+        $hydrator     = new OrganisationHydrator();
         $organisation = $hydrator->hydrate($data, new Organisation());
 
         return $this->createOrganisation($organisation);
     }
 
-    /**
-     * Find organisation by name
-     *
-     * @param string $name
-     * @return Organisation|null
-     */
     public function findOrganisationByName(string $name): ?Organisation
     {
         // find organisation in repository
@@ -86,26 +67,17 @@ class OrganisationManager
         return null;
     }
 
-    /**
-     * Find organisation by id
-     *
-     * @return Organisation|null|Object
-     */
     public function findOrganisationById(int $id): ?Organisation
     {
         return $this->entityManager->getRepository(Organisation::class)
             ->findOneBy(['id' => $id]);
     }
 
-    /**
-     * Find organisation by uuid
-     */
     public function findOrganisationByUuid(string $uuid): ?Organisation
     {
         return $this->entityManager->getRepository(Organisation::class)
             ->findOneByUuid($uuid);
     }
-
 
     /**
      * Update Organisation
@@ -115,10 +87,9 @@ class OrganisationManager
      *
      * @param int $id organisation to update
      * @param array $data data to populate
-     * @return Void
      * @throws Exception
      */
-    public function updateOrganisation(int $id, array $data): Void
+    public function updateOrganisation(int $id, array $data): void
     {
         // clear pending doctrine operations
         $this->entityManager->clear();
@@ -154,15 +125,10 @@ class OrganisationManager
 
         // update modification date and save
         $organisation->setModified();
-        $this->entityManager->flush();;
+        $this->entityManager->flush();
     }
 
-    /**
-     * Remove all domains for an organisation
-     *
-     * @param $id
-     */
-    public function removeOrganisationDomains($id): void
+    public function removeOrganisationDomains(int $id): void
     {
         $domains = $this->entityManager->getRepository(Domain::class)
             ->findBy(['organisation' => $id]);
@@ -182,9 +148,6 @@ class OrganisationManager
         return $this->entityManager->getRepository(Organisation::class)->findAll();
     }
 
-    /**
-     * Delete an organisation
-     */
     public function delete(Organisation $organisation): void
     {
         // check if organisation has sites before deleting.

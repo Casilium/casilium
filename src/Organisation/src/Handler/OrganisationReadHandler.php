@@ -33,10 +33,6 @@ class OrganisationReadHandler implements RequestHandlerInterface
         $this->urlHelper           = $urlHelper;
     }
 
-    /**
-     * @param ServerRequestInterface $request
-     * @return ResponseInterface
-     */
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $organisationId = $request->getAttribute('id');
