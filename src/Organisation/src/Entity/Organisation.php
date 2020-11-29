@@ -55,7 +55,7 @@ class Organisation implements OrganisationInterface
     protected $created;
 
     /**
-     * @ORM\Column(type="integer", nullable=false)
+     * @ORM\Column(name="is_active", type="integer", nullable=false)
      *
      * @var int
      */
@@ -84,7 +84,7 @@ class Organisation implements OrganisationInterface
     protected $name;
 
     /**
-     * @ORM\Column(type="integer", nullable=false)
+     * @ORM\Column(name="type_id", type="integer", nullable=false)
      *
      * @var int
      */
