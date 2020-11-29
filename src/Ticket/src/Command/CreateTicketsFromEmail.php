@@ -9,6 +9,7 @@ use Carbon\Carbon;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use OrganisationContact\Entity\Contact;
+use ServiceLevel\Service\CalculateBusinessHours;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -100,33 +101,34 @@ class CreateTicketsFromEmail extends Command
      */
     public function lock(): void
     {
-        if (defined('ROOT') == false) {
+        if (defined('ROOT') === false) {
             throw new Exception('ROOT path not defined!');
         }
 
-        $lock_filename = ROOT . '/data/get_mail.pid';
-        $lock_file     = fopen($lock_filename, 'c');
-        if ($lock_file === false) {
+        $lockFilename = ROOT . '/data/mail/fetch_mail.pid';
+
+        $lockFile = fopen($lockFilename, 'c');
+        if ($lockFile === false) {
             throw new Exception(sprintf(
                 'Unable to open lock file %s',
-                $lock_file
+                $lockFile
             ));
         }
-        $got_lock = flock($lock_file, LOCK_EX | LOCK_NB, $wouldBlock);
-        if (! $got_lock && ! $wouldBlock) {
+        $gotLock = flock($lockFile, LOCK_EX | LOCK_NB, $wouldBlock);
+        if (! $gotLock && ! $wouldBlock) {
             throw new Exception(sprintf(
                 'Unexpected error locking file %s',
-                $lock_filename
+                $lockFilename
             ));
-        } elseif (! $got_lock && $wouldBlock) {
+        } elseif (! $gotLock && $wouldBlock) {
             exit('Another instance is already running');
         }
 
         // lock acquired let's write our PID to te lock file for the convenience
         // of humans who may wish to terminate the script.
-        ftruncate($lock_file, 0);
-        fwrite($lock_file, getmypid() . "\n");
-        $this->lockFile = $lock_file;
+        ftruncate($lockFile, 0);
+        fwrite($lockFile, getmypid() . "\n");
+        $this->lockFile = $lockFile;
     }
 
     /**
@@ -173,20 +175,20 @@ class CreateTicketsFromEmail extends Command
             $output->writeln(sprintf(' <info>Retrieved %s messages</info>', count($messages)));
 
             foreach ($messages as $index => $message) {
-                $tracking_id = $this->getUuid($message['body']);
-                if ($tracking_id !== null) {
-                    $output->writeln(sprintf('  <info>Found ticket reply to %s', $tracking_id));
-                    if ($this->createTicketReplyFromMessage($message, $tracking_id)) {
+                $trackingId = $this->getUuid($message['body']);
+                if ($trackingId !== null) {
+                    $output->writeln(sprintf('  <info>Found ticket reply to %s', $trackingId));
+                    if ($this->createTicketReplyFromMessage($message, $trackingId)) {
                         $output->writeln('  <info>Response added to ticket</info>');
                     }
                     continue;
-                } elseif ($ticket_id = $this->createTicketFromMessage($message, $queue) > 0) {
+                } elseif ($ticketId = $this->createTicketFromMessage($message, $queue) > 0) {
                     $output->writeln(sprintf(
                         '  <info>Ticket created with id %s from %s</info>',
-                        $ticket_id,
+                        $ticketId,
                         $message['from']
                     ));
-                } elseif ($ticket_id < 0) {
+                } elseif ($ticketId < 0) {
                     $output->writeln(sprintf(
                         '  <comment>Ticket from %s was not created</comment> (user unknown)',
                         $message['from']
@@ -225,6 +227,17 @@ class CreateTicketsFromEmail extends Command
 
         $date = Carbon::parse($message['date']);
 
+        $startDate = Carbon::now('UTC');
+
+        if ($contact->getOrganisation()->getSla() !== null) {
+            $sla = $contact->getOrganisation()->getSla();
+
+            $businessHoursCalc = new CalculateBusinessHours($sla->getBusinessHours());
+
+            // todo adjust default duration of 2 hours
+            $startDate = $businessHoursCalc->addHoursTo($startDate, '02:00');
+        }
+
         $data = [
             'createdAt'         => $date->format('Y-m-d H:i:s'),
             'agent_id'          => null,
@@ -233,7 +246,8 @@ class CreateTicketsFromEmail extends Command
             'type_id'           => 1,
             'impact'            => 3,
             'urgency'           => 3,
-            'site_id'           => 1,
+            'start_date'        => $startDate->format('Y-m-d H:i:s'),
+            'site_id'           => null,
             'queue_id'          => $queue->getId(),
             'short_description' => $message['subject'],
             'long_description'  => $message['body'],

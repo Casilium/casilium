@@ -15,6 +15,8 @@ use OrganisationContact\Entity\Contact;
 use OrganisationContact\Service\ContactService;
 use OrganisationSite\Entity\SiteEntity;
 use OrganisationSite\Service\SiteManager;
+use ServiceLevel\Entity\BusinessHours;
+use ServiceLevel\Service\CalculateBusinessHours;
 use Ticket\Entity\Agent;
 use Ticket\Entity\Priority;
 use Ticket\Entity\Queue;
@@ -82,7 +84,7 @@ class TicketService
     /**
      * Find site by id
      */
-    public function findSiteById(int $id): SiteEntity
+    public function findSiteById(int $id): ?SiteEntity
     {
         return $this->siteManager->fetchSiteById($id);
     }
@@ -201,8 +203,13 @@ class TicketService
         $organisation = $this->getOrganisationById($data['organisation_id']);
         $ticket->setOrganisation($organisation);
 
-        $site = $this->findSiteById($data['site_id']);
-        $ticket->setSite($site);
+        $siteId = isset($data['site_id']) ? (int) $data['site_id'] : 0;
+        if ($siteId > 0) {
+            $site = $this->findSiteById($data['site_id']);
+            if ($site !== null) {
+                $ticket->setSite($site);
+            }
+        }
 
         $agentId = $data['agent_id'] ?? null;
         if (null !== $agentId) {
@@ -213,13 +220,25 @@ class TicketService
         $contact = $this->contactManager->findContactById($data['contact_id']);
         $ticket->setContact($contact);
 
-        $startDate = $data['start_date'] ?? null;
-        if (! empty($startDate)) {
-            $ticket->setStartDate($startDate);
-        }
-
         $type = $this->findTypeById($data['type_id']);
         $ticket->setType($type);
+
+        $startDate = $data['start_date'] ?? null;
+
+        if (! empty($startDate)) {
+            $ticket->setStartDate($startDate);
+        } else {
+            $date = Carbon::now('UTC');
+
+            if ($organisation->getSla() !== null) {
+                $calc = new CalculateBusinessHours($organisation->getSla()->getBusinessHours());
+                // todo fix default of 2 hours
+                $result = $calc->addHoursTo($date, '02:00');
+                $ticket->setStartDate($result->format('Y-m-d H:i:s'));
+            }
+
+            $ticket->setStartDate($date->format('Y-m-d H:i'));
+        }
 
         $status = $data['status'] ?? null;
         if (empty($status)) {

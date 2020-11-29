@@ -1,5 +1,6 @@
 *
 !cache
+!mail
 !migrations
 !migrations/*
 !cache/.gitkeep
