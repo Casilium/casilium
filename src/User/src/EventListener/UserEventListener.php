@@ -9,7 +9,7 @@ use Laminas\EventManager\Event;
 
 class UserEventListener
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): UserEventListener
     {
         // Grab some dependencies from the container and return self
         return new self();

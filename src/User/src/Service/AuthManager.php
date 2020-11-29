@@ -87,8 +87,8 @@ class AuthManager
 
                     if (strpos($allow, '@') === 0) {
                         // only the specific user is allowed to see the page
-                        $target_identity = substr($allow, 1);
-                        if ($target_identity === $identity) {
+                        $targetIdentity = substr($allow, 1);
+                        if ($targetIdentity === $identity) {
                             return self::ACCESS_GRANTED;
                         }
 

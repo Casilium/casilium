@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace User\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Doctrine\ORM\Query;
 use User\Entity\User;
 
@@ -32,23 +30,16 @@ class UserRepository extends EntityRepository
         return $this->findOneBy(['email' => $email]);
     }
 
-    /**
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
     public function save(User $user): void
     {
-        if ($user->getId() == null) {
+        if ($user->getId() === null) {
             $this->_em->persist($user);
         }
 
         $this->_em->flush();
     }
 
-    /**
-     * @param false $fetchCredentials
-     */
-    public function findUserById(int $id, $fetchCredentials = false): ?User
+    public function findUserById(int $id, bool $fetchCredentials = false): ?User
     {
         /** @var User $user */
         $user = $this->find($id);

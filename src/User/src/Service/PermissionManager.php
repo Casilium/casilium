@@ -33,7 +33,7 @@ class PermissionManager
         $existingPermission = $this->entityManager->getRepository(Permission::class)
             ->findOneByName($data['name']);
 
-        if ($existingPermission != null) {
+        if ($existingPermission !== null) {
             throw new Exception('Permission with such name already exists');
         }
 

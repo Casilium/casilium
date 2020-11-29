@@ -14,9 +14,9 @@ use function count;
  */
 class User
 {
-    const STATUS_INACTIVE = 0; // Inactive user
-    const STATUS_ACTIVE   = 1; // Active user
-    const STATUS_RETIRED  = 2; // Retired user
+    public const STATUS_INACTIVE = 0; // Inactive user
+    public const STATUS_ACTIVE   = 1; // Active user
+    public const STATUS_RETIRED  = 2; // Retired user
 
     /**
      * @ORM\Id

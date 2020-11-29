@@ -4,8 +4,6 @@ declare(strict_types=1);
 namespace User\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\OptimisticLockException;
-use Doctrine\ORM\ORMException;
 use Exception;
 use User\Entity\Permission;
 use User\Entity\Role;
@@ -36,7 +34,7 @@ class RoleManager
     {
         $existingRole = $this->entityManager->getRepository(Role::class)
             ->findOneByName($data['name']);
-        if ($existingRole != null) {
+        if ($existingRole !== null) {
             throw new Exception('Role with such name already exists');
         }
 
@@ -73,8 +71,8 @@ class RoleManager
      * Update an existing role
      *
      * @param array $data
-     * @throws ORMException
-     * @throws OptimisticLockException
+     * @param Role $role user role
+     * @throws Exception
      */
     public function updateRole(Role $role, array $data): void
     {
@@ -98,7 +96,7 @@ class RoleManager
                 $parentRole = $this->entityManager->getRepository(Role::class)
                     ->findOneById($roleId);
 
-                if ($parentRole == null) {
+                if ($parentRole === null) {
                     throw new Exception('Role to inherit not found');
                 }
 
@@ -114,12 +112,6 @@ class RoleManager
         $this->rbacManager->init(true);
     }
 
-    /**
-     * Delete a role from DB
-     *
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
     public function deleteRole(Role $role): void
     {
         $this->entityManager->remove($role);
@@ -127,11 +119,6 @@ class RoleManager
         $this->rbacManager->init(true);
     }
 
-    /**
-     * Retrieves all the permissions from the given role and its child roles
-     *
-     * @return array
-     */
     public function getEffectivePermissions(Role $role): array
     {
         $effectivePermissions = [];
@@ -152,11 +139,6 @@ class RoleManager
         return $effectivePermissions;
     }
 
-    /**
-     * @param array $data
-     * @throws ORMException
-     * @throws OptimisticLockException
-     */
     public function updateRolePermissions(Role $role, array $data): void
     {
         // remove older permissions
@@ -169,7 +151,7 @@ class RoleManager
             }
 
             $permission = $this->entityManager->getRepository(Permission::class)->findOneByName($name);
-            if ($permission == null) {
+            if ($permission === null) {
                 throw new Exception('Permission with such name does not exist');
             }
 

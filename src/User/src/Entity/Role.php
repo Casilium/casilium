@@ -144,7 +144,7 @@ class Role
 
     public function addParent(Role $role): bool
     {
-        if ($this->getId() == $role->getId()) {
+        if ($this->getId() === $role->getId()) {
             return false;
         }
 

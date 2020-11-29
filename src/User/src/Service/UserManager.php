@@ -38,9 +38,6 @@ class UserManager
     /** @var array */
     protected $config;
 
-    /**
-     * @param array $config
-     */
     public function __construct(
         EntityManagerInterface $entityManager,
         RoleManager $roleManager,
@@ -55,12 +52,6 @@ class UserManager
         $this->config            = $config;
     }
 
-    /**
-     * Add new user to database
-     *
-     * @param array $data
-     * @throws Exception
-     */
     public function addUser(array $data): ?User
     {
         if ($this->checkUserExists($data['email'])) {
@@ -70,8 +61,8 @@ class UserManager
         $user = new User();
         $user->setEmail($data['email']);
         $user->setFullName($data['full_name']);
-        $password_hash = password_hash($data['password'], PASSWORD_BCRYPT);
-        $user->setPassword($password_hash);
+        $passwordHash = $this->getPasswordHash($data['password']);
+        $user->setPassword($passwordHash);
         $user->setStatus($data['status']);
         $user->setDateCreated(date('Y-m-d H:i:s'));
 
@@ -83,21 +74,12 @@ class UserManager
         return $user;
     }
 
-    /**
-     * Create Password Hash
-     */
     public function getPasswordHash(string $password): string
     {
         $bcrypt = new Bcrypt();
         return $bcrypt->create($password);
     }
 
-    /**
-     * Update an existing user
-     *
-     * @param array $data
-     * @throws Exception
-     */
     public function updateUser(User $user, array $data): bool
     {
         // Do not allow to change user email if another user with such email already exits.
@@ -118,12 +100,6 @@ class UserManager
         return true;
     }
 
-    /**
-     * A helper method which assigns new roles to the user
-     *
-     * @param array $roleIds
-     * @throws Exception
-     */
     public function assignRoles(User $user, array $roleIds): void
     {
         //remove old user role(s).
@@ -142,22 +118,12 @@ class UserManager
         }
     }
 
-    /**
-     * Checks whether a user with the given email address already exists in the database
-     */
     public function checkUserExists(string $email): bool
     {
-        $user = $this->entityManager->getRepository(User::class)
-            ->findOneByEmail($email);
-
+        $user = $this->entityManager->getRepository(User::class)->findOneByEmail($email);
         return $user !== null;
     }
 
-    /**
-     * Generate password reset token to send to user via email
-     *
-     * @throws Exception
-     */
     public function generatePasswordResetToken(User $user): void
     {
         if ($user->getStatus() !== User::STATUS_ACTIVE) {
@@ -181,9 +147,6 @@ class UserManager
         $this->entityManager->flush();
     }
 
-    /**
-     * Verify password reset token
-     */
     public function verifyPasswordResetToken(string $email, string $passwordResetToken): bool
     {
         /** @var User $user */
@@ -205,16 +168,9 @@ class UserManager
         return ! ($currentDate - $tokenCreationDate > 24 * 60 * 60);
     }
 
-    /**
-     * Change current user password
-     *
-     * @param int $id user id
-     * @param string $current_password current password
-     * @param string $new_password the new password
-     */
-    public function changePassword(int $id, string $current_password, string $new_password): bool
+    public function changePassword(int $id, string $currentPassword, string $newPassword): bool
     {
-        if (strcmp($current_password, $new_password) === 0) {
+        if (strcmp($currentPassword, $newPassword) === 0) {
             throw PasswordMismatchException::whenPasswordsAreSame();
         }
 
@@ -223,12 +179,12 @@ class UserManager
 
         if ($user instanceof User) {
             // verify password
-            if (! password_verify($current_password, $user->getPassword())) {
+            if (! password_verify($currentPassword, $user->getPassword())) {
                 throw PasswordMismatchException::whenVerifying();
             }
 
             // set new password
-            $user->setPassword(password_hash($new_password, PASSWORD_BCRYPT));
+            $user->setPassword(password_hash($newPassword, PASSWORD_BCRYPT));
 
             // save password
             $this->entityManager->flush();
@@ -237,12 +193,6 @@ class UserManager
         return false;
     }
 
-    /**
-     * Find user by ID
-     *
-     * @param int $id
-     * @return User|object
-     */
     public function findById(int $id): User
     {
         return $this->entityManager->getRepository(User::class)->find($id);
