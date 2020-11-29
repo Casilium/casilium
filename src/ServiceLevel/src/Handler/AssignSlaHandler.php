@@ -45,7 +45,7 @@ class AssignSlaHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $orgId = $request->getAttribute('org_id');
+        $orgId        = $request->getAttribute('org_id');
         $organisation = $this->organisationManager->findOrganisationByUuid($orgId);
 
         $form = new AssignSlaForm();
@@ -77,8 +77,7 @@ class AssignSlaHandler implements RequestHandlerInterface
         $result = [];
         /** @var Sla[] $policies */
         $policies = $this->slaService->findAllSlaPolicies();
-        foreach ($policies as $policy)
-        {
+        foreach ($policies as $policy) {
             $result[$policy->getId()] = $policy->getName();
         }
 

@@ -3,7 +3,9 @@ declare(strict_types=1);
 
 namespace ServiceLevel\Exception;
 
-class BusinessHoursException extends \Exception
+use Exception;
+
+class BusinessHoursException extends Exception
 {
     public static function forInvalidDate(): self
     {

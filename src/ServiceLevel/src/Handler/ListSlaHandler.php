@@ -10,7 +10,6 @@ use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use ServiceLevel\Hydrator\SlaHydrator;
 use ServiceLevel\Service\SlaService;
 
 class ListSlaHandler implements RequestHandlerInterface

@@ -40,6 +40,7 @@ class Sla
 
     /**
      * @ORM\OneToMany(targetEntity="SlaTarget", mappedBy="sla", cascade={"persist"})
+     *
      * @var ArrayCollection
      */
     protected $slaTarget;

@@ -78,4 +78,3 @@ class CreateSlaHandler implements RequestHandlerInterface
         return $businessHours;
     }
 }
-

@@ -5,7 +5,9 @@ declare(strict_types=1);
 namespace ServiceLevel\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use Ticket\Entity\Priority;
+use function preg_match;
 
 /**
  * @ORM\Entity
@@ -25,6 +27,7 @@ class SlaTarget
     /**
      * @ORM\ManyToOne(targetEntity="Sla", inversedBy="target_sla")
      * @ORM\JoinColumn(name="sla_id", referencedColumnName="id")
+     *
      * @var Sla
      */
     protected $sla;
@@ -39,12 +42,14 @@ class SlaTarget
 
     /**
      * @ORM\Column(name="response_time", type="string", nullable=true)
+     *
      * @var string
      */
     protected $responseTime;
 
     /**
      * @ORM\Column(name="resolve_time", type="string", nullable=true)
+     *
      * @var string
      */
     protected $resolveTime;
@@ -102,14 +107,13 @@ class SlaTarget
     public function getTimeInSeconds(string $string): int
     {
         if (! preg_match('/^(\d{2}):(\d{2})$/', $string, $matches)) {
-            throw new \Exception('Invalid duration');
+            throw new Exception('Invalid duration');
         }
 
-        $hours = (int) $matches[1] * 60 * 60;
+        $hours   = (int) $matches[1] * 60 * 60;
         $minutes = (int) $matches[2] * 60;
         return $hours + $minutes;
     }
-
 
     public function exchangeArray(array $data)
     {

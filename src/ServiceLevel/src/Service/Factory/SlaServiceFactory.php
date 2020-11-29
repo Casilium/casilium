@@ -10,7 +10,7 @@ use ServiceLevel\Service\SlaService;
 
 class SlaServiceFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): SlaService
     {
         return new SlaService($container->get(EntityManager::class));
     }

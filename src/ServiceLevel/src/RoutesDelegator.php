@@ -83,6 +83,7 @@ class RoutesDelegator
         );
 
         $app->get(
+            // @codingStandardsIgnoreLine
             '/sla/due/org/{org_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}/priority/{priority:\d}/{type:response|resolve}',
             CalculateDueHandler::class,
             'admin.sla_due',

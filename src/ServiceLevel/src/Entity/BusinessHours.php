@@ -199,432 +199,264 @@ class BusinessHours
         $this->setFriStart('09:00')->setFriEnd('17:00');
     }
 
-    /**
-     * @return int|null
-     */
     public function getId(): ?int
     {
         return $this->id;
     }
 
-    /**
-     * @param int|null $id
-     * @return BusinessHours
-     */
     public function setId(?int $id): BusinessHours
     {
         $this->id = $id;
         return $this;
     }
 
-    /**
-     * @return string
-     */
     public function getName(): string
     {
         return $this->name;
     }
 
-    /**
-     * @param string $name
-     * @return BusinessHours
-     */
     public function setName(string $name): BusinessHours
     {
         $this->name = $name;
         return $this;
     }
 
-    /**
-     * @return int
-     */
     public function getTimezone(): string
     {
         return $this->timezone;
     }
 
-    /**
-     * @param int $timezone
-     * @return BusinessHours
-     */
     public function setTimezone(string $timezone): BusinessHours
     {
         $this->timezone = $timezone;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getMonStart(): ?string
     {
         return $this->monStart;
     }
 
-    /**
-     * @param string|null $monStart
-     * @return BusinessHours
-     */
     public function setMonStart(?string $monStart): BusinessHours
     {
         $this->monStart = $monStart;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getMonEnd(): ?string
     {
         return $this->monEnd;
     }
 
-    /**
-     * @param string|null $monEnd
-     * @return BusinessHours
-     */
     public function setMonEnd(?string $monEnd): BusinessHours
     {
         $this->monEnd = $monEnd;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getTueStart(): ?string
     {
         return $this->tueStart;
     }
 
-    /**
-     * @param string|null $tueStart
-     * @return BusinessHours
-     */
     public function setTueStart(?string $tueStart): BusinessHours
     {
         $this->tueStart = $tueStart;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getTueEnd(): ?string
     {
         return $this->tueEnd;
     }
 
-    /**
-     * @param string|null $tueEnd
-     * @return BusinessHours
-     */
     public function setTueEnd(?string $tueEnd): BusinessHours
     {
         $this->tueEnd = $tueEnd;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getWedStart(): ?string
     {
         return $this->wedStart;
     }
 
-    /**
-     * @param string|null $wedStart
-     * @return BusinessHours
-     */
     public function setWedStart(?string $wedStart): BusinessHours
     {
         $this->wedStart = $wedStart;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getWedEnd(): ?string
     {
         return $this->wedEnd;
     }
 
-    /**
-     * @param string|null $wedEnd
-     * @return BusinessHours
-     */
     public function setWedEnd(?string $wedEnd): BusinessHours
     {
         $this->wedEnd = $wedEnd;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getThuStart(): ?string
     {
         return $this->thuStart;
     }
 
-    /**
-     * @param string|null $thuStart
-     * @return BusinessHours
-     */
     public function setThuStart(?string $thuStart): BusinessHours
     {
         $this->thuStart = $thuStart;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getThuEnd(): ?string
     {
         return $this->thuEnd;
     }
 
-    /**
-     * @param string|null $thuEnd
-     * @return BusinessHours
-     */
     public function setThuEnd(?string $thuEnd): BusinessHours
     {
         $this->thuEnd = $thuEnd;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFriStart(): ?string
     {
         return $this->friStart;
     }
 
-    /**
-     * @param string|null $friStart
-     * @return BusinessHours
-     */
     public function setFriStart(?string $friStart): BusinessHours
     {
         $this->friStart = $friStart;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getFriEnd(): ?string
     {
         return $this->friEnd;
     }
 
-    /**
-     * @param string|null $friEnd
-     * @return BusinessHours
-     */
     public function setFriEnd(?string $friEnd): BusinessHours
     {
         $this->friEnd = $friEnd;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSatStart(): ?string
     {
         return $this->satStart;
     }
 
-    /**
-     * @param string|null $satStart
-     * @return BusinessHours
-     */
     public function setSatStart(?string $satStart): BusinessHours
     {
         $this->satStart = $satStart;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSatEnd(): ?string
     {
         return $this->satEnd;
     }
 
-    /**
-     * @param string|null $statEnd
-     * @return BusinessHours
-     */
     public function setSatEnd(?string $statEnd): BusinessHours
     {
         $this->statEnd = $statEnd;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSunStart(): ?string
     {
         return $this->sunStart;
     }
 
-    /**
-     * @param string|null $sunStart
-     * @return BusinessHours
-     */
     public function setSunStart(?string $sunStart): BusinessHours
     {
         $this->sunStart = $sunStart;
         return $this;
     }
 
-    /**
-     * @return string|null
-     */
     public function getSunEnd(): ?string
     {
         return $this->sunEnd;
     }
 
-    /**
-     * @param string|null $sunEnd
-     * @return BusinessHours
-     */
     public function setSunEnd(?string $sunEnd): BusinessHours
     {
         $this->sunEnd = $sunEnd;
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getMonActive(): ?bool
     {
         return $this->monActive;
     }
 
-    /**
-     * @param bool|null $monActive
-     * @return BusinessHours
-     */
     public function setMonActive(?bool $monActive): BusinessHours
     {
         $this->monActive = $monActive;
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getTueActive(): ?bool
     {
         return $this->tueActive;
     }
 
-    /**
-     * @param bool|null $tueActive
-     * @return BusinessHours
-     */
     public function setTueActive(?bool $tueActive): BusinessHours
     {
         $this->tueActive = $tueActive;
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getWedActive(): ?bool
     {
         return $this->wedActive;
     }
 
-    /**
-     * @param bool|null $wedActive
-     * @return BusinessHours
-     */
     public function setWedActive(?bool $wedActive): BusinessHours
     {
         $this->wedActive = $wedActive;
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getThuActive(): ?bool
     {
         return $this->thuActive;
     }
 
-    /**
-     * @param bool|null $thuActive
-     * @return BusinessHours
-     */
     public function setThuActive(?bool $thuActive): BusinessHours
     {
         $this->thuActive = $thuActive;
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getFriActive(): ?bool
     {
         return $this->friActive;
     }
 
-    /**
-     * @param bool|null $friActive
-     * @return BusinessHours
-     */
     public function setFriActive(?bool $friActive): BusinessHours
     {
         $this->friActive = $friActive;
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getSatActive(): ?bool
     {
         return $this->satActive;
     }
 
-    /**
-     * @param bool|null $satActive
-     * @return BusinessHours
-     */
     public function setSatActive(?bool $satActive): BusinessHours
     {
         $this->satActive = $satActive;
         return $this;
     }
 
-    /**
-     * @return bool|null
-     */
     public function getSunActive(): ?bool
     {
         return $this->sunActive;
     }
 
-    /**
-     * @param bool|null $sunActive
-     * @return BusinessHours
-     */
     public function setSunActive(?bool $sunActive): BusinessHours
     {
         $this->sunActive = $sunActive;

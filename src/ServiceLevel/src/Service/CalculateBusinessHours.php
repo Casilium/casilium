@@ -15,7 +15,6 @@ use function explode;
 use function is_array;
 use function number_format;
 use function preg_match;
-use function sprintf;
 use function strcmp;
 use function strpos;
 use function strtolower;
@@ -90,8 +89,6 @@ class CalculateBusinessHours
         }
 
         $date = $this->addMinutesTo($date, $minutes);
-
-        die($date);
         return $date;
     }
 

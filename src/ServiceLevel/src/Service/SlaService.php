@@ -22,12 +22,6 @@ class SlaService
         $this->entityManager = $entityManager;
     }
 
-    /**
-     * Save/update business hours information
-     *
-     * @param array $data form data
-     * @return BusinessHours
-     */
     public function saveBusinessHours(array $data): BusinessHours
     {
         // if id exists we're updating, otherwise creating
@@ -80,7 +74,7 @@ class SlaService
     public function findAllBusinessHours(): array
     {
         return $this->entityManager
-            ->createQueryBuilder('qb')
+            ->createQueryBuilder()
             ->select('b')
             ->from(BusinessHours::class, 'b')
             ->orderBy('b.name')
@@ -116,7 +110,6 @@ class SlaService
      * Create/update SLA policy
      *
      * @param array $data
-     * @return Sla
      * @throws Exception
      */
     public function createSla(array $data): Sla
@@ -227,7 +220,6 @@ class SlaService
      * Find priority from database
      *
      * @param int $id id of priority
-     * @return Priority
      */
     public function findPriorityById(int $id): Priority
     {
@@ -237,11 +229,11 @@ class SlaService
     public function assignOrganisationSla(int $orgId, int $slaId): void
     {
         if ($orgId === 0) {
-            throw new \Exception('Client ID not passed');
+            throw new Exception('Client ID not passed');
         }
 
         if ($slaId === 0) {
-            throw new \Exception('Invalid SLA ID');
+            throw new Exception('Invalid SLA ID');
         }
 
         /** @var Organisation $organisation */
