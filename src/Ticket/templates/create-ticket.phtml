@@ -176,7 +176,7 @@ $(document).ready(function() {
                 $('#start_date').val(n);
             },
             error: function(n) {
-                alert('Set due manually, error calculating');
+                $('#start_date').val('Error');
             }
         });
 
