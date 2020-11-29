@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ServiceLevel\Handler;
 
+use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
@@ -37,7 +38,7 @@ class ViewSlaHandler implements RequestHandlerInterface
     {
         $slaId = (int) $request->getAttribute('id');
         if ($slaId === 0) {
-            throw new \Exception('SLA not found');
+            throw new Exception('SLA not found');
         }
 
         $sla = $this->slaService->findSlaById($slaId);
