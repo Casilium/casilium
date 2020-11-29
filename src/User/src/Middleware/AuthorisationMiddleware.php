@@ -53,7 +53,7 @@ class AuthorisationMiddleware implements MiddlewareInterface
     {
         $routeResult      = $this->router->match($request);
         $matchedRouteName = $routeResult->getMatchedRouteName();
-        if ($matchedRouteName === null) {
+        if ($matchedRouteName === false) {
             return $handler->handle($request);
         }
 
