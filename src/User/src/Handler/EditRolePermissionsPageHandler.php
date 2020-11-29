@@ -61,7 +61,7 @@ class EditRolePermissionsPageHandler implements RequestHandlerInterface
 
         /** @var Role $role */
         $role = $this->entityManager->getRepository(Role::class)->find($id);
-        if ($role == null) {
+        if ($role === null) {
             return new HtmlResponse($this->renderer->render('error::404'), 404);
         }
 
@@ -84,7 +84,7 @@ class EditRolePermissionsPageHandler implements RequestHandlerInterface
             $isDisabled = false;
             if (
                 isset($effectivePermissions[$permission->getName()])
-                && $effectivePermissions[$permission->getName()] == 'inherited'
+                && $effectivePermissions[$permission->getName()] === 'inherited'
             ) {
                 $label     .= ' (inherited)';
                 $isDisabled = true;

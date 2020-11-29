@@ -49,7 +49,7 @@ class DeletePermissionPageHandler implements RequestHandlerInterface
 
         /** @var Permission $permission */
         $permission = $this->entityManager->getRepository(Permission::class)->find($id);
-        if ($permission == null) {
+        if ($permission === null) {
             return new HtmlResponse($this->renderer->render('error::404'), 404);
         }
 

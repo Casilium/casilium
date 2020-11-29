@@ -64,8 +64,8 @@ class DeleteRolePageHandler implements RequestHandlerInterface
         }
 
         $params = $request->getQueryParams();
-        if (array_key_exists('confirm', $params) && (bool) $params['confirm'] == true) {
-            if ($role->getId() == 1) {
+        if (array_key_exists('confirm', $params) && (bool) $params['confirm'] === true) {
+            if ($role->getId() === 1) {
                 throw new Exception('The Administrator role cannot be deleted!');
             }
 

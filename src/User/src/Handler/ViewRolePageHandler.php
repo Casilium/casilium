@@ -47,7 +47,7 @@ class ViewRolePageHandler implements RequestHandlerInterface
         $role = $this->entityManager->getRepository(Role::class)
             ->find($id);
 
-        if ($role == null) {
+        if ($role === null) {
             // role not found
             return new HtmlResponse($this->renderer->render('error::404'), 404);
         }

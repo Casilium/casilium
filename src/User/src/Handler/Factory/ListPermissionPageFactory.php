@@ -15,7 +15,7 @@ class ListPermissionPageFactory
         /** @var EntityManagerInterface $em */
         $em = $container->get('doctrine.entity_manager.orm_default');
 
-        /** @var TemplateRendererInterface $render */
+        /** @var TemplateRendererInterface $renderer */
         $renderer = $container->get(TemplateRendererInterface::class);
 
         return new ListPermissionPageHandler($em, $renderer);

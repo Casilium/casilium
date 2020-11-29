@@ -64,7 +64,7 @@ class EditRolePageHandler implements RequestHandlerInterface
         // find role
         /** @var Role $roleToEdit */
         $roleToEdit = $this->entityManager->getRepository(Role::class)->find($id);
-        if ($roleToEdit == null) {
+        if ($roleToEdit === null) {
             // not found
             return new HtmlResponse($this->renderer->render('error::404'), 404);
         }
@@ -89,7 +89,7 @@ class EditRolePageHandler implements RequestHandlerInterface
 
         /** @var Role $role */
         foreach ($roles as $role) {
-            if ($role->getId() == $roleToEdit->getId()) {
+            if ($role->getId() === $roleToEdit->getId()) {
                 continue; // Do not inherit from ourselves
             }
 

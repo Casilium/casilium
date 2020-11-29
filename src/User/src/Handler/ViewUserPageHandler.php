@@ -26,8 +26,11 @@ class ViewUserPageHandler implements RequestHandlerInterface
     /** @var EventManagerInterface */
     private $events;
 
-    public function __construct(EntityManagerInterface $entityManager, TemplateRendererInterface $renderer, $events)
-    {
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        TemplateRendererInterface $renderer,
+        EventManagerInterface $events
+    ) {
         $this->entityManager = $entityManager;
         $this->renderer      = $renderer;
         $this->events        = $events;
@@ -47,7 +50,7 @@ class ViewUserPageHandler implements RequestHandlerInterface
         }
 
         $user = $this->entityManager->getRepository(User::class)->find($id);
-        if ($user == null) {
+        if ($user === null) {
             return new HtmlResponse($this->renderer->render('error::404'));
         }
 

@@ -14,16 +14,16 @@ use User\Validator\PermissionExistsValidator;
 class PermissionForm extends Form
 {
     /** @var SessionCsrfGuard */
-    private $guard;
+    protected $guard;
 
     /** @var EntityManagerInterface|null */
-    private $entityManager;
+    protected $entityManager;
 
     /** @var Permission|null */
-    private $permission;
+    protected $permission;
 
     /** @var string */
-    private $scenario;
+    protected $scenario;
 
     public function __construct(
         SessionCsrfGuard $guard,

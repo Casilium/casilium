@@ -13,10 +13,10 @@ use Mezzio\Csrf\SessionCsrfGuard;
 class RolePermissionsForm extends Form
 {
     /** @var SessionCsrfGuard */
-    private $guard;
+    protected $guard;
 
     /** @var EntityManagerInterface */
-    private $entityManager;
+    protected $entityManager;
 
     public function __construct(EntityManagerInterface $entityManager, SessionCsrfGuard $guard)
     {

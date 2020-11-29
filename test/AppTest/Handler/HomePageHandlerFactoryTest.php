@@ -19,6 +19,7 @@ class HomePageHandlerFactoryTest extends TestCase
     /** @var ContainerInterface|ObjectProphecy */
     protected $container;
 
+    /** @var TemplateRendererInterface */
     protected $renderer;
 
     protected function setUp(): void

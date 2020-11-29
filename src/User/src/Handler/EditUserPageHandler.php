@@ -62,7 +62,7 @@ class EditUserPageHandler implements RequestHandlerInterface
 
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->find($id);
-        if ($user == null) {
+        if ($user === null) {
             return new HtmlResponse($this->renderer->render('error::404'), 404);
         }
 
