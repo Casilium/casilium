@@ -66,7 +66,8 @@
         "laminas/laminas-hydrator": "^3.2",
         "monolog/monolog": "^1.24",
         "nesbot/carbon": "^2.41.5",
-      "ext-sodium": "*"
+      "ext-sodium": "*",
+      "ext-json": "*"
     },
     "require-dev": {
         "laminas/laminas-development-mode": "^3.2",
