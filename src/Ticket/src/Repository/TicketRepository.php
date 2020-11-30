@@ -93,6 +93,12 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->addOrderBy('t.priority')
             ->addOrderBy('t.start_date');
 
+        if (isset($options['queue_id'])) {
+            $queueId = (int) $options['queue_id'];
+            $qb->where('t.queue = :queue')
+                ->setParameter('queue', $queueId);
+        }
+
         // if organisation uuid is defined, grab that organisation only
         if (isset($options['organisation_uuid'])) {
             $organisationUuid = $options['organisation_uuid'];
