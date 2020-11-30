@@ -38,6 +38,9 @@ class HomePageHandler implements RequestHandlerInterface
             'dueToday'   => $this->ticketRepo->findDueTodayTicketCount(),
             'open'       => $this->ticketRepo->findOpenTicketCount(),
             'hold'       => $this->ticketRepo->findOnHoldTicketCount(),
+            'created'    => $this->ticketRepo->findTotalTicketCount(),
+            'resolved'   => $this->ticketRepo->findResolvedTicketCount(),
+            'closed'     => $this->ticketRepo->findClosedTicketCount(),
         ];
 
         return new HtmlResponse($this->renderer->render('app::home-page', [

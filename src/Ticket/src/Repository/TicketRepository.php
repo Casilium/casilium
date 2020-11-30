@@ -189,12 +189,41 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
     public function findOnHoldTicketCount(): int
     {
-        $today = new DateTime('now', new DateTimeZone('UTC'));
-
         return (int) $this->createQueryBuilder('t')
             ->select('COUNT(t.id)')
             ->where('t.status = :status')
             ->setParameter('status', Ticket::STATUS_ON_HOLD)
+            ->getQuery()
+            ->useQueryCache(true)
+            ->getSingleScalarResult();
+    }
+
+    public function findTotalTicketCount(): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->getQuery()
+            ->useQueryCache(true)
+            ->getSingleScalarResult();
+    }
+
+    public function findResolvedTicketCount(): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.status = :status')
+            ->setParameter('status', [Ticket::STATUS_RESOLVED])
+            ->getQuery()
+            ->useQueryCache(true)
+            ->getSingleScalarResult();
+    }
+
+    public function findClosedTicketCount(): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.status = :status')
+            ->setParameter('status', [Ticket::STATUS_CLOSED])
             ->getQuery()
             ->useQueryCache(true)
             ->getSingleScalarResult();

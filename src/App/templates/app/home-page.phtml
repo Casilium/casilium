@@ -2,22 +2,48 @@
 <div class="container-fluid">
     <div class="row">
         <div class="col">
-            <h2>Ticket Summary</h2>
+        <h1>Ticket Summary</h1>
         </div>
     </div>
+    <hr style=" border-top: 1px dotted #999999;">
     <div class="row">
         <div class="col">
             <div class="card mb-1">
-                <div class="card-header bg-primary text-nowrap">
-                    Unresolved
+                <div class="card-header text-nowrap text-center">
+                    Total Tickets
                 </div>
-                <div class="card-body">
-                    <h3><?= $this->stats['unresolved'] ?></h3>
+                <div class="card-body text-center">
+                    <h3><?= $this->stats['created'] ?></h3>
                 </div>
             </div>
         </div>
         <div class="col">
             <div class="card mb-1">
+                <div class="card-header text-nowrap text-center">
+                    Resolved Tickets
+                </div>
+                <div class="card-body text-center">
+                    <h3><?= $this->stats['resolved'] ?></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mb-1">
+                <div class="card-header text-nowrap text-center">
+                    Closed Tickets
+                </div>
+                <div class="card-body text-center">
+                    <h3><?= $this->stats['closed'] ?></h3>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <hr style=" border-top: 1px dotted #999999;">
+
+    <div class="row">
+        <div class="col">
+            <div class="card mb-1 text-center">
                 <div class="card-header bg-danger text-nowrap">
                     Overdue
                 </div>
@@ -27,7 +53,7 @@
             </div>
         </div>
         <div class="col">
-            <div class="card mb-1">
+            <div class="card mb-1 text-center">
                 <div class="card-header bg-warning text-nowrap">
                     Due today
                 </div>
@@ -37,7 +63,17 @@
             </div>
         </div>
         <div class="col">
-            <div class="card mb-1">
+            <div class="card mb-1 text-center">
+                <div class="card-header bg-primary text-nowrap">
+                    Unresolved
+                </div>
+                <div class="card-body">
+                    <h3><?= $this->stats['unresolved'] ?></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mb-1 text-center">
                 <div class="card-header bg-success text-nowrap">
                     Open
                 </div>
@@ -47,7 +83,7 @@
             </div>
         </div>
         <div class="col">
-            <div class="card mb-1">
+            <div class="card mb-1 text-center">
                 <div class="card-header bg-info text-nowrap">
                     On hold
                 </div>
