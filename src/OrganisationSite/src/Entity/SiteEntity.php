@@ -284,7 +284,7 @@ class SiteEntity
             'county'          => $this->county,
             'postal_code'     => $this->postal_code,
             'telephone'       => $this->telephone,
-            'country'         => $this->county,
+            'country_id'      => $this->country->getId(),
             'organisation'    => $this->organisation,
         ];
     }
