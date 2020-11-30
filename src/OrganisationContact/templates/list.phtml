@@ -24,7 +24,8 @@
         class="btn btn-primary btn-sm mb-2">New Contact</a>
 
     <?php if (! empty($contacts)): ?>
-        <table class="table table-dark striped">
+    <div class="table-responsive">
+        <table class="table table-dark table-striped table-hover">
             <thead class="thead-dark">
                 <tr>
                     <th scope="col">Name</th>
@@ -53,11 +54,10 @@
             <?php endforeach ?>
             </tbody>
         </table>
-    <?php else: ?>
-
+        <?php else: ?>
             <p class="text-info">
                 No contacts are defined for <?= $this->escapeHtml($organisation->getName()) ?>
             </p>
-
+        </div>
     <?php endif ?>
 </div>
