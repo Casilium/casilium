@@ -8,8 +8,9 @@ $this->pageBreadcrumbs()->setItems([
 ]);
 
 $organisations = $this->organisations;
+$organisationCount = count($organisations);
 ?>
-<h1>Organisations</h1>
+<h1>Organisations <small><span class="badge badge-primary"><?= $organisationCount ?></span></small></h1>
 <div style="padding-bottom: 25px;">
     <a class="btn btn-sm btn-primary" href="<?= $this->url('organisation.create') ?>">New Organisation</a>
     <?php if (! empty($organisations)) : ?>
