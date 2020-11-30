@@ -88,7 +88,9 @@ class CreateSiteHandler implements RequestHandlerInterface
                 $this->siteManager->createSite($site);
 
                 $flashMessenger->flash('info', 'Site created successfully');
-                return new RedirectResponse($this->urlHelper->generate('organisation.list'));
+                return new RedirectResponse($this->urlHelper->generate('organisation_site.list', [
+                    'id' => $organisationUuid,
+                ]));
             }
         }
 
