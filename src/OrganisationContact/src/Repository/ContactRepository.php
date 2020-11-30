@@ -12,17 +12,12 @@ class ContactRepository extends EntityRepository
 {
     public function findByCorporationId(int $id): ?array
     {
-        $qb = $this->createQueryBuilder('qb');
+        $sql   = 'SELECT c FROM OrganisationContact\Entity\Contact c where c.organisation = :org';
+        $query = $this->getEntityManager()
+            ->createQuery($sql)
+            ->setParameter('org', $id);
 
-        $qb->select('c')
-            ->from(Contact::class, 'c')
-            ->join(Organisation::class, 'o')
-            ->where('c.organisation = :id')
-            ->orderBy('c.first_name')
-            ->setParameter('id', $id)
-            ->getQuery()
-            ->getResult();
 
-        return $qb->getQuery()->getResult();
+        return $query->getResult();
     }
 }
