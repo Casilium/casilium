@@ -110,7 +110,7 @@ class SiteForm extends Form implements InputFilterProviderInterface
                     [
                         'name'    => Validator\Regex::class,
                         'options' => [
-                            'pattern'  => '/^[a-z0-9_ \-,]{3,64}$/i',
+                            'pattern'  => '/^[a-z0-9_ \-,]\(\){3,64}$/i',
                             'messages' => [
                                 Validator\Regex::NOT_MATCH
                                     => 'Name can only container letters, numbers, and hyphens; must be 3-64 characters',
