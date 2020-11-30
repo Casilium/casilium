@@ -9,7 +9,7 @@
             </a>
         </div>
         <div class="list-group list-group-flush">
-            <a href="#" class="list-group-item list-group-item-action bg-dark">
+            <a href="<?= $this->url('home') ?>" class="list-group-item list-group-item-action bg-dark">
                 <i class="fas fa-tachometer-alt fa-fw mr-2"></i> Dashboard
             </a>
             <a href="<?= $this->url('organisation.list') ?>"
@@ -35,9 +35,6 @@
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
-                    <li class="nav-item active">
-                        <a class="nav-link" href="<?= $this->url('home') ?>">Home</a>
-                    </li>
                     <?php if ($this->identity() != null): ?>
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">

@@ -4,11 +4,15 @@ declare(strict_types=1);
 
 namespace Ticket\Repository;
 
+use DateTime;
+use DateTimeZone;
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\NonUniqueResultException;
+use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
 use Ticket\Entity\Ticket;
 
-class TicketRepository extends EntityRepository
+class TicketRepository extends EntityRepository implements TicketRepositoryInterface
 {
     /**
      * Find ticket by UUID
@@ -120,5 +124,79 @@ class TicketRepository extends EntityRepository
             ->addOrderBy('t.start_date');
 
         return $qb->getQuery()->getResult();
+    }
+
+    /**
+     * Find unresolved ticket count
+     *
+     * @return int unresolved count
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    public function findUnresolvedTicketCount(): int
+    {
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.status IN (:ids)')
+            ->setParameter('ids', [
+                Ticket::STATUS_NEW,
+                Ticket::STATUS_IN_PROGRESS,
+            ])
+            ->getQuery()
+            ->useQueryCache(true)
+            ->getSingleScalarResult();
+    }
+
+    public function findDueTodayTicketCount(): int
+    {
+        $today = new DateTime('now', new DateTimeZone('UTC'));
+
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.start_date BETWEEN :dateMin AND :dateMax')
+            ->setParameter('dateMin', $today->format('Y-m-d 00:00:00'))
+            ->setParameter('dateMax', $today->format('Y-m-d 23:59:59'))
+            ->getQuery()
+            ->useQueryCache(true)
+            ->getSingleScalarResult();
+    }
+
+    public function findOverdueTicketCount(): int
+    {
+        $today = new DateTime('now', new DateTimeZone('UTC'));
+
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.start_date < :date')
+            ->setParameter('date', $today->format('Y-m-d H:i:s'))
+            ->getQuery()
+            ->useQueryCache(true)
+            ->getSingleScalarResult();
+    }
+
+    public function findOpenTicketCount(): int
+    {
+        $today = new DateTime('now', new DateTimeZone('UTC'));
+
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.status = :status')
+            ->setParameter('status', Ticket::STATUS_NEW)
+            ->getQuery()
+            ->useQueryCache(true)
+            ->getSingleScalarResult();
+    }
+
+    public function findOnHoldTicketCount(): int
+    {
+        $today = new DateTime('now', new DateTimeZone('UTC'));
+
+        return (int) $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)')
+            ->where('t.status = :status')
+            ->setParameter('status', Ticket::STATUS_ON_HOLD)
+            ->getQuery()
+            ->useQueryCache(true)
+            ->getSingleScalarResult();
     }
 }

@@ -9,6 +9,7 @@ use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Ticket\Repository\TicketRepositoryInterface;
 
 /**
  * Display home page
@@ -18,13 +19,29 @@ class HomePageHandler implements RequestHandlerInterface
     /** @var null|TemplateRendererInterface */
     private $renderer;
 
-    public function __construct(TemplateRendererInterface $renderer)
-    {
-        $this->renderer = $renderer;
+    /** @var TicketRepositoryInterface */
+    private $ticketRepo;
+
+    public function __construct(
+        TemplateRendererInterface $renderer,
+        TicketRepositoryInterface $ticketRepository
+    ) {
+        $this->renderer   = $renderer;
+        $this->ticketRepo = $ticketRepository;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        return new HtmlResponse($this->renderer->render('app::home-page', []));
+        $stats = [
+            'unresolved' => $this->ticketRepo->findUnresolvedTicketCount(),
+            'overdue'    => $this->ticketRepo->findOverdueTicketCount(),
+            'dueToday'   => $this->ticketRepo->findDueTodayTicketCount(),
+            'open'       => $this->ticketRepo->findOpenTicketCount(),
+            'hold'       => $this->ticketRepo->findOnHoldTicketCount(),
+        ];
+
+        return new HtmlResponse($this->renderer->render('app::home-page', [
+            'stats' => $stats,
+        ]));
     }
 }

@@ -5,15 +5,19 @@ declare(strict_types=1);
 namespace App\Handler\Factory;
 
 use App\Handler\HomePageHandler;
+use Doctrine\ORM\EntityManager;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Ticket\Entity\Ticket;
 
 class HomePageHandlerFactory
 {
     public function __invoke(ContainerInterface $container): RequestHandlerInterface
     {
-        $renderer = $container->get(TemplateRendererInterface::class);
-        return new HomePageHandler($renderer);
+        $renderer         = $container->get(TemplateRendererInterface::class);
+        $ticketRepository = $container->get(EntityManager::class)
+            ->getRepository(Ticket::class);
+        return new HomePageHandler($renderer, $ticketRepository);
     }
 }

@@ -1,15 +1,60 @@
 <?php $this->headTitle('Home'); ?>
-<div class="jumbotron mt-3">
-    <h1>Welcome to <span class="casilium-blue">Casilium</span></h1>
-    <h2>Open Source Enterprise Level Help Desk Software</h2>
-    <p>
-        Built on Mezzio by the <a href="https://getlaminas.org/">Laminas Project</a>,
-        an open-source continuation of Zend Framework.
-    </p>
-    <hr>
-    <p>
-        Our goal is to help businesses and organisations become effective at supporting their users, customers,
-        and partners. We do it by developing surprisingly simple, user-friendly and
-        <span style="color: #009900">FREE</span> help desk software.
-    </p>
+<div class="container-fluid">
+    <div class="row">
+        <div class="col">
+            <h2>Ticket Summary</h2>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col">
+            <div class="card mb-1">
+                <div class="card-header bg-primary text-nowrap">
+                    Unresolved
+                </div>
+                <div class="card-body">
+                    <h3><?= $this->stats['unresolved'] ?></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mb-1">
+                <div class="card-header bg-danger text-nowrap">
+                    Overdue
+                </div>
+                <div class="card-body">
+                    <h3><?= $this->stats['overdue'] ?></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mb-1">
+                <div class="card-header bg-warning text-nowrap">
+                    Due today
+                </div>
+                <div class="card-body">
+                    <h3><?= $this->stats['dueToday'] ?></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mb-1">
+                <div class="card-header bg-success text-nowrap">
+                    Open
+                </div>
+                <div class="card-body">
+                    <h3><?= $this->stats['open'] ?></h3>
+                </div>
+            </div>
+        </div>
+        <div class="col">
+            <div class="card mb-1">
+                <div class="card-header bg-info text-nowrap">
+                    On hold
+                </div>
+                <div class="card-body">
+                    <h3><?= $this->stats['hold'] ?></h3>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
