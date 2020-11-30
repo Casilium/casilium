@@ -24,6 +24,9 @@ $organisations = $this->organisations;
                                     <span class="text-muted"><?= $this->escapeHtml($organisation->getName()) ?></span>
                                 <?php else: ?>
                                     <?= $this->escapeHtml($organisation->getName()) ?>
+                                    <?php if ($organisation->getSla() !== null): ?>
+                                        <small><span class="badge badge-primary ml-1">SLA</span></small>
+                                    <?php endif ?>
                                 <?php endif ?>
                            </a>
                        </li>
