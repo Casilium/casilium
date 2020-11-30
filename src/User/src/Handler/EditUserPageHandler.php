@@ -97,6 +97,11 @@ class EditUserPageHandler implements RequestHandlerInterface
 
                 $this->userManager->updateUser($user, $data);
 
+                // if admin user is being edited, logout
+                if ($user->getId() === 1) {
+                    return new RedirectResponse($this->urlHelper->generate('logout'));
+                }
+
                 return new RedirectResponse($this->urlHelper->generate('admin.user.view', [
                     'id' => $user->getId(),
                 ]));
