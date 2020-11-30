@@ -110,7 +110,7 @@ class SiteForm extends Form implements InputFilterProviderInterface
                     [
                         'name'    => Validator\Regex::class,
                         'options' => [
-                            'pattern'  => '/^[a-z0-9_ -,]{3,64}$/i',
+                            'pattern'  => '/^[a-z0-9_ \-,]{3,64}$/i',
                             'messages' => [
                                 Validator\Regex::NOT_MATCH
                                     => 'Name can only container letters, numbers, and hyphens; must be 3-64 characters',
@@ -130,7 +130,7 @@ class SiteForm extends Form implements InputFilterProviderInterface
                     [
                         'name'    => Validator\Regex::class,
                         'options' => [
-                            'pattern'  => '/^[a-z0-9_ -,]{3,64}$/i',
+                            'pattern'  => '/^[a-z0-9_ \-,]{3,64}$/i',
                             'messages' => [
                                 Validator\Regex::NOT_MATCH
                                     => 'Street address can only container letters, numbers, and hyphens; '
@@ -151,7 +151,7 @@ class SiteForm extends Form implements InputFilterProviderInterface
                     [
                         'name'    => Validator\Regex::class,
                         'options' => [
-                            'pattern'  => '/^[a-z0-9_ -,]{3,64}$/i',
+                            'pattern'  => '/^[a-z0-9_ \-,]{3,64}$/i',
                             'messages' => [
                                 Validator\Regex::NOT_MATCH
                                     => 'Street address (2) can only container letters, numbers, and hyphens; '
@@ -172,7 +172,7 @@ class SiteForm extends Form implements InputFilterProviderInterface
                     [
                         'name'    => Validator\Regex::class,
                         'options' => [
-                            'pattern'  => '/^[a-z0-9_ -,]{3,64}$/i',
+                            'pattern'  => '/^[a-z0-9_ \-,]{3,64}$/i',
                             'messages' => [
                                 Validator\Regex::NOT_MATCH
                                     => 'Town can only container letters, numbers, and hyphens; '
@@ -193,7 +193,7 @@ class SiteForm extends Form implements InputFilterProviderInterface
                     [
                         'name'    => Validator\Regex::class,
                         'options' => [
-                            'pattern'  => '/^[a-z0-9_ -,]{3,64}$/i',
+                            'pattern'  => '/^[a-z0-9_ \-,]{3,64}$/i',
                             'messages' => [
                                 Validator\Regex::NOT_MATCH
                                     => 'City can only container letters, numbers, and hyphens; '
@@ -214,7 +214,7 @@ class SiteForm extends Form implements InputFilterProviderInterface
                     [
                         'name'    => Validator\Regex::class,
                         'options' => [
-                            'pattern'  => '/^[a-z0-9_ -,]{3,64}$/i',
+                            'pattern'  => '/^[a-z0-9_ \-,]{3,64}$/i',
                             'messages' => [
                                 Validator\Regex::NOT_MATCH
                                     => 'County can only container letters, numbers, and hyphens; '
