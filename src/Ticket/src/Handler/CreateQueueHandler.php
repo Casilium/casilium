@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ticket\Handler;
 
 use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\Form\FormInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
@@ -46,6 +47,7 @@ class CreateQueueHandler implements RequestHandlerInterface
 
             if ($form->isValid()) {
                 $this->queueManager->save($form->getData(FormInterface::VALUES_AS_ARRAY));
+                return new RedirectResponse($this->urlHelper->generate('admin.queue_list'));
             }
         }
 
