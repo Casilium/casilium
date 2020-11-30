@@ -65,7 +65,7 @@ class SiteEntity
     /**
      * @ORM\Column(name="town", type="string", length=64)
      *
-     * @var string
+     * @var string|null
      */
     protected $town;
 
@@ -161,7 +161,7 @@ class SiteEntity
         return $this;
     }
 
-    public function setCounty(string $county): SiteEntity
+    public function setCounty(?string $county): SiteEntity
     {
         $this->county = $county;
         return $this;
@@ -205,7 +205,7 @@ class SiteEntity
         return $this->town;
     }
 
-    public function setTown(string $town): ?SiteEntity
+    public function setTown(?string $town): ?SiteEntity
     {
         $this->town = $town;
         return $this;
