@@ -51,7 +51,7 @@ class SiteEntity
     /**
      * @ORM\Column(name="street_address", type="string", length=64)
      *
-     * @var string
+     * @var string|null
      */
     protected $street_address;
 
@@ -144,7 +144,7 @@ class SiteEntity
         return $this->name;
     }
 
-    public function setName(string $name): SiteEntity
+    public function setName(?string $name): SiteEntity
     {
         $this->name = $name;
         return $this;
@@ -194,7 +194,7 @@ class SiteEntity
         return $this->street_address2;
     }
 
-    public function setStreetAddress2(string $street_address2): SiteEntity
+    public function setStreetAddress2(?string $street_address2): SiteEntity
     {
         $this->street_address2 = $street_address2;
         return $this;
