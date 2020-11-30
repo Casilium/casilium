@@ -7,7 +7,6 @@ namespace Ticket\Repository;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
 use Ticket\Entity\Ticket;
-use function sprintf;
 
 class TicketRepository extends EntityRepository
 {
