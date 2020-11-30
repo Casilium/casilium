@@ -1,4 +1,5 @@
 <?php
+    /** @var \OrganisationContact\Entity\Contact[] $contacts */
     $contacts = $this->contacts;
     $organisation = $this->organisation;
 
@@ -11,25 +12,48 @@
     'Contacts' => $this->url('contact.list', ['id' => $organisation->getUuid()]),
 ]);
 ?>
-<h1>Contacts</h1>
-<h2><?= $organisation->getName() ?></h2>
-<a href="<?= $this->url('contact.create', ['id' => $organisation->getUuid()]) ?>"
-    class="btn btn-primary btn-sm mb-2">New Contact</a>
-<?php if (! empty($contacts)): ?>
-<div class="list-group">
-    <?php foreach ($contacts as $contact): ?>
-        <div class="list-group-item">
-            <a href="<?= $this->url('contact.view', [
-                    'id' => $organisation->getUuid(),
-                'contact_id' => $contact->getId()]) ?>">
-            <?= $this->escapeHtml($contact->getFirstName()) ?>
-            <?= $this->escapeHtml($contact->getLastName()) ?>
-            </a>
-        </div>
-    <?php endforeach ?>
+<div class="container-fluid">
+    <h1>Contacts</h1>
+    <h2><?= $organisation->getName() ?></h2>
+
+    <a href="<?= $this->url('contact.create', ['id' => $organisation->getUuid()]) ?>"
+        class="btn btn-primary btn-sm mb-2">New Contact</a>
+
+    <?php if (! empty($contacts)): ?>
+        <table class="table table-dark striped">
+            <thead class="thead-dark">
+                <tr>
+                    <th scope="col">Name</th>
+                    <th scope="col">Work</th>
+                    <th scope="col">Mobile</th>
+                </tr>
+            </thead>
+            <tbody>
+            <?php foreach ($contacts as $contact): ?>
+                <tr>
+                    <td>
+                        <a href="<?= $this->url('contact.view', [
+                            'id' => $organisation->getUuid(),
+                            'contact_id' => $contact->getId()]) ?>">
+                            <?= $this->escapeHtml($contact->getFirstName()) ?>
+                            <?= $this->escapeHtml($contact->getLastName()) ?>
+                        </a>
+                    </td>
+                    <td>
+                        <?= $this->escapeHtml($contact->getWorkTelephone()) ?>
+                    </td>
+                    <td>
+                        <?= $this->escapeHtml($contact->getMobileTelephone()) ?>
+                    </td>
+                </tr>
+            <?php endforeach ?>
+            </tbody>
+        </table>
+    <?php else: ?>
+
+            <p class="text-info">
+                No contacts are defined for <?= $this->escapeHtml($organisation->getName()) ?>
+            </p>
+
+    <?php endif ?>
 </div>
-<?php else: ?>
-    <p class="text-info">
-        No contacts are defined for <?= $this->escapeHtml($organisation->getName()) ?>
-    </p>
-<?php endif ?>
