@@ -38,10 +38,11 @@ class ContactForm extends Form implements InputFilterProviderInterface
         $this->add([
             'name'       => 'first_name',
             'attributes' => [
-                'type'     => 'text',
-                'id'       => 'firstName',
-                'class'    => 'form-control',
-                'required' => true,
+                'type'         => 'text',
+                'id'           => 'firstName',
+                'class'        => 'form-control',
+                'required'     => true,
+                'autocomplete' => 'off',
             ],
             'options'    => [
                 'label' => 'First name',
@@ -52,9 +53,10 @@ class ContactForm extends Form implements InputFilterProviderInterface
         $this->add([
             'name'       => 'middle_name',
             'attributes' => [
-                'type'  => 'text',
-                'id'    => 'middleName',
-                'class' => 'form-control',
+                'type'         => 'text',
+                'id'           => 'middleName',
+                'class'        => 'form-control',
+                'autocomplete' => 'off',
             ],
             'options'    => [
                 'label' => 'Middle Name',
@@ -65,10 +67,11 @@ class ContactForm extends Form implements InputFilterProviderInterface
         $this->add([
             'name'       => 'last_name',
             'attributes' => [
-                'type'     => 'text',
-                'id'       => 'lastName',
-                'class'    => 'form-control',
-                'required' => true,
+                'type'         => 'text',
+                'id'           => 'lastName',
+                'class'        => 'form-control',
+                'required'     => true,
+                'autocomplete' => 'off',
             ],
             'options'    => [
                 'label' => 'Surname',
@@ -79,9 +82,10 @@ class ContactForm extends Form implements InputFilterProviderInterface
         $this->add([
             'name'       => 'work_telephone',
             'attributes' => [
-                'type'  => 'text',
-                'id'    => 'workTelephone',
-                'class' => 'form-control',
+                'type'         => 'text',
+                'id'           => 'workTelephone',
+                'class'        => 'form-control',
+                'autocomplete' => 'off',
             ],
             'options'    => [
                 'label' => 'Work telephone',
@@ -92,9 +96,10 @@ class ContactForm extends Form implements InputFilterProviderInterface
         $this->add([
             'name'       => 'work_extension',
             'attributes' => [
-                'type'  => 'text',
-                'id'    => 'workExtension',
-                'class' => 'form-control',
+                'type'         => 'text',
+                'id'           => 'workExtension',
+                'class'        => 'form-control',
+                'autocomplete' => 'off',
             ],
             'options'    => [
                 'label' => 'Extension',
@@ -105,9 +110,10 @@ class ContactForm extends Form implements InputFilterProviderInterface
         $this->add([
             'name'       => 'home_telephone',
             'attributes' => [
-                'type'  => 'text',
-                'id'    => 'homeTelephone',
-                'class' => 'form-control',
+                'type'         => 'text',
+                'id'           => 'homeTelephone',
+                'class'        => 'form-control',
+                'autocomplete' => 'off',
             ],
             'options'    => [
                 'label' => 'Home telephone',
@@ -118,9 +124,10 @@ class ContactForm extends Form implements InputFilterProviderInterface
         $this->add([
             'name'       => 'mobile_telephone',
             'attributes' => [
-                'type'  => 'text',
-                'id'    => 'mobileTelephone',
-                'class' => 'form-control',
+                'type'         => 'text',
+                'id'           => 'mobileTelephone',
+                'class'        => 'form-control',
+                'autocomplete' => 'off',
             ],
             'options'    => [
                 'label' => 'Mobile telephone',
@@ -131,10 +138,11 @@ class ContactForm extends Form implements InputFilterProviderInterface
         $this->add([
             'name'       => 'work_email',
             'attributes' => [
-                'type'     => 'text',
-                'id'       => 'workEmail',
-                'class'    => 'form-control',
-                'required' => true,
+                'type'         => 'text',
+                'id'           => 'workEmail',
+                'class'        => 'form-control',
+                'autocomplete' => 'off',
+                'required'     => true,
             ],
             'options'    => [
                 'label' => 'Work email',
@@ -145,9 +153,10 @@ class ContactForm extends Form implements InputFilterProviderInterface
         $this->add([
             'name'       => 'other_email',
             'attributes' => [
-                'type'  => 'text',
-                'id'    => 'otherEmail',
-                'class' => 'form-control',
+                'type'         => 'text',
+                'id'           => 'otherEmail',
+                'class'        => 'form-control',
+                'autocomplete' => 'off',
             ],
             'options'    => [
                 'label' => 'Other email',
@@ -158,9 +167,10 @@ class ContactForm extends Form implements InputFilterProviderInterface
         $this->add([
             'name'       => 'gender',
             'attributes' => [
-                'type'  => 'text',
-                'id'    => 'gender',
-                'class' => 'form-control',
+                'type'         => 'text',
+                'id'           => 'gender',
+                'class'        => 'form-control',
+                'autocomplete' => 'off',
             ],
             'options'    => [
                 'label' => 'Gender',
