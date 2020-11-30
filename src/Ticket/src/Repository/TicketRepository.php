@@ -99,6 +99,12 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
                 ->setParameter('queue', $queueId);
         }
 
+        if (isset($options['status_id'])) {
+            $statusId = (int) $options['status_id'];
+            $qb->where('t.status = :status')
+                ->setParameter('status', $statusId);
+        }
+
         // if organisation uuid is defined, grab that organisation only
         if (isset($options['organisation_uuid'])) {
             $organisationUuid = $options['organisation_uuid'];

@@ -39,6 +39,9 @@ class ListTicketHandler implements RequestHandlerInterface
         } elseif ($queueId = $request->getAttribute('queue_id')) {
             $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
                 ->findTicketsByPagination(['queue_id' => (int) $queueId]);
+        } elseif ($statusId = $request->getAttribute('status_id')) {
+            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
+                ->findTicketsByPagination(['status_id' => (int) $queueId]);
         } else {
             $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
                 ->findTicketsByPagination();

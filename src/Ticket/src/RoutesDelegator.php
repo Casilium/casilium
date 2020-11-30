@@ -52,6 +52,11 @@ class RoutesDelegator
             ListTicketHandler::class,
             'ticket.list_queue'
         );
+        $app->get(
+            '/ticket/list/status/{status_id:\d}',
+            ListTicketHandler::class,
+            'ticket.list_status'
+        );
 
         $app->route(
             '/admin/ticket/queue/create',
