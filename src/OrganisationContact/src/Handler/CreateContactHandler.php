@@ -73,7 +73,7 @@ class CreateContactHandler implements RequestHandlerInterface
                     $contact->getLastName()
                 ));
 
-                return new RedirectResponse($this->urlHelper->generate('organisation.list', [
+                return new RedirectResponse($this->urlHelper->generate('contact.list', [
                     'id' => $contact->getOrganisation()->getUuid(),
                 ]));
             }
