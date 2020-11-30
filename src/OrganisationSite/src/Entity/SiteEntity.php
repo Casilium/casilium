@@ -44,7 +44,7 @@ class SiteEntity
      *
      * @ORM\Column(name="name", type="string", length=64)
      *
-     * @var string
+     * @var string|null
      */
     protected $name;
 
@@ -139,7 +139,7 @@ class SiteEntity
         return $this;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }

@@ -34,7 +34,7 @@ $this->pageBreadcrumbs()->setItems([
                 <div class="col list-group-item">
                     <span class="text-info">
                         <a href="<?= $this->url('organisation_site.read', ['id' => $site->getUuid()]) ?>">
-                            <?= $this->escapeHtml($site->getName()) ?>
+                            <?= $this->escapeHtml($site->getName()) ?? $this->escapeHtml($site->getStreetAddress()) ?>
                         </a>
                     </span>
                     <?php if (null !== $site->getTelephone()): ?>:

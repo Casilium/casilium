@@ -42,7 +42,7 @@ final class Version20191218104532 extends AbstractMigration
         $table->addColumn('country_id', 'integer', ['unsigned' => true, 'notnull' => true]);
         $table->addColumn('telephone', 'string', ['length' => 20, 'notnull' => false]);
         $table->addColumn('postal_code', 'string',['notnull' => true, 'length' => 15]);
-        $table->addUniqueIndex(['postal_code'], 'postal_code_index');
+        $table->addIndex(['postal_code'], 'postal_code_index');
         $table->addForeignKeyConstraint('organisation',['organisation_id'], ['id'],
             ['onDelete'=>'RESTRICT', 'onUpdate'=>'CASCADE'], 'organisation_site_organisation_id_fk');
         $table->addForeignKeyConstraint('country',['country_id'], ['id'],
