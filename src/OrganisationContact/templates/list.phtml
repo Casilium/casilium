@@ -6,15 +6,19 @@
     $this->headTitle('Contacts');
 
     $this->pageBreadcrumbs()->setItems([
-    'Home' => $this->url('home'),
-    'Organisations'  => $this->url('organisation.list'),
-    $this->escapeHtml($organisation->getName())  => $this->url('organisation.view',['id' => $organisation->getUuid()]),
-    'Contacts' => $this->url('contact.list', ['id' => $organisation->getUuid()]),
-]);
+        'Home' => $this->url('home'),
+        'Organisations'  => $this->url('organisation.list'),
+        $this->escapeHtml($organisation->getName())  => $this->url('organisation.view',['id' => $organisation->getUuid()]),
+        'Contacts' => $this->url('contact.list', [
+            'id' => $organisation->getUuid()
+        ])
+    ]);
+
+    $contactCount = count($contacts);
 ?>
 <div class="container-fluid">
-    <h1>Contacts</h1>
-    <h2><?= $organisation->getName() ?></h2>
+    <h1>Contacts  <span class="badge badge-primary"><?= $contactCount ?></span></h1>
+    <h2><?= $this->escapeHtml($organisation->getName()) ?></h2>
 
     <a href="<?= $this->url('contact.create', ['id' => $organisation->getUuid()]) ?>"
         class="btn btn-primary btn-sm mb-2">New Contact</a>
