@@ -74,7 +74,10 @@ class CalculateBusinessHours
             }
 
             // passed end of day working hours?
-            if ($date->hour >= $this->workingHours[$dayOfWeek]['endHour']) {
+            if (
+                ($date->hour >= $this->workingHours[$dayOfWeek]['endHour'])
+                || $date->hour < $this->workingHours[$dayOfWeek]['startHour']
+            ) {
                 // set hour to beginning of day
                 $date->setHour($this->workingHours[$dayOfWeek]['startHour']);
                 $date->setMinute($this->workingHours[$dayOfWeek]['startMinute']);
