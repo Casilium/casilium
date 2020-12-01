@@ -33,14 +33,14 @@
             </div>
 
             <div class="form-group">
-                <?= $this->formLabel($form->get('start_date')) ?>
-                <div class="input-group date" id="start_date_picker" data-target-input="nearest">
-                    <?= $this->formElement($form->get('start_date')) ?>
-                    <div class="input-group-append" data-target="#start_date_picker" data-toggle="datetimepicker">
+                <?= $this->formLabel($form->get('due_date')) ?>
+                <div class="input-group date" id="due_date_picker" data-target-input="nearest">
+                    <?= $this->formElement($form->get('due_date')) ?>
+                    <div class="input-group-append" data-target="#due_date_picker" data-toggle="datetimepicker">
                         <div class="input-group-text"><i class="fa fa-calendar"></i></div>
                     </div>
                 </div>
-                <?= $this->formElementErrors($form->get('start_date')) ?>
+                <?= $this->formElementErrors($form->get('due_date')) ?>
             </div>
         </div>
         <div class="col-md-6">
@@ -133,22 +133,22 @@ $(document).ready(function() {
         updateDue();
     });
     
-    function toggleStartDate() {
+    function toggledueDate() {
       if ($('#type_id').val() === "2") {
-          $('#start_date').prop("readonly", true);
-          $('#start_date').val("");
+          $('#due_date').prop("readonly", true);
+          $('#due_date').val("");
           updateDue();
       } else {
-          $('#start_date').prop("readonly", false).val('');
+          $('#due_date').prop("readonly", false).val('');
           
       }  
     }
     
     $('#type_id').change(function() {
-      toggleStartDate();
+      toggledueDate();
     });
     
-    $('#start_date_picker').datetimepicker({
+    $('#due_date_picker').datetimepicker({
                 icons: {
                     time: "fas fa-clock",
                     date: "fa fa-calendar",
@@ -173,17 +173,17 @@ $(document).ready(function() {
             type : 'get',
             url: '/sla/due/org/$this->org_id/priority/' + weight + '/resolve',
             success: function(n) {
-                $('#start_date').val(n);
+                $('#due_date').val(n);
             },
             error: function(n) {
-                $('#start_date').val('Error');
+                $('#due_date').val('Error');
             }
         });
 
     }
     
     updatePriority();
-    toggleStartDate();
+    toggledueDate();
     updateDue();
 });
 JS;

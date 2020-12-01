@@ -130,7 +130,7 @@ final class Version20201117165118 extends AbstractMigration
         $table->addColumn('sla_target_id', 'integer', ['unsigned' => true, 'notnull' => false]);
         $table->addColumn('type_id', 'integer', ['unsigned' => true]);
         $table->addColumn('assigned_agent_id', 'integer', ['unsigned' => true, 'notnull' => false]);
-        $table->addColumn('start_date', 'datetime', ['notnull' => false, 'default' => NULL]);
+        $table->addColumn('due_date', 'datetime', ['notnull' => false, 'default' => NULL]);
         $table->addColumn('close_date', 'datetime', ['notnull' => false, 'default' => NULL]);
         $table->addColumn('resolve_date', 'datetime', ['notnull' => false, 'default' => NULL]);
         $table->addColumn('waiting_date', 'datetime', ['notnull' => false, 'default' => NULL]);

@@ -32,8 +32,8 @@
                 <span class="text-muted">
                     <small>
                     Due
-                    <time class="timeago" datetime="<?= $ticket->getStartDate() ?>">
-                    <?= $ticket->getStartDate() ?>
+                    <time class="timeago" datetime="<?= $ticket->getdueDate() ?>">
+                    <?= $ticket->getdueDate() ?>
                     </time>,
                     created
                     <time class="timeago" datetime="<?= $ticket->getCreatedAt() ?>">
@@ -67,7 +67,7 @@
                 <br>
                 <?php
                     $dt = new \DateTime('now');
-                    $dtDue = new \DateTime($ticket->getStartDate());
+                    $dtDue = new \DateTime($ticket->getdueDate());
 
                     if ($dt->getTimestamp() >  $dtDue->getTimestamp()
                         && $ticket->getStatus()->getId() < \Ticket\Entity\Status::STATUS_RESOLVED) : ?>

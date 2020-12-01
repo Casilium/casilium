@@ -224,10 +224,10 @@ class TicketService
         $type = $this->findTypeById($data['type_id']);
         $ticket->setType($type);
 
-        $startDate = $data['start_date'] ?? null;
+        $dueDate = $data['due_date'] ?? null;
 
-        if (! empty($startDate)) {
-            $ticket->setStartDate($startDate);
+        if (! empty($dueDate)) {
+            $ticket->setdueDate($dueDate);
         } else {
             $date = Carbon::now('UTC');
 
@@ -235,10 +235,10 @@ class TicketService
                 $calc = new CalculateBusinessHours($organisation->getSla()->getBusinessHours());
                 // todo fix default of 2 hours
                 $result = $calc->addHoursTo($date, '02:00');
-                $ticket->setStartDate($result->format('Y-m-d H:i:s'));
+                $ticket->setdueDate($result->format('Y-m-d H:i:s'));
             }
 
-            $ticket->setStartDate($date->format('Y-m-d H:i'));
+            $ticket->setdueDate($date->format('Y-m-d H:i'));
         }
 
         $status = $data['status'] ?? null;

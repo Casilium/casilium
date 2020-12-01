@@ -227,7 +227,7 @@ class CreateTicketsFromEmail extends Command
 
         $date = Carbon::parse($message['date']);
 
-        $startDate = Carbon::now('UTC');
+        $dueDate = Carbon::now('UTC');
 
         if ($contact->getOrganisation()->getSla() !== null) {
             $sla = $contact->getOrganisation()->getSla();
@@ -235,7 +235,7 @@ class CreateTicketsFromEmail extends Command
             $businessHoursCalc = new CalculateBusinessHours($sla->getBusinessHours());
 
             // todo adjust default duration of 2 hours
-            $startDate = $businessHoursCalc->addHoursTo($startDate, '02:00');
+            $dueDate = $businessHoursCalc->addHoursTo($dueDate, '02:00');
         }
 
         $data = [
@@ -246,7 +246,7 @@ class CreateTicketsFromEmail extends Command
             'type_id'           => 1,
             'impact'            => 3,
             'urgency'           => 3,
-            'start_date'        => $startDate->format('Y-m-d H:i:s'),
+            'due_date'        => $dueDate->format('Y-m-d H:i:s'),
             'site_id'           => null,
             'queue_id'          => $queue->getId(),
             'short_description' => $message['subject'],

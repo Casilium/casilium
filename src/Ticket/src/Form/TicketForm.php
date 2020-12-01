@@ -91,12 +91,12 @@ class TicketForm extends Form implements InputFilterProviderInterface
             ]);
         $this->add($element);
 
-        $element = new Element\Text('start_date');
+        $element = new Element\Text('due_date');
         $element->setLabel('Due By')
             ->setAttributes([
                 'class'       => 'form-control datetimepicker-input',
-                'data-target' => '#start_date_picker',
-                'id'          => 'start_date',
+                'data-target' => '#due_date_picker',
+                'id'          => 'due_date',
             ]);
         $this->add($element);
 
@@ -272,7 +272,7 @@ class TicketForm extends Form implements InputFilterProviderInterface
                 ],
             ],
             [
-                'name'       => 'start_date',
+                'name'       => 'due_date',
                 'required'   => false,
                 'filters'    => [
                     ['name' => Filter\StringTrim::class],

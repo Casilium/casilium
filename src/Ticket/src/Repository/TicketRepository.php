@@ -71,7 +71,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->from(Ticket::class, 't')
             ->orderBy('t.status')
             ->addOrderBy('t.priority')
-            ->addOrderBy('t.start_date');
+            ->addOrderBy('t.due_date');
 
         if ($fetchResolved === false) {
             $qb->where('t.status < :status')
@@ -105,7 +105,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->from(Ticket::class, 't')
             ->orderBy('t.status')
             ->addOrderBy('t.priority')
-            ->addOrderBy('t.start_date')
+            ->addOrderBy('t.due_date')
             ->where('t.status <= :status')
             ->setParameter('status', $status);
 
@@ -151,7 +151,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->leftJoin('t.organisation', 'o')
             ->orderBy('t.status')
             ->addOrderBy('t.priority')
-            ->addOrderBy('t.start_date');
+            ->addOrderBy('t.due_date');
 
         return $qb->getQuery()->getResult();
     }
@@ -183,7 +183,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         return (int) $this->createQueryBuilder('t')
             ->select('COUNT(t.id)')
-            ->where('t.start_date BETWEEN :dateMin AND :dateMax')
+            ->where('t.due_date BETWEEN :dateMin AND :dateMax')
             ->setParameter('dateMin', $today->format('Y-m-d 00:00:00'))
             ->setParameter('dateMax', $today->format('Y-m-d 23:59:59'))
             ->andWhere('t.status < :status')
@@ -199,7 +199,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         return (int) $this->createQueryBuilder('t')
             ->select('COUNT(t.id)')
-            ->where('t.start_date < :date')
+            ->where('t.due_date < :date')
             ->setParameter('date', $today->format('Y-m-d H:i:s'))
             ->andWhere('t.status < :status')
             ->setParameter('status', Ticket::STATUS_RESOLVED)

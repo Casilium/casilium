@@ -165,11 +165,11 @@ class Ticket
     private $source;
 
     /**
-     * @ORM\Column(name="start_date", type="string")
+     * @ORM\Column(name="due_date", type="string")
      *
      * @var string
      */
-    private $start_date;
+    private $due_date;
 
     /**
      * @ORM\OneToOne(targetEntity="Ticket\Entity\Status")
@@ -226,7 +226,6 @@ class Ticket
 
         $dateTime         = new DateTime('now', new DateTimeZone('UTC'));
         $this->createdAt  = $dateTime->format('Y-m-d H:i:s');
-        $this->start_date = $this->createdAt;
     }
 
     public function getAssignedAgent(): ?User
@@ -328,14 +327,14 @@ class Ticket
         return $this;
     }
 
-    public function getStartDate(): string
+    public function getdueDate(): string
     {
-        return $this->start_date;
+        return $this->due_date;
     }
 
-    public function setStartDate(string $start_date): Ticket
+    public function setdueDate(string $due_date): Ticket
     {
-        $this->start_date = $start_date;
+        $this->due_date = $due_date;
         return $this;
     }
 
@@ -464,7 +463,7 @@ class Ticket
         $this->impact            = isset($data['impact']) ? (int) $data['impact'] : self::IMPACT_DEFAULT;
         $this->urgency           = isset($data['urgency']) ? (int) $data['urgency'] : self::URGENCY_DEFAULT;
         $this->short_description = isset($data['short_description']) ? (string) $data['short_description'] : null;
-        $this->start_date        = isset($data['start_date']) && strlen($data['start_date']) > 1 ? (string) $data['start_date'] : date('Y-m-d H:i:s');
+        $this->due_date        = isset($data['due_date']) && strlen($data['due_date']) > 1 ? (string) $data['due_date'] : date('Y-m-d H:i:s');
         $this->long_description  = isset($data['long_description']) ? (string) $data['long_description'] : null;
         $this->lastResponseDate  = isset($data['last_response_date']) && strlen($data['last_response_date']) > 1 ? (string) $data['last_response_date'] : date('Y-m-d H:i:s');
         $this->lastResponseDate  = isset($data['first_response_date']) && strlen($data['first_response_date']) > 1 ? (string) $data['first_response_date'] : date('Y-m-d H:i:s');
