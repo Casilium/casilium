@@ -12,6 +12,7 @@ use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
+use OrganisationSite\Entity\SiteEntity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
@@ -92,6 +93,10 @@ class CreateTicketHandler implements RequestHandlerInterface
         ]));
     }
 
+    /**
+     * @param FormInterface $form form to populate
+     * @param SiteEntity[] $sites
+     */
     private function setFormSiteOptions(FormInterface $form, array $sites = []): void
     {
         // no sites? nothing to do
@@ -100,7 +105,7 @@ class CreateTicketHandler implements RequestHandlerInterface
         }
 
         foreach ($sites as $site) {
-            $siteOptions[$site->getId()] = $site->getName();
+            $siteOptions[$site->getId()] = $site->getAddressAsString();
         }
         $form->get('site_id')->setValueOptions($siteOptions);
         if (count($sites) === 1) {
