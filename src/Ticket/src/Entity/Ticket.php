@@ -216,6 +216,13 @@ class Ticket
     private $lastResponseDate;
 
     /**
+     * @ORM\Column(name="resolve_date", type="string")
+     *
+     * @var string|null
+     */
+    private $resolveDate;
+
+    /**
      * @ORM\Column(name="first_response_date", type="string")
      *
      * @var string|null
@@ -461,6 +468,17 @@ class Ticket
     public function setFirstResponseDate(?string $firstResponseDate): Ticket
     {
         $this->firstResponseDate = $firstResponseDate;
+        return $this;
+    }
+
+    public function getResolveDate(): ?string
+    {
+        return $this->resolveDate;
+    }
+
+    public function setResolveDate(?string $resolveDate): Ticket
+    {
+        $this->resolveDate = $resolveDate;
         return $this;
     }
 

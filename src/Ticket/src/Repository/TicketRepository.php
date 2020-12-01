@@ -262,4 +262,20 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->useQueryCache(true)
             ->getSingleScalarResult();
     }
+
+    public function findTicketsToClose(): array
+    {
+        $today = new DateTime('now', new DateTimeZone('UTC'));
+
+        return $this->createQueryBuilder('t')
+            ->select('t')
+            ->where('t.due_date BETWEEN :dateMin AND :dateMax')
+            ->setParameter('dateMin', $today->format('Y-m-d 00:00:00'))
+            ->setParameter('dateMax', $today->format('Y-m-d 23:59:59'))
+            ->andWhere('t.status < :status')
+            ->setParameter('status', Ticket::STATUS_RESOLVED)
+            ->getQuery()
+            ->useQueryCache(true)
+            ->getSingleScalarResult();
+    }
 }

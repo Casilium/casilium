@@ -316,6 +316,7 @@ class TicketService
                     break;
                 case 'save_resolve':
                     $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_RESOLVED);
+                    $ticket->setResolveDate(Carbon::now('UTC')->format('Y-m-d H:i:s'));
                     break;
                 default:
                     break;
