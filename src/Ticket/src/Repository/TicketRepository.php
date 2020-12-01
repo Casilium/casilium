@@ -233,12 +233,30 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->getSingleScalarResult();
     }
 
-    public function findTotalTicketCount(): int
+    /**
+     * Find total ticket count, to find between a period pass options as array.
+     * Example: ['start' => '2020-01-01', 'end' => 2020-01-31']
+     *
+     * @param array $options optional start/end, defaults to all time
+     * @return int number of tickets
+     * @throws NoResultException
+     * @throws NonUniqueResultException
+     */
+    public function findTotalTicketCount(array $options = []): int
     {
-        return (int) $this->createQueryBuilder('t')
-            ->select('COUNT(t.id)')
-            ->getQuery()
-            ->useQueryCache(true)
+        $start = isset($options['start']) ? Carbon::parse($options['start'], 'UTC') : null;
+        $end   = isset($options['end']) ? Carbon::parse($options['end'], 'UTC') : null;
+
+        $qb = $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)');
+
+        if ($start !== null && $end !== null) {
+            $qb->where('t.createdAt BETWEEN :dateMin AND :dateMax')
+                ->setParameter('dateMin', $start->format('Y-m-d 00:00:00'))
+                ->setParameter('dateMax', $end->format('Y-m-d 23:59:59'));
+        }
+
+        return (int) $qb->getQuery()
             ->getSingleScalarResult();
     }
 
