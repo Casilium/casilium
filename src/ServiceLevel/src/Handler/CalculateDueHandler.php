@@ -35,7 +35,7 @@ class CalculateDueHandler implements RequestHandlerInterface
         $type     = $request->getAttribute('type');
 
         /** @var SlaTarget[] $orgTargets */
-        $orgTargets = $organisation->getSla()->getSlaTarget();
+        $orgTargets = $organisation->getSla()->getSlaTargets();
         $targets    = [];
         foreach ($orgTargets as $target) {
             $targets[$target->getPriority()->getId()] = $target;

@@ -240,4 +240,13 @@ class Organisation implements OrganisationInterface
         $this->sla = $sla;
         return $this;
     }
+
+    public function hasSla(): bool
+    {
+        if ($this->sla !== false) {
+            return true;
+        }
+
+        return false;
+    }
 }

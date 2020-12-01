@@ -41,6 +41,39 @@ h1 {
   border-radius: $radius;
 }
 
+.priority {
+
+  .low {
+    @include rounded();
+    background-color: #494c15 !important;
+    padding: 3px;
+  }
+
+  .medium {
+    @include rounded();
+    background-color: #1d754b;
+    padding: 3px;
+  }
+
+  .high {
+    @include rounded();
+    background-color: #e9a627;
+    padding: 3px;
+  }
+
+  .urgent {
+    @include rounded();
+    background-color: #ea6e2d;
+    padding: 3px;
+  }
+
+  .critical {
+    @include rounded();
+    background-color: #f13c3c;
+    padding: 3px;
+  }
+}
+
 .ticket-list-item {
   margin-bottom: 3px;
   @include rounded();

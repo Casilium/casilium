@@ -78,7 +78,7 @@ class SlaHydrator extends AbstractHydrator
         }
 
         /** @var SlaTarget[] $slaTargets */
-        $slaTargets = $object->getSlaTarget();
+        $slaTargets = $object->getSlaTargets();
 
         $targets = [];
         foreach ($slaTargets as $slaTarget) {

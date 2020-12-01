@@ -15,7 +15,6 @@ use OrganisationContact\Entity\Contact;
 use OrganisationContact\Service\ContactService;
 use OrganisationSite\Entity\SiteEntity;
 use OrganisationSite\Service\SiteManager;
-use ServiceLevel\Entity\BusinessHours;
 use ServiceLevel\Service\CalculateBusinessHours;
 use Ticket\Entity\Agent;
 use Ticket\Entity\Priority;
@@ -224,8 +223,17 @@ class TicketService
         $type = $this->findTypeById($data['type_id']);
         $ticket->setType($type);
 
-        $dueDate = $data['due_date'] ?? null;
+        // assign sla target if organisation has sla
+        if (
+            ($ticket->getType()->getId() === $ticket->getType()::TYPE_INCIDENT
+                || $ticket->getType()->getId() === $ticket->getType()::TYPE_PROBLEM
+            )
+            && $organisation->hasSla()
+        ) {
+            $ticket->setSlaTarget($organisation->getSla()->getSlaTarget($ticket->getPriority()->getId()));
+        }
 
+        $dueDate = $data['due_date'] ?? null;
         if (! empty($dueDate)) {
             $ticket->setDueDate($dueDate);
         } else {

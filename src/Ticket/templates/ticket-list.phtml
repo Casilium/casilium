@@ -57,12 +57,21 @@
                 <span class="text-muted">Last Response</span><br/>
                 <?php if (null !== $ticket->getLastResponseDate()): ?>
                 <small>
-                    <time class="timeago" datetime="<?= $ticket->getLastResponseDate() ?>">
-                        <?= $ticket->getLastResponseDate() ?>
+                    <time class="timeago text-muted"
+                          datetime="<?= $this->localDate($ticket->getLastResponseDate(), 'Y-m-d H:i:s') ?>">
+                      <?= $this->localDate($ticket->getLastResponseDate()) ?>
                     </time>
                 </small>
                 <?php else: ?>
-                <small class="text-muted">No response</small>
+                    <?php if ($ticket->hasSla()): ?>
+                    <small class="text-warning">
+                        Response due <time class="timeago" datetime="<?= $ticket->getResponseDueDate() ?>">
+                            <?= $ticket->getResponseDueDate() ?>
+                        </time>
+                    </small>
+                    <?php else: ?>
+                        <small class="text-muted">No response</small><br>
+                    <?php endif ?>
                 <?php endif ?>
                 <br>
                 <?php

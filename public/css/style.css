@@ -33,6 +33,42 @@ h1 {
   }
 }
 
+.priority .low {
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+  background-color: #494c15 !important;
+  padding: 3px;
+}
+.priority .medium {
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+  background-color: #1d754b;
+  padding: 3px;
+}
+.priority .high {
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+  background-color: #e9a627;
+  padding: 3px;
+}
+.priority .urgent {
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+  background-color: #ea6e2d;
+  padding: 3px;
+}
+.priority .critical {
+  -webkit-border-radius: 0.5em;
+  -moz-border-radius: 0.5em;
+  border-radius: 0.5em;
+  background-color: #f13c3c;
+  padding: 3px;
+}
+
 .ticket-list-item {
   margin-bottom: 3px;
   -webkit-border-radius: 0.5em;

@@ -43,11 +43,11 @@ class Sla
      *
      * @var ArrayCollection
      */
-    protected $slaTarget;
+    protected $slaTargets;
 
     public function __construct()
     {
-        $this->slaTarget = new ArrayCollection();
+        $this->slaTargets = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -83,20 +83,29 @@ class Sla
         return $this;
     }
 
-    public function getSlaTarget(): ?Collection
+    public function getSlaTargets(): ?Collection
     {
-        return $this->slaTarget;
+        return $this->slaTargets;
     }
 
     public function addSlaTarget(SlaTarget $target): void
     {
-        $this->slaTarget[$target->getId()] = $target;
+        $this->slaTargets[$target->getPriority()->getId()] = $target;
+    }
+
+    public function getSlaTarget(int $id): SlaTarget
+    {
+        $targets = [];
+        foreach ($this->slaTargets as $target) {
+            $targets[$target->getPriority()->getId()] = $target;
+        }
+        return $targets[$id];
     }
 
     public function removeTarget(SlaTarget $target): void
     {
-        if ($this->slaTarget->contains($target)) {
-            $this->slaTarget->removeElement($target);
+        if ($this->slaTargets->contains($target)) {
+            $this->slaTargets->removeElement($target);
         }
     }
 
@@ -106,7 +115,7 @@ class Sla
             'id'             => $this->id,
             'name'           => $this->name,
             'business_hours' => $this->businessHours,
-            'sla_target'     => $this->slaTarget,
+            'sla_targets'    => $this->slaTargets,
         ];
     }
 }

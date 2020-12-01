@@ -139,16 +139,34 @@
                 </div>
                 <div class="card-body">
                     <p>
-                        <small class="text-light">Ticket Status</small><br>
+                        <small class="text-light">Ticket Status</small><br/>
                         <?= $ticket->getStatus()::getStatusTextFromId($ticket->getStatus()->getId()) ?>
                     </p>
-                    <p>
-                        <small class="text-light">Ticket Type</small><br>
-                        <?= $ticket->getType()::getStatusTextFromId($ticket->getType()->getId()); ?>
+                    <p class="priority">
+                        <small class="text-light">Ticket Type</small><br/>
+                        <span class="<?= strtolower($ticket->getPriority()->getName()) ?>">
+                            <?= $ticket->getType()::getStatusTextFromId($ticket->getType()->getId()); ?> /
+                            <?= $ticket->getPriority()->getName() ?> Priority
+                        </span>
                     </p>
+
+                    <?php if ($ticket->hasSla()): ?>
+                    <p>
+                        <small class="text-light">Response Due</small><br>
+                        <time class="timeago"
+                              datetime="<?= $this->localDate($ticket->getResponseDueDate(), 'Y-m-d H:i:s') ?>">
+                            <?= $this->localDate($ticket->getResponseDueDate()) ?>
+                        </time>
+                    </p>
+                    <?php endif ?>
                     <p>
                         <small class="text-light">Due Date</small><br>
-                        <?= $this->localDate($ticket->getDueDate()) ?>
+                        <?php if ($ticket->getDueDate() !== null): ?>
+                        <time class="timeago" datetime="<?= $this->localDate($ticket->getDueDate(), 'Y-m-d H:i:s') ?>">
+                            <?= $this->localDate($ticket->getDueDate()) ?>
+                        <?php else: ?>
+                            ???
+                        <?php endif ?>
                     </p>
                 </div>
             </div>

@@ -3,6 +3,8 @@ declare(strict_types=1);
 
 namespace Ticket\Entity;
 
+use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use DateTime;
 use DateTimeZone;
 use Doctrine\ORM\Mapping as ORM;
@@ -10,9 +12,12 @@ use Organisation\Entity\Organisation;
 use OrganisationContact\Entity\Contact;
 use OrganisationSite\Entity\SiteEntity;
 use Ramsey\Uuid\Uuid;
+use ServiceLevel\Entity\SlaTarget;
+use ServiceLevel\Service\CalculateBusinessHours;
 use User\Entity\User;
 use function date;
 use function get_object_vars;
+use function is_object;
 use function is_string;
 use function strlen;
 
@@ -217,6 +222,14 @@ class Ticket
      */
     private $firstResponseDate;
 
+    /**
+     * @ORM\OneToOne(targetEntity="ServiceLevel\Entity\SlaTarget")
+     * @ORM\JoinColumn(name="sla_target_id", referencedColumnName="id")
+     *
+     * @var SlaTarget|null
+     */
+    private $slaTarget;
+
     public function __construct()
     {
         $this->impact  = self::IMPACT_DEFAULT;
@@ -224,8 +237,8 @@ class Ticket
         $this->urgency = self::URGENCY_DEFAULT;
         $this->uuid    = Uuid::uuid4();
 
-        $dateTime         = new DateTime('now', new DateTimeZone('UTC'));
-        $this->createdAt  = $dateTime->format('Y-m-d H:i:s');
+        $dateTime        = new DateTime('now', new DateTimeZone('UTC'));
+        $this->createdAt = $dateTime->format('Y-m-d H:i:s');
     }
 
     public function getAssignedAgent(): ?User
@@ -451,6 +464,29 @@ class Ticket
         return $this;
     }
 
+    public function setSlaTarget(?SlaTarget $slaTarget): void
+    {
+        $this->slaTarget = $slaTarget;
+    }
+
+    public function getSlaTarget(): SlaTarget
+    {
+        return $this->slaTarget;
+    }
+
+    public function hasSla(): bool
+    {
+        return is_object($this->getSlaTarget());
+    }
+
+    public function getResponseDueDate(): CarbonInterface
+    {
+        $businessHours     = $this->organisation->getSla()->getBusinessHours();
+        $businessHoursCalc = new CalculateBusinessHours($businessHours);
+        $timeCreated       = Carbon::parse($this->getCreatedAt());
+        return $businessHoursCalc->addHoursTo($timeCreated, $this->getSlaTarget()->getResponseTime());
+    }
+
     public function getArrayCopy(): array
     {
         return get_object_vars($this);
@@ -463,10 +499,11 @@ class Ticket
         $this->impact            = isset($data['impact']) ? (int) $data['impact'] : self::IMPACT_DEFAULT;
         $this->urgency           = isset($data['urgency']) ? (int) $data['urgency'] : self::URGENCY_DEFAULT;
         $this->short_description = isset($data['short_description']) ? (string) $data['short_description'] : null;
-        $this->due_date        = isset($data['due_date']) && strlen($data['due_date']) > 1 ? (string) $data['due_date'] : date('Y-m-d H:i:s');
+        $this->due_date          = isset($data['due_date']) && strlen($data['due_date']) > 1 ? (string) $data['due_date'] : date('Y-m-d H:i:s');
         $this->long_description  = isset($data['long_description']) ? (string) $data['long_description'] : null;
         $this->lastResponseDate  = isset($data['last_response_date']) && strlen($data['last_response_date']) > 1 ? (string) $data['last_response_date'] : date('Y-m-d H:i:s');
         $this->lastResponseDate  = isset($data['first_response_date']) && strlen($data['first_response_date']) > 1 ? (string) $data['first_response_date'] : date('Y-m-d H:i:s');
+        $this->slaTarget         = $data['sla_target'] ?? null;
         $this->organisation      = $data['organisation'] ?? null;
         return $this;
     }
