@@ -476,7 +476,10 @@ class Ticket
 
     public function hasSla(): bool
     {
-        return is_object($this->getSlaTarget());
+        if ($this->slaTarget !== null) {
+            return true;
+        }
+        return false;
     }
 
     public function getResponseDueDate(): CarbonInterface
