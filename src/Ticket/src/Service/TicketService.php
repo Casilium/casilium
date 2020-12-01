@@ -162,11 +162,12 @@ class TicketService
     /**
      * Retrieve ticket list
      *
+     * @param bool $fetchResolved whether to fetch resolved and closed tickets
      * @return array
      */
-    public function fetchAllTickets(): array
+    public function fetchAllTickets(bool $fetchResolved = true): array
     {
-        return $this->entityManager->getRepository(Ticket::class)->findAll();
+        return $this->entityManager->getRepository(Ticket::class)->findAll($fetchResolved);
     }
 
     public function findTicketsByOrganisationUuid(string $uuid): array

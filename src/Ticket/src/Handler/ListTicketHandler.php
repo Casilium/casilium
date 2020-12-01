@@ -6,7 +6,6 @@ use App\Adapter\DoctrinePaginator as DoctrineAdapter;
 use Doctrine\ORM\Tools\Pagination\Paginator as ORMPaginator;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Paginator\Paginator;
-use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -35,16 +34,26 @@ class ListTicketHandler implements RequestHandlerInterface
 
         if ($organisationUuid = $request->getAttribute('org_id')) {
             $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-                ->findTicketsByPagination(['organisation_uuid' => $organisationUuid]);
+                ->findTicketsByPagination([
+                    'organisation_uuid' => $organisationUuid,
+                    'hide_completed'    => true,
+                ]);
         } elseif ($queueId = $request->getAttribute('queue_id')) {
             $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-                ->findTicketsByPagination(['queue_id' => (int) $queueId]);
+                ->findTicketsByPagination([
+                    'queue_id'       => (int) $queueId,
+                    'hide_completed' => true,
+                ]);
         } elseif ($statusId = $request->getAttribute('status_id')) {
             $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-                ->findTicketsByPagination(['status_id' => (int) $queueId]);
+                ->findTicketsByPagination([
+                    'status_id' => (int) $queueId,
+                ]);
         } else {
             $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-                ->findTicketsByPagination();
+                ->findTicketsByPagination([
+                    'hide_completed' => true,
+                ]);
         }
 
         $adapter   = new DoctrineAdapter(new ORMPaginator($query, false));

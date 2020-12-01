@@ -61,18 +61,24 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
     /**
      * Fetch all tickets from DB
      *
+     * @param bool $fetchResolved Whether to fetch closed and resolved tickets
      * @return array ticket list
      */
-    public function findAll(): array
+    public function findAll(bool $fetchResolved = true): array
     {
-        $qb = $this->createQueryBuilder('q');
-
-        return $qb->select('t')
+        $qb = $this->createQueryBuilder('q')
+            ->select('t')
             ->from(Ticket::class, 't')
             ->orderBy('t.status')
             ->addOrderBy('t.priority')
-            ->addOrderBy('t.start_date')
-            ->getQuery()->getResult();
+            ->addOrderBy('t.start_date');
+
+        if ($fetchResolved === false) {
+            $qb->where('t.status < :status')
+                ->setParameter('status', Ticket::STATUS_RESOLVED);
+        }
+
+        return $$qb->getQuery()->getResult();
     }
 
     /**
@@ -85,20 +91,32 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
      */
     public function findTicketsByPagination(array $options = [], int $offset = 0, int $limit = 2): Query
     {
+        if (isset($options['hide_completed']) && $options['hide_completed'] === true) {
+            // hide completed (resolved/closed) tickets?
+            $status = Ticket::STATUS_ON_HOLD;
+        } else {
+            // by default show all tickets
+            $status = Ticket::STATUS_CLOSED;
+        }
+
         // get query builder
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select(['t'])
             ->from(Ticket::class, 't')
             ->orderBy('t.status')
             ->addOrderBy('t.priority')
-            ->addOrderBy('t.start_date');
+            ->addOrderBy('t.start_date')
+            ->where('t.status <= :status')
+            ->setParameter('status', $status);
 
+        // if list queue show tickets for queue
         if (isset($options['queue_id'])) {
             $queueId = (int) $options['queue_id'];
-            $qb->where('t.queue = :queue')
+            $qb->andWhere('t.queue = :queue')
                 ->setParameter('queue', $queueId);
         }
 
+        // if requesting particular status, override status
         if (isset($options['status_id'])) {
             $statusId = (int) $options['status_id'];
             $qb->where('t.status = :status')
@@ -109,7 +127,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         if (isset($options['organisation_uuid'])) {
             $organisationUuid = $options['organisation_uuid'];
             $qb->leftJoin('t.organisation', 'o')
-                ->where('o.uuid = :uuid')
+                ->andWhere('o.uuid = :uuid')
                 ->setParameter('uuid', $organisationUuid);
         }
 
