@@ -327,12 +327,12 @@ class Ticket
         return $this;
     }
 
-    public function getdueDate(): string
+    public function getDueDate(): string
     {
         return $this->due_date;
     }
 
-    public function setdueDate(string $due_date): Ticket
+    public function setDueDate(string $due_date): Ticket
     {
         $this->due_date = $due_date;
         return $this;
