@@ -32,8 +32,8 @@
                 <span class="text-muted">
                     <small>
                     Due
-                    <time class="timeago" datetime="<?= $ticket->getdueDate() ?>">
-                    <?= $ticket->getdueDate() ?>
+                    <time class="timeago" datetime="<?= $ticket->getDueDate() ?>">
+                    <?= $ticket->getDueDate() ?>
                     </time>,
                     created
                     <time class="timeago" datetime="<?= $ticket->getCreatedAt() ?>">
@@ -67,10 +67,10 @@
                 <br>
                 <?php
                     $dt = new \DateTime('now');
-                    $dtDue = new \DateTime($ticket->getdueDate());
+                    $dtDue = new \DateTime($ticket->getDueDate());
 
                     if ($dt->getTimestamp() >  $dtDue->getTimestamp()
-                        && $ticket->getStatus()->getId() < \Ticket\Entity\Status::STATUS_RESOLVED) : ?>
+                        && $ticket->getStatus()->getId() <= $ticket::STATUS_ON_HOLD) : ?>
                         <span class="badge badge-danger">Overdue</span>
                     <?php endif
                 ?>
