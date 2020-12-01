@@ -46,9 +46,9 @@ class ViewTicketHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // get agent id from session (for response updates)
-        $session  = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
-        $user     = $session->get(UserInterface::class);
-        $agent_id = (int) $user['details']['id'];
+        $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
+        $user    = $session->get(UserInterface::class);
+        $agentId = (int) $user['details']['id'];
 
         // get ticket uuid from URL and find ticket
         $ticketUuid = $request->getAttribute('ticket_id');
@@ -70,7 +70,7 @@ class ViewTicketHandler implements RequestHandlerInterface
                 $data = $responseForm->getData();
 
                 // pass agent id to save
-                $data['agent_id'] = $agent_id;
+                $data['agent_id'] = $agentId;
 
                 $response = $this->ticketService->saveResponse($ticket, $data);
 
