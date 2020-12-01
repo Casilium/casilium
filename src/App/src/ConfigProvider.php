@@ -76,9 +76,11 @@ class ConfigProvider
         return [
             'factories'  => [
                 View\Helper\Breadcrumbs::class => InvokableFactory::class,
+                View\Helper\LocalDate::class   => View\Helper\Factory\LocalDateFactory::class,
             ],
             'aliases'    => [
                 'pageBreadcrumbs' => View\Helper\Breadcrumbs::class,
+                'localDate'       => View\Helper\LocalDate::class,
             ],
             'invokables' => [
                 'flash' => View\Helper\Flash::class,
