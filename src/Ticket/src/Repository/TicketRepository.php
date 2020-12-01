@@ -168,6 +168,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->where('t.start_date BETWEEN :dateMin AND :dateMax')
             ->setParameter('dateMin', $today->format('Y-m-d 00:00:00'))
             ->setParameter('dateMax', $today->format('Y-m-d 23:59:59'))
+            ->andWhere('t.status < :status')
+            ->setParameter('status', Ticket::STATUS_RESOLVED)
             ->getQuery()
             ->useQueryCache(true)
             ->getSingleScalarResult();
@@ -181,6 +183,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->select('COUNT(t.id)')
             ->where('t.start_date < :date')
             ->setParameter('date', $today->format('Y-m-d H:i:s'))
+            ->andWhere('t.status < :status')
+            ->setParameter('status', Ticket::STATUS_RESOLVED)
             ->getQuery()
             ->useQueryCache(true)
             ->getSingleScalarResult();
