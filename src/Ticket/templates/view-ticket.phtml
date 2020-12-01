@@ -143,6 +143,10 @@
                         <?= $ticket->getStatus()::getStatusTextFromId($ticket->getStatus()->getId()) ?>
                     </p>
                     <p>
+                        <small class="text-light">Ticket Type</small><br>
+                        <?= $ticket->getType()::getStatusTextFromId($ticket->getType()->getId()); ?>
+                    </p>
+                    <p>
                         <small class="text-light">Due Date</small><br>
                         <?= $this->localDate($ticket->getDueDate()) ?>
                     </p>
