@@ -44,6 +44,7 @@ class ConfigProvider
             ],
             'factories'  => [
                 Command\CreateTicketsFromEmail::class    => Command\Factory\CreateTicketsFromEmailFactory::class,
+                Command\CloseResolvedTickets::class      => Command\Factory\CloseResolvedTicketsFactory::class,
                 EventListener\TicketEventListener::class => EventListener\TicketEventListener::class,
                 Handler\CreateQueueHandler::class        => Handler\Factory\CreateQueueHandlerFactory::class,
                 Handler\DeleteQueueHandler::class        => Handler\Factory\DeleteQueueHandlerFactory::class,
@@ -105,6 +106,7 @@ class ConfigProvider
         return [
             'commands' => [
                 Command\CreateTicketsFromEmail::class,
+                Command\CloseResolvedTickets::class,
             ],
         ];
     }

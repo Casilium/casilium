@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ticket\Repository;
 
+use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
 use Doctrine\ORM\EntityRepository;
@@ -263,19 +264,21 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->getSingleScalarResult();
     }
 
-    public function findTicketsToClose(): array
+    public function closeResolvedTickets(int $days = 2): int
     {
-        $today = new DateTime('now', new DateTimeZone('UTC'));
+        // get current date
+        $today = Carbon::now('utc');
+
+        // add 2 days
+        $today = $today->subDays($days);
 
         return $this->createQueryBuilder('t')
-            ->select('t')
-            ->where('t.due_date BETWEEN :dateMin AND :dateMax')
+            ->update(Ticket::class, 't')
+            ->set('t.status', 5)
+            ->where('t.resolveDate < :dateMin')
             ->setParameter('dateMin', $today->format('Y-m-d 00:00:00'))
-            ->setParameter('dateMax', $today->format('Y-m-d 23:59:59'))
-            ->andWhere('t.status < :status')
+            ->andWhere('t.status = :status')
             ->setParameter('status', Ticket::STATUS_RESOLVED)
-            ->getQuery()
-            ->useQueryCache(true)
-            ->getSingleScalarResult();
+            ->getQuery()->execute();
     }
 }
