@@ -87,7 +87,7 @@
                 </div>
             </div>
 
-                <div class="card mb-2">
+            <div class="card mb-2">
                 <div class="card-header">
                     Add Response
                 </div>
@@ -130,10 +130,25 @@
 
                 </div>
             </div>
-
         </div> <!-- // col -->
 
         <div class="col-md-4">
+            <div class="card mb-2">
+                <div class="card-header">
+                    Ticket Info
+                </div>
+                <div class="card-body">
+                    <p>
+                        <small class="text-light">Ticket Status</small><br>
+                        <?= $ticket->getStatus()::getStatusTextFromId($ticket->getStatus()->getId()) ?>
+                    </p>
+                    <p>
+                        <small class="text-light">Due Date</small><br>
+                        <?= $this->escapeHtml($ticket->getDueDate()) ?>
+                    </p>
+                </div>
+            </div>
+
             <div class="card mb-2">
                 <div class="card-header">Contact Info</div>
                 <div class="card-body">
@@ -201,7 +216,7 @@
 
     </div>
 
-<?php
+        <?php
 $this->inlineScript()->captureStart();
 echo <<<JS
 // <script>
