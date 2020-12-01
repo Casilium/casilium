@@ -78,6 +78,15 @@ php.ini
 
     apc.enable_cli = 1
 
+Disable Development Mode
+------------------------
+Casilium is current set to development mode,
+be sure to disabled development mode.
+
+**Do not run development mode on a production system!**
+
+    composer development-disable
+
 License
 -------
 Calisium is released under the GPL2 license. See the included LICENSE.txt
