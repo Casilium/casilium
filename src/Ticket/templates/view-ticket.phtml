@@ -142,12 +142,18 @@
                         <small class="text-light">Ticket Status</small><br/>
                         <?= $ticket->getStatus()::getStatusTextFromId($ticket->getStatus()->getId()) ?>
                     </p>
-                    <p class="priority">
+                    <p class="<?= $ticket->hasSla() ? 'priority' : null?>">
                         <small class="text-light">Ticket Type</small><br/>
+                        <?php if ($ticket->hasSla()): ?>
                         <span class="<?= strtolower($ticket->getPriority()->getName()) ?>">
                             <?= $ticket->getType()::getStatusTextFromId($ticket->getType()->getId()); ?> /
                             <?= $ticket->getPriority()->getName() ?> Priority
                         </span>
+                        <?php else: ?>
+                        <span class="text-muted bg-secondary pl-2 pr-2">
+                           <?= $ticket->getType()::getStatusTextFromId($ticket->getType()->getId()); ?>
+                        </span>
+                        <?php endif ?>
                     </p>
 
                     <?php if ($ticket->hasSla()): ?>
