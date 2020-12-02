@@ -27,6 +27,9 @@
                         null,
                         [ 'reuse_result_params' => false] ) ?>">
                     <?= $this->escapeHtml($ticket->getOrganisation()->getName()) ?>
+                        <?php if ($ticket->hasSla()): ?>
+                        <small><span class="badge badge-info">SLA</span></small>
+                        <?php endif ?>
                     </a>
                 <br>
                 <span class="text-muted">
@@ -118,6 +121,7 @@
                         </div>
                     </div>
                 </div>
+                <?php if ($ticket->hasSla() ) : ?>
                 <div class="col-sm-12">
                     <div class="row priority text-center">
                         <div class="col-4 text-muted text-left"><small>Priority</small></div>
@@ -126,9 +130,10 @@
                         </div>
                     </div>
                 </div>
-                </div>
+                <?php endif ?>
             </div>
         </div>
+    </div>
     <?php endforeach; ?>
     <div class="row">
         <div class="col mt-4">
