@@ -4,10 +4,14 @@ declare(strict_types=1);
 
 namespace Ticket\Command;
 
+use Carbon\Carbon;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Ticket\Entity\Ticket;
 use Ticket\Service\TicketService;
+use function gmdate;
+use function sprintf;
 
 class Notifications extends Command
 {
@@ -36,7 +40,21 @@ class Notifications extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $output->writeln('Hello World');
+        /** @var Ticket[] $tickets */
+        $tickets = $this->ticketService->findTicketsDueWithin(30);
+        if (! empty($tickets)) {
+            foreach ($tickets as $ticket) {
+                $now     = Carbon::now('UTC');
+                $due     = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate());
+                $seconds = $now->diffInSeconds($due);
+
+                $output->writeln(sprintf(
+                    'Ticket #%s is due in %s',
+                    $ticket->getId(),
+                    gmdate('H:i:s', $seconds)
+                ));
+            }
+        }
 
         return 0;
     }

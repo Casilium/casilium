@@ -12,6 +12,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
 use Ticket\Entity\Ticket;
+use function sprintf;
 
 class TicketRepository extends EntityRepository implements TicketRepositoryInterface
 {
@@ -287,7 +288,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
     public function closeResolvedTickets(int $days = 2): int
     {
         // get current date
-        $today = Carbon::now('utc');
+        $today = Carbon::now('UTC');
 
         // add 2 days
         $today = $today->subDays($days);
@@ -300,5 +301,21 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->andWhere('t.status = :status')
             ->setParameter('status', Ticket::STATUS_RESOLVED)
             ->getQuery()->execute();
+    }
+
+    public function findTicketsDueWithinMinutes(int $minutes): array
+    {
+        $date     = Carbon::now('UTC');
+        $inFuture = clone $date;
+        $inFuture->addMinutes($minutes);
+
+        $qb = $this->createQueryBuilder('q')
+            ->select('t')
+            ->from(Ticket::class, 't')
+            ->andWhere('t.due_date BETWEEN :dateMin AND :dateMax')
+            ->setParameter('dateMin', $date->format('Y-m-d H:i:s'))
+            ->setParameter('dateMax', $inFuture->format('Y-m-d H:i:s'));
+
+        return $qb->getQuery()->getResult();
     }
 }

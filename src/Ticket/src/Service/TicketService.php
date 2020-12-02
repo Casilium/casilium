@@ -377,4 +377,10 @@ class TicketService
     {
         return $this->entityManager;
     }
+
+    public function findTicketsDueWithin(int $minutes): array
+    {
+        return $this->entityManager->getRepository(Ticket::class)
+            ->findTicketsDueWithinMinutes($minutes);
+    }
 }
