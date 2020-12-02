@@ -64,9 +64,9 @@
                     Last Responses
                 </div>
                 <div class="card-body">
-                    <small>
                     <?php foreach ($responses as $response): ?>
-                        <span class="text-muted">
+                    <p class="text-muted">
+                        <small>
                             <time class="timeago " datetime="<?= $this->escapeHtml($response->getResponseDate()) ?>">
                                 <?= $this->escapeHtml($response->getResponseDate()) ?>
                             </time>
@@ -78,12 +78,13 @@
                                 $this->escapeHtml($response->getContact()->getLastName()));
                             }
                             ?>
-                        </span>
-                        <br>
+                        </small>
+                    </p>
+                    <p>
                         <?= nl2br($this->escapeHtml($response->getResponse())) ?>
+                    </p>
                     <hr>
                     <?php endforeach; ?>
-                    </small>
                 </div>
             </div>
 
