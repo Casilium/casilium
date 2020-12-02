@@ -53,7 +53,7 @@ class AssignQueueMembersHandler implements RequestHandlerInterface
 
         $form = new AssignQueueMembersForm();
         $form->get('members')->setValueOptions($this->queueManager->findMemberOptions());
-        $form->setValue($this->getCurrentQueueMembers($queueId));
+        $form->get('members')->setValue(array_keys($this->getCurrentQueueMembers($queueId)));
 
         if ($request->getMethod() === 'POST') {
             $form->setData($request->getParsedBody());
