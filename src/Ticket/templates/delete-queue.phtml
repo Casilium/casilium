@@ -4,6 +4,12 @@
 $queue = $this->queue;
 
 $this->headTitle('Delete Queue');
+$this->pageBreadcrumbs()->setItems([
+    'Home'           => $this->url('home'),
+    'Administration' => $this->url('admin'),
+    'Queues'         => $this->url('admin.queue_list'),
+    'Delete'         => '',
+]);
 ?>
 <div class="container-fluid">
     <div class="row">

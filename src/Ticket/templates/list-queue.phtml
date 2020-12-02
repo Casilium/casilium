@@ -2,6 +2,13 @@
     /** @var \Ticket\Entity\Queue[] $queues
      */
     $queues = $this->queues;
+
+$this->headTitle('Queues');
+$this->pageBreadcrumbs()->setItems([
+    'Home'           => $this->url('home'),
+    'Administration' => $this->url('admin'),
+    'Queues'         => $this->url('admin.queue_list'),
+]);
 ?>
 <div class="container-fluid">
     <div class="row">

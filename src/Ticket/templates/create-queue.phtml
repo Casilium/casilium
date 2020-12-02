@@ -1,6 +1,14 @@
 <?php
 $this->headTitle('Create Queue');
 
+
+$this->pageBreadcrumbs()->setItems([
+    'Home'           => $this->url('home'),
+    'Administration' => $this->url('admin'),
+    'Queue'         => $this->url('admin.queue_list'),
+    'Create'         => 'admin.queue_create',
+]);
+
 /** @var \Laminas\Form\Form $form */
 $form = $this->form->prepare();
 ?>

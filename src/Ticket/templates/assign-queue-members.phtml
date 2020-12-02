@@ -1,9 +1,17 @@
 <?php
-    /** @var \Laminas\Form\FormInterface $form */
-    $form = $this->form->prepare();
+/** @var \Laminas\Form\FormInterface $form */
+$form = $this->form->prepare();
 
-    /** @var \Ticket\Entity\Queue $queue */
-    $queue = $this->queue;
+/** @var \Ticket\Entity\Queue $queue */
+$queue = $this->queue;
+
+$this->headTitle('Assign Queue Members');
+$this->pageBreadcrumbs()->setItems([
+    'Home'           => $this->url('home'),
+    'Administration' => $this->url('admin'),
+    'Queues'         => $this->url('admin.queue_list'),
+    'Assign'         => '',
+]);
 ?>
 <div class="container-fluid">
     <?= $this->form()->openTag($form) ?>
