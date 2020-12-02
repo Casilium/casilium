@@ -3,15 +3,25 @@
      */
     $queues = $this->queues;
 ?>
-<h1>Ticket Queues</h1>
 <div class="container-fluid">
-    <div class="list-group">
-        <?php foreach ($queues as $queue): ?>
-        <div class="list-group-item">
-            <a href="<?= $this->url('admin.queue_edit', ['id' => $queue->getId()]) ?>">
-                <?= $this->escapeHtml($queue->getName()) ?>
-            </a>
+    <div class="row">
+        <div class="col">
+            <h1>Ticket Queues</h1>
         </div>
-        <?php endforeach; ?>
     </div>
+    <?php foreach ($queues as $queue): ?>
+    <div class="row bg-secondary mb-4 p-3 rounded">
+            <div class="col-md-8 align-middle">
+                <a href="<?= $this->url('admin.queue_edit', ['id' => $queue->getId()]) ?>">
+                    <?= $this->escapeHtml($queue->getName()) ?>
+                </a>
+            </div>
+            <div class="col-md-4">
+                <a href="<?= $this->url('admin.queue_assign', ['id' => $queue->getId()]) ?>"
+                   class="btn btn-primary btn-sm">
+                    Assign Members
+                </a>
+            </div>
+        </div>
+    <?php endforeach; ?>
 </div>

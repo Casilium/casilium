@@ -6,6 +6,7 @@ namespace Ticket\Handler;
 
 use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
+use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\Form\FormInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
@@ -58,8 +59,10 @@ class AssignQueueMembersHandler implements RequestHandlerInterface
             $form->setData($request->getParsedBody());
 
             if ($form->isValid()) {
-                $this->queueManager->assignQueueMembers($queueId, $form->getData());
+                $this->queueManager->assignQueueMembers($queueId, $form->getData()['members']);
             }
+
+            return new RedirectResponse($this->urlHelper->generate('admin.queue_list'));
         }
 
         return new HtmlResponse($this->renderer->render('ticket::assign-queue-members', [

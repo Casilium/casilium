@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ticket\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Orm\Mapping as ORM;
 
 /**
@@ -34,6 +35,18 @@ class Agent
      * @var string
      */
     private $fullName;
+
+    /**
+     * @ORM\ManyToMany (targetEntity="Queue", mappedBy="queues")
+     *
+     * @var ArrayCollection
+     */
+    protected $queues;
+
+    public function __construct()
+    {
+        $this->queues = new ArrayCollection();
+    }
 
     public function getId(): int
     {

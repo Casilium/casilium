@@ -4,6 +4,7 @@ declare(strict_types=1);
 namespace Ticket\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use function get_object_vars;
 
@@ -72,11 +73,14 @@ class Queue
     private $fetch_from_mail;
 
     /**
-     * @ORM\OneToMany(targetEntity="Agent", mappedBy="queue", cascade={"persist"})
+     * @ORM\ManyToMany (targetEntity="Agent", inversedBy="queues")
+     * @ORM\JoinTable (name="queue_member",
+     *     joinColumns={@ORM\JoinColumn(name="queue_id", referencedColumnName="id")},
+     *     inverseJoinColumns={@ORM\JoinColumn("user_id", referencedColumnName="id")}
+     * )
      *
      * @var ArrayCollection
      */
-
     protected $members;
 
     public function construct()
@@ -174,20 +178,25 @@ class Queue
 
     public function addMember(Agent $agent): Queue
     {
-        if ($this->members->contains($agent)) {
-            return $this;
-        }
-
-        $this->members[$agent->getId()] = $agent;
+        $this->members->add($agent);
         return $this;
     }
 
-    /**
-     * @return ArrayCollection
-     */
-    public function getMembers(): ArrayCollection
+
+    public function getMembers(): Collection
     {
         return $this->members;
+    }
+
+    public function removeMember(Agent $agent): Queue
+    {
+        $this->members->removeElement($agent);
+        return $this;
+    }
+
+    public function hasMember(Agent $agent): bool
+    {
+        return $this->members->contains($agent);
     }
 
     /**

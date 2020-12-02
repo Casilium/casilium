@@ -9,7 +9,6 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Ticket\Entity\Agent;
 use Ticket\Entity\Queue;
-use Ticket\Entity\QueueMember;
 use User\Entity\User;
 use function array_key_exists;
 
@@ -118,10 +117,27 @@ class QueueManager
         /** @var Queue $queue */
         $queue = $this->entityManager->getRepository(Queue::class)->find($queueId);
 
+        $this->removeQueueMembers($queue);
+
         foreach ($members as $member) {
             /** @var Agent $agent */
             $agent = $this->entityManager->getRepository(Agent::class)->find((int) $member);
-            $queue->addMember($agent);
+            if ($agent !== null) {
+                if (! $queue->hasMember($agent)) {
+                    $queue->addMember($agent);
+                }
+            }
+        }
+
+        $this->entityManager->flush();
+    }
+
+    public function removeQueueMembers(Queue $queue): void
+    {
+        $queueMembers = $queue->getMembers();
+
+        foreach ($queueMembers as $member) {
+            $queue->removeMember($member);
         }
 
         $this->entityManager->flush();
