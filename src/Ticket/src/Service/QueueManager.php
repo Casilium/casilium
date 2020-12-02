@@ -7,7 +7,10 @@ namespace Ticket\Service;
 use App\Encryption\Sodium;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Ticket\Entity\Agent;
 use Ticket\Entity\Queue;
+use Ticket\Entity\QueueMember;
+use User\Entity\User;
 use function array_key_exists;
 
 class QueueManager
@@ -82,5 +85,45 @@ class QueueManager
         $this->entityManager->flush();
 
         return $q;
+    }
+
+    public function findMemberOptions(): array
+    {
+        /** @var Agent[] $agents */
+        $agents = $this->entityManager->createQueryBuilder()
+            ->select('a.id, a.fullName')
+            ->from(User::class, 'a')
+            ->orderBy('a.fullName')
+            ->getQuery()
+            ->getResult();
+
+        $result = [];
+        foreach ($agents as $agent) {
+            $result[$agent['id']] = $agent['fullName'];
+        }
+        return $result;
+    }
+
+    public function findQueueMembers(int $id): array
+    {
+        return $this->entityManager->createQueryBuilder()
+            ->select('qm')
+            ->from(Agent::class, 'qm')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function assignQueueMembers(int $queueId, array $members)
+    {
+        /** @var Queue $queue */
+        $queue = $this->entityManager->getRepository(Queue::class)->find($queueId);
+
+        foreach ($members as $member) {
+            /** @var Agent $agent */
+            $agent = $this->entityManager->getRepository(Agent::class)->find((int) $member);
+            $queue->addMember($agent);
+        }
+
+        $this->entityManager->flush();
     }
 }

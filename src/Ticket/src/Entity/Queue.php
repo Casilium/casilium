@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Ticket\Entity;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 use function get_object_vars;
 
@@ -69,6 +70,19 @@ class Queue
      * @var bool
      */
     private $fetch_from_mail;
+
+    /**
+     * @ORM\OneToMany(targetEntity="Agent", mappedBy="queue", cascade={"persist"})
+     *
+     * @var ArrayCollection
+     */
+
+    protected $members;
+
+    public function construct()
+    {
+        $this->members = new ArrayCollection();
+    }
 
     public function getId(): int
     {
@@ -156,6 +170,24 @@ class Queue
     {
         $this->fetch_from_mail = $fetch_from_email;
         return $this;
+    }
+
+    public function addMember(Agent $agent): Queue
+    {
+        if ($this->members->contains($agent)) {
+            return $this;
+        }
+
+        $this->members[$agent->getId()] = $agent;
+        return $this;
+    }
+
+    /**
+     * @return ArrayCollection
+     */
+    public function getMembers(): ArrayCollection
+    {
+        return $this->members;
     }
 
     /**

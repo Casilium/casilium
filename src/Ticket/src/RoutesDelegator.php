@@ -5,6 +5,7 @@ namespace Ticket;
 
 use Mezzio\Application;
 use Psr\Container\ContainerInterface;
+use Ticket\Handler\AssignQueueMembersHandler;
 use Ticket\Handler\CreateQueueHandler;
 use Ticket\Handler\CreateTicketHandler;
 use Ticket\Handler\DeleteQueueHandler;
@@ -79,6 +80,13 @@ class RoutesDelegator
             '/admin/ticket/queue/delete/{id:\d}[/confirm/{confirm}]',
             DeleteQueueHandler::class,
             'admin.queue_delete'
+        );
+
+        $app->route(
+            '/admin/ticket/queue/{id:\d}/assign',
+            AssignQueueMembersHandler::class,
+            ['GET', 'POST'],
+            'admin.queue_assign'
         );
 
         $app->get('/admin/ticket/queue/list', ListQueueHandler::class, 'admin.queue_list');
