@@ -106,8 +106,10 @@ class QueueManager
     public function findQueueMembers(int $id): array
     {
         return $this->entityManager->createQueryBuilder()
-            ->select('qm')
-            ->from(Agent::class, 'qm')
+            ->select('q')
+            ->from(Queue::class, 'q')
+            ->where('id = ?1')
+            ->setParameter(1, $id)
             ->getQuery()
             ->getResult();
     }

@@ -7,16 +7,16 @@ namespace Ticket\Handler;
 use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
-use Laminas\Form\FormInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Ticket\Entity\Agent;
-use Ticket\Entity\QueueMember;
+use Ticket\Entity\Queue;
 use Ticket\Form\AssignQueueMembersForm;
 use Ticket\Service\QueueManager;
+use function array_keys;
 
 class AssignQueueMembersHandler implements RequestHandlerInterface
 {
@@ -53,7 +53,9 @@ class AssignQueueMembersHandler implements RequestHandlerInterface
 
         $form = new AssignQueueMembersForm();
         $form->get('members')->setValueOptions($this->queueManager->findMemberOptions());
-        $form->get('members')->setValue(array_keys($this->getCurrentQueueMembers($queueId)));
+
+        $activeMembers = array_keys($this->getCurrentQueueMembers($queue));
+        $form->get('members')->setValue($activeMembers);
 
         if ($request->getMethod() === 'POST') {
             $form->setData($request->getParsedBody());
@@ -71,20 +73,12 @@ class AssignQueueMembersHandler implements RequestHandlerInterface
         ]));
     }
 
-    public function getCurrentQueueMembers(int $queueId): array
+    public function getCurrentQueueMembers(Queue $queue): array
     {
-        /** @var Agent[] $members */
-        $members = $this->queueManager->findQueueMembers($queueId);
-
-        if (empty($members)) {
-            return [];
-        }
-
         $result = [];
-        foreach ($members as $member) {
+        foreach ($queue->getMembers() as $member) {
             $result[$member->getId()] = $member->getFullName();
         }
-
         return $result;
     }
 }
