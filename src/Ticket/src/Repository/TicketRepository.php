@@ -70,7 +70,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         $qb = $this->createQueryBuilder('q')
             ->select('t')
             ->from(Ticket::class, 't')
-            ->orderBy('t.status')
+            ->orderBy('t.type', 'DESC')
+            ->addOrderBy('t.status')
             ->addOrderBy('t.priority')
             ->addOrderBy('t.due_date');
 
