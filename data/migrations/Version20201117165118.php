@@ -1,7 +1,10 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Schema\Schema;
 use Doctrine\Migrations\AbstractMigration;
 
@@ -12,9 +15,8 @@ final class Version20201117165118 extends AbstractMigration
 {
     /**
      * Create database tables
-     * @param Schema $schema
      */
-    public function up(Schema $schema) : void
+    public function up(Schema $schema): void
     {
         $this->createTicketStatusTable($schema);
         $this->createPriorityTable($schema);
@@ -28,12 +30,11 @@ final class Version20201117165118 extends AbstractMigration
 
     /**
      * Ticket Status table
-     * @param Schema $schema
      */
     public function createTicketStatusTable(Schema $schema): void
     {
         $table = $schema->createTable('ticket_status');
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement'=>true]);
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('description', 'string', ['notnull' => true]);
         $table->addUniqueIndex(['description']);
         $table->setPrimaryKey(['id']);
@@ -41,7 +42,6 @@ final class Version20201117165118 extends AbstractMigration
 
     /**
      * Create table for ticket priority
-     * @param Schema $schema
      */
     public function createPriorityTable(Schema $schema): void
     {
@@ -55,7 +55,7 @@ final class Version20201117165118 extends AbstractMigration
     public function createTicketTypeTable(Schema $schema): void
     {
         $table = $schema->createTable('ticket_type');
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement'=>true]);
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('description', 'string', ['notnull' => true]);
         $table->addUniqueIndex(['description']);
         $table->setPrimaryKey(['id']);
@@ -64,7 +64,7 @@ final class Version20201117165118 extends AbstractMigration
     public function createTicketSourceTable(Schema $schema): void
     {
         $table = $schema->createTable('ticket_source');
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement'=>true]);
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('description', 'string', ['notnull' => true]);
         $table->addUniqueIndex(['description']);
         $table->setPrimaryKey(['id']);
@@ -72,12 +72,11 @@ final class Version20201117165118 extends AbstractMigration
 
     /**
      * Create table for ticket Queues
-     * @param Schema $schema
      */
     public function createQueueTable(Schema $schema): void
     {
         $table = $schema->createTable('queue');
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement'=>true]);
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('name', 'string', ['notnull' => true]);
         $table->addColumn('email', 'string', ['notnull' => false]);
         $table->addColumn('host', 'string', ['notnull' => false]);
@@ -92,33 +91,41 @@ final class Version20201117165118 extends AbstractMigration
     public function createQueueMemberTable(Schema $schema): void
     {
         $table = $schema->createTable('queue_member');
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement'=>true]);
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('queue_id', 'integer', ['unsigned' => true]);
         $table->addColumn('user_id', 'integer', ['unsigned' => true]);
         $table->setPrimaryKey(['id']);
 
-        $table->addForeignKeyConstraint('queue', ['queue_id'], ['id'],
-            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'queue_member_queue_id_fk');
+        $table->addForeignKeyConstraint(
+            'queue',
+            ['queue_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'],
+            'queue_member_queue_id_fk'
+        );
 
-        $table->addForeignKeyConstraint('user', ['user_id'], ['id'],
-            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'queue_member_user_id_fk');
-
+        $table->addForeignKeyConstraint(
+            'user',
+            ['user_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'],
+            'queue_member_user_id_fk'
+        );
     }
 
     /**
      * Ticket Table
-     * @param Schema $schema
      */
     public function createTicketTable(Schema $schema): void
     {
         $table = $schema->createTable('ticket');
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement'=>true]);
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('uuid', 'string', ['length' => 36, 'fixed' => true, 'notnull' => true]);
         $table->addColumn('source_id', 'integer', ['unsigned' => true, 'notnull' => true]);
         $table->addColumn('organisation_id', 'integer', ['unsigned' => true]);
         $table->addColumn('site_id', 'integer', ['unsigned' => true, 'notnull' => false]);
         $table->addColumn('contact_id', 'integer', ['unsigned' => true]);
-        $table->addColumn('created_at', 'datetime', ['notnull'=>true]);
+        $table->addColumn('created_at', 'datetime', ['notnull' => true]);
         $table->addColumn('agent_id', 'integer', ['unsigned' => true, 'notnull' => false]);
         $table->addColumn('impact', 'smallint', ['unsigned' => true]);
         $table->addColumn('urgency', 'smallint', ['unsigned' => true]);
@@ -130,55 +137,91 @@ final class Version20201117165118 extends AbstractMigration
         $table->addColumn('sla_target_id', 'integer', ['unsigned' => true, 'notnull' => false]);
         $table->addColumn('type_id', 'integer', ['unsigned' => true]);
         $table->addColumn('assigned_agent_id', 'integer', ['unsigned' => true, 'notnull' => false]);
-        $table->addColumn('due_date', 'datetime', ['notnull' => false, 'default' => NULL]);
-        $table->addColumn('close_date', 'datetime', ['notnull' => false, 'default' => NULL]);
-        $table->addColumn('resolve_date', 'datetime', ['notnull' => false, 'default' => NULL]);
-        $table->addColumn('waiting_date', 'datetime', ['notnull' => false, 'default' => NULL]);
-        $table->addColumn('last_response_date', 'datetime', ['notnull' => false, 'default' => NULL]);
-        $table->addColumn('first_response_date', 'datetime', ['notnull' => false, 'default' => NULL]);
-        $table->addColumn('last_notified', 'datetime', ['notnull' => false, 'default' => NULL]);
+        $table->addColumn('due_date', 'datetime', ['notnull' => false, 'default' => null]);
+        $table->addColumn('close_date', 'datetime', ['notnull' => false, 'default' => null]);
+        $table->addColumn('resolve_date', 'datetime', ['notnull' => false, 'default' => null]);
+        $table->addColumn('waiting_date', 'datetime', ['notnull' => false, 'default' => null]);
+        $table->addColumn('last_response_date', 'datetime', ['notnull' => false, 'default' => null]);
+        $table->addColumn('first_response_date', 'datetime', ['notnull' => false, 'default' => null]);
+        $table->addColumn('last_notified', 'datetime', ['notnull' => false, 'default' => null]);
+        $table->addColumn('first_response_due', 'datetime', ['notnull' => false, 'default' => null]);
+        $table->addForeignKeyConstraint(
+            'user',
+            ['assigned_agent_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'],
+            'ticket_assigned_agent_id_user_id_fk'
+        );
 
+        $table->addForeignKeyConstraint(
+            'ticket_source',
+            ['source_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'],
+            'ticket_source_id_source_id_fk'
+        );
 
-        $table->addForeignKeyConstraint('user', ['assigned_agent_id'], ['id'],
-            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'ticket_assigned_agent_id_user_id_fk');
+        $table->addForeignKeyConstraint(
+            'queue',
+            ['queue_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'],
+            'ticket_response_queue_id_ticket_id_fk'
+        );
 
-        $table->addForeignKeyConstraint('ticket_source', ['source_id'], ['id'],
-            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'ticket_source_id_source_id_fk');
+        $table->addForeignKeyConstraint(
+            'organisation_site',
+            ['site_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'],
+            'ticket_site_id_site_id_fk'
+        );
 
-        $table->addForeignKeyConstraint('queue', ['queue_id'], ['id'],
-            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'ticket_response_queue_id_ticket_id_fk');
+        $table->addForeignKeyConstraint(
+            'organisation_contact',
+            ['contact_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'],
+            'ticket_contact_id_contact_id_fk'
+        );
 
-        $table->addForeignKeyConstraint('organisation_site', ['site_id'], ['id'],
-            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'ticket_site_id_site_id_fk');
+        $table->addForeignKeyConstraint(
+            'ticket_status',
+            ['status'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'],
+            'ticket_ticket_status_ticket_status_id_fk'
+        );
 
-        $table->addForeignKeyConstraint('organisation_contact', ['contact_id'], ['id'],
-            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'ticket_contact_id_contact_id_fk');
+        $table->addForeignKeyConstraint(
+            'ticket_priority',
+            ['priority_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'],
+            'ticket_ticket_priority_ticket_priority_id_fk'
+        );
 
-        $table->addForeignKeyConstraint('ticket_status', ['status'], ['id'],
-            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'ticket_ticket_status_ticket_status_id_fk');
-
-        $table->addForeignKeyConstraint('ticket_priority', ['priority_id'], ['id'],
-            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'ticket_ticket_priority_ticket_priority_id_fk');
-
-        $table->addForeignKeyConstraint('ticket_type', ['type_id'], ['id'],
-            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'ticket_type_id_type_id_fk');
-
+        $table->addForeignKeyConstraint(
+            'ticket_type',
+            ['type_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'],
+            'ticket_type_id_type_id_fk'
+        );
 
         $table->setPrimaryKey(['id']);
         $table->addOption('engine', 'InnoDB');
-
     }
 
     /**
      * Ticket Response table
-     * @param Schema $schema
      */
     public function createTicketResponseTable(Schema $schema): void
     {
         $table = $schema->createTable('ticket_response');
-        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement'=>true]);
+        $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('ticket_id', 'integer', ['unsigned' => true, 'notnull' => true]);
-        $table->addColumn('response_date', 'datetime', ['notnull'=>true]);
+        $table->addColumn('response_date', 'datetime', ['notnull' => true]);
         $table->addColumn('agent_id', 'integer', ['unsigned' => true, 'notnull' => false]);
         $table->addColumn('contact_id', 'integer', ['unsigned' => true, 'notnull' => false]);
         $table->addColumn('response', 'text', ['notnull' => true]);
@@ -188,17 +231,27 @@ final class Version20201117165118 extends AbstractMigration
         $table->setPrimaryKey(['id']);
         $table->addOption('engine', 'InnoDB');
 
-        $table->addForeignKeyConstraint('ticket', ['ticket_id'], ['id'],
-            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'ticket_response_ticket_id_ticket_id_fk');
+        $table->addForeignKeyConstraint(
+            'ticket',
+            ['ticket_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'],
+            'ticket_response_ticket_id_ticket_id_fk'
+        );
 
-        $table->addForeignKeyConstraint('ticket_status', ['ticket_status'], ['id'],
-            ['onDelete'=>'CASCADE', 'onUpdate'=>'CASCADE'], 'ticket_response_status_ticket_status_id_fk');
-
+        $table->addForeignKeyConstraint(
+            'ticket_status',
+            ['ticket_status'],
+            ['id'],
+            ['onDelete' => 'CASCADE', 'onUpdate' => 'CASCADE'],
+            'ticket_response_status_ticket_status_id_fk'
+        );
     }
 
     /**
      * Insert default values in to Ticket Status table
-     * @throws \Doctrine\DBAL\DBALException
+     *
+     * @throws DBALException
      */
     public function setUpTicketStatus(): void
     {
@@ -216,7 +269,6 @@ final class Version20201117165118 extends AbstractMigration
         $this->connection->insert('ticket_priority', ['id' => 4, 'name' => 'High']);
         $this->connection->insert('ticket_priority', ['id' => 5, 'name' => 'Medium']);
         $this->connection->insert('ticket_priority', ['id' => 6, 'name' => 'Low']);
-
     }
 
     public function setUpTicketType(): void
@@ -240,8 +292,8 @@ final class Version20201117165118 extends AbstractMigration
 
     /**
      * Call any post table creation routes, such as insert data
-     * @param Schema $schema
-     * @throws \Doctrine\DBAL\DBALException
+     *
+     * @throws DBALException
      */
     public function postUp(Schema $schema): void
     {
@@ -254,9 +306,8 @@ final class Version20201117165118 extends AbstractMigration
 
     /**
      * Revert any changes from this schema update
-     * @param Schema $schema
      */
-    public function down(Schema $schema) : void
+    public function down(Schema $schema): void
     {
         $schema->dropTable('queue_member');
         $schema->dropTable('queue');
