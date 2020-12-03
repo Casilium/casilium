@@ -29,7 +29,9 @@ use function getmypid;
 use function is_array;
 use function preg_match;
 use function sprintf;
+use function strip_tags;
 use function strripos;
+use function strtolower;
 use function substr;
 use const FILTER_VALIDATE_EMAIL;
 use const LOCK_EX;
@@ -175,6 +177,11 @@ class CreateTicketsFromEmail extends Command
             $output->writeln(sprintf(' <info>Retrieved %s messages</info>', count($messages)));
 
             foreach ($messages as $index => $message) {
+                if ($this->shouldIgnoreFromSubject($message['subject'])) {
+                    $output->writeln('- ignore message due to subject');
+                    continue;
+                }
+
                 $trackingId = $this->getUuid($message['body']);
                 if ($trackingId !== null) {
                     $output->writeln(sprintf('  <info>Found ticket reply to %s', $trackingId));
@@ -246,7 +253,7 @@ class CreateTicketsFromEmail extends Command
             'type_id'           => 1,
             'impact'            => 3,
             'urgency'           => 3,
-            'due_date'        => $dueDate->format('Y-m-d H:i:s'),
+            'due_date'          => $dueDate->format('Y-m-d H:i:s'),
             'site_id'           => null,
             'queue_id'          => $queue->getId(),
             'short_description' => $message['subject'],
@@ -352,5 +359,23 @@ class CreateTicketsFromEmail extends Command
             $body = substr($body, 0, $matches[0][1]);
         }
         return $body;
+    }
+
+    public function shouldIgnoreFromSubject(string $subject): bool
+    {
+        $patterns = $this->config['mail']['ignore_with_subject'] ?? [];
+
+        if (empty($subject) || empty($patterns)) {
+            return false;
+        }
+
+        $subject = strip_tags(strtolower($subject));
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $subject)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
