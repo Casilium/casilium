@@ -30,6 +30,13 @@ class RoutesDelegator
         );
 
         $app->route(
+            '/ticket/create/from/{ticket_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}',
+            CreateTicketHandler::class,
+            ['GET', 'POST'],
+            'ticket.clone'
+        );
+
+        $app->route(
             '/ticket/{ticket_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}/edit',
             EditTickerHandler::class,
             ['GET', 'POST'],

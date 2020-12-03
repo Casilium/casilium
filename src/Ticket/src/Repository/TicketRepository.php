@@ -12,6 +12,7 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
 use Ticket\Entity\Ticket;
+use Ticket\Service\TicketService;
 use function sprintf;
 
 class TicketRepository extends EntityRepository implements TicketRepositoryInterface
@@ -303,18 +304,36 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->getQuery()->execute();
     }
 
-    public function findTicketsDueWithinMinutes(int $minutes): array
+    public function findTicketsDueWithin(int $target, int $period): array
     {
         $date     = Carbon::now('UTC');
         $inFuture = clone $date;
-        $inFuture->addMinutes($minutes);
+
+        switch ($period) {
+            case TicketService::DUE_PERIOD_MINUTES:
+                $inFuture->addMinutes($target);
+                break;
+            case TicketService::DUE_PERIOD_HOURS:
+                $inFuture->addHours($target);
+                break;
+            case TicketService::DUE_PERIOD_DAYS:
+                $inFuture->addDays($target);
+                break;
+            case TicketService::DUE_PERIOD_WEEKS:
+                $inFuture->addWeeks($target);
+                break;
+            case TicketService::DUE_PERIOD_MONTHS:
+                $inFuture->addMonths($target);
+                break;
+        }
 
         $qb = $this->createQueryBuilder('q')
             ->select('t')
             ->from(Ticket::class, 't')
             ->andWhere('t.due_date BETWEEN :dateMin AND :dateMax')
             ->setParameter('dateMin', $date->format('Y-m-d H:i:s'))
-            ->setParameter('dateMax', $inFuture->format('Y-m-d H:i:s'));
+            ->setParameter('dateMax', $inFuture->format('Y-m-d H:i:s'))
+            ->andWhere('t.status <= 3');
 
         return $qb->getQuery()->getResult();
     }
