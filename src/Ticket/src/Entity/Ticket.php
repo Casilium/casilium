@@ -251,8 +251,9 @@ class Ticket
         $this->urgency = self::URGENCY_DEFAULT;
         $this->uuid    = Uuid::uuid4();
 
-        $dateTime        = new DateTime('now', new DateTimeZone('UTC'));
-        $this->createdAt = $dateTime->format('Y-m-d H:i:s');
+        $dateTime           = new DateTime('now', new DateTimeZone('UTC'));
+        $this->createdAt    = $dateTime->format('Y-m-d H:i:s');
+        $this->lastNotified = $dateTime->format('Y-m-d H:i:s');
     }
 
     public function getAssignedAgent(): ?User
