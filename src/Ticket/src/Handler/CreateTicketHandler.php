@@ -52,13 +52,22 @@ class CreateTicketHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $organisation = $this->ticketService->getOrganisationByUuid($request->getAttribute('org_id'));
-
         $session  = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
         $user     = $session->get(UserInterface::class);
         $agent_id = (int) $user['details']['id'];
 
         $form = new TicketForm();
+
+        if ($ticket_id = $request->getAttribute('ticket_id')) {
+            $ticket = $this->ticketService->getTicketByUuid($ticket_id);
+            $ticket->setId(0);
+            $form->get('contact_id')->setValue($ticket->getContact()->getId());
+            $form->get('type_id')->setValue($ticket->getType()->getId());
+            $organisation = $ticket->getOrganisation();
+            $form->setData($ticket->getArrayCopy());
+        } else {
+            $organisation = $this->ticketService->getOrganisationByUuid($request->getAttribute('org_id'));
+        }
 
         if ($request->getMethod() === 'POST') {
             $form->setData($request->getParsedBody());
@@ -74,7 +83,7 @@ class CreateTicketHandler implements RequestHandlerInterface
                 $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
                 $flashMessages->flash('info', sprintf('Ticket #%s successfully created', $ticket->getId()));
 
-                return new RedirectResponse($this->urlHelper->generate('organisation.list'));
+                return new RedirectResponse($this->urlHelper->generate('ticket.list'));
             }
         }
 

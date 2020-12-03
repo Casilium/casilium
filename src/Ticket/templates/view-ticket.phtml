@@ -98,14 +98,14 @@
 
                     <div class="form-group">
                         <?= $this->formLabel($responseForm->get('response')); ?>
+                        <div class="custom-control custom-checkbox text-left">
+                            <?= $this->formCheckbox($responseForm->get('is_public')); ?>
+                            <?= $this->formLabel($responseForm->get('is_public')); ?>
+                            <?= $this->formElementErrors()->render($responseForm->get('is_public'), ['class' => 'help-block']); ?>
+                        </div>
                         <?= $this->formElement($responseForm->get('response')); ?>
                         <?= $this->formElementErrors()->render($responseForm->get('response'), [
                                 'class' => 'help-block' ]); ?>
-                    </div>
-                    <div class="custom-control custom-checkbox text-right">
-                        <?= $this->formCheckbox($responseForm->get('is_public')); ?>
-                        <?= $this->formLabel($responseForm->get('is_public')); ?>
-                        <?= $this->formElementErrors()->render($responseForm->get('is_public'), ['class' => 'help-block']); ?>
                     </div>
 
                     <button type="submit" class="btn btn-primary" name="submit" value="save">
@@ -127,6 +127,18 @@
                     </button>
 
                     <?= $this->formElementErrors($responseForm->get('submit')) ?>
+
+                    <a class="btn btn-danger float-right" href="<?= $this->url('ticket.edit',
+                        ['ticket_id' => $ticket->getUuid()]) ?>">
+                        <i class="fas fa-clone fa-fw"></i> Edit Ticket
+                    </a>
+
+                    <a class="btn btn-secondary float-right" href="<?= $this->url('ticket.clone',
+                        ['ticket_id' => $ticket->getUuid()]) ?>">
+                        <i class="fas fa-hand-paper fa-fw"></i> Clone Ticket
+                    </a>
+
+
                     <?= $this->form()->closeTag() ?>
 
                 </div>
