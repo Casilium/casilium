@@ -257,12 +257,29 @@ class TicketService
 
             if ($organisation->getSla() !== null) {
                 $calc = new CalculateBusinessHours($organisation->getSla()->getBusinessHours());
-                // todo fix default of 2 hours
-                $result = $calc->addHoursTo($date, '02:00');
+
+                $result = $calc->addHoursTo(
+                    $date,
+                    $organisation->getSla()->getSlaTarget($priority->getId())->getResolveTime()
+                );
                 $ticket->setDueDate($result->format('Y-m-d H:i:s'));
             }
+        }
 
-            $ticket->setDueDate($date->format('Y-m-d H:i'));
+        $firstResponseDue = $data['first_response_due'] ?? null;
+        if (! empty($firstResponseDue)) {
+            $ticket->setFirstResponseDue($firstResponseDue);
+        } else {
+            $date = Carbon::now('UTC');
+
+            if ($organisation->getSla() !== null) {
+                $calc   = new CalculateBusinessHours($organisation->getSla()->getBusinessHours());
+                $result = $calc->addHoursTo(
+                    $date,
+                    $organisation->getSla()->getSlaTarget($priority->getId())->getResponseTime()
+                );
+                $ticket->setFirstResponseDue($result->format('Y-m-d H:i:s'));
+            }
         }
 
         $status = $data['status'] ?? null;

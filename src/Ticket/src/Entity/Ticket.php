@@ -17,7 +17,6 @@ use ServiceLevel\Service\CalculateBusinessHours;
 use User\Entity\User;
 use function date;
 use function get_object_vars;
-use function is_object;
 use function is_string;
 use function strlen;
 
@@ -228,6 +227,13 @@ class Ticket
      * @var string|null
      */
     private $firstResponseDate;
+
+    /**
+     * @ORM\Column(name="first_response_due", type="string")
+     *
+     * @var string|null
+     */
+    private $firstResponseDue;
 
     /**
      * @ORM\Column(name="last_notified", type="string")
@@ -537,6 +543,17 @@ class Ticket
     public function getCloseDate(): ?string
     {
         return $this->closeDate;
+    }
+
+    public function getFirstResponseDue(): ?string
+    {
+        return $this->firstResponseDue;
+    }
+
+    public function setFirstResponseDue(?string $firstResponseDue): Ticket
+    {
+        $this->firstResponseDue = $firstResponseDue;
+        return $this;
     }
 
     public function setCloseDate(string $closeDate): Ticket
