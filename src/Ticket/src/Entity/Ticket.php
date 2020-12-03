@@ -230,6 +230,13 @@ class Ticket
     private $firstResponseDate;
 
     /**
+     * @ORM\Column(name="last_notified", type="string")
+     *
+     * @var string|null
+     */
+    private $lastNotified;
+
+    /**
      * @ORM\OneToOne(targetEntity="ServiceLevel\Entity\SlaTarget")
      * @ORM\JoinColumn(name="sla_target_id", referencedColumnName="id")
      *
@@ -506,6 +513,17 @@ class Ticket
         $businessHoursCalc = new CalculateBusinessHours($businessHours);
         $timeCreated       = Carbon::parse($this->getCreatedAt());
         return $businessHoursCalc->addHoursTo($timeCreated, $this->getSlaTarget()->getResponseTime());
+    }
+
+    public function getLastNotified(): ?string
+    {
+        return $this->lastNotified;
+    }
+
+    public function setLastNotified(?string $lastNotified): Ticket
+    {
+        $this->lastNotified = $lastNotified;
+        return $this;
     }
 
     public function getArrayCopy(): array

@@ -9,6 +9,7 @@ use DateTime;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Laminas\EventManager\EventManagerInterface;
+use MailService\Service\MailService;
 use Organisation\Entity\Organisation;
 use Organisation\Service\OrganisationManager;
 use OrganisationContact\Entity\Contact;
@@ -25,9 +26,19 @@ use Ticket\Entity\TicketResponse;
 use Ticket\Entity\Type;
 use User\Entity\User;
 use User\Service\UserManager;
+use function filter_var;
+use function gmdate;
+use function sprintf;
+use const FILTER_SANITIZE_STRING;
 
 class TicketService
 {
+    public const DUE_PERIOD_MINUTES = 1;
+    public const DUE_PERIOD_HOURS   = 2;
+    public const DUE_PERIOD_DAYS    = 3;
+    public const DUE_PERIOD_WEEKS   = 4;
+    public const DUE_PERIOD_MONTHS  = 5;
+
     /** @var EventManagerInterface */
     protected $eventManager;
 
@@ -49,6 +60,9 @@ class TicketService
     /** @var UserManager */
     protected $userManager;
 
+   /** @var MailService  */
+    protected $mailService;
+
     public function __construct(
         EventManagerInterface $eventManager,
         EntityManager $entityManager,
@@ -56,7 +70,8 @@ class TicketService
         SiteManager $siteManager,
         ContactService $contactService,
         QueueManager $queueManager,
-        UserManager $userManager
+        UserManager $userManager,
+        MailService $mailService
     ) {
         $this->eventManager        = $eventManager;
         $this->entityManager       = $entityManager;
@@ -65,6 +80,7 @@ class TicketService
         $this->contactManager      = $contactService;
         $this->queueManager        = $queueManager;
         $this->userManager         = $userManager;
+        $this->mailService         = $mailService;
     }
 
     public function getOrganisationByUuid(string $uuid): Organisation
@@ -353,6 +369,64 @@ class TicketService
         return $response;
     }
 
+    public function sendNotificationEmail(Ticket $ticket, int $target, int $period = self::DUE_PERIOD_MINUTES)
+    {
+        $now          = Carbon::now('UTC');
+        $due          = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate());
+        $lastNotified = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getLastNotified());
+
+        $secondsDue = $due->diffInSeconds($now);
+
+        $notifyAt = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate());
+        switch ($period) {
+            case self::DUE_PERIOD_MINUTES:
+                $notifyAt->subMinutes($target);
+                break;
+            case self::DUE_PERIOD_HOURS:
+                $notifyAt->subHours($target);
+                break;
+            case self::DUE_PERIOD_DAYS:
+                $notifyAt->subDays($target);
+                break;
+            case self::DUE_PERIOD_WEEKS:
+                $notifyAt->subWeeks($target);
+                break;
+            case self::DUE_PERIOD_MONTHS:
+                $notifyAt->subMonths($target);
+                break;
+        }
+
+        /*
+        echo sprintf(
+            "-- Due: %s, Notify at: %s, Last notified: %s\n",
+            $due->format('Y-m-d H:i:s'),
+            $notifyAt->format('Y-m-d H:i:s'),
+            $lastNotified->format('Y-m-d H:i:s')
+        );
+        */
+
+        if ($lastNotified < $notifyAt) {
+            $due     = gmdate('H:i:s', $secondsDue);
+            $subject = sprintf('Ticket %s due in %s', $ticket->getId(), $secondsDue);
+
+            $body = sprintf(
+                'Ticket %s raised by %s at %s is due in %s',
+                $ticket->getId(),
+                filter_var($ticket->getContact()->getFirstName(), FILTER_SANITIZE_STRING),
+                filter_var($ticket->getOrganisation()->getName(), FILTER_SANITIZE_STRING),
+                $due
+            );
+
+            /** @var Agent $agent */
+            foreach ($ticket->getQueue()->getMembers() as $agent) {
+                $this->mailService->send($agent->getEmail(), $subject, $body);
+            }
+
+            $ticket->setLastNotified($now->format('Y-m-d H:i:s'));
+            $this->entityManager->flush();
+        }
+    }
+
     /**
      * @param int $id Ticket ID
      * @return array array of responses
@@ -378,9 +452,9 @@ class TicketService
         return $this->entityManager;
     }
 
-    public function findTicketsDueWithin(int $minutes): array
+    public function findTicketsDueWithin(int $target, int $period = self::NOTIFY_DUE_MINUTES): array
     {
         return $this->entityManager->getRepository(Ticket::class)
-            ->findTicketsDueWithinMinutes($minutes);
+            ->findTicketsDueWithin($target, $period);
     }
 }

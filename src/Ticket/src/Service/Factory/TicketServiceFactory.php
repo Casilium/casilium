@@ -7,6 +7,7 @@ namespace Ticket\Service\Factory;
 use Doctrine\ORM\EntityManager;
 use Laminas\EventManager\EventManager;
 use Laminas\EventManager\LazyListener;
+use MailService\Service\MailService;
 use Organisation\Service\OrganisationManager;
 use OrganisationContact\Service\ContactService;
 use OrganisationSite\Service\SiteManager;
@@ -26,6 +27,7 @@ class TicketServiceFactory
         $contactManager      = $container->get(ContactService::class);
         $queueManager        = $container->get(QueueManager::class);
         $userManager         = $container->get(UserManager::class);
+        $mailService         = $container->get(MailService::class);
 
         $events = new EventManager();
         $events->setIdentifiers([
@@ -51,7 +53,8 @@ class TicketServiceFactory
             $siteManager,
             $contactManager,
             $queueManager,
-            $userManager
+            $userManager,
+            $mailService
         );
     }
 }
