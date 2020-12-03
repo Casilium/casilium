@@ -26,6 +26,7 @@ use Ticket\Entity\TicketResponse;
 use Ticket\Entity\Type;
 use User\Entity\User;
 use User\Service\UserManager;
+use function count;
 use function filter_var;
 use function gmdate;
 use function sprintf;

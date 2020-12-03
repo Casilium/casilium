@@ -297,6 +297,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         return $this->createQueryBuilder('t')
             ->update(Ticket::class, 't')
             ->set('t.status', 5)
+            ->set('t.dateClosed', Carbon::now('UTC')->format('Y-m-d H:i:s'))
             ->where('t.resolveDate < :dateMin')
             ->setParameter('dateMin', $today->format('Y-m-d 00:00:00'))
             ->andWhere('t.status = :status')

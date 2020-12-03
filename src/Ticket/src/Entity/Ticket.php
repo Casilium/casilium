@@ -237,6 +237,13 @@ class Ticket
     private $lastNotified;
 
     /**
+     * @ORM\Column(name="close_date", type="string")
+     *
+     * @var string|null
+     */
+    private $closeDate;
+
+    /**
      * @ORM\OneToOne(targetEntity="ServiceLevel\Entity\SlaTarget")
      * @ORM\JoinColumn(name="sla_target_id", referencedColumnName="id")
      *
@@ -524,6 +531,17 @@ class Ticket
     public function setLastNotified(?string $lastNotified): Ticket
     {
         $this->lastNotified = $lastNotified;
+        return $this;
+    }
+
+    public function getCloseDate(): ?string
+    {
+        return $this->closeDate;
+    }
+
+    public function setCloseDate(string $closeDate): Ticket
+    {
+        $this->closeDate = $closeDate;
         return $this;
     }
 
