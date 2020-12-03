@@ -96,10 +96,17 @@ class Notifications extends Command
                     )
                 );
 
-               $this->ticketService->sendNotificationEmail($ticket, $target, $targetType);
+                $this->ticketService->sendNotificationEmail($ticket, $target, $targetType);
             }
         }
 
+        $tickets = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
+            ->findOverdueTickets();
+
+        foreach ($tickets as $ticket) {
+            $output->writeln(sprintf('Ticket #%s is now overdue', $ticket->getId()));
+            $this->ticketService->sendOverdueNotificationEmail($ticket);
+        }
         return 0;
     }
 }

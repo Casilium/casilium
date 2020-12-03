@@ -13,7 +13,6 @@ use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
 use Ticket\Entity\Ticket;
 use Ticket\Service\TicketService;
-use function sprintf;
 
 class TicketRepository extends EntityRepository implements TicketRepositoryInterface
 {
@@ -215,8 +214,6 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
     public function findOpenTicketCount(): int
     {
-        $today = new DateTime('now', new DateTimeZone('UTC'));
-
         return (int) $this->createQueryBuilder('t')
             ->select('COUNT(t.id)')
             ->where('t.status = :status')
@@ -333,5 +330,20 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->andWhere('t.status <= 3');
 
         return $qb->getQuery()->getResult();
+    }
+
+    public function findOverdueTickets(): array
+    {
+        $now = Carbon::now('UTC');
+
+        return $this->getEntityManager()->createQueryBuilder('q')
+            ->select('t')
+            ->from(Ticket::class, 't')
+            ->andWhere('t.due_date < :today')
+            ->andWhere('t.lastNotified < t.due_date')
+            ->setParameter('today', $now->format('Y-m-d H:i:s'))
+            ->andWhere('t.status <= 3')
+            ->getQuery()
+            ->getResult();
     }
 }

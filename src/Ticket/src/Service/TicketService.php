@@ -26,7 +26,6 @@ use Ticket\Entity\TicketResponse;
 use Ticket\Entity\Type;
 use User\Entity\User;
 use User\Service\UserManager;
-use function count;
 use function filter_var;
 use function gmdate;
 use function sprintf;
@@ -428,6 +427,25 @@ class TicketService
         }
     }
 
+    public function sendOverdueNotificationEmail(Ticket $ticket): void
+    {
+        $subject = sprintf('Ticket #%s is now overdue', $ticket->getId());
+        $body    = sprintf(
+            'Ticket #%s raised by %s from %s is now overdue and requires attention',
+            $ticket->getId(),
+            filter_var($ticket->getContact()->getFirstName(), FILTER_SANITIZE_STRING),
+            filter_var($ticket->getOrganisation()->getName(), FILTER_SANITIZE_STRING),
+        );
+
+        /** @var Agent $member */
+        foreach ($ticket->getQueue()->getMembers() as $member) {
+            $this->mailService->send($member->getEmail(), $subject, $body);
+        }
+
+        $ticket->setLastNotified(Carbon::now('UTC')->format('Y-m-d H:i:s'));
+        $this->entityManager->flush();
+    }
+
     /**
      * @param int $id Ticket ID
      * @return array array of responses
@@ -453,7 +471,7 @@ class TicketService
         return $this->entityManager;
     }
 
-    public function findTicketsDueWithin(int $target, int $period = self::NOTIFY_DUE_MINUTES): array
+    public function findTicketsDueWithin(int $target, int $period = self::DUE_PERIOD_MINUTES): array
     {
         return $this->entityManager->getRepository(Ticket::class)
             ->findTicketsDueWithin($target, $period);
