@@ -290,19 +290,15 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
     {
         // get current date
         $today = Carbon::now('UTC');
-
-        // add 2 days
         $today = $today->subDays($days);
 
-        return $this->createQueryBuilder('t')
-            ->update(Ticket::class, 't')
-            ->set('t.status', 5)
-            ->set('t.dateClosed', Carbon::now('UTC')->format('Y-m-d H:i:s'))
-            ->where('t.resolveDate < :dateMin')
-            ->setParameter('dateMin', $today->format('Y-m-d 00:00:00'))
-            ->andWhere('t.status = :status')
-            ->setParameter('status', Ticket::STATUS_RESOLVED)
-            ->getQuery()->execute();
+        $sql  = 'UPDATE Ticket\Entity\Ticket t ';
+        $sql .= 'SET t.status = 5,t.closeDate = :closed WHERE t.status = 4 AND t.resolveDate < :dateMin';
+        return $this->getEntityManager()
+            ->createQuery($sql)
+            ->setParameter('closed', Carbon::now('UTC')->format('Y-m-d H:i:s'))
+            ->setParameter('dateMin', $today)
+            ->execute();
     }
 
     public function findTicketsDueWithin(int $target, int $period): array
