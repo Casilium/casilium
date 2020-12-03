@@ -20,3 +20,6 @@
     Regards<br>
     <?= $this->escapeHtml($response->getAgent()->getFullName()) ?>
 </p>
+<p>
+    Tracking ID: <?= $this->escapeHtml($response->getTicket()->getUuid()) ?>
+</p>
