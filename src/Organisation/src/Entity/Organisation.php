@@ -3,6 +3,7 @@ declare(strict_types=1);
 
 namespace Organisation\Entity;
 
+use Carbon\Carbon;
 use DateTime;
 use DateTimeZone;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -143,7 +144,7 @@ class Organisation implements OrganisationInterface
     public function setCreated(DateTime $created): Organisation
     {
         if (null === $this->created && null === $this->id) {
-            $this->created = new DateTime('now', new DateTimeZone('UTC'));
+            $this->created = Carbon::now('UTC');
         } else {
             $this->created = $created;
         }
@@ -175,7 +176,7 @@ class Organisation implements OrganisationInterface
     public function setModified(?DateTime $modified = null): Organisation
     {
         if (null === $modified) {
-            $this->modified = new DateTime("now", new DateTimeZone('UTC'));
+            $this->modified = Carbon::now('UTC');
         } else {
             $this->modified = $modified;
         }

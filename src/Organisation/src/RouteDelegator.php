@@ -11,6 +11,7 @@ use Organisation\Handler\OrganisationDeleteHandler;
 use Organisation\Handler\OrganisationEditHandler;
 use Organisation\Handler\OrganisationListHandler;
 use Organisation\Handler\OrganisationReadHandler;
+use Organisation\Handler\OrganisationSelectHandler;
 use Psr\Container\ContainerInterface;
 
 class RouteDelegator
@@ -51,6 +52,13 @@ class RouteDelegator
             OrganisationDeleteHandler::class,
             ['GET', 'POST'],
             'organisation.delete'
+        );
+
+        $app->route(
+            '/organisation/select',
+            OrganisationSelectHandler::class,
+            ['GET', 'POST'],
+            'organisation.select'
         );
 
         $app->get('/organisation/export', ExportHandler::class, 'organisation.export');

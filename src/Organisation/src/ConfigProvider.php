@@ -34,10 +34,11 @@ class ConfigProvider
             'invokables' => [],
             'factories'  => [
                 Handler\OrganisationCreateHandler::class => Handler\Factory\OrganisationCreateHandlerFactory::class,
+                Handler\OrganisationDeleteHandler::class => Handler\Factory\OrganisationDeleteHandlerFactory::class,
                 Handler\OrganisationEditHandler::class   => Handler\Factory\OrganisationEditHandlerFactory::class,
                 Handler\OrganisationListHandler::class   => Handler\Factory\OrganisationListHandlerFactory::class,
                 Handler\OrganisationReadHandler::class   => Handler\Factory\OrganisationReadHandlerFactory::class,
-                Handler\OrganisationDeleteHandler::class => Handler\Factory\OrganisationDeleteHandlerFactory::class,
+                Handler\OrganisationSelectHandler::class => Handler\Factory\OrganisationSelectHandlerFactory::class,
                 Service\OrganisationManager::class       => Service\Factory\OrganisationManagerFactory::class,
                 Handler\ExportHandler::class             => Handler\Factory\ExportHandlerFactory::class,
                 Service\ImportExportService::class       => Service\Factory\ImportExportServiceFactory::class,

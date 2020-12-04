@@ -29,6 +29,12 @@ class OrganisationManager
         $this->siteManager   = $siteManager;
     }
 
+    /**
+     * Create new organisation
+     *
+     * @param OrganisationInterface $organisation organisation object to save
+     * @return OrganisationInterface|null saved organisation entity
+     */
     public function createOrganisation(OrganisationInterface $organisation): ?OrganisationInterface
     {
         // if organisation exists, throw an exception
@@ -44,14 +50,24 @@ class OrganisationManager
         return $organisation;
     }
 
+    /**
+     * @param array $data data to populate organisation
+     * @return OrganisationInterface|null organisation or null
+     */
     public function createOrganisationFromArray(array $data): ?OrganisationInterface
     {
-        $hydrator     = new OrganisationHydrator();
+        $hydrator = new OrganisationHydrator();
+
+        /** @var Organisation $organisation */
         $organisation = $hydrator->hydrate($data, new Organisation());
 
         return $this->createOrganisation($organisation);
     }
 
+    /**
+     * @param string $name name of organisation to find
+     * @return Organisation|null organisation or null
+     */
     public function findOrganisationByName(string $name): ?Organisation
     {
         // find organisation in repository
@@ -67,6 +83,10 @@ class OrganisationManager
         return null;
     }
 
+    /**
+     * @param int $id id of organisation
+     * @return Organisation|Object|null organisation or null if not found
+     */
     public function findOrganisationById(int $id): ?Organisation
     {
         return $this->entityManager->getRepository(Organisation::class)
@@ -128,6 +148,11 @@ class OrganisationManager
         $this->entityManager->flush();
     }
 
+    /**
+     * Remove domains belonging to organisation
+     *
+     * @param int $id id of organisation
+     */
     public function removeOrganisationDomains(int $id): void
     {
         $domains = $this->entityManager->getRepository(Domain::class)
@@ -148,6 +173,11 @@ class OrganisationManager
         return $this->entityManager->getRepository(Organisation::class)->findAll();
     }
 
+    /**
+     * Delete an organisation
+     *
+     * @param Organisation $organisation organisation to delete
+     */
     public function delete(Organisation $organisation): void
     {
         // check if organisation has sites before deleting.
@@ -158,5 +188,23 @@ class OrganisationManager
         // remove the organisation
         $this->entityManager->remove($organisation);
         $this->entityManager->flush();
+    }
+
+    /**
+     * Used for input autocomplete to select organisation
+     *
+     * @param string $name search string
+     * @return array list of matching organisations
+     */
+    public function autoCompleteName(string $name): array
+    {
+        return $this->entityManager->createQueryBuilder()
+            ->select('o.id as value, o.name as text')
+            ->from(Organisation::class, 'o')
+            ->where('o.name LIKE :name')
+            ->orderBy('o.name')
+            ->setParameter('name', $name . '%')
+            ->getQuery()
+            ->getArrayResult();
     }
 }
