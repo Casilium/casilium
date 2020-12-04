@@ -63,14 +63,14 @@ class Queue
      *
      * @var bool
      */
-    private $use_ssl;
+    private $useSsl;
 
     /**
      * @ORM\Column(name="fetch_from_mail", type="boolean", nullable=true)
      *
      * @var bool
      */
-    private $fetch_from_mail;
+    private $fetchFromMail;
 
     /**
      * @ORM\ManyToMany (targetEntity="Agent", inversedBy="queues")
@@ -156,23 +156,23 @@ class Queue
 
     public function getUseSsl(): ?bool
     {
-        return $this->use_ssl;
+        return $this->useSsl;
     }
 
-    public function setUseSsl(bool $use_ssl): Queue
+    public function setUseSsl(bool $useSsl): Queue
     {
-        $this->use_ssl = $use_ssl;
+        $this->useSsl = $useSsl;
         return $this;
     }
 
     public function getFetchFromMail(): ?bool
     {
-        return $this->fetch_from_mail;
+        return $this->fetchFromMail;
     }
 
-    public function setFetchFromMail(bool $fetch_from_email): Queue
+    public function setFetchFromMail(bool $fetchFromMail): Queue
     {
-        $this->fetch_from_mail = $fetch_from_email;
+        $this->fetchFromMail = $fetchFromMail;
         return $this;
     }
 
@@ -181,7 +181,6 @@ class Queue
         $this->members->add($agent);
         return $this;
     }
-
 
     public function getMembers(): Collection
     {
@@ -213,14 +212,14 @@ class Queue
      */
     public function exchangeArray(array $data): self
     {
-        $this->id              = $data['id'] ?? null;
-        $this->name            = $data['name'] ?? null;
-        $this->email           = $data['email'] ?? null;
-        $this->password        = $data['password'] ?? null;
-        $this->host            = $data['host'] ?? null;
-        $this->user            = $data['user'] ?? null;
-        $this->use_ssl         = $data['use_ssl'] ?? null;
-        $this->fetch_from_mail = $data['fetch_from_mail'] ?? null;
+        $this->id            = $data['id'] ?? null;
+        $this->name          = $data['name'] ?? null;
+        $this->email         = $data['email'] ?? null;
+        $this->password      = $data['password'] ?? null;
+        $this->host          = $data['host'] ?? null;
+        $this->user          = $data['user'] ?? null;
+        $this->useSsl        = $data['use_ssl'] ?? null;
+        $this->fetchFromMail = $data['fetch_from_mail'] ?? null;
         return $this;
     }
 }
