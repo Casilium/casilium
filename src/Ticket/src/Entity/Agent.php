@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace Ticket\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Orm\Mapping as ORM;
+use Doctrine\ORM\Mapping as ORM;
 
 /**
  * @ORM\Entity
