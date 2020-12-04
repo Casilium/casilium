@@ -20,6 +20,9 @@ $form = $this->form->prepare();
                 <?= $this->formLabel($form->get('organisation')) ?>
                 <?= $this->formElement($form->get('organisation')) ?>
                 <?= $this->formElementErrors($form->get('organisation')) ?>
+                <p class="text-muted">
+                    Please enter a minimum of three characters to start the search.
+                </p>
             </div>
             <div class="form-group">
                 <?= $this->formElement($form->get('submit')) ?>
