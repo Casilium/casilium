@@ -1,4 +1,10 @@
-<?php $this->headTitle('Home'); ?>
+<?php
+$this->headTitle('Home');
+
+$this->headLink()->appendStylesheet('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.css');
+$this->inlineScript()->appendFile('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js');
+
+?>
 <div class="container-fluid">
     <div class="row">
         <div class="col">
@@ -93,4 +99,78 @@
             </div>
         </div>
     </div>
+
+    <hr style=" border-top: 1px dotted #999999;">
+
+    <div class="row">
+        <div class="col">
+            <canvas id="myChart" width="200" height="200"></canvas>
+        </div>
+    </div>
 </div>
+<?php
+$chartData = [];
+
+$agentStats = $this->stats['agent'];
+usort($agentStats, function ($a, $b) {
+    return $b['open'] - $a['open'];
+});
+
+foreach ($agentStats as $agent) {
+    $chartData['names'][] = $agent['name'];
+    $chartData['open'][] = $agent['open'];
+    $chartData['resolved'][] = $agent['Resolved'];
+}
+$agentCount = count($this->stats['agent']);
+?>
+<?php $this->inlineScript()->captureStart(); ?>
+</script>
+<script>
+    var openData = {
+        label: 'Open',
+        data: [1,2,3],
+
+    }
+
+    var ctx = document.getElementById('myChart').getContext('2d');
+    var myChart = new Chart(ctx, {
+        type: 'bar',
+        data: {
+            labels: <?= json_encode($chartData['names']) ?>,
+            datasets: [{
+                label: 'Open',
+                data: <?= json_encode($chartData['open']) ?>,
+                backgroundColor: [
+                    <?php for ($i=0; $i<=$agentCount; $i++): ?>
+                    'rgba(255, 255, 0, 0.2)',
+                    <?php endfor ?>
+                ],
+            },{
+                label: 'Resolved',
+                data: <?= json_encode($chartData['resolved']) ?>,
+                backgroundColor: [
+                    <?php for ($i=0; $i<=$agentCount; $i++): ?>
+                    'rgba(0, 255, 0, 0.2)',
+                    <?php endfor ?>
+                ],
+            }]
+        },
+        options: {
+            scales: {
+                yAxes: [{
+                    ticks: {
+                        beginAtZero: true
+                    }
+                }]
+            },
+            title: {
+                text: 'Agent Statistics for <?= \Carbon\Carbon::now()->format('F') ?>',
+                display: true,
+            },
+            maintainAspectRatio: false,
+            responsive: true,
+        }
+    });
+
+<?php
+$this->inlineScript()->captureEnd();

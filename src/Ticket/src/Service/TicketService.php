@@ -493,4 +493,28 @@ class TicketService
         return $this->entityManager->getRepository(Ticket::class)
             ->findTicketsDueWithin($target, $period);
     }
+
+    public function newTicketReplyNotification(Ticket $ticket): void
+    {
+        $agents = $ticket->getQueue()->getMembers();
+
+        $body = sprintf('A new reply has been posted to ticket #%s', $ticket->getId());
+
+        /** @var Agent $agent */
+        foreach ($agents as $agent) {
+            $this->mailService->send($agent->getEmail(), 'New ticket reply', $body);
+        }
+    }
+
+    public function newTicketNotification(Ticket $ticket): void
+    {
+        $agents = $ticket->getQueue()->getMembers();
+
+        $body = sprintf('A new ticket has been created, ticket #%s', $ticket->getId());
+
+        /** @var Agent $agent */
+        foreach ($agents as $agent) {
+            $this->mailService->send($agent->getEmail(), 'New ticket notification', $body);
+        }
+    }
 }

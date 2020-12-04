@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Handler;
 
+use Carbon\Carbon;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -42,6 +43,12 @@ class HomePageHandler implements RequestHandlerInterface
             'resolved'   => $this->ticketRepo->findResolvedTicketCount(),
             'closed'     => $this->ticketRepo->findClosedTicketCount(),
         ];
+
+        $endOfMonth     = Carbon::now('UTC')->endOfMonth();
+        $startOfMonth   = Carbon::now('UTC')->startOfMonth();
+
+        $agentStats     = $this->ticketRepo->findAllAgentStats($startOfMonth, $endOfMonth);
+        $stats['agent'] = $agentStats;
 
         return new HtmlResponse($this->renderer->render('app::home-page', [
             'stats' => $stats,

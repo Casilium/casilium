@@ -5,13 +5,17 @@ declare(strict_types=1);
 namespace Ticket\Repository;
 
 use Carbon\Carbon;
+use Carbon\CarbonInterface;
 use DateTime;
 use DateTimeZone;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
+use Ticket\Entity\Agent;
+use Ticket\Entity\Status;
 use Ticket\Entity\Ticket;
+use Ticket\Entity\TicketResponse;
 use Ticket\Service\TicketService;
 
 class TicketRepository extends EntityRepository implements TicketRepositoryInterface
@@ -345,5 +349,75 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->andWhere('t.status <= 3')
             ->getQuery()
             ->getResult();
+    }
+
+    public function findAgentStats(
+        int $agentId,
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null
+    ): array {
+        $agent = $this->getEntityManager()->getRepository(Agent::class)->find($agentId);
+        if ($agent === null) {
+            throw new \Exception('Agent not found');
+        }
+
+        $stats = [];
+
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('COUNT(t.id)')
+            ->from(Ticket::class, 't')
+            ->where('t.agent = :agent')
+            ->setParameter('agent', $agentId);
+
+        if ($periodStart && $periodEnd !== null) {
+            $qb->andWhere('t.createdAt BETWEEN :dateMin AND :dateMax')
+                ->setParameter('dateMin', $periodStart->format('Y-m-d H:i:s'))
+                ->setParameter('dateMax', $periodEnd->format('Y-m-d H:i:s'));
+        }
+
+        $stats['open'] = $qb->getQuery()->getSingleScalarResult();
+
+        /** @var Status[] $statusTypes */
+        $statusTypes = $this->getEntityManager()->getRepository(Status::class)->findAll();
+
+        foreach ($statusTypes as $statusType) {
+            if ($statusType->getId() === Status::STATUS_OPEN) {
+                continue;
+            }
+
+            $qb = $this->getEntityManager()->createQueryBuilder()
+                ->select('COUNT(t.id)')
+                ->from(TicketResponse::class, 't')
+                ->where('t.agent = :agent')
+                ->andWhere('t.ticket_status = :status')
+                ->setParameter('agent', $agentId)
+                ->setParameter('status', $statusType->getId());
+
+            if ($periodStart && $periodEnd !== null) {
+                $qb->andWhere('t.response_date BETWEEN :dateMin AND :dateMax')
+                    ->setParameter('dateMin', $periodStart->format('Y-m-d H:i:s'))
+                    ->setParameter('dateMax', $periodEnd->format('Y-m-d H:i:s'));
+            }
+
+            $stats[Status::getStatusTextFromId($statusType->getId())] = $qb->getQuery()->getSingleScalarResult();
+        }
+
+        return $stats;
+    }
+
+    public function findAllAgentStats(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null
+    ): array {
+        /** @var Agent[] $agents */
+        $agents = $this->getEntityManager()->getRepository(Agent::class)->findAll();
+
+        $stats = [];
+        foreach ($agents as $agent) {
+            $stats[$agent->getId()]         = $this->findAgentStats($agent->getId(), $periodStart, $periodEnd);
+            $stats[$agent->getId()]['name'] = $agent->getFullName();
+        }
+
+        return $stats;
     }
 }

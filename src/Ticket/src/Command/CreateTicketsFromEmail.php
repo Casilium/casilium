@@ -318,6 +318,7 @@ class CreateTicketsFromEmail extends Command
             // save ticket
             $ticket = $this->ticketService->save($data);
 
+            $this->ticketService->newTicketNotification($ticket);
             // return id of created ticket
             return $ticket->getId();
         }
@@ -381,6 +382,8 @@ class CreateTicketsFromEmail extends Command
         // save the response
         $response = $this->ticketService->saveResponse($ticket, $data);
         if ($response->getId() !== null) {
+            $this->ticketService->newTicketReplyNotification($ticket);
+
             // return the response id
             return $response->getId();
         }
