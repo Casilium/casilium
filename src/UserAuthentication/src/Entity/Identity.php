@@ -17,6 +17,7 @@ class Identity
     /** @var string */
     private $email;
 
+    /** @var array */
     private $roles = [];
 
     public function getId(): int
@@ -57,16 +58,16 @@ class Identity
         return (string) $this->getId();
     }
 
-    public function setRoles(string $roles)
+    public function setRoles(string $roles): Identity
     {
         $this->roles = explode(',', $roles);
         return $this;
     }
 
-    public function hasRole(string $search)
+    public function hasRole(string $search): bool
     {
         foreach ($this->roles as $role) {
-            if (strcasecmp($role, $search) == 0) {
+            if (strcasecmp($role, $search) === 0) {
                 return true;
             }
         }
