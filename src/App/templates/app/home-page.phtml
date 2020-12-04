@@ -142,7 +142,7 @@ $agentCount = count($this->stats['agent']);
                 data: <?= json_encode($chartData['open']) ?>,
                 backgroundColor: [
                     <?php for ($i=0; $i<=$agentCount; $i++): ?>
-                    'rgba(255, 255, 0, 0.2)',
+                    'rgb(163,40,40)',
                     <?php endfor ?>
                 ],
             },{
@@ -150,7 +150,7 @@ $agentCount = count($this->stats['agent']);
                 data: <?= json_encode($chartData['resolved']) ?>,
                 backgroundColor: [
                     <?php for ($i=0; $i<=$agentCount; $i++): ?>
-                    'rgba(0, 255, 0, 0.2)',
+                    'rgb(115,234,44)',
                     <?php endfor ?>
                 ],
             }]
