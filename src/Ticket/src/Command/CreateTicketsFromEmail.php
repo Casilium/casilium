@@ -150,7 +150,7 @@ class CreateTicketsFromEmail extends Command
 
         // fetch ticket queue information
         $queues = $this->entityManager->getRepository(Queue::class)->findBy(
-            ['fetch_from_mail' => true],
+            ['fetchFromMail' => true],
             ['name' => 'ASC']
         );
 
