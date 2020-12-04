@@ -33,7 +33,7 @@ class IdentityViewHelper extends AbstractHelper
             return null;
         }
 
-        if ($this->user == null) {
+        if ($this->user === null) {
             $identity = $this->view->identity;
 
             /** @var User $user */

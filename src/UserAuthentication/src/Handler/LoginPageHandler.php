@@ -26,7 +26,7 @@ class LoginPageHandler implements MiddlewareInterface
 {
     use CsrfTrait;
 
-    /** @var $session */
+    /** @var SessionInterface */
     protected $session;
 
     /** @var TemplateRendererInterface */
@@ -38,7 +38,7 @@ class LoginPageHandler implements MiddlewareInterface
     /** @var StorageInterface */
     protected $cache;
 
-    public function __construct(TemplateRendererInterface $renderer, UrlHelper $helper, $cache)
+    public function __construct(TemplateRendererInterface $renderer, UrlHelper $helper, StorageInterface $cache)
     {
         $this->renderer = $renderer;
         $this->helper   = $helper;
@@ -59,7 +59,6 @@ class LoginPageHandler implements MiddlewareInterface
 
     public function handleLogin(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        /** @var SessionInterface $session */
         $session = $this->session;
 
         $guard = $request->getAttribute(CsrfMiddleware::GUARD_ATTRIBUTE);
@@ -78,15 +77,15 @@ class LoginPageHandler implements MiddlewareInterface
                         throw new Exception('User not found during login?');
                     }
 
-                    $status      = (int) $user['details']['status'] ?? 0;
-                    $user_id     = (int) $user['details']['id'] ?? null;
-                    $mfa_enabled = (int) $user['details']['mfa_enabled'] ?? 0;
+                    $status     = (int) $user['details']['status'] ?? 0;
+                    $userId     = (int) $user['details']['id'] ?? null;
+                    $mfaEnabled = (int) $user['details']['mfa_enabled'] ?? 0;
 
                     if ($status === 1) {
-                        if ($mfa_enabled > 0) {
-                            $this->cache->addItem('auth:cached_user:' . $user_id, $user);
+                        if ($mfaEnabled > 0) {
+                            $this->cache->addItem('auth:cached_user:' . $userId, $user);
                             $session->unset(UserInterface::class);
-                            $session->set('mfa:user:id', $user_id);
+                            $session->set('mfa:user:id', $userId);
                             return new RedirectResponse($this->helper->generate('mfa.validate'));
                         }
 
