@@ -13,6 +13,7 @@ use ServiceLevel\Service\CalculateBusinessHours;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Ticket\Entity\Agent;
 use Ticket\Entity\Queue;
 use Ticket\Entity\Ticket;
 use Ticket\Service\MailReader;
@@ -39,6 +40,9 @@ use const LOCK_NB;
 use const LOCK_UN;
 use const PREG_OFFSET_CAPTURE;
 
+/**
+ * Creates tickets from email messages
+ */
 class CreateTicketsFromEmail extends Command
 {
     public const TYPE_NEW   = 0;
@@ -68,13 +72,17 @@ class CreateTicketsFromEmail extends Command
         $this->ticketService = $ticketService;
         $this->config        = $config;
 
+        // we need the encryption key to decrypt the mailbox password
         if (! array_key_exists('encryption', $this->config) || ! isset($this->config['encryption']['key'])) {
             throw SodiumException::forEncryptionKeyNotFoundInConfig();
         }
 
+        // we need mail server settings
         if (! array_key_exists('mail', $this->config)) {
             throw new Exception('Mail service configuration not found');
         }
+
+        // get sender address from config
         if (
             ! isset($config['mail']['sender'])
             || (filter_var($config['mail']['sender'], FILTER_VALIDATE_EMAIL) === false)
@@ -142,6 +150,12 @@ class CreateTicketsFromEmail extends Command
         flock($this->lockFile, LOCK_UN);
     }
 
+    /**
+     * @param InputInterface $input console input handle
+     * @param OutputInterface $output console output handle
+     * @return int exit code
+     * @throws SodiumException
+     */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         $this->lock();
@@ -154,6 +168,7 @@ class CreateTicketsFromEmail extends Command
             ['name' => 'ASC']
         );
 
+        // if we don't have any queues to parse, exit cleanly
         if ($queues === null || ! is_array($queues) || count($queues) === 0) {
             $output->writeln('No queues found');
             return 0;
@@ -176,12 +191,15 @@ class CreateTicketsFromEmail extends Command
             $messages = $this->getMessages($queue);
             $output->writeln(sprintf(' <info>Retrieved %s messages</info>', count($messages)));
 
+            // process mail messages
             foreach ($messages as $index => $message) {
+                // ignore subjects such as out of office
                 if ($this->shouldIgnoreFromSubject($message['subject'])) {
                     $output->writeln('- ignore message due to subject');
                     continue;
                 }
 
+                //  if body has a tracking ID then this is a reply
                 $trackingId = $this->getUuid($message['body']);
                 if ($trackingId !== null) {
                     $output->writeln(sprintf('  <info>Found ticket reply to %s', $trackingId));
@@ -190,6 +208,7 @@ class CreateTicketsFromEmail extends Command
                     }
                     continue;
                 } elseif ($ticketId = $this->createTicketFromMessage($message, $queue) > 0) {
+                    // new ticket created if no tracking ID found
                     $output->writeln(sprintf(
                         '  <info>Ticket created with id %s from %s</info>',
                         $ticketId,
@@ -209,14 +228,19 @@ class CreateTicketsFromEmail extends Command
             }
         }
 
+        // release lock on pid file
         $this->releaseLock();
+
+        // exit cleanly
         return 0;
     }
 
     /**
      * Create a new ticket from email messages
      *
-     * @param array $message
+     * @param array $message email message
+     * @param Queue $queue queue to assign ticket to
+     * @return int|null id of created ticket or null if no ticket created
      * @throws Exception
      */
     private function createTicketFromMessage(array $message, Queue $queue): ?int
@@ -232,19 +256,38 @@ class CreateTicketsFromEmail extends Command
             return -1;
         }
 
-        $date = Carbon::parse($message['date']);
+        // parse date from mail (want as UTC timezone)
+        $date = Carbon::parse($message['date'], 'UTC');
 
-        $dueDate = Carbon::now('UTC');
+        $dueDate         = null;
+        $responseDueDate = null;
 
+        // if we have an sla then we can retrieve date response and resolution is due
         if ($contact->getOrganisation()->getSla() !== null) {
+            // grab the SLA
             $sla = $contact->getOrganisation()->getSla();
 
+            // used to calculate working hours so ticket becomes due during working hours
             $businessHoursCalc = new CalculateBusinessHours($sla->getBusinessHours());
 
-            // todo adjust default duration of 2 hours
-            $dueDate = $businessHoursCalc->addHoursTo($dueDate, '02:00');
+            // calculate due date
+            $dueDate = $businessHoursCalc->addHoursTo(
+                $dueDate,
+                $ticket->getOrganisation()
+                    ->getSla()
+                    ->getSlaTarget($ticket->getPriority()->getId())->getResolveTime()
+            );
+
+            // calculate expected response date
+            $responseDueDate = $businessHoursCalc->addHoursTo(
+                $responseDueDate,
+                $ticket->getOrganisation()
+                    ->getSla()
+                    ->getSlaTarget($ticket->getPriority()->getId())->getResolveTime()
+            );
         }
 
+        // build ticket info
         $data = [
             'createdAt'         => $date->format('Y-m-d H:i:s'),
             'agent_id'          => null,
@@ -253,7 +296,6 @@ class CreateTicketsFromEmail extends Command
             'type_id'           => 1,
             'impact'            => 3,
             'urgency'           => 3,
-            'due_date'          => $dueDate->format('Y-m-d H:i:s'),
             'site_id'           => null,
             'queue_id'          => $queue->getId(),
             'short_description' => $message['subject'],
@@ -261,13 +303,35 @@ class CreateTicketsFromEmail extends Command
             'source'            => $ticket::SOURCE_EMAIL,
         ];
 
+        // add due date if applicable
+        if ($dueDate !== null) {
+            $data['due_date'] = $dueDate->format('Y-m-d H:i:s');
+        }
+
+        // add response due date if applicable
+        if ($responseDueDate !== null) {
+            $data['first_response_due'] = $responseDueDate->format('Y-m-d H:i:s');
+        }
+
+        // only create ticket if we actually have a description of the problem
         if ($data['long_description'] !== null) {
+            // save ticket
             $ticket = $this->ticketService->save($data);
+
+            // return id of created ticket
             return $ticket->getId();
         }
+
+        // ticket not created
         return null;
     }
 
+    /**
+     * @param array $message message to parse
+     * @param string $uuid uuid of ticket to add reply to
+     * @return int|null response id or null if no response created
+     * @throws Exception
+     */
     public function createTicketReplyFromMessage(array $message, string $uuid): ?int
     {
         /** @var Ticket $ticket */
@@ -276,25 +340,52 @@ class CreateTicketsFromEmail extends Command
             throw new Exception(sprintf('Ticket with UUID %s not found', $uuid));
         }
 
+        // agent responding?
+        $agent = null;
+
         /** @var Contact $contact */
         $contact = $this->entityManager->getRepository(Contact::class)->findOneBy([
             'work_email' => $message['from'],
         ]);
+
+        // if haven't found a contact from the "from" field, check if the reply is from an agent
         if ($contact === null) {
-            throw new Exception(sprintf('Employee not found with email: %s', $message['from']));
+            // not found, reply from agent?
+            $agent = $this->entityManager->getRepository(Agent::class)->findOneBy([
+                'email' => $message['from'],
+            ]);
+
+            // no employee or agent found
+            if ($agent === null) {
+                return null;
+            }
         }
 
+        // build reply, set to public
         $data = [
-            'contact_id'    => $contact->getId(),
             'ticket_status' => $ticket->getStatus()->getId(),
             'is_public'     => 1,
             'response'      => $this->stripSignature($message['body']),
         ];
 
+        // assign contact if found
+        if ($contact !== null) {
+            $data['contact_id'] = $contact->getId();
+        }
+
+        // assign agent if found
+        if ($agent !== null) {
+            $data['agent_id'] = $agent->getId();
+        }
+
+        // save the response
         $response = $this->ticketService->saveResponse($ticket, $data);
         if ($response->getId() !== null) {
+            // return the response id
             return $response->getId();
         }
+
+        // response not created
         return null;
     }
 
@@ -338,7 +429,7 @@ class CreateTicketsFromEmail extends Command
     /**
      * Strip signature
      *
-     * @param string email body
+     * @param string $body string to parse
      * @return string|string[]|null
      */
     public function stripSignature(string $body): string
@@ -361,14 +452,23 @@ class CreateTicketsFromEmail extends Command
         return $body;
     }
 
+    /**
+     * Parses email subject to determine if should be skipped,
+     * for example "Out of Office"
+     *
+     * @param string $subject email subject
+     * @return bool true if should ignore or false
+     */
     public function shouldIgnoreFromSubject(string $subject): bool
     {
         $patterns = $this->config['mail']['ignore_with_subject'] ?? [];
 
+        // if no subject or patterns to check against then allow message
         if (empty($subject) || empty($patterns)) {
             return false;
         }
 
+        // if subject is found, flag message to be skipped
         $subject = strip_tags(strtolower($subject));
         foreach ($patterns as $pattern) {
             if (preg_match($pattern, $subject)) {
@@ -376,6 +476,7 @@ class CreateTicketsFromEmail extends Command
             }
         }
 
+        // otherwise allow message
         return false;
     }
 }
