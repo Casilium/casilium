@@ -2,12 +2,9 @@ Casilium
 ========
 
 **NOTE:** Casilium is currently under development and **SHOULD NOT**
-be used as it is currently incomplete!
+be used as it is currently in development, not even at Alpha stage.
 
-**Casilium** is an enterprise level open source ticket system, it is 
-an attractive alternative to higher-cost and complex customer support
-systems; lightweight, reliable, web based and easy to set up and use; 
-and it's completely free.
+**Casilium** is a work in-progress open-source ticket system.
 
 Requirements
 ------------
