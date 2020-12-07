@@ -1,9 +1,14 @@
-<?php $this->headTitle('403 Forbidden'); ?>
+<?php
+$this->headTitle('403 Forbidden');
 
-<h1>Oops!</h1>
-<h2>This is awkward.</h2>
-<p>We encountered a 403 Not Found error.</p>
-<p>
-    You do not have permission to access the requested resource, please contact your administrator
-    or head back to <a href="<?=$this->url('home')?>">Home</a>.
-</p>
+$this->layout('layout::clean');
+?>
+<div class="alert alert-danger">
+    <h1>Forbiddem</h1>
+    <h2>This is awkward.</h2>
+    <p>We encountered a 403 Not Found error.</p>
+    <p>
+        You do not have permission to access the requested resource, please contact your administrator
+        or head back to <a href="<?=$this->url('home')?>">Home</a>.
+    </p>
+</div>
