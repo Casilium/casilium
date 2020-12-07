@@ -13,7 +13,7 @@ $sla = $this->sla;
 
 $targets = [];
 /** @var \ServiceLevel\Entity\SlaTarget[] $slaTargets */
-$slaTargets = $sla->getSlaTarget();
+$slaTargets = $sla->getSlaTargets();
 foreach ($slaTargets as $target) {
     $targets[$target->getPriority()->getId()] = $target;
 }
