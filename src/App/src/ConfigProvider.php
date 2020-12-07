@@ -45,6 +45,7 @@ class ConfigProvider
                 EntityManager::class                               => entitymanagerfactory::class,
                 Handler\HomePageHandler::class                     => Handler\Factory\HomePageHandlerFactory::class,
                 Handler\AdminPageHandler::class                    => Handler\Factory\AdminPageHandlerFactory::class,
+                Middleware\PrgMiddleware::class                    => InvokableFactory::class,
                 Middleware\XMLHttpRequestTemplateMiddleware::class => ReflectionBasedAbstractFactory::class,
             ],
         ];
