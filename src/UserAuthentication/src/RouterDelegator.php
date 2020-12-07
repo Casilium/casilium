@@ -4,10 +4,12 @@ declare(strict_types=1);
 
 namespace UserAuthentication;
 
+use App\Middleware\PrgMiddleware;
 use Mezzio\Application;
-use Mezzio\Authentication\AuthenticationMiddleware;
+use Mfa\Middleware\MfaMiddleware;
 use Psr\Container\ContainerInterface;
 use UserAuthentication\Handler\LogoutPageHandler;
+use UserAuthentication\Middleware\AuthenticationMiddleware;
 
 class RouterDelegator
 {
@@ -17,8 +19,10 @@ class RouterDelegator
         $app = $callback();
 
         $app->route('/login', [
+            PrgMiddleware::class,
             Handler\LoginPageHandler::class,
             AuthenticationMiddleware::class,
+            MfaMiddleware::class,
         ], ['GET', 'POST'], 'login');
 
         $app->get('/logout', LogoutPageHandler::class, 'logout');

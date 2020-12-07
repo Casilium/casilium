@@ -82,14 +82,14 @@ class RbacManager
      *
      * @throws Exception
      */
-    public function isGranted(string $identity, string $permission, ?string $params = null): bool
+    public function isGranted(int $identity, string $permission, ?string $params = null): bool
     {
         if ($this->rbac === null) {
             $this->init();
         }
 
         /** @var User $user */
-        $user = $this->entityManager->getRepository(User::class)->findOneByEmail($identity);
+        $user = $this->entityManager->getRepository(User::class)->find($identity);
 
         if ($user === null) {
             throw new Exception(sprintf('No such user "%s"', $identity));

@@ -40,8 +40,11 @@ class ConfigProvider
             ],
             'invokables' => [],
             'factories'  => [
+                Handler\DisableMfaHandler::class  => Handler\Factory\DisableMfaHandlerFactory::class,
                 Handler\EnableMfaHandler::class   => Handler\Factory\EnableMfaHandlerFactory::class,
                 Handler\ValidateMfaHandler::class => Handler\Factory\ValidateMfaHandlerFactory::class,
+                Middleware\MfaMiddleware::class   => Middleware\Factory\MfaMiddlewareFactory::class,
+                Service\MfaService::class         => Service\Factory\MfaServiceFactory::class,
             ],
         ];
     }

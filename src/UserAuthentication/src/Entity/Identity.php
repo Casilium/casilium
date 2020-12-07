@@ -6,7 +6,7 @@ namespace UserAuthentication\Entity;
 use function explode;
 use function strcasecmp;
 
-class Identity
+class Identity implements IdentityInterface
 {
     /** @var int */
     private $id;
@@ -20,7 +20,7 @@ class Identity
     /** @var array */
     private $roles = [];
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -31,7 +31,7 @@ class Identity
         return $this;
     }
 
-    public function getEmail(): string
+    public function getEmail(): ?string
     {
         return $this->email;
     }
@@ -42,7 +42,7 @@ class Identity
         return $this;
     }
 
-    public function getName(): string
+    public function getName(): ?string
     {
         return $this->name;
     }
@@ -51,11 +51,6 @@ class Identity
     {
         $this->name = $name;
         return $this;
-    }
-
-    public function __toString(): string
-    {
-        return (string) $this->getId();
     }
 
     public function setRoles(string $roles): Identity

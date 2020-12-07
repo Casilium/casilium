@@ -4,12 +4,12 @@ declare(strict_types=1);
 namespace UserAuthentication\Handler;
 
 use Laminas\Diactoros\Response\RedirectResponse;
-use Mezzio\Authentication\UserInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\SessionMiddleware;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use UserAuthentication\Entity\IdentityInterface;
 
 class LogoutPageHandler implements RequestHandlerInterface
 {
@@ -24,7 +24,7 @@ class LogoutPageHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
-        if ($session->has(UserInterface::class)) {
+        if ($session->has(IdentityInterface::class)) {
             $session->clear();
         }
 

@@ -5,28 +5,31 @@ declare(strict_types=1);
 namespace Account\Handler;
 
 use Laminas\Diactoros\Response\HtmlResponse;
-use Mezzio\Authentication\UserInterface;
-use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
+use Mfa\Service\MfaService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use UserAuthentication\Entity\IdentityInterface;
 
 class AccountPageHandler implements RequestHandlerInterface
 {
     /** @var TemplateRendererInterface */
     private $renderer;
 
-    public function __construct(TemplateRendererInterface $renderer)
+    /** @var MfaService */
+    private $mfaService;
+
+    public function __construct(TemplateRendererInterface $renderer, MfaService $mfaService)
     {
-        $this->renderer = $renderer;
+        $this->renderer   = $renderer;
+        $this->mfaService = $mfaService;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $session    = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
-        $user       = $session->get(UserInterface::class);
-        $mfaEnabled = (int) $user['details']['mfa_enabled'];
+        $user       = $request->getAttribute(IdentityInterface::class);
+        $mfaEnabled = $this->mfaService->hasMfa($user);
 
         return new HtmlResponse($this->renderer->render('account::account-page', [
             'mfa_enabled' => $mfaEnabled,

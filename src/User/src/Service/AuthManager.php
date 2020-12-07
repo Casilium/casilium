@@ -4,6 +4,8 @@ declare(strict_types=1);
 namespace User\Service;
 
 use Exception;
+use User\Entity\User;
+use UserAuthentication\Entity\Identity;
 use function array_pop;
 use function explode;
 use function implode;
@@ -38,7 +40,7 @@ class AuthManager
      *
      * @throws Exception
      */
-    public function filterAccess(string $route, ?string $identity = null): int
+    public function filterAccess(string $route, ?int $identity = null): int
     {
         $actionName = null;
 
@@ -123,5 +125,19 @@ class AuthManager
         }
 
         return self::ACCESS_GRANTED;
+    }
+
+    /**
+     * @param User $user User to fetch identity for
+     * @return Identity user's identity
+     */
+    public function createIdentityFromArray(array $data): Identity
+    {
+        $identity = new Identity();
+        $identity->setId($data['id']);
+        $identity->setEmail($data['email']);
+        $identity->setName($data['name']);
+
+        return $identity;
     }
 }

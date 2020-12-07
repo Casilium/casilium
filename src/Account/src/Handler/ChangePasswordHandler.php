@@ -7,17 +7,15 @@ namespace Account\Handler;
 use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
-use Mezzio\Authentication\UserInterface;
 use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\UrlHelper;
-use Mezzio\Session\Session;
-use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use User\Form\PasswordChangeForm;
 use User\Service\UserManager;
+use UserAuthentication\Entity\IdentityInterface;
 
 /**
  * Change user account password
@@ -45,13 +43,11 @@ class ChangePasswordHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        /** @var Session $session */
-        $session       = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
         $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
 
         // get user from session
-        $user   = $session->get(UserInterface::class);
-        $userId = (int) $user['details']['id'];
+        $user   = $request->getAttribute(IdentityInterface::class);
+        $userId = $user->getId();
         if (null === 0) {
             throw new Exception('User not logged!?');
         }

@@ -6,6 +6,7 @@ namespace Mfa;
 
 use Mezzio\Application;
 use Mezzio\Csrf\CsrfMiddleware;
+use Mfa\Handler\DisableMfaHandler;
 use Psr\Container\ContainerInterface;
 
 class RouterDelegator
@@ -33,6 +34,8 @@ class RouterDelegator
             ['GET', 'POST'],
             'mfa.validate'
         );
+
+        $app->get('/mfa/disable', DisableMfaHandler::class, 'mfa.disable');
 
         return $app;
     }

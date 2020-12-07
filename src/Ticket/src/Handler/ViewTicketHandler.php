@@ -6,9 +6,7 @@ namespace Ticket\Handler;
 
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
-use Mezzio\Authentication\UserInterface;
 use Mezzio\Helper\UrlHelper;
-use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -16,6 +14,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Ticket\Form\TicketResponseForm;
 use Ticket\Hydrator\TicketHydrator;
 use Ticket\Service\TicketService;
+use UserAuthentication\Entity\IdentityInterface;
 
 class ViewTicketHandler implements RequestHandlerInterface
 {
@@ -45,10 +44,8 @@ class ViewTicketHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        // get agent id from session (for response updates)
-        $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
-        $user    = $session->get(UserInterface::class);
-        $agentId = (int) $user['details']['id'];
+        $user    = $request->getAttribute(IdentityInterface::class);
+        $agentId = $user->getId();
 
         // get ticket uuid from URL and find ticket
         $ticketUuid = $request->getAttribute('ticket_id');

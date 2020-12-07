@@ -4,25 +4,22 @@ declare(strict_types=1);
 
 namespace UserAuthentication\Handler\Factory;
 
-use Laminas\Cache\Storage\StorageInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
+use Mfa\Service\MfaService;
 use Psr\Container\ContainerInterface;
 use UserAuthentication\Handler\LoginPageHandler;
+use UserAuthentication\Service\AuthenticationService;
 
 class LoginPageHandlerFactory
 {
     public function __invoke(ContainerInterface $container): LoginPageHandler
     {
-        /** @var UrlHelper $helper */
-        $helper = $container->get(UrlHelper::class);
+        $authService = $container->get(AuthenticationService::class);
+        $mfaService  = $container->get(MfaService::class);
+        $helper      = $container->get(UrlHelper::class);
+        $renderer    = $container->get(TemplateRendererInterface::class);
 
-        /** @var TemplateRendererInterface $renderer */
-        $renderer = $container->get(TemplateRendererInterface::class);
-
-        /** @var StorageInterface $cache */
-        $cache = $container->get(StorageInterface::class);
-
-        return new LoginPageHandler($renderer, $helper, $cache);
+        return new LoginPageHandler($authService, $mfaService, $renderer, $helper);
     }
 }

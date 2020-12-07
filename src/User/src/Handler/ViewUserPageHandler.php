@@ -6,14 +6,12 @@ namespace User\Handler;
 use Doctrine\ORM\EntityManagerInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\EventManager\EventManagerInterface;
-use Mezzio\Authentication\UserInterface;
-use Mezzio\Session\Session;
-use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use User\Entity\User;
+use UserAuthentication\Entity\IdentityInterface;
 
 class ViewUserPageHandler implements RequestHandlerInterface
 {
@@ -38,11 +36,7 @@ class ViewUserPageHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        /** @var Session $session */
-        $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
-
-        // get current user to pass to log
-        $currentUser = $session->get(UserInterface::class);
+        $currentUser = $request->getAttribute(IdentityInterface::class);
 
         $id = (int) $request->getAttribute('id', -1);
         if ($id < 1) {
@@ -55,7 +49,7 @@ class ViewUserPageHandler implements RequestHandlerInterface
         }
 
         $this->events->trigger('user.view', $this, [
-            'user_id'      => $currentUser['details']['id'],
+            'user_id'      => $currentUser->getId(),
             'view_user_id' => $user->getId(),
         ]);
 

@@ -4,30 +4,32 @@ declare(strict_types=1);
 
 namespace UserAuthentication\Handler;
 
-use App\Traits\CsrfTrait;
-use Exception;
-use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Authentication\UserInterface;
 use Mezzio\Csrf\CsrfMiddleware;
+use Mezzio\Csrf\SessionCsrfGuard;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\Session;
 use Mezzio\Session\SessionInterface;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
+use Mfa\Service\MfaService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use UserAuthentication\Entity\IdentityInterface;
 use UserAuthentication\Form\LoginForm;
+use UserAuthentication\Service\AuthenticationService;
 
 class LoginPageHandler implements MiddlewareInterface
 {
-    use CsrfTrait;
+    /** @var AuthenticationService */
+    protected $authService;
 
-    /** @var SessionInterface */
-    protected $session;
+    /** @var MfaService */
+    protected $mfa;
 
     /** @var TemplateRendererInterface */
     protected $renderer;
@@ -35,21 +37,26 @@ class LoginPageHandler implements MiddlewareInterface
     /** @var UrlHelper */
     protected $helper;
 
-    /** @var StorageInterface */
-    protected $cache;
+    /** @var SessionInterface */
+    protected $session;
 
-    public function __construct(TemplateRendererInterface $renderer, UrlHelper $helper, StorageInterface $cache)
-    {
-        $this->renderer = $renderer;
-        $this->helper   = $helper;
-        $this->cache    = $cache;
+    public function __construct(
+        AuthenticationService $authService,
+        MfaService $mfa,
+        TemplateRendererInterface $renderer,
+        UrlHelper $helper
+    ) {
+        $this->authService = $authService;
+        $this->mfa         = $mfa;
+        $this->renderer    = $renderer;
+        $this->helper      = $helper;
     }
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
         /** @var Session $session */
         $session = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
-        if ($session->has(UserInterface::class)) {
+        if ($session->has(IdentityInterface::class) && ! empty($session->get(IdentityInterface::class))) {
             return new RedirectResponse('/');
         }
 
@@ -59,53 +66,26 @@ class LoginPageHandler implements MiddlewareInterface
 
     public function handleLogin(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        $session = $this->session;
-
+        /** @var SessionCsrfGuard $guard */
         $guard = $request->getAttribute(CsrfMiddleware::GUARD_ATTRIBUTE);
-        $token = $this->getToken($session, $guard);
-
         $form  = new LoginForm($guard);
-        $error = null;
+
         if ('POST' === $request->getMethod()) {
             $form->setData($request->getParsedBody());
             if ($form->isValid()) {
-                $response = $handler->handle($request);
-
-                if ($response->getStatusCode() !== 302) {
-                    $user = $session->get(UserInterface::class);
-                    if (null === $user) {
-                        throw new Exception('User not found during login?');
-                    }
-
-                    $status     = (int) $user['details']['status'] ?? 0;
-                    $userId     = (int) $user['details']['id'] ?? null;
-                    $mfaEnabled = (int) $user['details']['mfa_enabled'] ?? 0;
-
-                    if ($status === 1) {
-                        if ($mfaEnabled > 0) {
-                            $this->cache->addItem('auth:cached_user:' . $userId, $user);
-                            $session->unset(UserInterface::class);
-                            $session->set('mfa:user:id', $userId);
-                            return new RedirectResponse($this->helper->generate('mfa.validate'));
-                        }
-
-                        return new RedirectResponse($this->helper->generate('home'));
-                    }
-
-                    $session->clear();
-                    $error = 'User is not inactive';
-                } else {
-                    $error = 'Invalid username and/or password.';
+                $data = $form->getData();
+                if ($identity = $this->authService->authenticate($data['username'], $data['password'])) {
+                    $request = $request->withAttribute(UserInterface::class, $identity);
+                    return $handler->handle($request);
                 }
             }
-            // regenerate csrf on failure
-            $token = $this->getToken($session, $guard);
+            return new RedirectResponse($this->helper->generate('login'));
         }
 
+        $token = $guard->generateToken();
         $form->get('csrf')->setValue($token);
         return new HtmlResponse($this->renderer->render('user_auth::login-page', [
             'form'   => $form,
-            'error'  => $error,
             'layout' => 'layout::clean',
         ]));
     }

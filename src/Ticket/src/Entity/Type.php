@@ -16,7 +16,7 @@ class Type
     public const TYPE_PROBLEM  = 3;
 
     public const TYPE_TEXT = [
-        1 => 'Service Request',
+        1 => 'Factory Request',
         2 => 'Incident',
         3 => 'Problem',
     ];

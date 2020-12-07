@@ -22,8 +22,8 @@ $this->pageBreadcrumbs()->setItems([
                 <div class="tab-pane fade show active" id="account-security" role="tabpanel" aria-labelledby="list-account-security">
                     <ul class="list-group">
                         <li class="list-group-item">
-                            <?php if ($this->mfa_enabled === 1): ?>
-                                <span class="text-muted">Enabled MFA</span>
+                            <?php if ($this->mfa_enabled === true): ?>
+                                <a href="<?= $this->url('mfa.disable') ?>">Disable MFA</a>
                             <?php else: ?>
                                 <a href="<?= $this->url('mfa.enable') ?>">Enable MFA</a>
                             <?php endif ?>

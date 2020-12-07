@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace UserAuthentication;
 
 use Mezzio\Application;
-use Mezzio\Authentication\AuthenticationInterface;
-use Mezzio\Authentication\Session\PhpSessionFactory;
 use Mezzio\Authentication\UserRepository\PdoDatabase;
 use Mezzio\Authentication\UserRepositoryInterface;
 
@@ -32,15 +30,11 @@ class ConfigProvider
                     RouterDelegator::class,
                 ],
             ],
-            'aliases'    => [
-                UserRepositoryInterface::class
-                    => PdoDatabase::class,
-            ],
             'factories'  => [
-                Handler\LoginPageHandler::class  => Handler\Factory\LoginPageHandlerFactory::class,
-                Handler\LogoutPageHandler::class => Handler\Factory\LogoutPageHandlerFactory::class,
-                AuthenticationInterface::class
-                    => PhpSessionFactory::class,
+                Handler\LoginPageHandler::class            => Handler\Factory\LoginPageHandlerFactory::class,
+                Handler\LogoutPageHandler::class           => Handler\Factory\LogoutPageHandlerFactory::class,
+                Middleware\AuthenticationMiddleware::class => Middleware\Factory\AuthenticationMiddlewareFactory::class,
+                Service\AuthenticationService::class       => Service\Factory\AuthenticationServiceFactory::class,
             ],
         ];
     }

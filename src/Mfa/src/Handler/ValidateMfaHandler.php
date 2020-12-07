@@ -4,26 +4,22 @@ declare(strict_types=1);
 namespace Mfa\Handler;
 
 use App\Traits\CsrfTrait;
-use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
-use Mezzio\Authentication\UserInterface;
 use Mezzio\Csrf\CsrfMiddleware;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\Session;
 use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
 use Mfa\Form\GoogleMfaForm;
+use Mfa\Service\MfaService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
-use Sonata\GoogleAuthenticator\GoogleAuthenticator;
-use Sonata\GoogleAuthenticator\GoogleQrUrl;
-use User\Entity\User;
-use function array_key_exists;
+use User\Service\UserManager;
+use UserAuthentication\Entity\IdentityInterface;
 use function gettype;
 use function is_array;
 use function sprintf;
@@ -35,11 +31,11 @@ class ValidateMfaHandler implements MiddlewareInterface
 {
     use CsrfTrait;
 
-    /** @var StorageInterface */
-    private $cache;
+    /** @var MfaService */
+    private $mfaService;
 
-    /** @var EntityManagerInterface */
-    private $entityManager;
+    /** @var UserManager */
+    private $userManager;
 
     /** @var UrlHelper */
     private $helper;
@@ -47,29 +43,16 @@ class ValidateMfaHandler implements MiddlewareInterface
     /** @var TemplateRendererInterface */
     private $renderer;
 
-    /** @var array */
-    private $config;
-
-    /**
-     * @param array $config
-     * @throws Exception
-     */
     public function __construct(
-        StorageInterface $cache,
-        EntityManagerInterface $entityManager,
+        MfaService $mfaService,
+        UserManager $userManager,
         TemplateRendererInterface $renderer,
-        UrlHelper $helper,
-        array $config
+        UrlHelper $helper
     ) {
-        $this->cache         = $cache;
-        $this->entityManager = $entityManager;
-        $this->renderer      = $renderer;
-        $this->helper        = $helper;
-        $this->config        = $config;
-
-        if (! array_key_exists('issuer', $this->config)) {
-            throw new Exception('mfa issuer key not found in configuration');
-        }
+        $this->mfaService  = $mfaService;
+        $this->userManager = $userManager;
+        $this->renderer    = $renderer;
+        $this->helper      = $helper;
     }
 
     /**
@@ -86,19 +69,15 @@ class ValidateMfaHandler implements MiddlewareInterface
         }
 
         // get user id from session
-        $user_id = (int) $session->get('mfa:user:id');
-
-        // check if user is cached and retrieve user from cache
-        $cache_key = 'auth:cached_user:' . $user_id;
-        if ($this->cache->hasItem($cache_key) == false) {
-            throw new Exception('User not found in cache!');
+        $userId = (int) $session->get('mfa:user:id');
+        if ($userId === 0) {
+            throw new \Exception('MFA User ID not found');
         }
-        $cached_user = $this->cache->getItem($cache_key);
 
-        /** @var User $user */
-        $user = $this->entityManager->getRepository(User::class)->find($user_id);
-        if ($user == null) {
-            throw new Exception('User not found');
+        // find user attempting to verify MFA
+        $user = $this->userManager->findById($userId);
+        if ($user === null) {
+            throw new \Exception('User not found');
         }
 
         // generate csrf
@@ -106,10 +85,11 @@ class ValidateMfaHandler implements MiddlewareInterface
         $token = $this->getToken($session, $guard);
 
         // get users secret key
-        $secret_key = $user->getSecretKey();
+        $key = $user->getSecretKey();
 
         $form  = new GoogleMfaForm($guard);
         $error = null;
+
         if ($request->getMethod() === 'POST') {
             // get user data from POST vars
             $form->setData($request->getParsedBody());
@@ -124,31 +104,30 @@ class ValidateMfaHandler implements MiddlewareInterface
                 }
 
                 // get secret key and code from POST
-                $secret_key = $data['secret_key'];
-                $pin        = $data['pin'];
+                $key = $data['secret_key'];
+                $pin = $data['pin'];
 
-                // verify code/pin
-                $authenticator = new GoogleAuthenticator();
-                if ($authenticator->checkCode($secret_key, $pin)) {
-                    // remove mfa user id from session
+                if ($this->mfaService->isValidCode($key, $pin)) {
                     $session->unset('mfa:user:id');
-                    // restore the user object to session from cache
-                    $session->set(UserInterface::class, $cached_user);
+                    $session->set(IdentityInterface::class, [
+                        'id'    => $user->getId(),
+                        'email' => $user->getEmail(),
+                        'name'  => $user->getFullName(),
+                    ]);
                     return new RedirectResponse($this->helper->generate('home'));
                 }
             }
+
             $error = 'Invalid key';
-            // regenerate token on falure
+            // regenerate token on failure
             $token = $this->getToken($session, $guard);
         }
 
-        // generate google url
-        $qrcode_url = GoogleQrUrl::generate($user->getEmail(), $secret_key, $this->config['issuer']);
         return new HtmlResponse($this->renderer->render('mfa::mfa-page', [
             'layout'     => 'layout::clean',
             'form'       => $form,
-            'qrcode_url' => $qrcode_url,
-            'secret_key' => $secret_key,
+            'qrcode_url' => $this->mfaService->getQrCodeUrl($user->getEmail(), $key),
+            'secret_key' => $key,
             'token'      => $token,
             'error'      => $error,
         ]));

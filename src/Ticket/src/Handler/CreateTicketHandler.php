@@ -7,10 +7,8 @@ namespace Ticket\Handler;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\Form\FormInterface;
-use Mezzio\Authentication\UserInterface;
 use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\UrlHelper;
-use Mezzio\Session\SessionMiddleware;
 use Mezzio\Template\TemplateRendererInterface;
 use OrganisationSite\Entity\SiteEntity;
 use Psr\Http\Message\ResponseInterface;
@@ -21,6 +19,7 @@ use Ticket\Entity\Ticket;
 use Ticket\Form\TicketForm;
 use Ticket\Hydrator\TicketHydrator;
 use Ticket\Service\TicketService;
+use UserAuthentication\Entity\IdentityInterface;
 use function count;
 use function sprintf;
 
@@ -52,9 +51,8 @@ class CreateTicketHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $session  = $request->getAttribute(SessionMiddleware::SESSION_ATTRIBUTE);
-        $user     = $session->get(UserInterface::class);
-        $agent_id = (int) $user['details']['id'];
+        $user     = $request->getAttribute(IdentityInterface::class);
+        $agent_id = $user->getId();
 
         $form = new TicketForm();
 

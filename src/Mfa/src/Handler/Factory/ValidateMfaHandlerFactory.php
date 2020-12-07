@@ -8,7 +8,9 @@ use Laminas\Cache\Storage\StorageInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Mfa\Handler;
+use Mfa\Service\MfaService;
 use Psr\Container\ContainerInterface;
+use User\Service\UserManager;
 
 /**
  * Displays the MFA form for validation after user login
@@ -17,20 +19,17 @@ class ValidateMfaHandlerFactory
 {
     public function __invoke(ContainerInterface $container): Handler\ValidateMfaHandler
     {
-        // get mfa config
-        $config = $container->get('config')['mfa'] ?? [];
+        /** @var UserManager $userManager */
+        $userManager = $container->get(UserManager::class);
 
-        /** @var StorageInterface $cache */
-        $cache = $container->get(StorageInterface::class);
-
-        /** @var EntityManagerInterface $entityManager */
-        $entityManager = $container->get(EntityManagerInterface::class);
+        /** @var MfaService $mfaService */
+        $mfaService = $container->get(MfaService::class);
 
         /** @var TemplateRendererInterface $renderer */
         $renderer = $container->get(TemplateRendererInterface::class);
 
         /** @var UrlHelper $urlHelper */
         $urlHelper = $container->get(UrlHelper::class);
-        return new Handler\ValidateMfaHandler($cache, $entityManager, $renderer, $urlHelper, $config);
+        return new Handler\ValidateMfaHandler($mfaService, $userManager, $renderer, $urlHelper);
     }
 }
