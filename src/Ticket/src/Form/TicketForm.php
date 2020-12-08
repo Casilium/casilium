@@ -105,7 +105,7 @@ class TicketForm extends Form implements InputFilterProviderInterface
             ->setEmptyOption('Please Select')
             ->setAttributes(['id' => 'type_id', 'class' => 'form-control', 'required' => true])
             ->setValueOptions([
-                '1' => 'Factory Request',
+                '1' => 'Service Request',
                 '2' => 'Incident',
             ])
             ->setValue(2)
