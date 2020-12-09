@@ -6,6 +6,7 @@ namespace User\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Laminas\Cache\Storage\StorageInterface;
+use Laminas\Permissions\Rbac\AssertionInterface;
 use Laminas\Permissions\Rbac\Rbac;
 use User\Entity\Role;
 use User\Entity\User;
@@ -104,7 +105,7 @@ class RbacManager
             }
 
             foreach ($this->assertionManagers as $assertionManager) {
-                if ($assertionManager->asset($this->rbac, $permission, $params)) {
+                if ($assertionManager->assert($this->rbac, $permission, $params)) {
                     return true;
                 }
             }
@@ -118,5 +119,11 @@ class RbacManager
         }
 
         return false;
+    }
+
+    public function addAssertion(AssertionInterface $assertion): RbacManager
+    {
+        $this->assertionManagers[] = $assertion;
+        return $this;
     }
 }
