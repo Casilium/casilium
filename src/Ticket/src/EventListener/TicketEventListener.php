@@ -113,6 +113,11 @@ class TicketEventListener
             return;
         }
 
+        //response is not from agent,
+        if (null === $response->getAgent()) {
+            return;
+        }
+
         // default template is ticket response
         $template = "ticket_mail::ticket_response";
         if ($response->getTicket()->getStatus()->getId() === Status::STATUS_RESOLVED) {
