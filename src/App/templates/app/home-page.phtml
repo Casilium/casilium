@@ -113,7 +113,7 @@ $chartData = [];
 
 $agentStats = $this->stats['agent'];
 usort($agentStats, function ($a, $b) {
-    return $b['open'] - $a['open'];
+    return $b['Resolved'] - $a['Resolved'];
 });
 
 foreach ($agentStats as $agent) {
