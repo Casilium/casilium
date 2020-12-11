@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 return [
     'slack' => [
+        // whether to enable slack notifications
+        'enabled'  => true,
+
          // Endpoint which slack generates when creating a new incoming webhook.
          // https://hooks.slack.com/services/XXXXXXXX/XXXXXXXX/XXXXXXXXXXXXXX
         'endpoint' => '',

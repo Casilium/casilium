@@ -11,9 +11,11 @@ use Logger\Service\LogService;
 use MailService\Service\MailService;
 use Monolog\Logger;
 use Psr\Container\ContainerInterface;
+use SlackIntegration\Service\Client as slackClient;
 use Ticket\Entity\Status;
 use Ticket\Entity\Ticket;
 use Ticket\Entity\TicketResponse;
+use function sprintf;
 
 class TicketEventListener
 {
@@ -22,6 +24,9 @@ class TicketEventListener
 
     /** @var MailService */
     protected $mailService;
+
+    /** @var slackClient */
+    protected $slackClient;
 
     /** @var Logger */
     protected $logger;
@@ -35,12 +40,14 @@ class TicketEventListener
         $entityManager = $container->get(EntityManager::class);
         $logService    = $container->get(LogService::class);
         $mailService   = $container->get(MailService::class);
+        $slackClient   = $container->get(slackClient::class);
 
         $listener = new self();
         $listener->setEntityManager($entityManager);
         $listener->setLogService($logService);
         $listener->setMailService($mailService);
         $listener->setEnabled($config['enabled'] ?? false);
+        $listener->setSetSlackClient($slackClient);
 
         return $listener;
     }
@@ -67,23 +74,35 @@ class TicketEventListener
      */
     public function onTicketCreated(Event $event): void
     {
-        // if mail service is disabled, don't send mail
-        if (false === $this->enabled) {
-            return;
-        }
-
         $ticketId = $event->getParam('id') ?? null;
 
         if (null !== $ticketId) {
             /** @var Ticket $ticket */
             $ticket = $this->entityManager->getRepository(Ticket::class)->find($ticketId);
 
-            $body = $this->mailService->prepareBody('ticket_mail::ticket_created', ['ticket' => $ticket]);
-            $this->mailService->send(
-                $ticket->getContact()->getWorkEmail(),
-                'Support Case Open',
-                $body
-            );
+            if ($this->enabled) {
+                $body = $this->mailService->prepareBody('ticket_mail::ticket_created', ['ticket' => $ticket]);
+                $this->mailService->send(
+                    $ticket->getContact()->getWorkEmail(),
+                    'Support Case Open',
+                    $body
+                );
+            }
+
+            if ($this->slackClient->isEnabled()) {
+                $createdBy = null === $ticket->getAgent()
+                    ? $ticket->getContact()->getFirstName() . ' ' . $ticket->getContact()->getLastName()
+                    : $ticket->getAgent()->getFullName();
+
+                $message = $this->slackClient->createMessage();
+                $message->setText(sprintf(
+                    'Ticket #%s was created by %s - %s',
+                    $ticket->getId(),
+                    $createdBy,
+                    $ticket->getShortDescription()
+                ));
+                $this->slackClient->sendMessage($message);
+            }
         }
     }
 
@@ -94,10 +113,7 @@ class TicketEventListener
      */
     public function onTicketReply(Event $event): void
     {
-        // if mail service is disabled, don't send mail
-        if (false === $this->enabled) {
-            return;
-        }
+        $action = 'response';
 
         // if we have no respond ID, return
         $responseId = $event->getParam('id') ?? null;
@@ -108,11 +124,6 @@ class TicketEventListener
         /** @var TicketResponse $response */
         $response = $this->entityManager->getRepository(TicketResponse::class)->find($responseId);
 
-        // if response is not public, don't send an email
-        if ($response->getIsPublic() === 0) {
-            return;
-        }
-
         //response is not from agent,
         if (null === $response->getAgent()) {
             return;
@@ -122,16 +133,42 @@ class TicketEventListener
         $template = "ticket_mail::ticket_response";
         if ($response->getTicket()->getStatus()->getId() === Status::STATUS_RESOLVED) {
             // use resolved template
+            $action   = 'resolved';
             $template = "ticket_mail::ticket_resolved";
         }
 
-        // prepare email body and send email
-        $body = $this->mailService->prepareBody($template, ['response' => $response]);
-        $this->mailService->send(
-            $response->getContact()->getWorkEmail(),
-            'Your request has been updated',
-            $body
-        );
+        if ($this->enabled === true && $response->getIsPublic() === 1) {
+            // prepare email body and send email
+            $body = $this->mailService->prepareBody($template, ['response' => $response]);
+            $this->mailService->send(
+                $response->getContact()->getWorkEmail(),
+                'Your request has been updated',
+                $body
+            );
+        }
+
+        if ($this->slackClient->isEnabled()) {
+            $updatedBy = null === $response->getAgent()
+                ? $response->getContact()->getFirstName() . ' ' . $response->getContact()->getLastName()
+                : $response->getAgent()->getFullName();
+
+            $text = sprintf(
+                'Ticket #%s %s by %s: %s',
+                $response->getTicket()->getId(),
+                $action,
+                $updatedBy,
+                $response->getResponse()
+            );
+
+            $message = $this->slackClient->createMessage();
+            $message->setText($text);
+            $this->slackClient->sendMessage($message);
+        }
+    }
+
+    public function setSetSlackClient(slackClient $client): void
+    {
+        $this->slackClient = $client;
     }
 
     /**

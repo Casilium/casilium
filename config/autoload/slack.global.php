@@ -4,9 +4,6 @@ declare(strict_types=1);
 
 return [
     'slack' => [
-        // slack notifications enabled?
-        'enabled' => false,
-
         // The channel to post to, channel can either be a #channel, #group or @username. Set to null
         // to use webhook defaults
         'channel' => '#support',
