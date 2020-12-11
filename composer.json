@@ -67,7 +67,8 @@
         "monolog/monolog": "^1.24",
         "nesbot/carbon": "^2.41.5",
       "ext-sodium": "*",
-      "ext-json": "*"
+      "ext-json": "*",
+      "ext-curl": "*"
     },
     "require-dev": {
         "laminas/laminas-development-mode": "^3.2",
@@ -92,7 +93,8 @@
             "ServiceLevel\\": "src/ServiceLevel/src",
             "Ticket\\": "src/Ticket/src",
             "MailService\\": "src/MailService/src",
-            "Logger\\": "src/Logger/src"
+            "Logger\\": "src/Logger/src",
+            "SlackIntegration\\": "src/SlackIntegration/src"
         }
     },
     "autoload-dev": {

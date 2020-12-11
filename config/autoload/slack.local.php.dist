@@ -1,0 +1,11 @@
+<?php
+
+declare(strict_types=1);
+
+return [
+    'slack' => [
+         // Endpoint which slack generates when creating a new incoming webhook.
+         // https://hooks.slack.com/services/XXXXXXXX/XXXXXXXX/XXXXXXXXXXXXXX
+        'endpoint' => '',
+    ],
+];
