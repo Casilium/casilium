@@ -352,6 +352,10 @@ class TicketService
                     $ticket->setResolveDate(Carbon::now('UTC')->format('Y-m-d H:i:s'));
                     break;
                 default:
+                    // update ticket status to IN PROGRESS if is currently OPEN
+                    if ($ticket->getStatus()->getId() === Status::STATUS_OPEN) {
+                        $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_IN_PROGRESS);
+                    }
                     break;
             }
         }
