@@ -331,7 +331,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->andWhere('t.due_date BETWEEN :dateMin AND :dateMax')
             ->setParameter('dateMin', $date->format('Y-m-d H:i:s'))
             ->setParameter('dateMax', $inFuture->format('Y-m-d H:i:s'))
-            ->andWhere('t.status <= 3');
+            ->andWhere('t.status <= 2');
 
         return $qb->getQuery()->getResult();
     }
