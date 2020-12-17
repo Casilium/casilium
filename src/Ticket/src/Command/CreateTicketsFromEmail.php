@@ -193,6 +193,10 @@ class CreateTicketsFromEmail extends Command
 
             // process mail messages
             foreach ($messages as $index => $message) {
+                if (null === $message) {
+                    continue;
+                }
+
                 // ignore subjects such as out of office
                 if ($this->shouldIgnoreFromSubject($message['subject'])) {
                     $output->writeln('- ignore message due to subject');
