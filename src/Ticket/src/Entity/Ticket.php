@@ -250,6 +250,20 @@ class Ticket
     private $closeDate;
 
     /**
+     * @ORM\Column(name="waiting_date", type="string")
+     *
+     * @var string|null
+     */
+    private $waitingDate;
+
+    /**
+     * @ORM\Column(name="waiting_reset_date", type="string")
+     *
+     * @var string|null
+     */
+    private $waitingResetDate;
+
+    /**
      * @ORM\OneToOne(targetEntity="ServiceLevel\Entity\SlaTarget")
      * @ORM\JoinColumn(name="sla_target_id", referencedColumnName="id")
      *
@@ -562,6 +576,28 @@ class Ticket
         return $this;
     }
 
+    public function getWaitingDate(): ?string
+    {
+        return $this->waitingDate;
+    }
+
+    public function setWaitingDate(?string $waitingDate): Ticket
+    {
+        $this->waitingDate = $waitingDate;
+        return $this;
+    }
+
+    public function getWaitingResetDate(): ?string
+    {
+        return $this->waitingResetDate;
+    }
+
+    public function setWaitingResetDate(?string $waitingResetDate): Ticket
+    {
+        $this->waitingResetDate = $waitingResetDate;
+        return $this;
+    }
+
     public function getArrayCopy(): array
     {
         return get_object_vars($this);
@@ -574,12 +610,30 @@ class Ticket
         $this->impact            = isset($data['impact']) ? (int) $data['impact'] : self::IMPACT_DEFAULT;
         $this->urgency           = isset($data['urgency']) ? (int) $data['urgency'] : self::URGENCY_DEFAULT;
         $this->short_description = isset($data['short_description']) ? (string) $data['short_description'] : null;
-        $this->due_date          = isset($data['due_date']) && strlen($data['due_date']) > 1 ? (string) $data['due_date'] : date('Y-m-d H:i:s');
-        $this->long_description  = isset($data['long_description']) ? (string) $data['long_description'] : null;
-        $this->lastResponseDate  = isset($data['last_response_date']) && strlen($data['last_response_date']) > 1 ? (string) $data['last_response_date'] : date('Y-m-d H:i:s');
-        $this->lastResponseDate  = isset($data['first_response_date']) && strlen($data['first_response_date']) > 1 ? (string) $data['first_response_date'] : date('Y-m-d H:i:s');
         $this->slaTarget         = $data['sla_target'] ?? null;
         $this->organisation      = $data['organisation'] ?? null;
+        $this->long_description  = isset($data['long_description']) ? (string) $data['long_description'] : null;
+
+        $this->due_date = isset($data['due_date']) && strlen($data['due_date']) > 1
+            ? (string) $data['due_date']
+            : date('Y-m-d H:i:s');
+
+        $this->lastResponseDate = isset($data['last_response_date']) && strlen($data['last_response_date']) > 1
+            ? (string) $data['last_response_date']
+            : date('Y-m-d H:i:s');
+
+        $this->lastResponseDate = isset($data['first_response_date']) && strlen($data['first_response_date']) > 1
+            ? (string) $data['first_response_date']
+            : date('Y-m-d H:i:s');
+
+        $this->waitingDate = isset($data['waiting_date']) && strlen($data['waiting_date']) > 1
+            ? (string) $data['waiting_date']
+            : null;
+
+        $this->waitingDate = isset($data['waiting_reset_date']) && strlen($data['waiting_reset_date']) > 1
+            ? (string) $data['waiting_reset_date']
+            : null;
+
         return $this;
     }
 
@@ -596,5 +650,21 @@ class Ticket
     public static function getSourceTextFromCode(int $code): string
     {
         return self::SOURCE_TEXT[$code];
+    }
+
+    public function isOverdue(): bool
+    {
+        if (null === $this->getDueDate()) {
+            return false;
+        }
+
+        $now = Carbon::now('UTC');
+        $due = Carbon::createFromFormat('Y-m-d H:i:s', $this->getDueDate(), 'UTC');
+
+        if ($due < $now) {
+            return true;
+        }
+
+        return false;
     }
 }

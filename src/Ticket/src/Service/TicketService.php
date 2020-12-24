@@ -342,9 +342,16 @@ class TicketService
                     if ($ticket->getStatus()->getId() !== Status::STATUS_ON_HOLD) {
                         // if not on hold, place on hold
                         $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_ON_HOLD);
+
+                        // set hold date
+                        $ticket->setWaitingDate(Carbon::now('UTC')->format('Y-m-d H:i:s'));
                     } else {
                         // if on hold, place in progress.
                         $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_IN_PROGRESS);
+
+                        // remove waiting/hold date
+                        $ticket->setWaitingDate(null);
+                        $ticket->setWaitingResetDate(null);
                     }
                     break;
                 case 'save_resolve':
@@ -520,5 +527,105 @@ class TicketService
         foreach ($agents as $agent) {
             $this->mailService->send($agent->getEmail(), 'New ticket notification', $body);
         }
+    }
+
+    public function findWaitingTicketsToUpdate(): array
+    {
+        return $this->entityManager->getRepository(Ticket::class)->findWaitingTicketsToUpdateById();
+    }
+
+    public function updateWaitingTickets(): array
+    {
+        // returns an array of IDs of tickets that requiring the due date updating
+        // because the ticket is on hold/waiting and the waiting date
+        $tickets = $this->findWaitingTicketsToUpdate();
+
+        // if no tickets to process return
+        if (empty($tickets)) {
+            return [];
+        }
+
+        $updateStatus = [];
+
+        foreach ($tickets as $ticketId) {
+            // find the ticket to update
+            $ticket = $this->findTicketById((int) $ticketId);
+
+            // if due date or waiting date is null then continue
+            if (null === $ticket->getDueDate() || null === $ticket->getWaitingDate()) {
+                continue;
+            }
+
+            // don't bother with tickets already overdue
+            if ($ticket->isOverdue()) {
+                continue;
+            }
+
+            // get due date as carbon object
+            $dueDate = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate(), 'UTC');
+            $wasDue  = $dueDate->clone();
+
+            // get waiting date as carbon object
+            $waitingDate = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getWaitingDate(), 'UTC');
+
+            // get last reset date (if set) as carbon object
+            $waitingResetDate = $ticket->getWaitingResetDate()
+                ? Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getWaitingResetDate())
+                : null;
+
+            // update the due date
+            $now = Carbon::now('UTC');
+            if (null !== $waitingResetDate) {
+                // get the difference in minutes between last reset and now
+                // add the difference to the due date
+                $diffInMinutes = $now->diffInMinutes($waitingResetDate);
+
+                // no point in updating if same
+                if ($diffInMinutes === 0) {
+                    continue;
+                }
+
+                // if has sla then calculate according to SLA hours
+                if ($ticket->hasSla()) {
+                    $businessHours     = $ticket->getOrganisation()->getSla()->getBusinessHours();
+                    $businessHoursCalc = new CalculateBusinessHours($businessHours);
+                    $dueDate           = $businessHoursCalc->addMinutesTo($dueDate, $diffInMinutes);
+                } else {
+                    // otherwise just update
+                    $dueDate = $dueDate->addMinutes($diffInMinutes);
+                }
+            } else {
+                // ticket has never been reset, get difference in seconds between
+                // date ticket was put on hold and now, add the difference to the due date
+                $diffInMinutes = $now->diffInMinutes($waitingDate);
+                if ($diffInMinutes === 0) {
+                    continue;
+                }
+
+                // if has sla then calculate according to SLA hours
+                if ($ticket->hasSla()) {
+                    $businessHours     = $ticket->getOrganisation()->getSla()->getBusinessHours();
+                    $businessHoursCalc = new CalculateBusinessHours($businessHours);
+                    $dueDate           = $businessHoursCalc->addMinutesTo($dueDate, $diffInMinutes);
+                } else {
+                    // otherwise just update
+                    $dueDate = $dueDate->addMinutes($diffInMinutes);
+                }
+            }
+
+            // update due date and set the last reset date to now
+            $ticket->setDueDate($dueDate->format('Y-m-d H:i:s'));
+            $ticket->setWaitingResetDate($now->format('Y-m-d H:i:s'));
+
+            $updateStatus[$ticket->getId()] = [
+                'was_due' => $wasDue->format('Y-m-d H:i:s'),
+                'now_due' => $dueDate->format('Y-m-d H:i:s'),
+            ];
+
+            // write ticket changes
+            $this->getEntityManager()->flush();
+        }
+
+        return $updateStatus;
     }
 }

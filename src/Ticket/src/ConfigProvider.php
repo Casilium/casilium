@@ -46,6 +46,7 @@ class ConfigProvider
                 Command\CreateTicketsFromEmail::class    => Command\Factory\CreateTicketsFromEmailFactory::class,
                 Command\CloseResolvedTickets::class      => Command\Factory\CloseResolvedTicketsFactory::class,
                 Command\Notifications::class             => Command\Factory\NotificationsFactory::class,
+                Command\UpdateWaitingTickets::class      => Command\Factory\UpdatingWaitingTicketsFactory::class,
                 EventListener\TicketEventListener::class => EventListener\TicketEventListener::class,
                 Handler\AssignQueueMembersHandler::class => Handler\Factory\AssignQueueMembersHandlerFactory::class,
                 Handler\CreateQueueHandler::class        => Handler\Factory\CreateQueueHandlerFactory::class,
@@ -110,6 +111,7 @@ class ConfigProvider
                 Command\CreateTicketsFromEmail::class,
                 Command\CloseResolvedTickets::class,
                 Command\Notifications::class,
+                Command\UpdateWaitingTickets::class,
             ],
         ];
     }

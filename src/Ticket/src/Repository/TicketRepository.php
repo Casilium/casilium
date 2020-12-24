@@ -12,11 +12,13 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
+use Exception;
 use Ticket\Entity\Agent;
 use Ticket\Entity\Status;
 use Ticket\Entity\Ticket;
 use Ticket\Entity\TicketResponse;
 use Ticket\Service\TicketService;
+use function array_map;
 
 class TicketRepository extends EntityRepository implements TicketRepositoryInterface
 {
@@ -351,6 +353,25 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->getResult();
     }
 
+    public function findWaitingTicketsToUpdateById(): array
+    {
+        $now = Carbon::now('UTC');
+
+        $result = $this->getEntityManager()->createQueryBuilder('q')
+            ->select('t.id')
+            ->from(Ticket::class, 't')
+            ->where('t.status = :t_status')
+            ->andWhere('t.waitingResetDate < :date_now OR t.waitingResetDate is null')
+            ->setParameter('date_now', $now->format('Y-m-d H:i:s'))
+            ->andWhere('t.status = :t_status')
+            ->setParameter('t_status', Status::STATUS_ON_HOLD)
+            ->getQuery()
+            ->getScalarResult();
+
+        // as we only have one element per array we can use 'current' as a callback instead of a closure
+        return array_map('current', $result);
+    }
+
     public function findAgentStats(
         int $agentId,
         ?CarbonInterface $periodStart = null,
@@ -358,7 +379,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
     ): array {
         $agent = $this->getEntityManager()->getRepository(Agent::class)->find($agentId);
         if ($agent === null) {
-            throw new \Exception('Agent not found');
+            throw new Exception('Agent not found');
         }
 
         $stats = [];
