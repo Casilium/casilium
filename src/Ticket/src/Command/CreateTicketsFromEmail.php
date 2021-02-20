@@ -421,10 +421,17 @@ class CreateTicketsFromEmail extends Command
     }
 
     /**
-     * Find ticket UUID in body content
+     * Find ticket UUID in message body
+     *
+     * @param string|null $content The message to parse
+     * @return string|null uuid or null if not found
      */
-    private function getUuid(string $content): ?string
+    private function getUuid(?string $content): ?string
     {
+        if (null === $content) {
+            return null;
+        }
+
         $pattern = '/Tracking ID: ([0-9a-fA-F]{8}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{4}\-[0-9a-fA-F]{12})/';
         preg_match($pattern, $content, $matches);
         if (! empty($matches)) {
