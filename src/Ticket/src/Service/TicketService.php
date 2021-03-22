@@ -169,7 +169,7 @@ class TicketService
         return $this->entityManager->getRepository(Status::class)->find($id);
     }
 
-    public function findTicketById(int $id): Ticket
+    public function findTicketById(int $id): ?Ticket
     {
         return $this->entityManager->getRepository(Ticket::class)->find($id);
     }

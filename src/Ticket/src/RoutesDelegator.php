@@ -11,6 +11,7 @@ use Ticket\Handler\CreateTicketHandler;
 use Ticket\Handler\DeleteQueueHandler;
 use Ticket\Handler\EditQueueHandler;
 use Ticket\Handler\EditTickerHandler;
+use Ticket\Handler\GoToTicketHandler;
 use Ticket\Handler\ListQueueHandler;
 use Ticket\Handler\ListTicketHandler;
 use Ticket\Handler\ViewTicketHandler;
@@ -36,6 +37,12 @@ class RoutesDelegator
             'ticket.clone'
         );
 
+        $app->get(
+            '/ticket/go/{ticket_id:\d+}',
+            GoToTicketHandler::class,
+            'ticket.goto',
+        );
+
         $app->route(
             '/ticket/{ticket_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}/edit',
             EditTickerHandler::class,
@@ -56,12 +63,12 @@ class RoutesDelegator
             'ticket.list'
         );
         $app->get(
-            '/ticket/list/queue/{queue_id:\d}',
+            '/ticket/list/queue/{queue_id:\d+}',
             ListTicketHandler::class,
             'ticket.list_queue'
         );
         $app->get(
-            '/ticket/list/status/{status_id:\d}',
+            '/ticket/list/status/{status_id:\d+}',
             ListTicketHandler::class,
             'ticket.list_status'
         );
@@ -75,7 +82,7 @@ class RoutesDelegator
             'admin.queue_create'
         );
         $app->route(
-            '/admin/ticket/queue/edit/{id:\d}',
+            '/admin/ticket/queue/edit/{id:\d+}',
             [
                 EditQueueHandler::class,
             ],
@@ -84,13 +91,13 @@ class RoutesDelegator
         );
 
         $app->get(
-            '/admin/ticket/queue/delete/{id:\d}[/confirm/{confirm}]',
+            '/admin/ticket/queue/delete/{id:\d+}[/confirm/{confirm}]',
             DeleteQueueHandler::class,
             'admin.queue_delete'
         );
 
         $app->route(
-            '/admin/ticket/queue/{id:\d}/assign',
+            '/admin/ticket/queue/{id:\d+}/assign',
             AssignQueueMembersHandler::class,
             ['GET', 'POST'],
             'admin.queue_assign'
