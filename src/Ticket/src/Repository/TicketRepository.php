@@ -431,7 +431,9 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         ?CarbonInterface $periodEnd = null
     ): array {
         /** @var Agent[] $agents */
-        $agents = $this->getEntityManager()->getRepository(Agent::class)->findAll();
+        $agents = $this->getEntityManager()->getRepository(Agent::class)->findBy([
+            'status' => 1,
+        ]);
 
         $stats = [];
         foreach ($agents as $agent) {

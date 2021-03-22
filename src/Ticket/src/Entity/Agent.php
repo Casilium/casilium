@@ -43,6 +43,13 @@ class Agent
      */
     protected $queues;
 
+    /**
+     * @ORM\Column(name="status")
+     *
+     * @var int
+     */
+    protected $status;
+
     public function __construct()
     {
         $this->queues = new ArrayCollection();
@@ -79,5 +86,10 @@ class Agent
     {
         $this->fullName = $fullName;
         return $this;
+    }
+
+    public function getStatus(): int
+    {
+        return $this->status;
     }
 }
