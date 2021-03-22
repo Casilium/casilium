@@ -38,7 +38,7 @@ class RoutesDelegator
         );
 
         $app->get(
-            '/ticket/go/{ticket_id:\d+}',
+            '/ticket/go',
             GoToTicketHandler::class,
             'ticket.goto',
         );
