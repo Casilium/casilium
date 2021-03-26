@@ -19,6 +19,7 @@ use Ticket\Entity\Ticket;
 use Ticket\Entity\TicketResponse;
 use Ticket\Service\TicketService;
 use function array_map;
+use function intval;
 
 class TicketRepository extends EntityRepository implements TicketRepositoryInterface
 {
@@ -251,16 +252,58 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
      */
     public function findTotalTicketCount(array $options = []): int
     {
-        $start = isset($options['start']) ? Carbon::parse($options['start'], 'UTC') : null;
-        $end   = isset($options['end']) ? Carbon::parse($options['end'], 'UTC') : null;
+        $start        = isset($options['start']) ? Carbon::parse($options['start'], 'UTC') : null;
+        $end          = isset($options['end']) ? Carbon::parse($options['end'], 'UTC') : null;
+        $organisation = isset($options['organisation']) ? intval($options['organisation']) : null;
 
         $qb = $this->createQueryBuilder('t')
             ->select('COUNT(t.id)');
 
         if ($start !== null && $end !== null) {
-            $qb->where('t.createdAt BETWEEN :dateMin AND :dateMax')
+            $qb->andWhere('t.createdAt BETWEEN :dateMin AND :dateMax')
                 ->setParameter('dateMin', $start->format('Y-m-d 00:00:00'))
                 ->setParameter('dateMax', $end->format('Y-m-d 23:59:59'));
+        }
+
+        if (null !== $organisation) {
+            $qb->andWhere('t.organisation = :organisation')
+                ->setParameter('organisation', $organisation);
+        }
+
+        return (int) $qb->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function findTicketCount(array $options = []): int
+    {
+        $start        = isset($options['start']) ? Carbon::parse($options['start'], 'UTC') : null;
+        $end          = isset($options['end']) ? Carbon::parse($options['end'], 'UTC') : null;
+        $organisation = isset($options['organisation']) ? intval($options['organisation']) : null;
+        $status       = isset($options['status']) ? intval($options['status']) : null;
+        $type         = isset($options['type']) ? intval($options['type']) : null;
+
+        $qb = $this->createQueryBuilder('t')
+            ->select('COUNT(t.id)');
+
+        if ($start !== null && $end !== null) {
+            $qb->andWhere('t.createdAt BETWEEN :dateMin AND :dateMax')
+                ->setParameter('dateMin', $start->format('Y-m-d 00:00:00'))
+                ->setParameter('dateMax', $end->format('Y-m-d 23:59:59'));
+        }
+
+        if (null !== $organisation) {
+            $qb->andWhere('t.organisation = :organisation')
+                ->setParameter('organisation', $organisation);
+        }
+
+        if (null !== $status) {
+            $qb->andWhere('t.status = :status')
+                ->setParameter('status', $status);
+        }
+
+        if (null !== $type) {
+            $qb->andWhere('t.type = :type')
+                ->setParameter('type', $type);
         }
 
         return (int) $qb->getQuery()

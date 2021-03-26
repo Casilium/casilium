@@ -1,0 +1,99 @@
+.col-sm-1 {
+  width: 8%;
+  float: left;
+}
+
+.col-sm-2 {
+  width: 17%;
+  float: left;
+}
+
+.col-sm-3 {
+  width: 25%;
+  float: left;
+}
+
+.col-sm-4 {
+  width: 33%;
+  float: left;
+}
+
+.col-sm-5 {
+  width: 42%;
+  float: left;
+}
+
+.col-sm-6 {
+  width: 50%;
+  float: left;
+}
+
+.col-sm-7 {
+  width: 58%;
+  float: left;
+}
+
+.col-sm-8 {
+  width: 67%;
+  float: left;
+}
+
+.col-sm-9 {
+  width: 75%;
+  float: left;
+}
+
+.col-sm-10 {
+  width: 83%;
+  float: left;
+}
+
+.col-sm-11 {
+  width: 92%;
+  float: left;
+}
+
+.col-sm-12 {
+  width: 100%;
+  float: left;
+}
+
+#pdfcontent {
+  color: red;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  color: black;
+}
+
+#pdfcontent {
+  background-color: white;
+  font-family: arial;
+  border-width: 2px;
+  border-style: dotted;
+  padding: 1em;
+  font-size: 120%;
+  line-height: 1.5em;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#doc-output {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 30px;
+  bottom: 0;
+}
+
+#doc-output > iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
+
+/*# sourceMappingURL=print.css.map */

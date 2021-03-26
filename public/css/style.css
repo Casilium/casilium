@@ -174,5 +174,17 @@ h1 {
     margin-left: -15rem;
   }
 }
+/************ PDF ***************/
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#doc-output > iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+}
 
 /*# sourceMappingURL=style.css.map */

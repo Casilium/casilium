@@ -1,0 +1,349 @@
+<?php
+$this->headLink()
+    ->appendStylesheet('/css/print.css', ['media' => 'print'])
+    ->appendStylesheet('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.css')
+;
+
+$this->inlineScript()
+    ->appendFile('https://cdnjs.cloudflare.com/ajax/libs/jspdf/1.3.2/jspdf.min.js')
+    ->appendFile('https://cdnjs.cloudflare.com/ajax/libs/html2canvas/0.4.1/html2canvas.min.js')
+    ->appendFile('https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.14/jspdf.plugin.autotable.min.js')
+    ->appendFile('https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.4/Chart.min.js')
+;
+
+$total = $this->stats['total'];
+$completed = $this->stats['resolved'] + $this->stats['closed'];
+$organisationName = $this->organisation->getName();
+
+if ($this->startDate->format('m') === $this->endDate->format('m')) {
+    $reportMonth = $this->startDate->format('F Y');
+} else {
+    $reportMonth = sprintf("%s to %s", $this->startDate->format('F Y'), $this->endDate->format('F Y'));
+}
+
+
+?>
+    <div id="doc-output" style="height: 900px">
+        <iframe></iframe>
+    </div>
+
+    <a href="javascript:loadPDF()" class="btn btn-success">Refresh</a>
+    <a href="javascript:savePDF()" class="btn btn-success">Download</a>
+
+
+<?php
+$this->inlineScript()->captureStart();
+echo <<<EOF
+// <script>
+    // create new pdf
+    const doc =  new jsPDF('p', 'pt', 'a4');
+    
+    // set pdf margins
+    let margins = { left: 54, right: 54, top: 54, bottom: 60 }
+    
+    // initial y offset
+    let LastY = 0;
+    let lineHeightOffset = 5;
+       
+    doc.width = 595.27559055;
+   
+    
+    //let imageData = null;
+    
+    // Assumes your document using is `pt` units
+    // If you're using any other unit (mm, px, etc.) use this gist to translate:
+    // https://gist.github.com/AnalyzePlatypus/55d806caa739ba6c2b27ede752fa3c9c
+    function addWrappedText(
+        {
+            text, 
+            textWidth                = 595 - (margins.left + margins.right),
+            doc, 
+            fontSize                 = 11, 
+            fontType                 = 'normal', 
+            lineSpacing              = 14, 
+            xPosition                = margins.left, 
+            initialYPosition         = 10, 
+            pageWrapInitialYPosition = margins.top,
+            updateY                  = 1
+        }
+    ) {
+        // split text into array
+        let textLines  = doc.splitTextToSize(text, textWidth);
+        
+        // set cursor position
+        let cursorY    = initialYPosition;
+        
+        // set page height  
+        let pageHeight = doc.internal.pageSize.height;   
+      
+        // set default font type and size
+        doc.setFontType(fontType);
+        doc.setFontSize(fontSize);
+     
+        // loop through array of text
+        textLines.forEach(lineText => {
+            // add new page and reset Y offset if running of page
+            if (cursorY > pageHeight) {
+                doc.addPage();
+                cursorY = pageWrapInitialYPosition;
+            }
+        
+            // splat text in to PDF
+            doc.text(xPosition, cursorY, lineText);
+            cursorY += lineSpacing;
+        })
+      
+        // update Y position offset (not always wanted)?
+        if (updateY == 1) {
+            LastY = cursorY + lineSpacing;
+        }
+    }
+         
+    // load PDF document into viewer 
+    function loadPDF() {
+        var elem = document.querySelector('#doc-output > iframe');
+        var pdf = makePDF();
+                
+        elem.src = pdf.output('datauristring');
+    }
+    
+    function savePDF() {
+        doc.save();
+    }
+    
+    function addLogo(imageData) {
+        doc.addImage(imageData, 'PNG', (doc.width - margins.left - 188), margins.top - 10 , 188, 26.5, 'logo', 'none');
+    }
+     
+    function setupPdfHeader(doc) {        
+        doc.setFontSize(18);
+        doc.text('Executive Summary Report', margins.left, margins.top);
+        doc.setFontSize(12);
+        doc.text('$organisationName, $reportMonth', margins.left, margins.top + 18);
+        doc.line(margins.left, margins.top + 30, doc.width - margins.right, margins.top + 30);
+        
+        // add logo
+        getDataUri('/img/casilium-black.png', addLogo);
+         
+    }
+    
+    function makePDF() {
+        //var pdf = new jsPDF('p', 'pt', 'a4');
+        let pdf = doc;
+        let fontSize = 12;        
+        let paragraph = null;
+        
+        setupPdfHeader(doc);
+        
+        paragraph  = "This Executive Summary Report has been compiled to provide you with a breakdown of support ";
+        paragraph += "tickets that have been received during the specified period.";
+        addWrappedText({
+            text: paragraph, 
+            doc,       
+            initialYPosition: 120,
+        });  
+        
+        paragraph  = "In order to help you identify the types of support requests that have been received we have ";
+        paragraph += "broken them down into \"Incidents\" and \"Requests\". We have defined these terms below for ";
+        paragraph += "your convenience and understanding.";
+        addWrappedText({
+            text: paragraph, 
+            doc,
+            initialYPosition: LastY,         // Initial offset from top of document; set based on prior objects in document
+        });
+        
+        addWrappedText({text: 'Incident:', doc,initialYPosition: LastY, fontType: "bold"});
+        addWrappedText({
+            text: "An unplanned interruption to an IT service or reduction in the quality of an IT service.", 
+            doc,
+            initialYPosition: LastY,
+        });  
+        
+        addWrappedText({text: 'Service Request:', doc, initialYPosition: LastY, fontType: "bold" });
+        paragraph  = "A request from a user for something to be provided – for example, a request for information ";
+        paragraph += "or advice; to reset a password; or to install a workstation for a new user.";
+        addWrappedText({text: paragraph, doc, initialYPosition: LastY });   
+        
+      //  LastY = 330;
+        addWrappedText({text: 'Results:', doc, initialYPosition: LastY, fontType: "bold" });
+         
+        paragraph  = "The report shows that over the period defined above, a total of ";
+        paragraph += "{$this->stats['total']} tickets were received, of which {$this->stats['totalComplete']} ";
+        paragraph += "have been resolved. {$this->stats['totalIncident']} were received due to incidents, ";
+        paragraph += "and {$this->stats['totalRequest']} were due to general user requests.";
+        addWrappedText({text: paragraph, textWidth: 200, doc, initialYPosition: LastY });   
+        
+        addWrappedText({
+           text: "This information has been broken down further in the table below for clarity.",
+           textWidth: 200,
+           doc,            
+           initialYPosition: LastY
+        });
+
+        // add ticket statistics table
+        let headers = [['Incidents', 'Incidents Resolved', 'Requests', 'Requests Completed']];
+        let data    = [
+                [
+                    "{$this->stats['totalIncident']}", 
+                    "{$this->stats['totalIncidentComplete']}", 
+                    "{$this->stats['totalRequest']}", 
+                    "{$this->stats['totalRequestComplete']}"
+                ]
+        ];
+      
+        pdf.autoTable({
+            head: headers,
+            body: data,   
+            margin: { top: margins.top, right: margins.right, bottom: margins.bottom, left: margins.left },
+            theme: 'striped',
+            styles: {
+                fontSize: fontSize
+            }, 
+            tableWidth: 595 - (margins.left + margins.right),
+            startY: 500
+        });
+           
+        LastY = 580;
+        paragraph  = "Of all the requests received, {$this->stats['totalOutstanding']} remain outstanding which are ";
+        paragraph += "either currently being worked on, are on hold awaiting a user response, or are waiting to be ";
+        paragraph += "assigned to a technician.";      
+        addWrappedText({ text: paragraph, doc, initialYPosition: LastY });
+        
+        // add outsanding tickets stats table
+        headers = [['Unassigned', 'In-Progress', 'On Hold']];
+        data    = [
+                [
+                    "{$this->stats['new']}", 
+                    "{$this->stats['progress']}", 
+                    "{$this->stats['hold']}", 
+                ]
+        ];
+      
+        pdf.autoTable({
+            head: headers,
+            body: data,   
+            margin: { top: margins.top, right: margins.right, bottom: margins.bottom, left: margins.left },
+            theme: 'striped',
+            styles: {
+                fontSize: fontSize
+            }, 
+            tableWidth: 595 - (margins.left + margins.right),
+            startY: 610
+        });
+
+        // add ticket stats chart
+        let canvas = createChart();
+        let imageData = canvas.toDataURL('image/png', 1.0);
+        pdf.addImage(imageData, 'PNG', (doc.width - margins.right - 260), 350 , 260, 130, 'name', 'none');
+        
+        // return pdf document
+        return pdf;
+    }     
+    
+    function cloneCanvas(oldCanvas) {
+         // create a new canvas
+         var newCanvas = document.createElement('canvas');
+         var context = newCanvas.getContext('2d');
+         
+         // set dimensions
+         newCanvas.width = 1200;
+         newCanvas.height = 900;
+         
+         // apply the old image
+         context.drawImage(oldCanvas, 0, 0, newCanvas.height, newCanvas.width);
+         
+         // return the canvas
+         return newCanvas;
+    }
+    
+    // create chart for incidents    
+    function createChart() {
+        let canvas = document.createElement('canvas');
+       
+        canvas.width = 520;
+        canvas.height = 260;
+        
+        let ctx = canvas.getContext('2d');
+        
+        let myChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: ['Incidents ({$this->stats['totalIncident']})', 'Tasks ({$this->stats['totalRequest']})'],
+                datasets: [{
+                    label: 'Created ({$this->stats['total']})',
+                    data: ['{$this->stats['totalIncident']}', '{$this->stats['totalRequest']}'],
+                    backgroundColor: [
+                        'rgb(163,40,40)',
+                        'rgb(163,40,40)',
+                    ],
+                },{
+                    label: 'Complete ({$this->stats['totalComplete']})',
+                    data: ['{$this->stats['totalIncidentComplete']}', '{$this->stats['totalRequestComplete']}'],
+                    backgroundColor: [
+                        'rgb(115,234,44)',
+                        'rgb(115,234,44)',
+                    ],
+                }]
+            },
+            options: {
+                animation: false,
+                aspectRatio: 3,
+                legend: {
+                    position: 'top',
+                    labels: {
+                        fontSize: 20,
+                    }
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            fontSize: 16
+                        }
+                    }],
+                    xAxes: [{
+                        ticks: {
+                            fontSize: 24
+                        }
+                    }]
+                },
+                title: {
+                    text: 'Ticket Statistics',
+                    display: true,
+                    fontSize: 24,
+                },
+                maintainAspectRatio: false,
+                responsive: false        
+            }
+        })
+        
+       return canvas;
+    }    
+    
+    function getDataUri(url, callback)
+    {
+        var image = new Image();
+        image.setAttribute('crossOrigin', 'anonymous'); //getting images from external domain
+        image.onload = function () {
+            var canvas = document.createElement('canvas');
+            canvas.width = this.naturalWidth;
+            canvas.height = this.naturalHeight; 
+
+            //next three lines for white background in case png has a transparent background
+            var ctx = canvas.getContext('2d');
+            ctx.fillStyle = '#fff';  /// set white fill style
+            ctx.fillRect(0, 0, canvas.width, canvas.height);
+            canvas.getContext('2d').drawImage(this, 0, 0);
+            callback(canvas.toDataURL('image/png'));
+        };
+        image.src = url;  
+    }
+    
+    $(document).ready(function() {
+        loadPDF();
+    });
+   
+// </script>
+EOF;
+
+$this->inlineScript()->captureEnd();

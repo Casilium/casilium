@@ -54,7 +54,7 @@ $aggregator = new ConfigAggregator([
     \OrganisationSite\ConfigProvider::class,
     \ServiceLevel\ConfigProvider::class,
     \Ticket\ConfigProvider::class,
-
+    \Report\ConfigProvider::class,
     \SlackIntegration\ConfigProvider::class,
     // Swoole config to overwrite some services (if installed)
    // class_exists(\Mezzio\Swoole\ConfigProvider::class)

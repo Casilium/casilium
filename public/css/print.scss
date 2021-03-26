@@ -1,0 +1,44 @@
+@for $i from 1 through 12 {
+  .col-sm-#{$i} {
+    width: #{percentage(round($i*8.33)/100)};
+    float: left;
+  }
+}
+
+#pdfcontent {
+  color: red;
+}
+h1,h2,h3,h4,h5,h6 {
+  color: black;
+}
+
+#pdfcontent {
+  background-color: white;
+  font-family: arial;
+  border-width: 2px;
+  border-style: dotted;
+  padding: 1em;
+  font-size: 120%;
+  line-height: 1.5em;
+}
+
+
+body {
+  margin: 0;
+  padding: 0;
+}
+
+#doc-output {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 30px;
+  bottom: 0;
+}
+
+#doc-output > iframe {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border: none;
+}

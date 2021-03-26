@@ -94,7 +94,8 @@
             "Ticket\\": "src/Ticket/src",
             "MailService\\": "src/MailService/src",
             "Logger\\": "src/Logger/src",
-            "SlackIntegration\\": "src/SlackIntegration/src"
+            "SlackIntegration\\": "src/SlackIntegration/src",
+            "Report\\": "src/Report/src"
         }
     },
     "autoload-dev": {
