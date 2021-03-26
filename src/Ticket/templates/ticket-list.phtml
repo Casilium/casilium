@@ -1,5 +1,8 @@
 <?php
-    $this->inlineScript()->appendFile('/js/timeago.js');
+// Refresh ticket list
+$this->headMeta()->appendHttpEquiv('Refresh', '120');
+// include libraries
+$this->inlineScript()->appendFile('/js/timeago.js');
 ?>
 <div class="container-fluid">
     <?php if (count($this->tickets) === 0): ?>
