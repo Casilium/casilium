@@ -17,23 +17,32 @@ $this->inlineScript()->appendFile('/js/timeago.js');
     foreach ($this->tickets as $ticket): ?>
         <div class="row ticket-list-item bg-dark">
             <div class="col-sm-6 ">
+                <!-- ticket description -->
                 <a href="<?= $this->url('ticket.view', ['ticket_id' => $ticket->getUuid()]) ?>">
                     <?= $this->escapeHtml($ticket->getShortDescription()) ?>
                 </a>
+                <!-- Ticket ID -->
                 <span class="text-muted">#<?= $this->escapehtml($ticket->getId()) ?><br></span>
+                <!-- Who raised the ticket? -->
                 <span class="text-muted">Raised by</span>
                     <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>
                     <?= $this->escapeHtml($ticket->getContact()->getLastName()) ?> /
+                    <!-- Name of organisation with link to tickets -->
                     <a href="<?= $this->url('ticket.list',
                         [ 'org_id' => $ticket->getOrganisation()->getUuid() ],
                         [],
                         null,
                         [ 'reuse_result_params' => false] ) ?>">
-                    <?= $this->escapeHtml($ticket->getOrganisation()->getName()) ?>
-                        <?php if ($ticket->hasSla()): ?>
-                        <small><span class="badge badge-info">SLA</span></small>
-                        <?php endif ?>
+                        <?= $this->escapeHtml($ticket->getOrganisation()->getName()) ?>
                     </a>
+                <?php if (!empty ($ticket->getSite()->getName())): ?>
+                    <!-- Name of site -->
+                    / <?= $this->escapeHtml($ticket->getSite()->getName()) ?>
+                <?php endif ?>
+                <?php if ($ticket->hasSla()): ?>
+                    <!-- SLA Identifier -->
+                    <small><span class="badge badge-info">SLA</span></small>
+                <?php endif ?>
                 <br>
                 <span class="text-muted">
                     <small>
@@ -124,7 +133,7 @@ $this->inlineScript()->appendFile('/js/timeago.js');
                         </div>
                     </div>
                 </div>
-                <?php if ($ticket->hasSla() ) : ?>
+                <?php if ($ticket->hasSla()) : ?>
                 <div class="col-sm-12">
                     <div class="row priority text-center">
                         <div class="col-4 text-muted text-left"><small>Priority</small></div>
