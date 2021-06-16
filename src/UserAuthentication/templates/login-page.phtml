@@ -45,3 +45,12 @@
     </div>
     </div>
 </div>
+<?php
+$this->inlineScript()->captureStart();
+echo <<<EOF
+    $(document).ready(function() {
+        $('#username').focus();
+    });
+EOF;
+
+$this->inlineScript()->captureEnd();
