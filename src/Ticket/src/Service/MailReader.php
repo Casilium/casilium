@@ -37,12 +37,16 @@ class MailReader
     public function getConnection(): Imap
     {
         if ($this->connection == null) {
-            $this->connection = new Imap([
-                'host'     => $this->host,
-                'user'     => $this->user,
-                'password' => $this->password,
-                'ssl'      => true,
-            ]);
+            try {
+                $this->connection = new Imap([
+                    'host'     => $this->host,
+                    'user'     => $this->user,
+                    'password' => $this->password,
+                    'ssl'      => $this->ssl,
+                ]);
+            } catch (Exception $ex) {
+                throw new Exception('Unable to connect to server');
+            }
         }
 
         return $this->connection;
