@@ -434,8 +434,8 @@ class TicketService
         */
 
         if ($lastNotified < $notifyAt) {
-            $due     = gmdate('H:i:s', $secondsDue);
-            $subject = sprintf('Ticket %s due in %s', $ticket->getId(), $secondsDue);
+            $due       = gmdate('H:i:s', $secondsDue);
+            $subject   = sprintf('Ticket %s due in %s', $ticket->getId(), $due);
 
             $body = sprintf(
                 'Ticket %s raised by %s at %s is due in %s',
