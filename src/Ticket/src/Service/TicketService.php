@@ -437,9 +437,12 @@ class TicketService
             $due     = gmdate('H:i:s', $secondsDue);
             $subject = sprintf('Ticket %s due in %s', $ticket->getId(), $secondsDue);
 
+            $ticketTitle = $ticket->getShortDescription();
+
             $body = sprintf(
-                'Ticket %s raised by %s at %s is due in %s',
+                'Ticket %s (%s) raised by %s at %s is due in %s',
                 $ticket->getId(),
+                $ticketTitle,
                 filter_var($ticket->getContact()->getFirstName(), FILTER_SANITIZE_STRING),
                 filter_var($ticket->getOrganisation()->getName(), FILTER_SANITIZE_STRING),
                 $due
