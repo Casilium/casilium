@@ -462,8 +462,9 @@ class TicketService
     {
         $subject = sprintf('Ticket #%s is now overdue', $ticket->getId());
         $body    = sprintf(
-            'Ticket #%s raised by %s from %s is now overdue and requires attention',
+            'Ticket #%s (%s) raised by %s from %s is now overdue and requires attention',
             $ticket->getId(),
+            $ticket->getShortDescription(),
             filter_var($ticket->getContact()->getFirstName(), FILTER_SANITIZE_STRING),
             filter_var($ticket->getOrganisation()->getName(), FILTER_SANITIZE_STRING),
         );
