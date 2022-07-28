@@ -30,7 +30,7 @@
         }
     },
     "require": {
-        "php": "^7.3",
+        "php": "^7.4",
         "roave/psr-container-doctrine": "^2.2",
         "doctrine/doctrine-laminas-hydrator": "^2.0",
         "doctrine/migrations": "^2.2",
