@@ -9,7 +9,7 @@ be used as it is currently in development, not even at Alpha stage.
 Requirements
 ------------
   * HTTP server running Apache / Nginx / IIS
-  * PHP Version 7.2 or higher with the following extensions:
+  * PHP Version 7.4:
     * curl
     * gd
     * iconv
