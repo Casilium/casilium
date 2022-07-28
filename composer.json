@@ -11,7 +11,11 @@
     ],
     "homepage": "https://casilium.com",
     "config": {
-        "sort-packages": true
+        "sort-packages": true,
+        "allow-plugins": {
+            "dealerdirect/phpcodesniffer-composer-installer": false,
+            "laminas/laminas-component-installer": true
+        }
     },
     "extra": {
         "laminas": {
