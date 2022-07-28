@@ -273,13 +273,14 @@ class TicketForm extends Form implements InputFilterProviderInterface
             ],
             [
                 'name'       => 'due_date',
-                'required'   => false,
+                'required'   => true,
                 'filters'    => [
                     ['name' => Filter\StringTrim::class],
                     ['name' => Filter\StripTags::class],
                 ],
                 'validators' => [
                     ['name' => DateTimeValidator::class],
+                    ['name' => Validator\NotEmpty::class],
                 ],
             ],
             [
