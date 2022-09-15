@@ -115,9 +115,14 @@ function updatePriority()
     priority[5] = "Medium";
     priority[6] = "Low";
     
+    // if type is service type, urgency and impact is always low
+    if ($('#type_id').val() === "1") {
+        $('#urgency').val(3);
+        $('#impact').val(3);
+    }
+    
     var urgency = parseInt($('#urgency').val()) || 0;
     var impact = parseInt($('#impact').val()) || 0;
-    
     var weight = urgency + impact;
     
     $('#priority').val(priority[weight]);
@@ -136,12 +141,11 @@ $(document).ready(function() {
     function toggledueDate() {
       if ($('#type_id').val() === "2") {
           $('#due_date').prop("readonly", true);
-          $('#due_date').val("");
-          updateDue();
       } else {
           $('#due_date').prop("readonly", false).val('');
-          
-      }  
+      }
+      
+      updateDue();
     }
     
     $('#type_id').change(function() {
@@ -160,14 +164,11 @@ $(document).ready(function() {
     
     function updateDue()
     {
-        if ($('#type_id').val() !== "2") {
-            return;       
-        }
-        
         var urgency = parseInt($('#urgency').val()) || 0;
         var impact = parseInt($('#impact').val()) || 0;
+        
         var weight = urgency + impact;
-          
+        
         //var clientId = $('#clientId').val();
         $.ajax({
             type : 'get',
