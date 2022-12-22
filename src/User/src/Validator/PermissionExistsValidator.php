@@ -75,7 +75,7 @@ class PermissionExistsValidator extends AbstractValidator
             ->findOneByName($value);
 
         if ($this->options['permission'] === null) {
-            $isValid = false;
+            $isValid = $permission === null;
         } else {
             if ($this->options['permission']->getName() !== $value && $permission !== null) {
                 $isValid = false;

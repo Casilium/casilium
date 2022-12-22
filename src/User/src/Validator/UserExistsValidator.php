@@ -75,7 +75,7 @@ class UserExistsValidator extends AbstractValidator
             ->findOneByEmail($value);
 
         if ($this->options['user'] === null) {
-            $isValid = false;
+            $isValid = $user === null;
         } else {
             if ($this->options['user']->getEmail() !== $value && $user !== null) {
                 $isValid = false;

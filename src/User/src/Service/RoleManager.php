@@ -12,11 +12,9 @@ use function date;
 
 class RoleManager
 {
-    /** @var EntityManagerInterface */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    /** @var RbacManager */
-    private $rbacManager;
+    private RbacManager $rbacManager;
 
     public function __construct(EntityManagerInterface $entityManager, RbacManager $rbacManager)
     {
@@ -32,8 +30,7 @@ class RoleManager
      */
     public function addRole(array $data): void
     {
-        $existingRole = $this->entityManager->getRepository(Role::class)
-            ->findOneByName($data['name']);
+        $existingRole = $this->entityManager->getRepository(Role::class)->findOneByName($data['name']);
         if ($existingRole !== null) {
             throw new Exception('Role with such name already exists');
         }
@@ -47,9 +44,7 @@ class RoleManager
         $inheritedRoles = $data['inherit_roles'] ?? [];
         if (count($inheritedRoles) > 0) {
             foreach ($inheritedRoles as $roleId) {
-                $parentRole = $this->entityManager->getRepository(Role::class)
-                    ->findOneById($roleId);
-
+                $parentRole = $this->entityManager->getRepository(Role::class)->findOneById($roleId);
                 if ($parentRole === null) {
                     throw new Exception('Role to inherit not found');
                 }
@@ -76,9 +71,7 @@ class RoleManager
      */
     public function updateRole(Role $role, array $data): void
     {
-        $existingRole = $this->entityManager->getRepository(Role::class)
-            ->findOneByName($data['name']);
-
+        $existingRole = $this->entityManager->getRepository(Role::class)->findOneByName($data['name']);
         if ($existingRole !== null && $existingRole !== $role) {
             throw new Exception('Another role with such name already exists');
         }
@@ -90,7 +83,7 @@ class RoleManager
         $role->clearParentRoles();
 
         // add the new parent roles to inherit
-        $inheritedRoles = $data['inherit_roles'];
+        $inheritedRoles = $data['inherit_roles'] ?? [];
         if (count($inheritedRoles) > 0) {
             foreach ($inheritedRoles as $roleId) {
                 $parentRole = $this->entityManager->getRepository(Role::class)

@@ -73,7 +73,7 @@ class RoleExistsValidator extends AbstractValidator
             ->findOneByName($value);
 
         if ($this->options['role'] === null) {
-            $isValid = false;
+            $isValid = $role === null;
         } else {
             if ($this->options['role']->getName() !== $value && $role !== null) {
                 $isValid = false;
