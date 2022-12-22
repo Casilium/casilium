@@ -2,12 +2,12 @@
     /** @var \Ticket\Entity\TicketResponse $response */
     $response = $this->response;
 
-    $useSatisfaction = true;
+    $useSatisfaction = false;
 
     $ticketId = $response->getTicket()->getUuid();
 
     $csatUrl = function(?int $option = null) use ($ticketId) {
-        $url = sprintf('https://sheridancomputers.co.uk/customer-satisfaction/%s', $ticketId);
+        $url = sprintf('https://example.com/customer-satisfaction/%s', $ticketId);
         if ($option === null) {
             return $url;
         }
