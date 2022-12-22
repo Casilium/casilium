@@ -35,7 +35,7 @@ $this->inlineScript()->appendFile('/js/timeago.js');
                         [ 'reuse_result_params' => false] ) ?>">
                         <?= $this->escapeHtml($ticket->getOrganisation()->getName()) ?>
                     </a>
-                <?php if (!empty ($ticket->getSite()->getName())): ?>
+                <?php if ($ticket->getSite() instanceof \OrganisationSite\Entity\SiteEntity && !empty ($ticket->getSite()->getName())): ?>
                     <!-- Name of site -->
                     / <?= $this->escapeHtml($ticket->getSite()->getName()) ?>
                 <?php endif ?>

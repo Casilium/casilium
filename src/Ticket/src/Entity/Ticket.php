@@ -437,7 +437,7 @@ class Ticket
         return $this;
     }
 
-    public function getSite(): SiteEntity
+    public function getSite(): ?SiteEntity
     {
         return $this->site;
     }

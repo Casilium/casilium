@@ -10,17 +10,21 @@
     $recentTickets = $this->recentTickets;
     $responseForm = $this->responseForm->prepare();
 
-    // prepare address
-    $siteAddress = array_filter([
-            'name'              => $this->escapeHtml($ticket->getSite()->getName()) ?: null,
-            'street_address'    => $this->escapeHtml($ticket->getSite()->getStreetAddress()) ?: null,
-            'street_address2'   => $this->escapeHtml($ticket->getSite()->getStreetAddress2()) ?: null,
-            'town'              => $this->escapeHtml($ticket->getSite()->getTown()) ?: null,
-            'city'              => $this->escapeHtml($ticket->getSite()->getCity()) ?: null,
-            'county'            => $this->escapeHtml($ticket->getSite()->getCounty()) ?: null,
-            'postcode'          => $this->escapeHtml($ticket->getSite()->getPostalCode()) ?: null,
-            'country'           => $this->escapehtml($ticket->getSite()->getCountry()->getName()),
-    ]);
+    $site = $ticket->getSite() ?? null;
+    $siteAddress = [];
+    if ($site instanceof \OrganisationSite\Entity\SiteEntity) {
+        // prepare address
+        $siteAddress = array_filter([
+            'name' => $this->escapeHtml($site->getName()) ?: null,
+            'street_address' => $this->escapeHtml($site->getStreetAddress()) ?: null,
+            'street_address2' => $this->escapeHtml($site->getStreetAddress2()) ?: null,
+            'town' => $this->escapeHtml($site->getTown()) ?: null,
+            'city' => $this->escapeHtml($site->getCity()) ?: null,
+            'county' => $this->escapeHtml($site->getCounty()) ?: null,
+            'postcode' => $this->escapeHtml($site->getPostalCode()) ?: null,
+            'country' => $this->escapehtml($site->getCountry()->getName()),
+        ]);
+    }
 ?>
     <div class="row">
         <div class="col-md-8">
@@ -239,7 +243,7 @@
                         <?= implode('<br>', $siteAddress); ?>
                     </p>
 
-                    <?php if (null !== $ticket->getSite()->getTelephone()): ?>
+                    <?php if (null !== $site && null !== $site->getTelephone()): ?>
                     <p>
                         <small class="text-light">Site Telephone:</small><br/>
                         <a href="tel:<?= $this->escapeHtml($ticket->getSite()->getTelephone()) ?>">

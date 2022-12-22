@@ -169,7 +169,7 @@ class CreateTicketsFromEmail extends Command
         );
 
         // if we don't have any queues to parse, exit cleanly
-        if ($queues === null || ! is_array($queues) || count($queues) === 0) {
+        if (! is_array($queues) || count($queues) === 0) {
             $output->writeln('No queues found');
             return 0;
         }
@@ -249,8 +249,6 @@ class CreateTicketsFromEmail extends Command
      */
     private function createTicketFromMessage(array $message, Queue $queue): ?int
     {
-        $ticket = new Ticket();
-
         // see if we have an employee in the database matching the email address
         /** @var Contact $contact */
         $contact = $this->entityManager->getRepository(Contact::class)->findOneBy([
@@ -260,13 +258,22 @@ class CreateTicketsFromEmail extends Command
             return -1;
         }
 
+        $organisation = $contact->getOrganisation();
+        if ($organisation === null) {
+            return -1;
+        }
+
+        // if we have a contact and organisation we can continue
+        $ticket = new Ticket();
+        $ticket->setOrganisation($organisation);
+
         // parse date from mail (want as UTC timezone)
         $date = Carbon::parse($message['date'], 'UTC');
 
-        $dueDate         = null;
-        $responseDueDate = null;
+        $dueDate         = $date->addDays(2);
+        $responseDueDate = $dueDate->subHours(4);
 
-        // if we have an sla then we can retrieve date response and resolution is due
+        // if we have a sla then we can retrieve date response and resolution is due
         if ($contact->getOrganisation()->getSla() !== null) {
             // grab the SLA
             $sla = $contact->getOrganisation()->getSla();
@@ -305,12 +312,8 @@ class CreateTicketsFromEmail extends Command
             'short_description' => $message['subject'],
             'long_description'  => $message['body'],
             'source'            => $ticket::SOURCE_EMAIL,
+            'due_date'          => $dueDate->format('Y-m-d H:i:s'),
         ];
-
-        // add due date if applicable
-        if ($dueDate !== null) {
-            $data['due_date'] = $dueDate->format('Y-m-d H:i:s');
-        }
 
         // add response due date if applicable
         if ($responseDueDate !== null) {

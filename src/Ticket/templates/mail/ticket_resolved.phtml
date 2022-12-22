@@ -2,7 +2,18 @@
     /** @var \Ticket\Entity\TicketResponse $response */
     $response = $this->response;
 
-    $useSatisfaction = false;
+    $useSatisfaction = true;
+
+    $ticketId = $response->getTicket()->getUuid();
+
+    $csatUrl = function(?int $option = null) use ($ticketId) {
+        $url = sprintf('https://sheridancomputers.co.uk/customer-satisfaction/%s', $ticketId);
+        if ($option === null) {
+            return $url;
+        }
+
+        return $url . '/' . $option;
+    }
 ?>
 <p>
     Your case #<?= $response->getTicket()->getId() ?>
@@ -30,13 +41,13 @@
     <table border="0" cellpadding="5" cellspacing="5" style="border-radius:5px;">
         <tr>
             <td align="center" valign="middle" style="background-color:#2c3d3a !important; border-color: #2c3d3a; color: #7db0ff; font-family:Helvetica, Arial, sans-serif; font-size:16px; font-weight:bold; letter-spacing:-.5px; line-height:150%; padding-top:15px; padding-right:30px; padding-bottom:15px; padding-left:30px; border-radius:5px;">
-                <a href="#" target="_blank" style="color:#7db0ff; text-decoration:none;">Awesome</a>
+                <a href="<?= $csatUrl(2) ?>" target="_blank" style="color:#7db0ff; text-decoration:none;">Awesome</a>
             </td>
             <td align="center" valign="middle" style="background-color:#05352c !important; border-color: #05352c; color: #7db0ff; font-family:Helvetica, Arial, sans-serif; font-size:16px; font-weight:bold; letter-spacing:-.5px; line-height:150%; padding-top:15px; padding-right:30px; padding-bottom:15px; padding-left:30px; border-radius:5px;">
-                <a href="#" target="_blank" style="color:#FFFFFF; text-decoration:none;">Just Okay</a>
+                <a href="<?= $csatUrl(1) ?>" target="_blank" style="color:#FFFFFF; text-decoration:none;">Just Okay</a>
             </td>
             <td align="center" valign="middle" style="background-color:#443639 !important; border-color: #443639; color: #7db0ff; font-family:Helvetica, Arial, sans-serif; font-size:16px; font-weight:bold; letter-spacing:-.5px; line-height:150%; padding-top:15px; padding-right:30px; padding-bottom:15px; padding-left:30px; border-radius:5px;">
-                <a href="#" target="_blank" style="color:#FFFFFF; text-decoration:none;">Not Good</a>
+                <a href="<?= $csatUrl(0) ?>" target="_blank" style="color:#FFFFFF; text-decoration:none;">Not Good</a>
             </td>
         </tr>
     </table>

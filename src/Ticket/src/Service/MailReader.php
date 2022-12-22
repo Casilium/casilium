@@ -36,7 +36,7 @@ class MailReader
 
     public function getConnection(): Imap
     {
-        if ($this->connection == null) {
+        if ($this->connection === null) {
             try {
                 $this->connection = new Imap([
                     'host'     => $this->host,
@@ -54,6 +54,11 @@ class MailReader
 
     public function processMessages(): array
     {
+        $messages = [];
+        if (null === $this->getConnection()) {
+            return $messages;
+        }
+
         $data = [
             'messages' => $this->getConnection()->countMessages(),
             'unread'   => $this->getConnection()->countMessages(Storage::FLAG_UNSEEN),
@@ -61,7 +66,6 @@ class MailReader
         ];
 
         $uniqueIds = [];
-        $messages  = [];
 
         $cnt = 0;
         foreach ($this->getConnection() as $index => $message) {
@@ -81,8 +85,9 @@ class MailReader
                 throw new Exception('Expected single result received array');
             }
 
-            $uniqueIds[]                = $messageUniqueId;
-            $messages[$messageUniqueId] = [
+            $uniqueIds[] = $messageUniqueId;
+
+            $email = [
                 'from'      => EmailMessageParser::getEmail($message->from),
                 'to'        => EmailMessageParser::getEmail($message->to),
                 'date'      => $message->date,
@@ -91,6 +96,10 @@ class MailReader
                 'messageid' => $this->getConnection()->getNumberByUniqueId($messageUniqueId),
                 'body'      => EmailMessageParser::getMessageBody($message),
             ];
+
+            if ($email['from'] !== null && $email['to'] !== null) {
+                $messages[$messageUniqueId] = $email;
+            }
         }
 
         $this->connection->close();
