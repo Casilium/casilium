@@ -32,8 +32,9 @@ class AdminPageHandlerTest extends TestCase
         $renderer->render('app::admin-page', Argument::type('array'))
             ->willReturn('');
 
-        $adminPage = new AdminPageHandler($renderer->reveal());
-        $response  = $adminPage->handle($this->prophesize(ServerRequestInterface::class)->reveal());
+        $adminPage     = new AdminPageHandler($renderer->reveal());
+        $serverRequest = $this->prophesize(ServerRequestInterface::class);
+        $response      = $adminPage->handle($serverRequest->reveal());
 
         self::assertInstanceOf(HtmlResponse::class, $response);
     }

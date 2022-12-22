@@ -12,6 +12,7 @@ use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Psr\Container\ContainerInterface;
 use Psr\Http\Message\ServerRequestInterface;
+use Ticket\Repository\TicketRepository;
 
 class HomePageHandlerTest extends TestCase
 {
@@ -32,8 +33,18 @@ class HomePageHandlerTest extends TestCase
             ->render('app::home-page', Argument::type('array'))
             ->willReturn('');
 
-        $homePage = new HomePageHandler($renderer->reveal());
+        $ticketRepository = $this->prophesize(TicketRepository::class);
+        $ticketRepository->findUnResolvedTicketCount()->willReturn(5);
+        $ticketRepository->findOverDueTicketCount()->willReturn(5);
+        $ticketRepository->findDueTodayTicketCount()->willReturn(5);
+        $ticketRepository->findOpenTicketCount()->willReturn(5);
+        $ticketRepository->findOnHoldTicketCount()->willReturn(5);
+        $ticketRepository->findTotalTicketCount()->willReturn(5);
+        $ticketRepository->findResolvedTicketCount()->willReturn(5);
+        $ticketRepository->findClosedTicketCount()->willReturn(5);
+        $ticketRepository->findAllAgentStats(Argument::any(), Argument::any())->willReturn([]);
 
+        $homePage = new HomePageHandler($renderer->reveal(), $ticketRepository->reveal());
         $response = $homePage->handle($this->prophesize(ServerRequestInterface::class)->reveal());
 
         self::assertInstanceOf(HtmlResponse::class, $response);
