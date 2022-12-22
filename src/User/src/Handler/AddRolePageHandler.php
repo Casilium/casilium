@@ -61,7 +61,7 @@ class AddRolePageHandler implements RequestHandlerInterface
         $guard = $request->getAttribute(CsrfMiddleware::GUARD_ATTRIBUTE);
         $token = $this->getToken($session, $guard);
 
-        $form = new RoleForm($guard, 'create', $this->entityManager);
+        $form = new RoleForm($guard, $this->entityManager);
 
         $roleList = [];
         $roles    = $this->entityManager->getRepository(Role::class)

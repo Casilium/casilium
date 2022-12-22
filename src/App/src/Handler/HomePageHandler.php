@@ -17,11 +17,8 @@ use Ticket\Repository\TicketRepositoryInterface;
  */
 class HomePageHandler implements RequestHandlerInterface
 {
-    /** @var null|TemplateRendererInterface */
-    private $renderer;
-
-    /** @var TicketRepositoryInterface */
-    private $ticketRepo;
+    private TemplateRendererInterface $renderer;
+    private TicketRepositoryInterface $ticketRepo;
 
     public function __construct(
         TemplateRendererInterface $renderer,
@@ -44,8 +41,8 @@ class HomePageHandler implements RequestHandlerInterface
             'closed'     => $this->ticketRepo->findClosedTicketCount(),
         ];
 
-        $endOfMonth     = Carbon::now('UTC')->endOfMonth();
-        $startOfMonth   = Carbon::now('UTC')->startOfMonth();
+        $endOfMonth   = Carbon::now('UTC')->endOfMonth();
+        $startOfMonth = Carbon::now('UTC')->startOfMonth();
 
         $agentStats     = $this->ticketRepo->findAllAgentStats($startOfMonth, $endOfMonth);
         $stats['agent'] = $agentStats;

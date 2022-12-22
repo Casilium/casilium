@@ -4,11 +4,9 @@ declare(strict_types=1);
 
 namespace Ticket\Form;
 
-use Laminas\Filter;
 use Laminas\Form\Element;
 use Laminas\Form\Form;
 use Laminas\InputFilter\InputFilterProviderInterface;
-use Laminas\Validator;
 
 class AssignQueueMembersForm extends Form implements InputFilterProviderInterface
 {
@@ -46,7 +44,7 @@ class AssignQueueMembersForm extends Form implements InputFilterProviderInterfac
     {
         return [
             [
-                'name' => 'members',
+                'name'     => 'members',
                 'required' => true,
             ],
         ];

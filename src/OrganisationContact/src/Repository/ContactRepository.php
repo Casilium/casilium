@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace OrganisationContact\Repository;
 
 use Doctrine\ORM\EntityRepository;
-use Organisation\Entity\Organisation;
-use OrganisationContact\Entity\Contact;
 
 class ContactRepository extends EntityRepository
 {
@@ -16,7 +14,6 @@ class ContactRepository extends EntityRepository
         $query = $this->getEntityManager()
             ->createQuery($sql)
             ->setParameter('org', $id);
-
 
         return $query->getResult();
     }

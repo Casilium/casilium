@@ -13,9 +13,6 @@ use User\Validator\RoleExistsValidator;
  */
 class RoleForm extends Form
 {
-    /** @var string */
-    private $scenario;
-
     /** @var EntityManagerInterface|null */
     private $entityManager;
 
@@ -27,12 +24,10 @@ class RoleForm extends Form
 
     public function __construct(
         SessionCsrfGuard $guard,
-        string $scenario = 'create',
         ?EntityManagerInterface $entityManager = null,
         ?Role $role = null
     ) {
         $this->guard         = $guard;
-        $this->scenario      = $scenario;
         $this->entityManager = $entityManager;
         $this->role          = $role;
 

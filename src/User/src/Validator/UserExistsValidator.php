@@ -24,15 +24,15 @@ class UserExistsValidator extends AbstractValidator
     ];
 
     // Validation failure message IDs.
-    const NOT_SCALAR  = 'notScalar';
-    const USER_EXISTS = 'userExists';
+    public const NOT_SCALAR  = 'notScalar';
+    public const USER_EXISTS = 'userExists';
 
     /**
      * Validation failure messages.
      *
      * @var array
      */
-    protected $messageTemplates = [
+    protected array $messageTemplates = [
         self::NOT_SCALAR  => "The email must be a scalar value",
         self::USER_EXISTS => "Another user with such an email already exists",
     ];
@@ -74,10 +74,10 @@ class UserExistsValidator extends AbstractValidator
         $user = $entityManager->getRepository(User::class)
             ->findOneByEmail($value);
 
-        if ($this->options['user'] == null) {
-            $isValid = $user == null;
+        if ($this->options['user'] === null) {
+            $isValid = false;
         } else {
-            if ($this->options['user']->getEmail() != $value && $user != null) {
+            if ($this->options['user']->getEmail() !== $value && $user !== null) {
                 $isValid = false;
             } else {
                 $isValid = true;

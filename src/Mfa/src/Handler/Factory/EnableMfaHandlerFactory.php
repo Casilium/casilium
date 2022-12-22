@@ -3,7 +3,6 @@ declare(strict_types=1);
 
 namespace Mfa\Handler\Factory;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Mfa\Handler;

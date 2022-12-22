@@ -24,15 +24,15 @@ class RoleExistsValidator extends AbstractValidator
     ];
 
     // Validation failure message IDs.
-    const NOT_SCALAR  = 'notScalar';
-    const ROLE_EXISTS = 'roleExists';
+    public const NOT_SCALAR  = 'notScalar';
+    public const ROLE_EXISTS = 'roleExists';
 
     /**
      * Validation failure messages.
      *
      * @var array
      */
-    protected $messageTemplates = [
+    protected array $messageTemplates = [
         self::NOT_SCALAR  => "The email must be a scalar value",
         self::ROLE_EXISTS => "Another role with such name already exists",
     ];
@@ -72,10 +72,10 @@ class RoleExistsValidator extends AbstractValidator
         $role = $entityManager->getRepository(Role::class)
             ->findOneByName($value);
 
-        if ($this->options['role'] == null) {
-            $isValid = $role == null;
+        if ($this->options['role'] === null) {
+            $isValid = false;
         } else {
-            if ($this->options['role']->getName() != $value && $role != null) {
+            if ($this->options['role']->getName() !== $value && $role !== null) {
                 $isValid = false;
             } else {
                 $isValid = true;

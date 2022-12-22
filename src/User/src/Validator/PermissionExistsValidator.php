@@ -24,15 +24,15 @@ class PermissionExistsValidator extends AbstractValidator
     ];
 
     // Validation failure message IDs.
-    const NOT_SCALAR        = 'notScalar';
-    const PERMISSION_EXISTS = 'permissionExists';
+    public const NOT_SCALAR        = 'notScalar';
+    public const PERMISSION_EXISTS = 'permissionExists';
 
     /**
      * Validation failure messages.
      *
      * @var array
      */
-    protected $messageTemplates = [
+    protected array $messageTemplates = [
         self::NOT_SCALAR        => "The email must be a scalar value",
         self::PERMISSION_EXISTS => "Another permission with such name already exists",
     ];
@@ -74,10 +74,10 @@ class PermissionExistsValidator extends AbstractValidator
         $permission = $entityManager->getRepository(Permission::class)
             ->findOneByName($value);
 
-        if ($this->options['permission'] == null) {
-            $isValid = $permission == null;
+        if ($this->options['permission'] === null) {
+            $isValid = false;
         } else {
-            if ($this->options['permission']->getName() != $value && $permission != null) {
+            if ($this->options['permission']->getName() !== $value && $permission !== null) {
                 $isValid = false;
             } else {
                 $isValid = true;

@@ -5,8 +5,6 @@ declare(strict_types=1);
 namespace UserAuthentication;
 
 use Mezzio\Application;
-use Mezzio\Authentication\UserRepository\PdoDatabase;
-use Mezzio\Authentication\UserRepositoryInterface;
 
 class ConfigProvider
 {

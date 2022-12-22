@@ -3,10 +3,8 @@ declare(strict_types=1);
 
 namespace Ticket\Command\Factory;
 
-use Doctrine\ORM\EntityManagerInterface;
 use Psr\Container\ContainerInterface;
 use Ticket\Command\CloseResolvedTickets;
-use Ticket\Command\CreateTicketsFromEmail;
 use Ticket\Service\TicketService;
 
 class CloseResolvedTicketsFactory

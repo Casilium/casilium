@@ -5,12 +5,9 @@ declare(strict_types=1);
 namespace Mfa\Middleware;
 
 use Laminas\Diactoros\Response\RedirectResponse;
-use Laminas\Diactoros\Response\TextResponse;
-use Laminas\Stratigility\Middleware\RequestHandlerMiddleware;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\SessionInterface;
 use Mezzio\Session\SessionMiddleware;
-use Mfa\Handler\ValidateMfaHandler;
 use Mfa\Service\MfaService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;

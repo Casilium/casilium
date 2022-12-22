@@ -71,13 +71,13 @@ class ValidateMfaHandler implements MiddlewareInterface
         // get user id from session
         $userId = (int) $session->get('mfa:user:id');
         if ($userId === 0) {
-            throw new \Exception('MFA User ID not found');
+            throw new Exception('MFA User ID not found');
         }
 
         // find user attempting to verify MFA
         $user = $this->userManager->findById($userId);
         if ($user === null) {
-            throw new \Exception('User not found');
+            throw new Exception('User not found');
         }
 
         // generate csrf

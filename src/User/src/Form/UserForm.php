@@ -94,7 +94,7 @@ class UserForm extends Form
             ],
         ]);
 
-        if ($this->scenario == 'create') {
+        if ($this->scenario === 'create') {
             // Add "password" field
             $this->add([
                 'type'       => 'password',
@@ -268,7 +268,7 @@ class UserForm extends Form
             ],
         ]);
 
-        if ($this->scenario == 'create') {
+        if ($this->scenario === 'create') {
             // Add input for "password" field
             $inputFilter->add([
                 'name'       => 'password',

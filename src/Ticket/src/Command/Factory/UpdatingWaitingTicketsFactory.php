@@ -4,7 +4,6 @@ declare(strict_types=1);
 namespace Ticket\Command\Factory;
 
 use Psr\Container\ContainerInterface;
-use Ticket\Command\CloseResolvedTickets;
 use Ticket\Command\UpdateWaitingTickets;
 use Ticket\Service\TicketService;
 

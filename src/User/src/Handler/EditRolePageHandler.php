@@ -79,7 +79,7 @@ class EditRolePageHandler implements RequestHandlerInterface
         $token = $this->getToken($session, $guard);
 
         // create form (passing csrf guard)
-        $form = new RoleForm($guard, 'update', $this->entityManager, $roleToEdit);
+        $form = new RoleForm($guard, $this->entityManager, $roleToEdit);
 
         $roleList      = [];
         $selectedRoles = [];

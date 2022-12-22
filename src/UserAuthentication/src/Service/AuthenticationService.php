@@ -5,13 +5,8 @@ declare(strict_types=1);
 namespace UserAuthentication\Service;
 
 use Doctrine\DBAL\Connection;
-use Mezzio\Session\SessionInterface;
-use Mezzio\Session\SessionMiddleware;
-use Psr\Http\Message\ResponseInterface;
-use Psr\Http\Message\ServerRequestInterface;
 use UserAuthentication\Entity\Identity;
 use UserAuthentication\Entity\IdentityInterface;
-use function is_array;
 use function password_verify;
 
 class AuthenticationService
@@ -44,19 +39,5 @@ class AuthenticationService
         }
 
         return null;
-    }
-
-    private function createIdentityFromArray(array $identityInfo): ?IdentityInterface
-    {
-        if (! is_array($identityInfo) || ! isset($identityInfo['email'])) {
-            return null;
-        }
-
-        $identity = new Identity();
-        $identity->setId($identityInfo['id']);
-        $identity->setEmail($identityInfo['email']);
-        $identity->setName($identityInfo['full_name']);
-
-        return $identity;
     }
 }
