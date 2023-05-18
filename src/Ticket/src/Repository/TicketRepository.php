@@ -58,7 +58,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
      */
     public function findRecentTicketsByContact(int $contactId, $limit = 5): array
     {
-        $sql   = 'SELECT t FROM Ticket\Entity\Ticket t where t.contact = ?1';
+        $sql   = 'SELECT t FROM Ticket\Entity\Ticket t where t.contact = ?1 ORDER BY t.id DESC';
         $query = $this->getEntityManager()
             ->createQuery($sql)
             ->setParameter(1, $contactId)
