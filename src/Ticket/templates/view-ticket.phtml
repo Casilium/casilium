@@ -122,32 +122,32 @@
                                 'class' => 'help-block' ]); ?>
                     </div>
 
-                    <button type="submit" class="btn btn-primary" name="submit" value="save">
+                    <button type="submit" class="btn btn-primary mb-3" name="submit" value="save">
                         <i class="fas fa-save fa-fw"></i> Save
                     </button>
 
                     <?php if ($ticket->getStatus()->getId() !== $ticket::STATUS_ON_HOLD): ?>
-                    <button type="submit" class="btn btn-warning" name="submit" value="save_hold">
+                    <button type="submit" class="btn btn-warning mb-3" name="submit" value="save_hold">
                         <i class="fas fa-hand-paper fa-fw"></i> Save + Hold
                     </button>
                     <?php elseif ($ticket->getStatus()->getId() === $ticket::STATUS_ON_HOLD): ?>
-                        <button type="submit" class="btn btn-warning" name="submit" value="save_hold">
+                        <button type="submit" class="btn btn-warning mb-3" name="submit" value="save_hold">
                             <i class="fas fa-hand-paper fa-fw"></i> Save (remove hold)
                         </button>
                     <?php endif ?>
 
-                    <button id="submit" type="submit" class="btn btn-success" name="submit" value="save_resolve">
+                    <button id="submit" type="submit" class="btn btn-success mb-3" name="submit" value="save_resolve">
                         <i class="fas fa-check fa-fw"></i> Save + Resolve
                     </button>
 
                     <?= $this->formElementErrors($responseForm->get('submit')) ?>
 
-                    <a class="btn btn-danger float-right" href="<?= $this->url('ticket.edit',
+                    <a class="btn btn-danger float-right mb-3" href="<?= $this->url('ticket.edit',
                         ['ticket_id' => $ticket->getUuid()]) ?>">
                         <i class="fas fa-clone fa-fw"></i> Edit Ticket
                     </a>
 
-                    <a class="btn btn-secondary float-right" href="<?= $this->url('ticket.clone',
+                    <a class="btn btn-secondary float-right mb-3" href="<?= $this->url('ticket.clone',
                         ['ticket_id' => $ticket->getUuid()]) ?>">
                         <i class="fas fa-hand-paper fa-fw"></i> Clone Ticket
                     </a>
