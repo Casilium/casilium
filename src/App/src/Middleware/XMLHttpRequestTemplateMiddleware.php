@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\MiddlewareInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+
 use function in_array;
 
 class XMLHttpRequestTemplateMiddleware implements MiddlewareInterface
@@ -23,12 +24,16 @@ class XMLHttpRequestTemplateMiddleware implements MiddlewareInterface
 
     public function process(ServerRequestInterface $request, RequestHandlerInterface $handler): ResponseInterface
     {
-        // set template layout to false to disable layout whe n request has X-Requested-With =
-        // XmlHttpRequest as an ajax detection
+        if (! $request->hasHeader('X-Requested-With')) {
+            return $handler->handle($request);
+        }
+
         if (in_array('XMLHttpRequest', $request->getHeader('X-Requested-With'), true)) {
-            (function ($template) {
-                $template->layout = false;
-            })->bindTo($this->renderer, $this->renderer)($this->renderer);
+            $this->renderer->addDefaultParam(
+                TemplateRendererInterface::TEMPLATE_ALL,
+                'layout',
+                false
+            );
         }
 
         return $handler->handle($request);
