@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Organisation\Entity;
@@ -17,24 +18,17 @@ class Domain
      * @ORM\Id
      * @ORM\Column(type="integer", name="id", unique=true)
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int
      */
-    protected $id;
+    protected int $id;
+
+    /** @ORM\Column(type="string", name="name", nullable=false) */
+    protected string $name;
 
     /**
-     * @ORM\Column(type="string", name="name", nullable=false)
-     *
-     * @var string
+     * @ORM\ManyToOne(targetEntity="Organisation", inversedBy="domains")
+     * @ORM\JoinColumn("organisation_id", referencedColumnName="id", onDelete="cascade")
      */
-    protected $name;
-
-    /**
-     * @ORM\ManyToOne(targetEntity="Organisation", inversedBy="domains", cascade={"persist"})
-     *
-     * @var Organisation
-     */
-    protected $organisation;
+    protected Organisation $organisation;
 
     public function getId(): ?int
     {
