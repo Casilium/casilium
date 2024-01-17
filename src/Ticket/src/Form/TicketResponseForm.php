@@ -39,8 +39,8 @@ class TicketResponseForm extends Form implements InputFilterProviderInterface
                 'class' => 'custom-control-label',
             ])
             ->setOptions([
-                'check_value'     => 1,
-                'unchecked_value' => 0,
+                'check_value'     => '1',
+                'unchecked_value' => '0',
             ])
             ->setValue(1);
         $this->add($element);
