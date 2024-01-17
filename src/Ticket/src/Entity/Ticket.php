@@ -278,6 +278,8 @@ class Ticket
         $this->urgency = self::URGENCY_DEFAULT;
         $this->uuid    = Uuid::uuid4();
 
+        $this->priority = Priority::PRIORITY_LOW;
+
         $dateTime           = new DateTime('now', new DateTimeZone('UTC'));
         $this->createdAt    = $dateTime->format('Y-m-d H:i:s');
         $this->lastNotified = $dateTime->format('Y-m-d H:i:s');
