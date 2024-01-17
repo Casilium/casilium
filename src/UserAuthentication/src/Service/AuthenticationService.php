@@ -25,9 +25,10 @@ class AuthenticationService
         $sql  = 'SELECT id,full_name,email,password FROM `user` WHERE `email` = ? LIMIT 1';
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(1, $username);
+        $result = $stmt->executeQuery();
 
-        if ($stmt->execute()) {
-            if ($result = $stmt->fetchAssociative()) {
+        if ($result->rowCount()) {
+            if ($result = $result->fetchAssociative()) {
                 if (password_verify($password, $result['password'])) {
                     $identity = new Identity();
                     $identity->setId((int) $result['id']);
