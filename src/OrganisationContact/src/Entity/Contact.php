@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace OrganisationContact\Entity;
@@ -6,6 +7,7 @@ namespace OrganisationContact\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use Organisation\Entity\Organisation;
 use OrganisationSite\Entity\SiteEntity;
+
 use function get_object_vars;
 
 /**
@@ -20,96 +22,50 @@ class Contact
      * @ORM\Id
      * @ORM\Column(name="id", type="integer")
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\ManyToOne(targetEntity="Organisation\Entity\Organisation")
      * @ORM\JoinColumn(name="organisation_id", referencedColumnName="id")
-     *
-     * @var Organisation
      */
-    private $organisation;
+    private ?Organisation $organisation = null;
 
     /**
      * @ORM\ManyToOne(targetEntity="OrganisationSite\Entity\SiteEntity")
      * @ORM\JoinColumn(name="site_id", referencedColumnName="id")
-     *
-     * @var SiteEntity
      */
-    private $site;
+    private ?SiteEntity $site = null;
 
-    /**
-     * @ORM\Column(name="first_name", type="string", length=32)
-     *
-     * @var string
-     */
-    private $first_name;
+    /** @ORM\Column(name="first_name", type="string", length=32) */
+    private string $firstName;
 
-    /**
-     * @ORM\Column(name="middle_name", type="string", length=32)
-     *
-     * @var string
-     */
-    private $middle_name;
+    /** @ORM\Column(name="middle_name", type="string", length=32) */
+    private string $middleName;
 
-    /**
-     * @ORM\Column(name="last_name", type="string", length=32)
-     *
-     * @var string
-     */
-    private $last_name;
+    /** @ORM\Column(name="last_name", type="string", length=32) */
+    private string $lastName;
 
-    /**
-     * @ORM\Column(name="work_telephone", type="string", length=32)
-     *
-     * @var string
-     */
-    private $work_telephone;
+    /** @ORM\Column(name="work_telephone", type="string", length=32) */
+    private string $workTelephone;
 
-    /**
-     * @ORM\Column(name="work_extension", type="string", length=20)
-     *
-     * @var string
-     */
-    private $work_extension;
+    /** @ORM\Column(name="work_extension", type="string", length=20) */
+    private string $workExtension;
 
-    /**
-     * @ORM\Column(name="mobile_telephone", type="string", length=20)
-     *
-     * @var string
-     */
-    private $mobile_telephone;
+    /** @ORM\Column(name="mobile_telephone", type="string", length=20) */
+    private string $mobileTelephone;
 
-    /**
-     * @ORM\Column(name="home_telephone", type="string", length=20)
-     *
-     * @var string
-     */
-    private $home_telephone;
+    /** @ORM\Column(name="home_telephone", type="string", length=20) */
+    private string $homeTelephone;
 
-    /**
-     * @ORM\Column(name="work_email", type="string", length=20)
-     *
-     * @var string
-     */
-    private $work_email;
+    /** @ORM\Column(name="work_email", type="string", length=20) */
+    private string $workEmail;
 
-    /**
-     * @ORM\Column(name="other_email", type="string", length=20)
-     *
-     * @var string
-     */
-    private $other_email;
+    /** @ORM\Column(name="other_email", type="string", length=20) */
+    private string $otherEmail;
 
-    /**
-     * @ORM\Column(name="gender", type="string", length=1)
-     *
-     * @var string
-     */
-    private $gender;
+    /** @ORM\Column(name="gender", type="string", length=1) */
+    private ?string $gender = null;
 
     public function getId(): int
     {
@@ -122,7 +78,7 @@ class Contact
         return $this;
     }
 
-    public function getOrganisation(): Organisation
+    public function getOrganisation(): ?Organisation
     {
         return $this->organisation;
     }
@@ -146,104 +102,104 @@ class Contact
 
     public function getFirstName(): string
     {
-        return $this->first_name;
+        return $this->firstName;
     }
 
-    public function setFirstName(string $first_name): Contact
+    public function setFirstName(string $firstName): Contact
     {
-        $this->first_name = $first_name;
+        $this->firstName = $firstName;
         return $this;
     }
 
     public function getMiddleName(): string
     {
-        return $this->middle_name;
+        return $this->middleName;
     }
 
-    public function setMiddleName(string $middle_name): Contact
+    public function setMiddleName(string $middleName): Contact
     {
-        $this->middle_name = $middle_name;
+        $this->middleName = $middleName;
         return $this;
     }
 
     public function getLastName(): string
     {
-        return $this->last_name;
+        return $this->lastName;
     }
 
-    public function setLastName(string $last_name): Contact
+    public function setLastName(string $lastName): Contact
     {
-        $this->last_name = $last_name;
+        $this->lastName = $lastName;
         return $this;
     }
 
     public function getWorkTelephone(): string
     {
-        return $this->work_telephone;
+        return $this->workTelephone;
     }
 
-    public function setWorkTelephone(string $work_telephone): Contact
+    public function setWorkTelephone(string $workTelephone): Contact
     {
-        $this->work_telephone = $work_telephone;
+        $this->workTelephone = $workTelephone;
         return $this;
     }
 
     public function getWorkExtension(): string
     {
-        return $this->work_extension;
+        return $this->workExtension;
     }
 
-    public function setWorkExtension(string $work_extension): Contact
+    public function setWorkExtension(string $workExtension): Contact
     {
-        $this->work_extension = $work_extension;
+        $this->workExtension = $workExtension;
         return $this;
     }
 
     public function getMobileTelephone(): string
     {
-        return $this->mobile_telephone;
+        return $this->mobileTelephone;
     }
 
-    public function setMobileTelephone(string $mobile_telephone): Contact
+    public function setMobileTelephone(string $mobileTelephone): Contact
     {
-        $this->mobile_telephone = $mobile_telephone;
+        $this->mobileTelephone = $mobileTelephone;
         return $this;
     }
 
     public function getHomeTelephone(): string
     {
-        return $this->home_telephone;
+        return $this->homeTelephone;
     }
 
-    public function setHomeTelephone(string $home_telephone): Contact
+    public function setHomeTelephone(string $homeTelephone): Contact
     {
-        $this->home_telephone = $home_telephone;
+        $this->homeTelephone = $homeTelephone;
         return $this;
     }
 
     public function getWorkEmail(): string
     {
-        return $this->work_email;
+        return $this->workEmail;
     }
 
-    public function setWorkEmail(string $work_email): Contact
+    public function setWorkEmail(string $workEmail): Contact
     {
-        $this->work_email = $work_email;
+        $this->workEmail = $workEmail;
         return $this;
     }
 
     public function getOtherEmail(): string
     {
-        return $this->other_email;
+        return $this->otherEmail;
     }
 
-    public function setOtherEmail(string $other_email): Contact
+    public function setOtherEmail(string $otherEmail): Contact
     {
-        $this->other_email = $other_email;
+        $this->otherEmail = $otherEmail;
         return $this;
     }
 
-    public function getGender(): string
+    public function getGender(): ?string
     {
         return $this->gender;
     }
@@ -267,19 +223,19 @@ class Contact
      */
     public function exchangeArray(array $data): Contact
     {
-        $this->id               = (int) $data['id'] ?? null;
-        $this->organisation     = $data['organisation'] ?? null;
-        $this->site             = $data['site'] ?? null;
-        $this->first_name       = $data['first_name'] ?? null;
-        $this->middle_name      = $data['middle_name'] ?? null;
-        $this->last_name        = $data['last_name'] ?? null;
-        $this->work_telephone   = $data['work_telephone'] ?? null;
-        $this->work_extension   = $data['work_extension'] ?? null;
-        $this->mobile_telephone = $data['mobile_telephone'] ?? null;
-        $this->home_telephone   = $data['home_telephone'] ?? null;
-        $this->work_email       = $data['work_email'] ?? null;
-        $this->other_email      = $data['other_email'] ?? null;
-        $this->gender           = $data['gender'] ?? null;
+        $this->id              = (int) $data['id'] ?? null;
+        $this->organisation    = $data['organisation'] ?? null;
+        $this->site            = $data['site'] ?? null;
+        $this->firstName       = $data['first_name'] ?? null;
+        $this->middleName      = $data['middle_name'] ?? null;
+        $this->lastName        = $data['last_name'] ?? null;
+        $this->workTelephone   = $data['work_telephone'] ?? null;
+        $this->workExtension   = $data['work_extension'] ?? null;
+        $this->mobileTelephone = $data['mobile_telephone'] ?? null;
+        $this->homeTelephone   = $data['home_telephone'] ?? null;
+        $this->workEmail       = $data['work_email'] ?? null;
+        $this->otherEmail      = $data['other_email'] ?? null;
+        $this->gender          = $data['gender'] ?? null;
         return $this;
     }
 }

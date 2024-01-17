@@ -17,18 +17,16 @@ use OrganisationContact\Service\ContactService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+
 use function sprintf;
 
 class CreateContactHandler implements RequestHandlerInterface
 {
-    /** @var ContactService */
-    protected $contactService;
+    protected ContactService $contactService;
 
-    /** @var TemplateRendererInterface */
-    protected $renderer;
+    protected TemplateRendererInterface $renderer;
 
-    /** @var UrlHelper */
-    protected $urlHelper;
+    protected UrlHelper $urlHelper;
 
     public function __construct(
         ContactService $service,
@@ -53,15 +51,15 @@ class CreateContactHandler implements RequestHandlerInterface
 
         // new contact form and bind to contact object
         $form = new ContactForm();
-        $form->bind(new Contact());
+    //    $form->bind(new Contact());
 
         if ($request->getMethod() === 'POST') {
             // set form data from POST vars
             $form->setData($request->getParsedBody());
 
             if ($form->isValid()) {
-                /** @var Contact $contact */
-                $contact = $form->getData();
+                $contact = new Contact();
+                $contact->exchangeArray($form->getInputFilter()->getValues());
 
                 $contact->setOrganisation($organisation);
                 $result = $this->contactService->createContact($contact);

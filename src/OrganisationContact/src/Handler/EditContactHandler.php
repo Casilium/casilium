@@ -11,6 +11,7 @@ use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use OrganisationContact\Exception\ContactNotFoundException;
 use OrganisationContact\Form\ContactForm;
+use OrganisationContact\Hydrator;
 use OrganisationContact\Service\ContactService;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -42,14 +43,18 @@ class EditContactHandler implements RequestHandlerInterface
         // get organisation uuid from url
         $orgId = $request->getAttribute('id');
 
-        $contact_id = (int) $request->getAttribute('contact_id');
-        $contact    = $this->contactService->findContactById($contact_id);
-        if (null == $contact) {
-            throw ContactNotFoundException::whenSearchingById($contact_id);
+        $contactId = (int) $request->getAttribute('contact_id');
+        $contact   = $this->contactService->findContactById($contactId);
+        if (null === $contact) {
+            throw ContactNotFoundException::whenSearchingById($contactId);
         }
 
+        $hydrator = new Hydrator\ContactHydrator($this->contactService);
+
         $form = new ContactForm();
+        $form->setHydrator($hydrator);
         $form->bind($contact);
+
         if ($request->getMethod() === 'POST') {
             $form->setData($request->getParsedBody());
 
@@ -65,6 +70,7 @@ class EditContactHandler implements RequestHandlerInterface
                 ]));
             }
         }
+
 
         return new HtmlResponse($this->renderer->render('contact::create', [
             'contact' => $contact,
