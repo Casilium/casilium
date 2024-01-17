@@ -1,31 +1,32 @@
-<?php declare(strict_types=1);
+<?php
+
+declare(strict_types=1);
 
 namespace DoctrineMigrations;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\Migrations\AbstractMigration;
-use phpDocumentor\Reflection\Types\Void_;
+
+use function date;
 
 /**
  * Creates the schema required for users
  */
 final class Version20181119211033 extends AbstractMigration
 {
-    const USER_TABLE = 'user';
+    private const USER_TABLE = 'user';
 
     /**
      * Returns the description of this migration.
-     * @return string
      */
     public function getDescription(): string
     {
-        $description = 'This is the initial migration which creates the users table';
-        return $description;
+        return 'This is the initial migration which creates the users table';
     }
 
     /**
      * Updates the schema to its newer state.
-     * @param Schema $schema
      */
     public function up(Schema $schema): void
     {
@@ -51,18 +52,18 @@ final class Version20181119211033 extends AbstractMigration
     {
         // create initial admin user, password = Password1
         $this->connection->insert('user', [
-            'email' => 'admin@example.com',
-            'password' => '$2y$12$lZHLgnuwJSyTRgErOESY6OX2SXJuyYYqpAisdRfQEvrPN4QLg.jjW',
-            'full_name' => 'Administrator',
+            'email'        => 'admin@example.com',
+            'password'     => '$2y$12$lZHLgnuwJSyTRgErOESY6OX2SXJuyYYqpAisdRfQEvrPN4QLg.jjW',
+            'full_name'    => 'Administrator',
             'date_created' => date('Y-m-d H:i:s'),
-            'status' => 1,
+            'status'       => 1,
         ]);
     }
 
     /**
      * Reverts the schema changes.
-     * @param Schema $schema
-     * @throws \Doctrine\DBAL\Schema\SchemaException
+     *
+     * @throws SchemaException
      */
     public function down(Schema $schema): void
     {
