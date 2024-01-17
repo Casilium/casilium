@@ -15,27 +15,23 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Ticket\Entity\Queue;
-use Ticket\Entity\Ticket;
 use Ticket\Form\TicketForm;
 use Ticket\Hydrator\TicketHydrator;
 use Ticket\Service\TicketService;
 use UserAuthentication\Entity\IdentityInterface;
+
 use function count;
 use function sprintf;
 
 class CreateTicketHandler implements RequestHandlerInterface
 {
-    /** @var TicketService */
-    protected $ticketService;
+    protected TicketService $ticketService;
 
-    /** @var TicketHydrator */
-    protected $hydrator;
+    protected TicketHydrator $hydrator;
 
-    /** @var TemplateRendererInterface */
-    protected $renderer;
+    protected TemplateRendererInterface $renderer;
 
-    /** @var UrlHelper */
-    protected $urlHelper;
+    protected UrlHelper $urlHelper;
 
     public function __construct(
         TicketService $ticketService,
@@ -51,16 +47,17 @@ class CreateTicketHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $user     = $request->getAttribute(IdentityInterface::class);
-        $agent_id = $user->getId();
+        $user    = $request->getAttribute(IdentityInterface::class);
+        $agentId = $user->getId();
 
         $form = new TicketForm();
 
-        if ($ticket_id = $request->getAttribute('ticket_id')) {
-            $ticket = $this->ticketService->getTicketByUuid($ticket_id);
+        if ($ticketId = $request->getAttribute('ticket_id')) {
+            $ticket = $this->ticketService->getTicketByUuid($ticketId);
             $ticket->setId(0);
             $form->get('contact_id')->setValue($ticket->getContact()->getId());
             $form->get('type_id')->setValue($ticket->getType()->getId());
+
             $organisation = $ticket->getOrganisation();
             $form->setData($ticket->getArrayCopy());
         } else {
@@ -71,10 +68,9 @@ class CreateTicketHandler implements RequestHandlerInterface
             $form->setData($request->getParsedBody());
 
             if ($form->isValid()) {
-                /** @var Ticket $ticket */
                 $data = $form->getData();
 
-                $data['agent_id']        = $agent_id;
+                $data['agent_id']        = $agentId;
                 $data['organisation_id'] = $organisation->getId();
                 $ticket                  = $this->ticketService->save($data);
 
