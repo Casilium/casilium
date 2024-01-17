@@ -10,12 +10,12 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Ticket\Entity\Ticket;
 use Ticket\Service\TicketService;
+
 use function sprintf;
 
 class CloseResolvedTickets extends Command
 {
-    /** @var TicketService */
-    protected $ticketService;
+    protected TicketService $ticketService;
 
     public function __construct(TicketService $service)
     {
