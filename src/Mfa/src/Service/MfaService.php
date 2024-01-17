@@ -12,14 +12,12 @@ use UserAuthentication\Entity\IdentityInterface;
 
 class MfaService
 {
-    /** @var GoogleAuthenticator */
-    protected $authenticator;
+    protected GoogleAuthenticator $authenticator;
 
-    /** @var Connection */
-    protected $connection;
+    protected Connection $connection;
 
     /** @var array */
-    protected $config;
+    protected array $config;
 
     public function __construct(Connection $connection, array $config)
     {
@@ -41,9 +39,10 @@ class MfaService
         $sql  = 'SELECT mfa_enabled from `user` WHERE id = ? LIMIT 1';
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(1, $user->getId());
+        $result = $stmt->executeQuery();
 
-        if ($stmt->execute()) {
-            return (bool) $stmt->fetchOne();
+        if ($result->rowCount()) {
+            return (bool) $result->fetchOne();
         }
 
         return false;
@@ -62,8 +61,7 @@ class MfaService
         $sql  = 'UPDATE `user` SET mfa_enabled = 1 WHERE id = ?';
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(1, $user->getId());
-
-        return $stmt->execute();
+        return (bool) $stmt->executeStatement();
     }
 
     /**
@@ -80,8 +78,7 @@ class MfaService
         $sql  = 'UPDATE `user` SET mfa_enabled = 0, secret_key = null WHERE id = ?';
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(1, $user->getId());
-
-        return $stmt->execute();
+        return (bool) $stmt->executeStatement();
     }
 
     /**
@@ -91,7 +88,7 @@ class MfaService
      */
     public function isMfaEnabled(): bool
     {
-        return isset($this->config['enabled']) ? (bool) $this->config['enabled'] : false;
+        return isset($this->config['enabled']) && (bool) $this->config['enabled'];
     }
 
     /**
@@ -108,9 +105,10 @@ class MfaService
         $sql  = 'SELECT secret_key from `user` WHERE id = ? LIMIT 1';
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(1, $user->getId());
+        $result = $stmt->executeQuery();
 
-        if ($stmt->execute()) {
-            if (! $secretKey = $stmt->fetchOne()) {
+        if ($result->rowCount()) {
+            if (! $secretKey = $result->fetchOne()) {
                 // no secret key? Generate and save
                 $key = $this->generateSecretKey();
                 $this->saveSecretKey($user, $key);
@@ -148,8 +146,7 @@ class MfaService
         $stmt = $this->connection->prepare($sql);
         $stmt->bindValue(1, $key);
         $stmt->bindValue(2, $user->getId());
-
-        return $stmt->execute();
+        return (bool) $stmt->executeStatement();
     }
 
     /**
