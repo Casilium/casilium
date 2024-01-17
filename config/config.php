@@ -13,6 +13,9 @@ $cacheConfig = [
 ];
 
 $aggregator = new ConfigAggregator([
+    \Laminas\Cache\Storage\Adapter\Apcu\ConfigProvider::class,
+    \Mezzio\Tooling\ConfigProvider::class,
+    \Laminas\Cache\Storage\Adapter\Filesystem\ConfigProvider::class,
     \Laminas\Mail\ConfigProvider::class,
     \Laminas\Paginator\ConfigProvider::class,
     \Laminas\Log\ConfigProvider::class,
