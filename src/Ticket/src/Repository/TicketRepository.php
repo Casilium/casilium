@@ -13,11 +13,14 @@ use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
 use Exception;
+use Organisation\Entity\Organisation;
+use ServiceLevel\Entity\SlaTarget;
 use Ticket\Entity\Agent;
 use Ticket\Entity\Status;
 use Ticket\Entity\Ticket;
 use Ticket\Entity\TicketResponse;
 use Ticket\Service\TicketService;
+
 use function array_map;
 use function intval;
 
@@ -45,6 +48,19 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
      */
     public function save(Ticket $ticket): Ticket
     {
+        // todo: organisation refuses to persist
+        $organisationId = $ticket->getOrganisation()->getId();
+        $reference      = $this->_em->getReference(Organisation::class, $organisationId);
+        $ticket->setOrganisation($reference);
+
+        // todo sla refuses to persist
+        $slaTarget = $ticket->getSlaTarget();
+        if ($slaTarget !== null) {
+            $slaTargetId  = $ticket->getSlaTarget()->getId();
+            $slaReference = $this->_em->getReference(SlaTarget::class, $slaTargetId);
+            $ticket->setSlaTarget($slaReference);
+        }
+
         $this->getEntityManager()->persist($ticket);
         $this->getEntityManager()->flush();
 
