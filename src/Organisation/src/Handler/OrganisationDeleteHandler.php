@@ -17,14 +17,11 @@ use Psr\Http\Server\RequestHandlerInterface;
 
 class OrganisationDeleteHandler implements RequestHandlerInterface
 {
-    /** @var OrganisationManager */
-    protected $organisationManager;
+    protected OrganisationManager $organisationManager;
 
-    /** @var TemplateRendererInterface */
-    protected $renderer;
+    protected TemplateRendererInterface $renderer;
 
-    /** @var UrlHelper */
-    protected $urlHelper;
+    protected UrlHelper $urlHelper;
 
     public function __construct(
         OrganisationManager $organisationManager,

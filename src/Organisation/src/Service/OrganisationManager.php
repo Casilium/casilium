@@ -13,6 +13,7 @@ use Organisation\Exception\OrganisationExistsException;
 use Organisation\Exception\OrganisationSitesExistException;
 use Organisation\Hydrator\OrganisationHydrator;
 use OrganisationSite\Service\SiteManager;
+
 use function in_array;
 
 class OrganisationManager
@@ -85,18 +86,16 @@ class OrganisationManager
 
     /**
      * @param int $id id of organisation
-     * @return Organisation|Object|null organisation or null if not found
+     * @return Organisation|null organisation or null if not found
      */
     public function findOrganisationById(int $id): ?Organisation
     {
-        return $this->entityManager->getRepository(Organisation::class)
-            ->findOneBy(['id' => $id]);
+        return $this->entityManager->getRepository(Organisation::class)->findOneBy(['id' => $id]);
     }
 
     public function findOrganisationByUuid(string $uuid): ?Organisation
     {
-        return $this->entityManager->getRepository(Organisation::class)
-            ->findOneByUuid($uuid);
+        return $this->entityManager->getRepository(Organisation::class)->findOneBy(['uuid' => $uuid]);
     }
 
     /**
@@ -178,10 +177,10 @@ class OrganisationManager
      *
      * @param Organisation $organisation organisation to delete
      */
-    public function delete(Organisation $organisation): void
+    public function delete(Organisation $organisation, bool $force = false): void
     {
         // check if organisation has sites before deleting.
-        if ($sites = $this->siteManager->fetchSitesByOrganisationId($organisation->getId())) {
+        if (! $force && $sites = $this->siteManager->fetchSitesByOrganisationId($organisation->getId())) {
             throw OrganisationSitesExistException::whenDeleting($organisation->getName());
         }
 

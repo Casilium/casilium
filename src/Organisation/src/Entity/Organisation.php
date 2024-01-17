@@ -1,10 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Organisation\Entity;
 
 use Carbon\Carbon;
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -36,73 +38,46 @@ class Organisation implements OrganisationInterface
      * @ORM\Id
      * @ORM\Column(type="integer", name="id", unique=true)
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int
      */
-    protected $id;
+    protected ?int $id;
 
-    /**
-     * @ORM\Column(type="uuid", unique=true)
-     *
-     * @var Uuid
-     */
-    protected $uuid;
+    /** @ORM\Column(type="uuid", unique=true) */
+    protected UuidInterface $uuid;
 
-    /**
-     * @ORM\Column(type="utcdatetime", nullable=false)
-     *
-     * @var DateTime
-     */
-    protected $created;
+    /** @ORM\Column(type="utcdatetime", nullable=false) */
+    protected DateTime $created;
 
-    /**
-     * @ORM\Column(name="is_active", type="integer", nullable=false)
-     *
-     * @var int
-     */
-    protected $isActive;
+    /** @ORM\Column(name="is_active", type="integer", nullable=false) */
+    protected int $isActive;
 
     /**
      * @ORM\OneToOne(targetEntity="ServiceLevel\Entity\Sla")
      * @ORM\JoinColumn(name="sla_id", referencedColumnName="id", nullable=true)
-     *
-     * @var Sla|null
      */
-    protected $sla;
+    protected ?Sla $sla;
 
     /**
      * @ORM\Column(type="utcdatetime", nullable=false)
      *
      * @var DateTime
      */
-    protected $modified;
+    protected DateTimeInterface $modified;
 
-    /**
-     * @ORM\Column(type="string", name="name", nullable=false)
-     *
-     * @var string
-     */
-    protected $name;
+    /** @ORM\Column(type="string", name="name", nullable=false) */
+    protected string $name;
 
-    /**
-     * @ORM\Column(name="type_id", type="integer", nullable=false)
-     *
-     * @var int
-     */
-    protected $typeId;
+    /** @ORM\Column(name="type_id", type="integer", nullable=false) */
+    protected int $typeId;
 
-    /**
-     * @ORM\OneToMany(targetEntity="Domain", mappedBy="organisation", orphanRemoval=true, cascade={"persist", "remove"})
-     *
-     * @var Domain[]
-     */
-    protected $domains;
+    /** @ORM\OneToMany(targetEntity="Domain", mappedBy="organisation", orphanRemoval=true, cascade={"persist", "remove"}) */
+    protected array|Collection $domains;
 
     /**
      * @throws Exception
      */
     public function __construct()
     {
+        $this->id      = null;
         $this->domains = new ArrayCollection();
 
         $this->isActive = self::STATE_ACTIVE;
@@ -143,7 +118,7 @@ class Organisation implements OrganisationInterface
 
     public function setCreated(DateTime $created): Organisation
     {
-        if (null === $this->created && null === $this->id) {
+        if (null === $this->id) {
             $this->created = Carbon::now('UTC');
         } else {
             $this->created = $created;
@@ -159,10 +134,10 @@ class Organisation implements OrganisationInterface
 
     public function setIsActive(int $isActive): Organisation
     {
-        if (null === $this->isActive) {
+        if (! $this->isActive) {
             $this->isActive = 1;
         } else {
-            $this->isActive = (int) $isActive;
+            $this->isActive = $isActive;
         }
 
         return $this;
@@ -218,7 +193,9 @@ class Organisation implements OrganisationInterface
 
     public function addDomain(Domain $domain)
     {
-        $this->domains[] = $domain;
+        if (! $this->hasDomain($domain)) {
+            $this->domains[] = $domain;
+        }
     }
 
     public function hasDomain(Domain $domain): bool
@@ -249,5 +226,10 @@ class Organisation implements OrganisationInterface
         }
 
         return false;
+    }
+
+    public function __toString(): string
+    {
+        return $this->getName();
     }
 }
