@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Ticket\Command;
@@ -18,6 +19,7 @@ use Ticket\Entity\Queue;
 use Ticket\Entity\Ticket;
 use Ticket\Service\MailReader;
 use Ticket\Service\TicketService;
+
 use function array_key_exists;
 use function count;
 use function defined;
@@ -34,6 +36,7 @@ use function strip_tags;
 use function strripos;
 use function strtolower;
 use function substr;
+
 use const FILTER_VALIDATE_EMAIL;
 use const LOCK_EX;
 use const LOCK_NB;
@@ -49,16 +52,13 @@ class CreateTicketsFromEmail extends Command
     public const TYPE_REPLY = 1;
 
     /** @var array */
-    private $config;
+    private array $config;
 
-    /** @var EntityManagerInterface */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    /** @var TicketService */
-    private $ticketService;
+    private TicketService $ticketService;
 
-    /** @var string */
-    private $ourSenderAddress;
+    private string $ourSenderAddress;
 
     /** @var resource */
     private $lockFile;
@@ -252,7 +252,7 @@ class CreateTicketsFromEmail extends Command
         // see if we have an employee in the database matching the email address
         /** @var Contact $contact */
         $contact = $this->entityManager->getRepository(Contact::class)->findOneBy([
-            'work_email' => $message['from'],
+            'workEmail' => $message['from'],
         ]);
         if ($contact === null) {
             return -1;
@@ -353,7 +353,7 @@ class CreateTicketsFromEmail extends Command
 
         /** @var Contact $contact */
         $contact = $this->entityManager->getRepository(Contact::class)->findOneBy([
-            'work_email' => $message['from'],
+            'workEmail' => $message['from'],
         ]);
 
         // if haven't found a contact from the "from" field, check if the reply is from an agent
