@@ -1,14 +1,16 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Adapter;
 
+use ArrayIterator;
 use Doctrine\ORM\Tools\Pagination\Paginator;
 use Laminas\Paginator\Adapter\AdapterInterface;
 
 class DoctrinePaginator implements AdapterInterface
 {
-    /** @var Paginator */
-    protected $paginator;
+    protected Paginator $paginator;
 
     public function __construct(Paginator $paginator)
     {
@@ -18,6 +20,7 @@ class DoctrinePaginator implements AdapterInterface
     public function setPaginator(Paginator $paginator): self
     {
         $this->paginator = $paginator;
+        return $this;
     }
 
     public function getPaginator(): Paginator
@@ -28,7 +31,7 @@ class DoctrinePaginator implements AdapterInterface
     /**
      * {@inheritDoc}
      */
-    public function getItems($offset, $itemCountPerPage)
+    public function getItems($offset, $itemCountPerPage): ArrayIterator|iterable
     {
         $this->paginator
             ->getQuery()
@@ -41,7 +44,7 @@ class DoctrinePaginator implements AdapterInterface
     /**
      * {@inheritDoc}
      */
-    public function count()
+    public function count(): int
     {
         return $this->paginator->count();
     }

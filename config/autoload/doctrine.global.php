@@ -1,72 +1,71 @@
 <?php
+
 declare(strict_types=1);
 
+use App\Doctrine\UtcDateTimeType;
+use Doctrine\Migrations\Configuration\Migration\ConfigurationLoader;
+use Doctrine\Migrations\DependencyFactory;
 use Doctrine\ORM\EntityManagerInterface;
-use ContainerInteropDoctrine\EntityManagerFactory;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
+use Laminas\Cache\Storage\StorageInterface;
 use Ramsey\Uuid\Doctrine\UuidType;
+use Roave\PsrContainerDoctrine\EntityManagerFactory;
+use Roave\PsrContainerDoctrine\Migrations\ConfigurationLoaderFactory;
+use Roave\PsrContainerDoctrine\Migrations\DependencyFactoryFactory;
 
 return [
     'dependencies' => [
+        'aliases'   => [
+            EntityManagerInterface::class => 'doctrine.entity_manager.orm_default',
+            StorageInterface::class       => 'FileSystemCache',
+        ],
         'factories' => [
-            'doctrine.entity_manager.orm_default' => \ContainerInteropDoctrine\EntityManagerFactory::class,
+            'doctrine.entity_manager.orm_default' => EntityManagerFactory::class,
+            ConfigurationLoader::class            => ConfigurationLoaderFactory::class,
+            DependencyFactory::class              => DependencyFactoryFactory::class,
         ],
     ],
-    'doctrine' => [
-        'driver' => [
+    'doctrine'     => [
+        'driver'        => [
             'orm_default' => [
-                'class' => \Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain::class,
-                'drivers' => [
+                'class'   => MappingDriverChain::class,
+                'drivers' => [],
+            ],
+        ],
+        'migrations'    => [
+            'orm_default' => [
+                'table_storage'           => [
+                    'table_name'                 => 'doctrine_migration_versions',
+                    'version_column_name'        => 'version',
+                    'version_column_length'      => 1024,
+                    'executed_at_column_name'    => 'executed_at',
+                    'execution_time_column_name' => 'execution_time',
                 ],
+                'migrations_paths'        => [
+                    'DoctrineMigrations' => 'data/migrations',
+                ],
+                'all_or_nothing'          => true,
+                'check_database_platform' => true,
             ],
         ],
-        'cache' => [
-            'apcu' => [
-                'class' => \Doctrine\Common\Cache\ApcuCache::class,
-                'namespace' => 'container-interop-doctrine',
-            ],
-            'array' => [
-                'class' => \Doctrine\Common\Cache\ArrayCache::class,
-                'namespace' => 'container-interop-doctrine',
-            ],
-            'filesystem' => [
-                'class' => \Doctrine\Common\Cache\FilesystemCache::class,
-                'directory' => 'data/cache/DoctrineCache',
-                'namespace' => 'container-interop-doctrine',
-            ],
-            'chain' => [
-                'class' => \Doctrine\Common\Cache\ChainCache::class,
-                'providers' => ['array', 'apcu'],
-                'namespace' => 'container-interop-doctrine',
-            ],
-        ],
-        // migrations configuration
-        'migrations_configuration' => [
-            'orm_default' => [
-                'directory' => 'data/Migrations',
-                'name' => 'Doctrine Database Migrations',
-                'namespace' => 'Migrations',
-                'table' => 'migrations',
-            ],
-        ],
-
         'configuration' => [
             'orm_default' => [
-                'result_cache' => 'array',
-                'metadata_cache' => 'array',
-                'query_cache' => 'array',
-                'hydration_cache' => 'array',
+                'result_cache'       => 'array',
+                'metadata_cache'     => 'array',
+                'query_cache'        => 'array',
+                'hydration_cache'    => 'array',
                 'second_level_cache' => [
-                    'enabled' => false,
-                    'default_lifetime' => 3600,
-                    'default_lock_lifetime' => 60,
+                    'enabled'                    => false,
+                    'default_lifetime'           => 3600,
+                    'default_lock_lifetime'      => 60,
                     'file_lock_region_directory' => '',
-                    'regions' => [],
+                    'regions'                    => [],
                 ],
             ],
         ],
-        'types' => [
+        'types'         => [
             UuidType::NAME => UuidType::class,
-            'utcdatetime' => \App\Doctrine\UtcDateTimeType::class,
+            'utcdatetime'  => UtcDateTimeType::class,
         ],
     ],
 ];
