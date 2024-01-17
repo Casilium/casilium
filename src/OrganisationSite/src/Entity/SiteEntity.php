@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace OrganisationSite\Entity;
@@ -11,6 +12,7 @@ use Laminas\Validator;
 use Organisation\Entity\Organisation;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
+
 use function array_filter;
 use function implode;
 use function is_string;
@@ -27,95 +29,63 @@ class SiteEntity
      * @ORM\Id
      * @ORM\Column(name="id", type="integer")
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int
      */
-    protected $id;
+    protected int $id;
 
-    /**
-     * @ORM\Column(type="uuid", unique=true)
-     *
-     * @var Uuid
-     */
-    protected $uuid;
+    /** @ORM\Column(type="uuid", unique=true) */
+    protected UuidInterface $uuid;
 
     /**
      * Site name or identifier
      *
      * @ORM\Column(name="name", type="string", length=64)
-     *
-     * @var string|null
      */
-    protected $name;
+    protected ?string $name = null;
 
-    /**
-     * @ORM\Column(name="street_address", type="string", length=64)
-     *
-     * @var string|null
-     */
-    protected $street_address;
+    /** @ORM\Column(name="street_address", type="string", length=64) */
+    protected ?string $streetAddress = null;
 
-    /**
-     * @ORM\Column(name="street_address2", type="string", length=64)
-     *
-     * @var string
-     */
-    protected $street_address2;
+    /** @ORM\Column(name="street_address2", type="string", length=64) */
+    protected ?string $streetAddress2 = null;
 
-    /**
-     * @ORM\Column(name="town", type="string", length=64)
-     *
-     * @var string|null
-     */
-    protected $town;
+    /** @ORM\Column(name="town", type="string", length=64) */
+    protected ?string $town = null;
 
-    /**
-     * @ORM\Column(name="city", type="string", length=64)
-     *
-     * @var string
-     */
-    protected $city;
+    /** @ORM\Column(name="city", type="string", length=64) */
+    protected ?string $city = null;
 
     /**
      * County, Province or State
      *
      * @ORM\Column(name="county", type="string", length=64)
-     *
-     * @var string|null
      */
-    protected $county;
+    protected ?string $county = null;
 
-    /**
-     * @ORM\Column(name="postal_code", type="string", length=10)
-     *
-     * @var string
-     */
-    protected $postal_code;
+    /** @ORM\Column(name="postal_code", type="string", length=10) */
+    protected ?string $postalCode = null;
 
-    /**
-     * @ORM\Column(name="telephone", type="string", length=20)
-     *
-     * @var string
-     */
-    protected $telephone;
+    /** @ORM\Column(name="telephone", type="string", length=20) */
+    protected ?string $telephone = null;
+
+    public function __construct()
+    {
+        $this->id   = 0;
+        $this->uuid = Uuid::uuid4();
+    }
 
     /**
      * Country
      *
-     * @ORM\OneToOne(targetEntity="OrganisationSite\Entity\CountryEntity", fetch="EAGER")
+     * @ORM\OneToOne(targetEntity="OrganisationSite\Entity\CountryEntity")
      * @ORM\JoinColumn(name="country_id", referencedColumnName="id", nullable=false)
-     *
-     * @var CountryEntity
      */
-    protected $country;
+    protected ?CountryEntity $country;
 
     /**
-     * @ORM\OneToOne(targetEntity="Organisation\Entity\Organisation", fetch="EAGER")
-     * @ORM\JoinColumn(name="organisation_id", referencedColumnName="id", nullable=false)
-     *
-     * @var Organisation
+     * @ORM\OneToOne(targetEntity="Organisation\Entity\Organisation")
+     * @ORM\JoinColumn(name="organisation_id", referencedColumnName="id", nullable=false, onDelete="cascade")
      */
-    protected $organisation;
+    protected ?Organisation $organisation = null;
 
     public function getId(): int
     {
@@ -150,7 +120,7 @@ class SiteEntity
         return $this;
     }
 
-    public function getCountry(): CountryEntity
+    public function getCountry(): ?CountryEntity
     {
         return $this->country;
     }
@@ -172,31 +142,25 @@ class SiteEntity
         return $this->county;
     }
 
-    public function setRegion(string $county): SiteEntity
+    public function getStreetAddress(): ?string
     {
-        $this->county = $county;
-        return $this;
+        return $this->streetAddress;
     }
 
-    public function getStreetAddress(): string
+    public function setStreetAddress(string $streetAddress): SiteEntity
     {
-        return $this->street_address;
-    }
-
-    public function setStreetAddress(string $street_address): SiteEntity
-    {
-        $this->street_address = $street_address;
+        $this->streetAddress = $streetAddress;
         return $this;
     }
 
     public function getStreetAddress2(): ?string
     {
-        return $this->street_address2;
+        return $this->streetAddress2;
     }
 
-    public function setStreetAddress2(?string $street_address2): SiteEntity
+    public function setStreetAddress2(?string $streetAddress2): SiteEntity
     {
-        $this->street_address2 = $street_address2;
+        $this->streetAddress2 = $streetAddress2;
         return $this;
     }
 
@@ -211,7 +175,7 @@ class SiteEntity
         return $this;
     }
 
-    public function getCity(): string
+    public function getCity(): ?string
     {
         return $this->city;
     }
@@ -222,18 +186,18 @@ class SiteEntity
         return $this;
     }
 
-    public function getPostalCode(): string
+    public function getPostalCode(): ?string
     {
-        return $this->postal_code;
+        return $this->postalCode;
     }
 
-    public function setPostalCode(string $postal_code): SiteEntity
+    public function setPostalCode(string $postalCode): SiteEntity
     {
-        $this->postal_code = $postal_code;
+        $this->postalCode = $postalCode;
         return $this;
     }
 
-    public function getTelephone(): string
+    public function getTelephone(): ?string
     {
         return $this->telephone;
     }
@@ -249,7 +213,7 @@ class SiteEntity
         return $this->organisation;
     }
 
-    public function setOrganisation(?Organisation $organisation): SiteEntity
+    public function setOrganisation(Organisation $organisation): SiteEntity
     {
         $this->organisation = $organisation;
         return $this;
@@ -277,14 +241,14 @@ class SiteEntity
             'id'              => $this->id,
             'uuid'            => $this->uuid,
             'name'            => $this->name,
-            'street_address'  => $this->street_address,
-            'street_address2' => $this->street_address2,
+            'street_address'  => $this->streetAddress,
+            'street_address2' => $this->streetAddress2,
             'town'            => $this->town,
             'city'            => $this->city,
             'county'          => $this->county,
-            'postal_code'     => $this->postal_code,
+            'postal_code'     => $this->postalCode,
             'telephone'       => $this->telephone,
-            'country_id'      => $this->country ? $this->country->getId() : null,
+            'country_id'      => $this->country?->getId(),
             'organisation'    => $this->organisation,
         ];
     }
