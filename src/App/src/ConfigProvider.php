@@ -4,10 +4,10 @@ declare(strict_types=1);
 
 namespace App;
 
-use containerinteropdoctrine\entitymanagerfactory;
 use Doctrine\ORM\EntityManager;
 use Laminas\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory;
 use Laminas\ServiceManager\Factory\InvokableFactory;
+use Roave\PsrContainerDoctrine\EntityManagerFactory;
 
 /**
  * The configuration provider for the App module
@@ -42,7 +42,7 @@ class ConfigProvider
                 Command\CreateSodiumKey::class,
             ],
             'factories'  => [
-                EntityManager::class                               => entitymanagerfactory::class,
+                EntityManager::class                               => EntityManagerFactory::class,
                 Handler\HomePageHandler::class                     => Handler\Factory\HomePageHandlerFactory::class,
                 Handler\AdminPageHandler::class                    => Handler\Factory\AdminPageHandlerFactory::class,
                 Middleware\PrgMiddleware::class                    => InvokableFactory::class,
