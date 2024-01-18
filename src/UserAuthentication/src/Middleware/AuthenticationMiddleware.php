@@ -13,8 +13,7 @@ use UserAuthentication\Service\AuthenticationService;
 
 class AuthenticationMiddleware implements MiddlewareInterface
 {
-    /** @var AuthenticationService */
-    private $authenticationService;
+    private AuthenticationService $authenticationService;
 
     public function __construct(AuthenticationService $authenticationService)
     {
