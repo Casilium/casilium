@@ -14,8 +14,8 @@ return [
 
             ],
             'sql_get_details' => 'SELECT id,status,mfa_enabled FROM user WHERE user.email = :identity',
-            'username' => 'YOUR_PASSWORD',
-            'password' => 'YOUR_USERNAME'
+            'username' => 'YOUR_USERNAME',
+            'password' => 'YOUR_PASSWORD'
         ],
     ],
 ];
