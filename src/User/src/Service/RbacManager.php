@@ -55,8 +55,6 @@ class RbacManager
         $result = $this->cache->getItem('rbac_container', $result);
         if (null !== $result) {
             $this->rbac = unserialize($result);
-
-            die('got it');
         }
 
         if (! $this->rbac instanceof Rbac) {
