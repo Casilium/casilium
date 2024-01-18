@@ -1,41 +1,44 @@
 <?php
+
 declare(strict_types=1);
 
 namespace User\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
+use Laminas\Cache\Exception\ExceptionInterface;
 use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Permissions\Rbac\AssertionInterface;
 use Laminas\Permissions\Rbac\Rbac;
 use User\Entity\Role;
 use User\Entity\User;
+
+use function serialize;
 use function sprintf;
+use function unserialize;
 
 class RbacManager
 {
-    /** @var array */
-    private $assertionManagers = [];
+    private array $assertionManagers = [];
 
-    /** @var StorageInterface */
-    private $cache;
+    private StorageInterface $cache;
 
-    /** @var EntityManagerInterface */
-    private $entityManager;
+    private EntityManagerInterface $entityManager;
 
-    /** @var Rbac */
-    private $rbac;
+    private ?Rbac $rbac;
 
     public function __construct(StorageInterface $cache, EntityManagerInterface $entityManager)
     {
         $this->cache         = $cache;
         $this->entityManager = $entityManager;
+        $this->rbac          = null;
     }
 
     /**
      * Initialize the RBAC container
      *
      * @param bool $forceCreate Force creation if already initialized
+     * @throws ExceptionInterface
      */
     public function init(bool $forceCreate = false): bool
     {
@@ -49,8 +52,11 @@ class RbacManager
         }
 
         // try to load Rbac container from cache
-        $result     = false;
-        $this->rbac = $this->cache->getItem('rbac_container', $result);
+        $result = $this->cache->getItem('rbac_container', $result);
+        if (null !== $result) {
+            $result = unserialize($result);
+        }
+
         if (! $result) {
             $this->rbac = new Rbac();
             $this->rbac->setCreateMissingRoles(true);
@@ -73,13 +79,13 @@ class RbacManager
             }
 
             // save Rbac container to the cache
-            $this->cache->setItem('rbac_container', $this->rbac);
+            $this->cache->setItem('rbac_container', serialize($this->rbac));
         }
         return true;
     }
 
     /**
-     * Check if user access access to resource
+     * Check if user access to resource
      *
      * @throws Exception
      */
