@@ -156,8 +156,8 @@ class UserForm extends Form
             'name'    => 'mfa_enabled',
             'options' => [
                 'label'              => 'MFA Enabled',
-                'checked_value'      => 1,
-                'unchecked_value'    => 0,
+                'checked_value'      => '1',
+                'unchecked_value'    => '0',
                 'use_hidden_element' => true,
             ],
         ]);

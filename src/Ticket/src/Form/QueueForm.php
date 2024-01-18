@@ -87,8 +87,8 @@ class QueueForm extends Form implements InputFilterProviderInterface
             ])->setLabelAttributes([
                 'class' => 'form-check-label',
             ])->setOptions([
-                'checked_value'   => 1,
-                'unchecked_value' => 0,
+                'checked_value'   => '1',
+                'unchecked_value' => '0',
             ]);
         $this->add($element);
 
@@ -100,8 +100,8 @@ class QueueForm extends Form implements InputFilterProviderInterface
             ])->setLabelAttributes([
                 'class' => 'form-check-label',
             ])->setOptions([
-                'checked_value'   => 1,
-                'unchecked_value' => 0,
+                'checked_value'   => '1',
+                'unchecked_value' => '0',
             ]);
         $this->add($element);
 
