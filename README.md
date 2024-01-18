@@ -66,15 +66,16 @@ Example:
 
     'authentication' => [
         'pdo' => [
-        'dsn'   => 'mysql:host=localhost; dbname=YOUR_DBNAME',
-        'table' => 'user',
-        'field' => [
-        'identity' => 'email',
-        'password' => 'password',
-    ],
-    'sql_get_details' => 'SELECT id,status,mfa_enabled FROM user WHERE user.email = :identity',
-    'username' => 'YOUR_PASSWORD',
-    'password' => 'YOUR_USERNAME'
+            'dsn'   => 'mysql:host=localhost; dbname=YOUR_DBNAME',
+            'table' => 'user',
+            'field' => [
+                'identity' => 'email',
+                'password' => 'password',
+            ],
+        'sql_get_details' => 'SELECT id,status,mfa_enabled FROM user WHERE user.email = :identity',
+        'username' => 'YOUR_PASSWORD',
+        'password' => 'YOUR_USERNAME',
+    ];
 
 Change to:
 
@@ -83,13 +84,13 @@ Change to:
         'dsn'   => 'mysql:host=localhost; dbname=casilium',
         'table' => 'user',
         'field' => [
-        'identity' => 'email',
+            'identity' => 'email',
+            'password' => 'password',
+        ],
+        'sql_get_details' => 'SELECT id,status,mfa_enabled FROM user WHERE user.email = :identity',
+        'username' => 'casilium',
         'password' => 'password',
-    ],
-    'sql_get_details' => 'SELECT id,status,mfa_enabled FROM user WHERE user.email = :identity',
-    'username' => 'casilium',
-    'password' => 'password'
-
+    ];
 
 ### Database Migrations
     
@@ -110,6 +111,11 @@ You will need to ensure that the scripts are executable, if not run
 
 From the Casilium project directory
 
+## Web Server Configuration
+
+You'll need to update the configuration of your web server to serve the files from the
+`public` folder within the project director, for example:
+
 **Example Apache Configuration**
 
 Files should be served from the "public" directory:
@@ -119,17 +125,20 @@ Files should be served from the "public" directory:
         DocumentRoot /usr/local/www/casilium/public
     </VirtualHost>     
 
-php.ini
--------
+### php.ini
+
+Enable apc within your `php.ini` folder
 
     apc.enable_cli = 1
 
-Disable Development Mode
-------------------------
+## Disable Development Mode
+
 Casilium is current set to development mode,
 be sure to disabled development mode.
 
 **Do not run development mode on a production system!**
+
+From within the project directory:
 
     composer development-disable
 
