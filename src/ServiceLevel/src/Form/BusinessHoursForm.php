@@ -12,6 +12,7 @@ use Laminas\Form\Form;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator;
 use ServiceLevel\Form\Element\Time;
+
 use function abs;
 use function array_keys;
 use function array_merge;
@@ -115,8 +116,8 @@ class BusinessHoursForm extends Form implements InputFilterProviderInterface
         $this->add($element);
 
         $element = new Element\Checkbox('mon_active');
-        $element->setCheckedValue(1)
-            ->setUncheckedValue(0)
+        $element->setCheckedValue('1')
+            ->setUncheckedValue('0')
             ->setUseHiddenElement(true)
             ->setAttributes([
                 'class' => 'form-check-input',
@@ -125,8 +126,8 @@ class BusinessHoursForm extends Form implements InputFilterProviderInterface
         $this->add($element);
 
         $element = new Element\Checkbox('tue_active');
-        $element->setCheckedValue(1)
-            ->setUncheckedValue(0)
+        $element->setCheckedValue('1')
+            ->setUncheckedValue('0')
             ->setUseHiddenElement(true)
             ->setAttributes([
                 'class' => 'form-check-input',
@@ -135,8 +136,8 @@ class BusinessHoursForm extends Form implements InputFilterProviderInterface
         $this->add($element);
 
         $element = new Element\Checkbox('wed_active');
-        $element->setCheckedValue(1)
-            ->setUncheckedValue(0)
+        $element->setCheckedValue('1')
+            ->setUncheckedValue('0')
             ->setUseHiddenElement(true)
             ->setAttributes([
                 'class' => 'form-check-input',
@@ -145,8 +146,8 @@ class BusinessHoursForm extends Form implements InputFilterProviderInterface
         $this->add($element);
 
         $element = new Element\Checkbox('thu_active');
-        $element->setCheckedValue(1)
-            ->setUncheckedValue(0)
+        $element->setCheckedValue('1')
+            ->setUncheckedValue('0')
             ->setUseHiddenElement(true)
             ->setAttributes([
                 'class' => 'form-check-input',
@@ -155,8 +156,8 @@ class BusinessHoursForm extends Form implements InputFilterProviderInterface
         $this->add($element);
 
         $element = new Element\Checkbox('fri_active');
-        $element->setCheckedValue(1)
-            ->setUncheckedValue(0)
+        $element->setCheckedValue('1')
+            ->setUncheckedValue('0')
             ->setUseHiddenElement(true)
             ->setAttributes([
                 'class' => 'form-check-input',
@@ -165,8 +166,8 @@ class BusinessHoursForm extends Form implements InputFilterProviderInterface
         $this->add($element);
 
         $element = new Element\Checkbox('sat_active');
-        $element->setCheckedValue(1)
-            ->setUncheckedValue(0)
+        $element->setCheckedValue('1')
+            ->setUncheckedValue('0')
             ->setUseHiddenElement(true)
             ->setAttributes([
                 'class' => 'form-check-input',
@@ -175,8 +176,8 @@ class BusinessHoursForm extends Form implements InputFilterProviderInterface
         $this->add($element);
 
         $element = new Element\Checkbox('sun_active');
-        $element->setCheckedValue(1)
-            ->setUncheckedValue(0)
+        $element->setCheckedValue('1')
+            ->setUncheckedValue('0')
             ->setUseHiddenElement(true)
             ->setAttributes([
                 'class' => 'form-check-input',
@@ -488,8 +489,8 @@ class BusinessHoursForm extends Form implements InputFilterProviderInterface
         foreach ($timezoneOffsets as $timezone => $offset) {
             $offsetPrefix            = $offset < 0 ? '-' : '+';
             $offsetFormatted         = gmdate('H:i', abs($offset));
-            $prettyOffset            = "UTC${offsetPrefix}${offsetFormatted}";
-            $timezoneList[$timezone] = "$timezone (${prettyOffset}) ";
+            $prettyOffset            = "UTC$offsetPrefix$offsetFormatted";
+            $timezoneList[$timezone] = "$timezone ($prettyOffset) ";
         }
 
         return $timezoneList;

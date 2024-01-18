@@ -46,6 +46,6 @@ class DoctrinePaginator implements AdapterInterface
      */
     public function count(): int
     {
-        return $this->paginator->count();
+        return (int) $this->paginator->count();
     }
 }
