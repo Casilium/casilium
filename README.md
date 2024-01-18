@@ -1,64 +1,114 @@
-Casilium
-========
+# Casilium
 
-**NOTE:** Casilium is currently under development and **SHOULD NOT**
-be used as it is currently in development, not even at Alpha stage.
+
+**NOTE:** Casilium is currently under development.
 
 **Casilium** is a work in-progress open-source ticket system.
 
-Requirements
-------------
-  * HTTP server running Apache / Nginx / IIS
-  * PHP Version 8.2:
-    * curl
-    * gd
+## Requirements
+
+  * HTTP server running (apache/nginx)
+  * PHP Version 8.2 with following extensions:
+    * apcu
+    * dom
     * iconv
-    * intl
-    * mbsring
-    * mysqli
     * pdo
     * pdo_mysql
-    * pecl-APCu
-    * pecl-mcrypt
     * session
     * simplexml
     * sodium
+    * tokenizer
     * xml
-  * Mysql Server v5.7 / v8.0
+    * xmlwriter
+  * Mysql Server 5.7/8
   
-Installation
-------------
+## Installation
+
 The easy way to install Casilium is to clone the git repository
 
-    git clone https://github.com/sheridans/casilium.git
+    git clone https://github.com/Casilium/casilium.git
 
 Install via composer:
 
+    cd casilium
     composer install
     
-Configuration
--------------
+## Configuration
 
-Currently, there is gui installer until the project is more complete.
 
-* Create a suitable database in MySQL
-* Copy **config/auth.local.php.dist** to **config/auth.local.php**
-  * Modify the **dsn** to suit your needs
-  * Modify the username/password fields
-* Copy **config/local.php.dist** to **config/local.php**
-  * Edit the **url** key for your database details
+### Create the database in MySQL:
+
+    CREATE USER casilium@localhost IDENTIFIED BY 'password';
+    CREATE DATABASE casilium;
+    GRANT ALL PRIVILEGES ON *.* TO casilium@localhost;
+
+### Update Configuration files:
+
+**config/autoload/local.php**
+
+Copy the file `config/autoload/local.php.dist` to `config/autoload/local.php` 
+and update the credentials to those you created the database with.
+
+For example, if we used the credentials specified above:
+
+    'url' => 'mysql://USERNAME:PASSWORD@localhost/DATABASE_NAME'
+
+Would be changed to:
+
+    'url' => 'mysql://casilium:password@localhost/casilium',
+
+**config/autoload/auth.local.php**
+
+Copy the file `config/autoload/auth.local.php.dist` to `config/autoload/auth.local.php`
+and update the file with the correct database credentials.
+
+Example:
+
+    'authentication' => [
+        'pdo' => [
+        'dsn'   => 'mysql:host=localhost; dbname=YOUR_DBNAME',
+        'table' => 'user',
+        'field' => [
+        'identity' => 'email',
+        'password' => 'password',
+    ],
+    'sql_get_details' => 'SELECT id,status,mfa_enabled FROM user WHERE user.email = :identity',
+    'username' => 'YOUR_PASSWORD',
+    'password' => 'YOUR_USERNAME'
+
+Change to:
+
+    'authentication' => [
+        'pdo' => [
+        'dsn'   => 'mysql:host=localhost; dbname=casilium',
+        'table' => 'user',
+        'field' => [
+        'identity' => 'email',
+        'password' => 'password',
+    ],
+    'sql_get_details' => 'SELECT id,status,mfa_enabled FROM user WHERE user.email = :identity',
+    'username' => 'casilium',
+    'password' => 'password'
+
+
+### Database Migrations
     
-**Database Setup**
+First test the database connectivity by issuing the following command from the project
+directory:
 
-Casilium uses Doctrine for database and migrations which enables easy
-modification and setup of the databases. To run the database migration
-tool, from the project root run:
+    ./vendor/bin/doctrine-migrations status
 
-    ./vendor/bin/doctrine-migrations: migrations:migrate
+All being well, if you have no issues at this stage you should be shown the migrations status page.
+Now execute the migrations to create the database:
+
+    ./vendor/bin/doctrine-migrations migrate
+
 
 You will need to ensure that the scripts are executable, if not run
+    
+    chmod a+rx ./vendor/bin/*
 
-    chmod a+x /vendor/bin/*
+From the Casilium project directory
 
 **Example Apache Configuration**
 
@@ -85,7 +135,7 @@ be sure to disabled development mode.
 
 License
 -------
-Calisium is released under the GPL2 license. See the included LICENSE.txt
+Casilium is released under the Apache 2.0 license. See the included LICENSE.txt
 file for details of the General Public License.
 
 Casilium is uses several open source projects, including
