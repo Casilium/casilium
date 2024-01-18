@@ -9,6 +9,7 @@ use Laminas\Mail\Transport\Smtp as SmtpTransport;
 use Laminas\Mime\Message as MimeMessage;
 use Laminas\Mime\Part as MimePart;
 use Mezzio\Template\TemplateRendererInterface;
+
 use function array_merge;
 
 class MailService

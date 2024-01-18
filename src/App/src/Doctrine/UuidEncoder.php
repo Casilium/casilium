@@ -6,10 +6,12 @@ namespace App\Doctrine;
 
 use Ramsey\Uuid\UuidInterface;
 use Throwable;
+
 use function array_reduce;
 use function str_pad;
 use function str_replace;
 use function substr_replace;
+
 use const STR_PAD_LEFT;
 
 /**

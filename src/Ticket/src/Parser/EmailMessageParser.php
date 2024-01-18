@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Ticket\Parser;
@@ -6,6 +7,7 @@ namespace Ticket\Parser;
 use Exception;
 use Laminas\Mail\Storage\Message;
 use RecursiveIteratorIterator;
+
 use function base64_decode;
 use function filter_var;
 use function gettype;
@@ -18,6 +20,7 @@ use function strip_tags;
 use function strrpos;
 use function strtok;
 use function substr;
+
 use const FILTER_SANITIZE_STRING;
 use const FILTER_VALIDATE_EMAIL;
 

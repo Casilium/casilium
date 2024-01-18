@@ -7,6 +7,7 @@ namespace UserAuthentication\Service;
 use Doctrine\DBAL\Connection;
 use UserAuthentication\Entity\Identity;
 use UserAuthentication\Entity\IdentityInterface;
+
 use function password_verify;
 
 class AuthenticationService

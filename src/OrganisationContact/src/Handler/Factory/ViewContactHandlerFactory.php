@@ -12,7 +12,7 @@ use Psr\Container\ContainerInterface;
 
 class ViewContactHandlerFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): ViewContactHandler
     {
         $service  = $container->get(ContactService::class);
         $renderer = $container->get(TemplateRendererInterface::class);

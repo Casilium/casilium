@@ -37,12 +37,12 @@ class ListSiteHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // grab organisation uuid from url vars
-        $org_id = $request->getAttribute('id');
+        $orgId = $request->getAttribute('id');
 
         // find the related organisation
-        $organisation = $this->siteManager->getOrganisationByUuid($org_id);
+        $organisation = $this->siteManager->getOrganisationByUuid($orgId);
         if (null === $organisation) {
-            throw OrganisationNotFoundException::whenSearchingByUuid($org_id);
+            throw OrganisationNotFoundException::whenSearchingByUuid($orgId);
         }
 
         $sites = $this->siteManager->fetchSitesByOrganisationId($organisation->getId());

@@ -6,8 +6,8 @@ namespace OrganisationContact\Hydrator;
 
 use Laminas\Hydrator\HydratorInterface;
 use OrganisationContact\Entity\Contact;
-
 use OrganisationContact\Service\ContactService;
+
 use function array_key_exists;
 
 class ContactHydrator implements HydratorInterface

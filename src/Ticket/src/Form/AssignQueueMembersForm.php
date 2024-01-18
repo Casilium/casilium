@@ -40,7 +40,7 @@ class AssignQueueMembersForm extends Form implements InputFilterProviderInterfac
         $this->add($element);
     }
 
-    public function getInputFilterSpecification()
+    public function getInputFilterSpecification(): array
     {
         return [
             [

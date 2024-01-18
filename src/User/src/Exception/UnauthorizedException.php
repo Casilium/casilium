@@ -1,10 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace User\Exception;
 
 use Exception;
 use Throwable;
+
 use function sprintf;
 
 class UnauthorizedException extends Exception

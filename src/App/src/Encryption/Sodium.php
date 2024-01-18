@@ -1,10 +1,12 @@
 <?php
+
 declare(strict_types=1);
 
 namespace App\Encryption;
 
 use App\Exception\SodiumException;
 use Exception;
+
 use function base64_decode;
 use function base64_encode;
 use function constant;
@@ -15,6 +17,7 @@ use function sodium_bin2hex;
 use function sodium_crypto_secretbox;
 use function sodium_crypto_secretbox_open;
 use function sodium_hex2bin;
+
 use const SODIUM_CRYPTO_SECRETBOX_KEYBYTES;
 use const SODIUM_CRYPTO_SECRETBOX_NONCEBYTES;
 

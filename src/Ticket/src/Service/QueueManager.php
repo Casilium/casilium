@@ -10,6 +10,7 @@ use Exception;
 use Ticket\Entity\Agent;
 use Ticket\Entity\Queue;
 use User\Entity\User;
+
 use function array_key_exists;
 
 class QueueManager

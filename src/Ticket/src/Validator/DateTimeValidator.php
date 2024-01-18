@@ -1,23 +1,25 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Ticket\Validator;
 
 use DateTime;
 use Laminas\Validator\AbstractValidator;
+
 use function is_string;
 
 class DateTimeValidator extends AbstractValidator
 {
-    const NOT_STRING     = "notString";
-    const INVALID_FORMAT = 'invalidForm';
+    public const NOT_STRING     = "notString";
+    public const INVALID_FORMAT = 'invalidForm';
 
-    protected $messageTemplates = [
+    protected array $messageTemplates = [
         self::NOT_STRING     => 'Date/Time must be a string',
         self::INVALID_FORMAT => 'Date/Time is not an accepted format',
     ];
 
-    public function isValid($value)
+    public function isValid(mixed $value): bool
     {
         if (! is_string($value)) {
             $this->error(self::NOT_STRING);

@@ -13,6 +13,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Ticket\Entity\Ticket;
 use Ticket\Service\TicketService;
+
 use function intval;
 
 class GoToTicketHandler implements RequestHandlerInterface

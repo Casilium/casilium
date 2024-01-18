@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Ticket\Service;
@@ -7,6 +8,7 @@ use Exception;
 use Laminas\Mail\Storage;
 use Laminas\Mail\Storage\Imap;
 use Ticket\Parser\EmailMessageParser;
+
 use function is_array;
 
 class MailReader

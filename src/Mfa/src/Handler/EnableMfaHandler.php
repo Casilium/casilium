@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Mfa\Handler;
@@ -21,6 +22,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use User\Service\UserManager;
 use UserAuthentication\Entity\IdentityInterface;
+
 use function gettype;
 use function is_array;
 use function sprintf;

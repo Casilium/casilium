@@ -10,7 +10,7 @@ use Ticket\Service\TicketService;
 
 class TicketHydratorFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): TicketHydrator
     {
         $ticketService = $container->get(TicketService::class);
         return new TicketHydrator($ticketService);

@@ -2,8 +2,9 @@
 
 declare(strict_types=1);
 
-use Laminas\ConfigAggregator\ConfigAggregator;
+use Laminas\Cache\Storage\Adapter\Apcu;
 use Laminas\Cache\Storage\Adapter\Filesystem;
+use Laminas\ConfigAggregator\ConfigAggregator;
 
 return [
     // Toggle the configuration cache. Set this to boolean false, or remove the
@@ -13,8 +14,7 @@ return [
     ConfigAggregator::ENABLE_CACHE => true,
 
     // Enable debugging; typically used to provide debugging information within templates.
-    'debug' => false,
-
+    'debug'  => false,
     'mezzio' => [
         // Provide templates for the error handling middleware to use when
         // generating responses.
@@ -31,8 +31,8 @@ return [
                 'ttl'       => 60 * 60 * 1,
             ],
         ],
-        'ApcCache' => [
-            'adapter' => \Laminas\Cache\Storage\Adapter\Apcu::class,
+        'ApcCache'        => [
+            'adapter' => Apcu::class,
         ],
     ],
 ];

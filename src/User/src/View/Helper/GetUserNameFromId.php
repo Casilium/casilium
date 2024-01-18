@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace User\View\Helper;
@@ -8,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use Laminas\View\Helper\AbstractHelper;
 use User\Entity\User;
+
 use function array_key_exists;
 use function is_object;
 

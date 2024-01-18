@@ -41,6 +41,7 @@ class RouteDelegator
         );
 
         $app->route(
+            // @codingStandardsIgnoreLine
             '/organisation/{id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}/contact/delete/{contact_id:[\d]+}[/confirm/{confirm}]',
             DeleteContactHandler::class,
             ['GET'],

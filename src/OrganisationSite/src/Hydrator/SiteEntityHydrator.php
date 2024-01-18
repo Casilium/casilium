@@ -11,8 +11,7 @@ use Ramsey\Uuid\Uuid;
 
 class SiteEntityHydrator extends AbstractHydrator
 {
-    /** @var SiteManager */
-    protected $siteManager;
+    protected SiteManager $siteManager;
 
     /**
      * @param SiteManager $siteManager Site manager instance to inject
@@ -69,11 +68,11 @@ class SiteEntityHydrator extends AbstractHydrator
             $object->setCounty($county);
         }
 
-        if ($postcode = $data['postal_code'] ?? null) {
+        if ($data['postal_code'] ?? null) {
             $object->setPostalCode($data['postal_code']);
         }
 
-        if ($country_id = $data['country_id'] ?? null) {
+        if ($data['country_id'] ?? null) {
             $country = $this->siteManager->getCountry($data['country_id']);
             if ($country !== null) {
                 $object->setCountry($country);

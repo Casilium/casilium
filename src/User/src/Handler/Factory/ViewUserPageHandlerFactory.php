@@ -1,10 +1,11 @@
 <?php
+
 declare(strict_types=1);
 
 namespace User\Handler\Factory;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Interop\Container\ContainerInterface;
+use interop\container\containerinterface;
 use Laminas\EventManager\EventManager;
 use Laminas\EventManager\LazyListener;
 use Mezzio\Template\TemplateRendererInterface;
@@ -13,7 +14,7 @@ use User\Handler;
 
 class ViewUserPageHandlerFactory
 {
-    public function __invoke(ContainerInterface $container): Handler\ViewUserPageHandler
+    public function __invoke(containerinterface $container): Handler\ViewUserPageHandler
     {
         $events = new EventManager();
         $events->setIdentifiers([Handler\ViewUserPageHandler::class]);

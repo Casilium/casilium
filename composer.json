@@ -74,7 +74,8 @@
         "ramsey/uuid-doctrine": "^1.6",
         "roave/psr-container-doctrine": "^3.9.0",
         "sonata-project/google-authenticator": "^2.2",
-        "symfony/console": "^5.0"
+        "symfony/console": "^5.0",
+      "ext-pdo": "*"
     },
     "require-dev": {
         "filp/whoops": "^2.7.1",

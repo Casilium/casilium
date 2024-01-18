@@ -6,6 +6,7 @@ namespace Organisation\Validator;
 
 use Laminas\Validator\AbstractValidator;
 use Laminas\Validator\Hostname;
+
 use function key;
 
 class DomainValidator extends AbstractValidator

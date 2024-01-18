@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace User\Handler;
@@ -16,6 +17,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use User\Entity\Role;
 use User\Service\RoleManager;
+
 use function array_key_exists;
 
 class DeleteRolePageHandler implements RequestHandlerInterface

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace SlackIntegration\Entity;
 
 use SlackIntegration\Service\Client;
+
 use function mb_strlen;
 use function mb_substr;
 

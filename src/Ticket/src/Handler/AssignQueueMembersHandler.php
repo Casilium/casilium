@@ -15,18 +15,16 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Ticket\Entity\Queue;
 use Ticket\Form\AssignQueueMembersForm;
 use Ticket\Service\QueueManager;
+
 use function array_keys;
 
 class AssignQueueMembersHandler implements RequestHandlerInterface
 {
-    /** @var QueueManager */
-    protected $queueManager;
+    protected QueueManager $queueManager;
 
-    /** @var TemplateRendererInterface */
-    protected $renderer;
+    protected TemplateRendererInterface $renderer;
 
-    /** @var UrlHelper */
-    protected $urlHelper;
+    protected UrlHelper $urlHelper;
 
     public function __construct(
         QueueManager $queueManager,

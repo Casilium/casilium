@@ -11,6 +11,7 @@ use Organisation\Service\OrganisationManager;
 use Ticket\Entity\Ticket;
 use Ticket\Repository\TicketRepository;
 use Ticket\Repository\TicketRepositoryInterface;
+
 use function array_merge;
 
 class ReportService

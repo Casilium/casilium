@@ -11,7 +11,7 @@ use Ticket\Service\TicketService;
 
 class ListTickerHandlerFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): ListTicketHandler
     {
         $ticketService = $container->get(TicketService::class);
         $renderer      = $container->get(TemplateRendererInterface::class);

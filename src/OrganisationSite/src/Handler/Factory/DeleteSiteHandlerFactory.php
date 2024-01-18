@@ -12,7 +12,7 @@ use Psr\Container\ContainerInterface;
 
 class DeleteSiteHandlerFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): DeleteSiteHandler
     {
         $siteManager = $container->get(SiteManager::class);
         $renderer    = $container->get(TemplateRendererInterface::class);

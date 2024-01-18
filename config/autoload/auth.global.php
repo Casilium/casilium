@@ -1,4 +1,7 @@
 <?php
+
+declare(strict_types=1);
+
 return [
     'authentication' => [
         'redirect' => '/',
@@ -11,14 +14,14 @@ return [
             // permissive or restrictive, restrictive by default
             'mode' => 'restrictive',
         ],
-        'routes' => [
-            'admin' => [
-                ['allow' => '@']
+        'routes'  => [
+            'admin'            => [
+                ['allow' => '@'],
             ],
-            'admin.user' => [
+            'admin.user'       => [
                 ['allow' => '+user.manage'],
             ],
-            'admin.role' => [
+            'admin.role'       => [
                 ['allow' => '+role.manage'],
             ],
             'admin.permission' => [
@@ -37,11 +40,9 @@ return [
             'logout' => [
                 ['allow' => '@'],
             ],
-            'mfa' => [
+            'mfa'    => [
                 ['allow' => '*'],
             ],
-
         ],
     ],
-
 ];

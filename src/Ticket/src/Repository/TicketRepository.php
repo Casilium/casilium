@@ -97,7 +97,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->orderBy('t.type', 'DESC')
             ->addOrderBy('t.status')
             ->addOrderBy('t.priority')
-            ->addOrderBy('t.due_date');
+            ->addOrderBy('t.dueDate');
 
         if ($fetchResolved === false) {
             $qb->where('t.status < :status')
@@ -132,7 +132,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->orderBy('t.type', 'DESC')
             ->addOrderBy('t.status')
             ->addOrderBy('t.priority')
-            ->addOrderBy('t.due_date')
+            ->addOrderBy('t.dueDate')
             ->where('t.status <= :status')
             ->setParameter('status', $status);
 
@@ -178,7 +178,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->leftJoin('t.organisation', 'o')
             ->orderBy('t.status')
             ->addOrderBy('t.priority')
-            ->addOrderBy('t.due_date');
+            ->addOrderBy('t.dueDate');
 
         return $qb->getQuery()->getResult();
     }
@@ -210,7 +210,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         return (int) $this->createQueryBuilder('t')
             ->select('COUNT(t.id)')
-            ->where('t.due_date BETWEEN :dateMin AND :dateMax')
+            ->where('t.dueDate BETWEEN :dateMin AND :dateMax')
             ->setParameter('dateMin', $today->format('Y-m-d 00:00:00'))
             ->setParameter('dateMax', $today->format('Y-m-d 23:59:59'))
             ->andWhere('t.status < :status')
@@ -226,7 +226,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         return (int) $this->createQueryBuilder('t')
             ->select('COUNT(t.id)')
-            ->where('t.due_date < :date')
+            ->where('t.dueDate < :date')
             ->setParameter('date', $today->format('Y-m-d H:i:s'))
             ->andWhere('t.status < :status')
             ->setParameter('status', Ticket::STATUS_RESOLVED)
@@ -389,7 +389,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         $qb = $this->createQueryBuilder('q')
             ->select('t')
             ->from(Ticket::class, 't')
-            ->andWhere('t.due_date BETWEEN :dateMin AND :dateMax')
+            ->andWhere('t.dueDate BETWEEN :dateMin AND :dateMax')
             ->setParameter('dateMin', $date->format('Y-m-d H:i:s'))
             ->setParameter('dateMax', $inFuture->format('Y-m-d H:i:s'))
             ->andWhere('t.status <= 2');
@@ -404,8 +404,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         return $this->getEntityManager()->createQueryBuilder('q')
             ->select('t')
             ->from(Ticket::class, 't')
-            ->andWhere('t.due_date < :today')
-            ->andWhere('t.lastNotified < t.due_date')
+            ->andWhere('t.dueDate < :today')
+            ->andWhere('t.lastNotified < t.dueDate')
             ->setParameter('today', $now->format('Y-m-d H:i:s'))
             ->andWhere('t.status <= 3')
             ->getQuery()
@@ -469,12 +469,12 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
                 ->select('COUNT(t.id)')
                 ->from(TicketResponse::class, 't')
                 ->where('t.agent = :agent')
-                ->andWhere('t.ticket_status = :status')
+                ->andWhere('t.ticketStatus = :status')
                 ->setParameter('agent', $agentId)
                 ->setParameter('status', $statusType->getId());
 
             if ($periodStart && $periodEnd !== null) {
-                $qb->andWhere('t.response_date BETWEEN :dateMin AND :dateMax')
+                $qb->andWhere('t.responseDate BETWEEN :dateMin AND :dateMax')
                     ->setParameter('dateMin', $periodStart->format('Y-m-d H:i:s'))
                     ->setParameter('dateMax', $periodEnd->format('Y-m-d H:i:s'));
             }

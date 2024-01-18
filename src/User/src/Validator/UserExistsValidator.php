@@ -1,9 +1,12 @@
 <?php
 
+declare(strict_types=1);
+
 namespace User\Validator;
 
 use Laminas\Validator\AbstractValidator;
 use User\Entity\User;
+
 use function is_array;
 use function is_scalar;
 

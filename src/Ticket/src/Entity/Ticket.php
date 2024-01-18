@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Ticket\Entity;
@@ -72,31 +73,21 @@ class Ticket
     /**
      * @ORM\OneToOne(targetEntity="User\Entity\User")
      * @ORM\JoinColumn(name="assigned_agent_id", referencedColumnName="id", nullable=true)
-     *
-     * @var User
      */
-    private User $assigned_agent;
+    private User $assignedAgent;
 
-    /**
-     * @ORM\Column(name="created_at", type="string", length=10)
-     *
-     * @var string
-     */
+    /** @ORM\Column(name="created_at", type="string", length=10) */
     private string $createdAt;
 
     /**
      * @ORM\OneToOne(targetEntity="Agent", cascade={"all"})
      * @ORM\JoinColumn(name="agent_id", referencedColumnName="id", nullable=true)
-     *
-     * @var Agent
      */
     private Agent $agent;
 
     /**
      * @ORM\OneToOne(targetEntity="\OrganisationContact\Entity\Contact")
      * @ORM\JoinColumn(name="contact_id", referencedColumnName="id")
-     *
-     * @var Contact
      */
     private Contact $contact;
 
@@ -104,170 +95,97 @@ class Ticket
      * @ORM\Id
      * @ORM\Column(name="id", type="integer")
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int
      */
     private int $id;
 
-    /**
-     * @ORM\Column(name="impact", type="integer")
-     *
-     * @var int
-     */
+    /** @ORM\Column(name="impact", type="integer") */
     private int $impact;
 
-    /**
-     * @ORM\Column(name="long_description", type="string")
-     *
-     * @var string
-     */
-    private string $long_description;
+    /** @ORM\Column(name="long_description", type="string") */
+    private string $longDescription;
 
     /**
      * @ORM\OneToOne(targetEntity="\Organisation\Entity\Organisation")
      * @ORM\JoinColumn(name="organisation_id", referencedColumnName="id")
-     *
-     * @var Organisation
      */
     private Organisation $organisation;
 
     /**
      * @ORM\OneToOne(targetEntity="\Ticket\Entity\Priority")
      * @ORM\JoinColumn(name="priority_id", referencedColumnName="id")
-     *
-     * @var Priority
      */
-    private $priority;
+    private Priority|int $priority;
 
     /**
      * @ORM\OneToOne(targetEntity="\Ticket\Entity\Queue")
      * @ORM\JoinColumn(name="queue_id", referencedColumnName="id")
-     *
-     * @var Queue
      */
     private Queue $queue;
 
     /**
      * @ORM\OneToOne(targetEntity="\OrganisationSite\Entity\SiteEntity")
      * @ORM\JoinColumn(name="site_id", referencedColumnName="id", nullable=true)
-     *
-     * @var SiteEntity
      */
     private SiteEntity $site;
 
-    /**
-     * @ORM\Column(name="short_description", type="string", length=255)
-     *
-     * @var string
-     */
-    private string $short_description;
+    /** @ORM\Column(name="short_description", type="string", length=255) */
+    private string $shortDescription;
 
-    /**
-     * @ORM\Column(name="source_id", type="integer")
-     *
-     * @var int
-     */
+    /** @ORM\Column(name="source_id", type="integer") */
     private int $source;
 
-    /**
-     * @ORM\Column(name="due_date", type="string")
-     *
-     * @var string
-     */
-    private string $due_date;
+    /** @ORM\Column(name="due_date", type="string") */
+    private string $dueDate;
 
     /**
      * @ORM\OneToOne(targetEntity="Ticket\Entity\Status")
      * @ORM\JoinColumn(name="status", referencedColumnName="id")
-     *
-     * @var Status
      */
     private Status $status;
 
     /**
      * @ORM\OneToOne(targetEntity="Ticket\Entity\Type")
      * @ORM\JoinColumn(name="type_id", referencedColumnName="id")
-     *
-     * @var Type
      */
     private Type $type;
 
-    /**
-     * @ORM\Column(name="urgency", type="integer")
-     *
-     * @var int
-     */
+    /** @ORM\Column(name="urgency", type="integer") */
     private int $urgency;
 
     /**
      * Unique ticket identifier, non-user friendly to use in e-mail messages to identify tickets
      *
      * @ORM\Column(name="uuid", type="string")
-     *
-     * @var string
      */
-    private $uuid;
+    private string $uuid;
 
-    /**
-     * @ORM\Column(name="last_response_date", type="string")
-     *
-     * @var string|null
-     */
+    /** @ORM\Column(name="last_response_date", type="string") */
     private ?string $lastResponseDate;
 
-    /**
-     * @ORM\Column(name="resolve_date", type="string")
-     *
-     * @var string|null
-     */
+    /** @ORM\Column(name="resolve_date", type="string") */
     private ?string $resolveDate;
 
-    /**
-     * @ORM\Column(name="first_response_date", type="string")
-     *
-     * @var string|null
-     */
+    /** @ORM\Column(name="first_response_date", type="string") */
     private ?string $firstResponseDate;
 
-    /**
-     * @ORM\Column(name="first_response_due", type="string")
-     *
-     * @var string|null
-     */
+    /** @ORM\Column(name="first_response_due", type="string") */
     private ?string $firstResponseDue;
 
-    /**
-     * @ORM\Column(name="last_notified", type="string")
-     *
-     * @var string|null
-     */
+    /** @ORM\Column(name="last_notified", type="string") */
     private ?string $lastNotified;
 
-    /**
-     * @ORM\Column(name="close_date", type="string")
-     *
-     * @var string|null
-     */
+    /** @ORM\Column(name="close_date", type="string") */
     private ?string $closeDate;
 
-    /**
-     * @ORM\Column(name="waiting_date", type="string")
-     *
-     * @var string|null
-     */
+    /** @ORM\Column(name="waiting_date", type="string") */
     private ?string $waitingDate;
 
-    /**
-     * @ORM\Column(name="waiting_reset_date", type="string")
-     *
-     * @var string|null
-     */
+    /** @ORM\Column(name="waiting_reset_date", type="string") */
     private ?string $waitingResetDate;
 
     /**
      * @ORM\OneToOne(targetEntity="ServiceLevel\Entity\SlaTarget")
      * @ORM\JoinColumn(name="sla_target_id", referencedColumnName="id")
-     *
      */
     private ?SlaTarget $slaTarget = null;
 
@@ -276,7 +194,7 @@ class Ticket
         $this->impact  = self::IMPACT_DEFAULT;
         $this->source  = self::SOURCE_PHONE;
         $this->urgency = self::URGENCY_DEFAULT;
-        $this->uuid    = Uuid::uuid4();
+        $this->uuid    = Uuid::uuid4()->toString();
 
         $this->priority = Priority::PRIORITY_LOW;
 
@@ -287,12 +205,12 @@ class Ticket
 
     public function getAssignedAgent(): ?User
     {
-        return $this->assigned_agent;
+        return $this->assignedAgent;
     }
 
-    public function setAssignedAgent(User $assigned_agent): Ticket
+    public function setAssignedAgent(User $assignedAgent): Ticket
     {
-        $this->assigned_agent = $assigned_agent;
+        $this->assignedAgent = $assignedAgent;
         return $this;
     }
 
@@ -342,23 +260,23 @@ class Ticket
 
     public function getShortDescription(): string
     {
-        return $this->short_description;
+        return $this->shortDescription;
     }
 
-    public function setShortDescription(string $short_description): Ticket
+    public function setShortDescription(string $shortDescription): Ticket
     {
-        $this->short_description = $short_description;
+        $this->shortDescription = $shortDescription;
         return $this;
     }
 
     public function getLongDescription(): string
     {
-        return $this->long_description;
+        return $this->longDescription;
     }
 
-    public function setLongDescription(string $long_description): Ticket
+    public function setLongDescription(string $longDescription): Ticket
     {
-        $this->long_description = $long_description;
+        $this->longDescription = $longDescription;
         return $this;
     }
 
@@ -386,12 +304,12 @@ class Ticket
 
     public function getDueDate(): string
     {
-        return $this->due_date;
+        return $this->dueDate;
     }
 
-    public function setDueDate(string $due_date): Ticket
+    public function setDueDate(string $dueDate): Ticket
     {
-        $this->due_date = $due_date;
+        $this->dueDate = $dueDate;
         return $this;
     }
 
@@ -607,16 +525,16 @@ class Ticket
 
     public function exchangeArray(array $data): Ticket
     {
-        $this->id                = isset($data['id']) ? (int) $data['id'] : null;
-        $this->createdAt         = isset($data['createdAt']) ? (string) $data['createdAt'] : date('Y-m-d H:i:s');
-        $this->impact            = isset($data['impact']) ? (int) $data['impact'] : self::IMPACT_DEFAULT;
-        $this->urgency           = isset($data['urgency']) ? (int) $data['urgency'] : self::URGENCY_DEFAULT;
-        $this->short_description = isset($data['short_description']) ? (string) $data['short_description'] : null;
-        $this->slaTarget         = $data['sla_target'] ?? null;
-        $this->organisation      = $data['organisation'] ?? null;
-        $this->long_description  = isset($data['long_description']) ? (string) $data['long_description'] : null;
+        $this->id               = isset($data['id']) ? (int) $data['id'] : null;
+        $this->createdAt        = isset($data['createdAt']) ? (string) $data['createdAt'] : date('Y-m-d H:i:s');
+        $this->impact           = isset($data['impact']) ? (int) $data['impact'] : self::IMPACT_DEFAULT;
+        $this->urgency          = isset($data['urgency']) ? (int) $data['urgency'] : self::URGENCY_DEFAULT;
+        $this->shortDescription = isset($data['short_description']) ? (string) $data['short_description'] : null;
+        $this->slaTarget        = $data['sla_target'] ?? null;
+        $this->organisation     = $data['organisation'] ?? null;
+        $this->longDescription  = isset($data['long_description']) ? (string) $data['long_description'] : null;
 
-        $this->due_date = isset($data['due_date']) && strlen($data['due_date']) > 1
+        $this->dueDate = isset($data['due_date']) && strlen($data['due_date']) > 1
             ? (string) $data['due_date']
             : date('Y-m-d H:i:s');
 

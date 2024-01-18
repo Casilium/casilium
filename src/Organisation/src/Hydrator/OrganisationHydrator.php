@@ -9,6 +9,7 @@ use Laminas\Hydrator\AbstractHydrator;
 use Organisation\Entity\Domain;
 use Organisation\Entity\Organisation;
 use Ramsey\Uuid\Uuid;
+
 use function array_key_exists;
 use function implode;
 use function is_string;

@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OrganisationSite\Exception;
 
 use RuntimeException;
+
 use function sprintf;
 
 class SiteNotFoundException extends RuntimeException implements ExceptionInterface

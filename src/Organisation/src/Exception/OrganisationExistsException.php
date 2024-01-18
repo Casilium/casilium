@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Organisation\Exception;
 
 use RuntimeException;
+
 use function sprintf;
 
 class OrganisationExistsException extends RuntimeException implements ExceptionInterface

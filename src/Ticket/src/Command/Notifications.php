@@ -12,6 +12,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Ticket\Entity\Ticket;
 use Ticket\Service\TicketService;
+
 use function gmdate;
 use function sprintf;
 use function strtolower;

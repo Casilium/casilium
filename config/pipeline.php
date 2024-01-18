@@ -2,8 +2,10 @@
 
 declare(strict_types=1);
 
+use App\Middleware\XMLHttpRequestTemplateMiddleware;
 use Laminas\Stratigility\Middleware\ErrorHandler;
 use Mezzio\Application;
+use Mezzio\Csrf\CsrfMiddleware;
 use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Handler\NotFoundHandler;
 use Mezzio\Helper\ServerUrlMiddleware;
@@ -16,11 +18,13 @@ use Mezzio\Router\Middleware\MethodNotAllowedMiddleware;
 use Mezzio\Router\Middleware\RouteMiddleware;
 use Mezzio\Session\SessionMiddleware;
 use Psr\Container\ContainerInterface;
+use User\Middleware\AuthorisationMiddleware;
 
 /**
  * Setup middleware pipeline:
  */
-return function (Application $app, MiddlewareFactory $factory, ContainerInterface $container) : void {
+
+return function (Application $app, MiddlewareFactory $factory, ContainerInterface $container): void {
     // The error handler should be the first (most outer) middleware to catch
     // all Exceptions.
     $app->pipe(ErrorHandler::class);
@@ -64,7 +68,7 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
 
     // Seed the UrlHelper with the routing results:
     $app->pipe(UrlHelperMiddleware::class);
-    $app->pipe(\Mezzio\Csrf\CsrfMiddleware::class);
+    $app->pipe(CsrfMiddleware::class);
 
     // Add more middleware here that needs to introspect the routing results; this
     // might include:
@@ -73,10 +77,10 @@ return function (Application $app, MiddlewareFactory $factory, ContainerInterfac
     // - route-based validation
     // - etc.
 
-    $app->pipe(\User\Middleware\AuthorisationMiddleware::class);
+    $app->pipe(AuthorisationMiddleware::class);
 
     // AJAX / XMLHttpRequest detection
-    $app->pipe(\App\Middleware\XMLHttpRequestTemplateMiddleware::class);
+    $app->pipe(XMLHttpRequestTemplateMiddleware::class);
 
     // Register the dispatch middleware in the middleware pipeline
     $app->pipe(DispatchMiddleware::class);

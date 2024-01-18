@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace User\Service;
@@ -6,6 +7,7 @@ namespace User\Service;
 use Exception;
 use User\Entity\User;
 use UserAuthentication\Entity\Identity;
+
 use function array_pop;
 use function explode;
 use function implode;

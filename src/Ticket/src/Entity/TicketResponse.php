@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace Ticket\Entity;
@@ -6,6 +7,7 @@ namespace Ticket\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use OrganisationContact\Entity\Contact;
 use Ticket\Entity\Ticket;
+
 use function date;
 use function get_object_vars;
 use function time;
@@ -20,68 +22,50 @@ class TicketResponse
      * @ORM\Id
      * @ORM\Column(name="id", type="integer")
      * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\OneToOne(targetEntity="Agent")
      * @ORM\JoinColumn(name="agent_id", referencedColumnName="id", nullable=true)
-     *
-     * @var Agent
      */
-    private $agent;
+    private ?Agent $agent;
 
     /**
      * @ORM\OneToOne(targetEntity="\OrganisationContact\Entity\Contact")
      * @ORM\JoinColumn(name="contact_id", referencedColumnName="id")
-     *
-     * @var Contact
      */
-    private $contact;
+    private ?Contact $contact;
 
-    /**
-     * @ORM\Column(name="response", type="string")
-     *
-     * @var string
-     */
-    private $response;
+    /** @ORM\Column(name="response", type="string") */
+    private string $response;
 
-    /**
-     * @ORM\Column(name="response_date", type="string")
-     *
-     * @var string
-     */
-    private $response_date;
+    /** @ORM\Column(name="response_date", type="string") */
+    private string $responseDate;
 
     /**
      * @ORM\ManyToOne(targetEntity="Ticket\Entity\Ticket", inversedBy="response")
      * @ORM\JoinColumn(name="ticket_id", referencedColumnName="id")
-     *
-     * @var Ticket
      */
-    private $ticket;
+    private Ticket $ticket;
 
     /**
      * @ORM\OneToOne(targetEntity="Ticket\Entity\Status")
      * @ORM\JoinColumn(name="ticket_status", referencedColumnName="id")
-     *
-     * @var Status
      */
-    private $ticket_status;
+    private Status $ticketStatus;
 
     /**
      * @ORM\Column(name="is_public")
      *
      * @var int
      */
-    private $is_public;
+    private $isPublic;
 
     public function __construct()
     {
-        $this->response_date = date('Y-m-d H:i:s', time());
-        $this->is_public     = 1;
+        $this->responseDate = date('Y-m-d H:i:s', time());
+        $this->isPublic     = 1;
     }
 
     public function getAgent(): ?Agent
@@ -130,12 +114,12 @@ class TicketResponse
 
     public function getResponseDate(): string
     {
-        return $this->response_date;
+        return $this->responseDate;
     }
 
-    public function setResponseDate(string $response_date): TicketResponse
+    public function setResponseDate(string $responseDate): TicketResponse
     {
-        $this->response_date = $response_date;
+        $this->responseDate = $responseDate;
         return $this;
     }
 
@@ -152,23 +136,23 @@ class TicketResponse
 
     public function getTicketStatus(): Status
     {
-        return $this->ticket_status;
+        return $this->ticketStatus;
     }
 
-    public function setTicketStatus(Status $ticket_status): TicketResponse
+    public function setTicketStatus(Status $ticketStatus): TicketResponse
     {
-        $this->ticket_status = $ticket_status;
+        $this->ticketStatus = $ticketStatus;
         return $this;
     }
 
     public function getIsPublic(): int
     {
-        return $this->is_public;
+        return $this->isPublic;
     }
 
-    public function setIsPublic(int $is_public): TicketResponse
+    public function setIsPublic(int $isPublic): TicketResponse
     {
-        $this->is_public = $is_public;
+        $this->isPublic = $isPublic;
         return $this;
     }
 
@@ -182,12 +166,12 @@ class TicketResponse
 
     public function exchangeArray(array $data): TicketResponse
     {
-        $this->id        = isset($data['id']) ? (int) $data['id'] : null;
-        $this->response  = isset($data['response']) ? (string) $data['response'] : null;
-        $this->agent     = isset($data['agent_id']) ? (int) $data['agent_id'] : null;
-        $this->contact   = isset($data['contact_id']) ? (int) $data['contact_id'] : null;
-        $this->ticket    = $data['ticket'] ?? null;
-        $this->is_public = isset($data['is_public']) ? (int) $data['is_public'] : 0;
+        $this->id       = $data['id'] ?? null;
+        $this->response = $data['response'] ?? null;
+        $this->agent    = $data['agent_id'] ?? null;
+        $this->contact  = $data['contact_id'] ?? null;
+        $this->ticket   = $data['ticket'] ?? null;
+        $this->isPublic = isset($data['is_public']) ? (int) $data['is_public'] : 0;
         return $this;
     }
 }

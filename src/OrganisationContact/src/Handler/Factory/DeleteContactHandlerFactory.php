@@ -12,7 +12,7 @@ use Psr\Container\ContainerInterface;
 
 class DeleteContactHandlerFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): DeleteContactHandler
     {
         $service  = $container->get(ContactService::class);
         $renderer = $container->get(TemplateRendererInterface::class);

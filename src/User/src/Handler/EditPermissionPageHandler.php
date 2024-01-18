@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace User\Handler;
@@ -19,6 +20,7 @@ use Psr\Http\Server\RequestHandlerInterface;
 use User\Entity\Permission;
 use User\Form\PermissionForm;
 use User\Service\PermissionManager;
+
 use function gettype;
 use function is_array;
 use function sprintf;

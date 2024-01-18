@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace User\Handler;
@@ -21,6 +22,7 @@ use User\Entity\Role;
 use User\Entity\User;
 use User\Form\UserForm;
 use User\Service\UserManager;
+
 use function gettype;
 use function is_array;
 use function sprintf;

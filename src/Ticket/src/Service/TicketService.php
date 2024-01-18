@@ -26,9 +26,11 @@ use Ticket\Entity\TicketResponse;
 use Ticket\Entity\Type;
 use User\Entity\User;
 use User\Service\UserManager;
+
 use function filter_var;
 use function gmdate;
 use function sprintf;
+
 use const FILTER_SANITIZE_STRING;
 
 class TicketService

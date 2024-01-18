@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace User\Service;
@@ -6,6 +7,7 @@ namespace User\Service;
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
 use User\Entity\Permission;
+
 use function date;
 
 class PermissionManager

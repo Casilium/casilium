@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace User\Handler;
@@ -20,6 +21,7 @@ use User\Entity\Permission;
 use User\Entity\Role;
 use User\Form\RolePermissionsForm;
 use User\Service\RoleManager;
+
 use function gettype;
 use function is_array;
 use function sprintf;

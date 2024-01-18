@@ -1,4 +1,5 @@
 <?php
+
 declare(strict_types=1);
 
 namespace User\Service;
@@ -10,6 +11,7 @@ use Mezzio\Template\TemplateRendererInterface;
 use User\Entity\Role;
 use User\Entity\User;
 use User\Exception\PasswordMismatchException;
+
 use function bin2hex;
 use function date;
 use function password_hash;
@@ -19,6 +21,7 @@ use function sprintf;
 use function strcmp;
 use function strtotime;
 use function time;
+
 use const PASSWORD_BCRYPT;
 
 class UserManager

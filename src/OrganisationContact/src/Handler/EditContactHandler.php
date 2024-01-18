@@ -71,7 +71,6 @@ class EditContactHandler implements RequestHandlerInterface
             }
         }
 
-
         return new HtmlResponse($this->renderer->render('contact::create', [
             'contact' => $contact,
             'form'    => $form,

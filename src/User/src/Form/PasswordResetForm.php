@@ -1,5 +1,7 @@
 <?php
 
+declare(strict_types=1);
+
 namespace User\Form;
 
 use Laminas\Form\Element;
@@ -85,7 +87,7 @@ class PasswordResetForm extends Form
     /**
      * This method creates input filter (used for form filtering/validation).
      */
-    private function addInputFilter(): array
+    private function addInputFilter(): void
     {
         // Create main input filter
         $inputFilter = $this->getInputFilter();

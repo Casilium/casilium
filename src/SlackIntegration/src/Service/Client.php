@@ -6,6 +6,7 @@ namespace SlackIntegration\Service;
 
 use Exception;
 use SlackIntegration\Entity\Message;
+
 use function curl_close;
 use function curl_exec;
 use function curl_init;
@@ -15,6 +16,7 @@ use function json_last_error;
 use function json_last_error_msg;
 use function sprintf;
 use function str_replace;
+
 use const CURLOPT_CUSTOMREQUEST;
 use const CURLOPT_POSTFIELDS;
 use const CURLOPT_RETURNTRANSFER;

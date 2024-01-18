@@ -15,25 +15,21 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Ticket\Entity\Queue;
-use Ticket\Entity\Ticket;
 use Ticket\Form\TicketForm;
 use Ticket\Hydrator\TicketHydrator;
 use Ticket\Service\TicketService;
+
 use function sprintf;
 
 class EditTickerHandler implements RequestHandlerInterface
 {
-    /** @var TicketService */
-    protected $ticketService;
+    protected TicketService $ticketService;
 
-    /** @var TicketHydrator */
-    protected $hydrator;
+    protected TicketHydrator $hydrator;
 
-    /** @var TemplateRendererInterface */
-    protected $renderer;
+    protected TemplateRendererInterface $renderer;
 
-    /** @var UrlHelper */
-    protected $urlHelper;
+    protected UrlHelper $urlHelper;
 
     public function __construct(
         TicketService $ticketService,
@@ -70,7 +66,6 @@ class EditTickerHandler implements RequestHandlerInterface
             $form->setData($request->getParsedBody());
 
             if ($form->isValid()) {
-                /** @var Ticket $ticket */
                 $data = $form->getData();
 
                 $data['id']              = $ticket->getId();

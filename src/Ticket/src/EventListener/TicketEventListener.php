@@ -15,6 +15,7 @@ use SlackIntegration\Service\Client as slackClient;
 use Ticket\Entity\Status;
 use Ticket\Entity\Ticket;
 use Ticket\Entity\TicketResponse;
+
 use function sprintf;
 
 class TicketEventListener

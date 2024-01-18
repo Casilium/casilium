@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Organisation\Validator;
 
 use Laminas\Validator\AbstractValidator;
+
 use function preg_match;
 
 /**

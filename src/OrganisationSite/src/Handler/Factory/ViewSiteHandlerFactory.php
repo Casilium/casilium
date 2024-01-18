@@ -12,7 +12,7 @@ use Psr\Container\ContainerInterface;
 
 class ViewSiteHandlerFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): ViewSiteHandler
     {
         $siteManager = $container->get(SiteManager::class);
         $renderer    = $container->get(TemplateRendererInterface::class);

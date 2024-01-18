@@ -45,11 +45,11 @@ class ConfigProvider
             'invokables' => [],
             'factories'  => [
                 // Role Pages
-                Handler\AddRolePageHandler::class       => Handler\Factory\AddRolePageHandlerFactory::class,
-                Handler\DeleteRolePageHandler::class    => Handler\Factory\DeleteRolePageHandlerFactory::class,
-                Handler\EditRolePageHandler::class      => Handler\Factory\EditRolePageHandlerFactory::class,
-                Handler\ListRolePageHandler::class      => Handler\Factory\ListRolePageHandlerFactory::class,
-                Handler\ViewRolePageHandler::class      => Handler\Factory\ViewRolePageHandlerFactory::class,
+                Handler\AddRolePageHandler::class    => Handler\Factory\AddRolePageHandlerFactory::class,
+                Handler\DeleteRolePageHandler::class => Handler\Factory\DeleteRolePageHandlerFactory::class,
+                Handler\EditRolePageHandler::class   => Handler\Factory\EditRolePageHandlerFactory::class,
+                Handler\ListRolePageHandler::class   => Handler\Factory\ListRolePageHandlerFactory::class,
+                Handler\ViewRolePageHandler::class   => Handler\Factory\ViewRolePageHandlerFactory::class,
                 Handler\EditRolePermissionsPageHandler::class
                     => Handler\Factory\EditRolePermissionsPageHandlerFactory::class,
 

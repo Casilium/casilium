@@ -11,7 +11,7 @@ use Psr\Container\ContainerInterface;
 
 class ContactServiceFactory
 {
-    public function __invoke(ContainerInterface $container)
+    public function __invoke(ContainerInterface $container): ContactService
     {
         $entityManager       = $container->get(EntityManager::class);
         $organisationService = $container->get(OrganisationManager::class);
