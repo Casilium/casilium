@@ -46,7 +46,7 @@ class RbacManager
             return false;
         }
 
-        // If user wants us to reinit RBAC container, clear cache now
+        // If user wants us to init RBAC container, clear cache now
         if ($forceCreate) {
             $this->cache->removeItem('rbac_container');
         }
@@ -54,10 +54,10 @@ class RbacManager
         // try to load Rbac container from cache
         $result = $this->cache->getItem('rbac_container', $result);
         if (null !== $result) {
-            $result = unserialize($result);
+            $this->rbac = unserialize($result);
         }
 
-        if (! $result) {
+        if ($this->rbac instanceof Rbac) {
             $this->rbac = new Rbac();
             $this->rbac->setCreateMissingRoles(true);
 
@@ -81,6 +81,7 @@ class RbacManager
             // save Rbac container to the cache
             $this->cache->setItem('rbac_container', serialize($this->rbac));
         }
+
         return true;
     }
 
