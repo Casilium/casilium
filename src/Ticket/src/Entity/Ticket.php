@@ -15,6 +15,7 @@ use Ramsey\Uuid\Uuid;
 use ServiceLevel\Entity\SlaTarget;
 use ServiceLevel\Service\CalculateBusinessHours;
 use User\Entity\User;
+
 use function date;
 use function get_object_vars;
 use function is_string;
@@ -74,14 +75,14 @@ class Ticket
      *
      * @var User
      */
-    private $assigned_agent;
+    private User $assigned_agent;
 
     /**
      * @ORM\Column(name="created_at", type="string", length=10)
      *
      * @var string
      */
-    private $createdAt;
+    private string $createdAt;
 
     /**
      * @ORM\OneToOne(targetEntity="Agent", cascade={"all"})
@@ -89,7 +90,7 @@ class Ticket
      *
      * @var Agent
      */
-    private $agent;
+    private Agent $agent;
 
     /**
      * @ORM\OneToOne(targetEntity="\OrganisationContact\Entity\Contact")
@@ -97,7 +98,7 @@ class Ticket
      *
      * @var Contact
      */
-    private $contact;
+    private Contact $contact;
 
     /**
      * @ORM\Id
@@ -106,21 +107,21 @@ class Ticket
      *
      * @var int
      */
-    private $id;
+    private int $id;
 
     /**
      * @ORM\Column(name="impact", type="integer")
      *
      * @var int
      */
-    private $impact;
+    private int $impact;
 
     /**
      * @ORM\Column(name="long_description", type="string")
      *
      * @var string
      */
-    private $long_description;
+    private string $long_description;
 
     /**
      * @ORM\OneToOne(targetEntity="\Organisation\Entity\Organisation")
@@ -128,7 +129,7 @@ class Ticket
      *
      * @var Organisation
      */
-    private $organisation;
+    private Organisation $organisation;
 
     /**
      * @ORM\OneToOne(targetEntity="\Ticket\Entity\Priority")
@@ -144,7 +145,7 @@ class Ticket
      *
      * @var Queue
      */
-    private $queue;
+    private Queue $queue;
 
     /**
      * @ORM\OneToOne(targetEntity="\OrganisationSite\Entity\SiteEntity")
@@ -152,28 +153,28 @@ class Ticket
      *
      * @var SiteEntity
      */
-    private $site;
+    private SiteEntity $site;
 
     /**
      * @ORM\Column(name="short_description", type="string", length=255)
      *
      * @var string
      */
-    private $short_description;
+    private string $short_description;
 
     /**
      * @ORM\Column(name="source_id", type="integer")
      *
      * @var int
      */
-    private $source;
+    private int $source;
 
     /**
      * @ORM\Column(name="due_date", type="string")
      *
      * @var string
      */
-    private $due_date;
+    private string $due_date;
 
     /**
      * @ORM\OneToOne(targetEntity="Ticket\Entity\Status")
@@ -181,7 +182,7 @@ class Ticket
      *
      * @var Status
      */
-    private $status;
+    private Status $status;
 
     /**
      * @ORM\OneToOne(targetEntity="Ticket\Entity\Type")
@@ -189,14 +190,14 @@ class Ticket
      *
      * @var Type
      */
-    private $type;
+    private Type $type;
 
     /**
      * @ORM\Column(name="urgency", type="integer")
      *
      * @var int
      */
-    private $urgency;
+    private int $urgency;
 
     /**
      * Unique ticket identifier, non-user friendly to use in e-mail messages to identify tickets
@@ -212,64 +213,63 @@ class Ticket
      *
      * @var string|null
      */
-    private $lastResponseDate;
+    private ?string $lastResponseDate;
 
     /**
      * @ORM\Column(name="resolve_date", type="string")
      *
      * @var string|null
      */
-    private $resolveDate;
+    private ?string $resolveDate;
 
     /**
      * @ORM\Column(name="first_response_date", type="string")
      *
      * @var string|null
      */
-    private $firstResponseDate;
+    private ?string $firstResponseDate;
 
     /**
      * @ORM\Column(name="first_response_due", type="string")
      *
      * @var string|null
      */
-    private $firstResponseDue;
+    private ?string $firstResponseDue;
 
     /**
      * @ORM\Column(name="last_notified", type="string")
      *
      * @var string|null
      */
-    private $lastNotified;
+    private ?string $lastNotified;
 
     /**
      * @ORM\Column(name="close_date", type="string")
      *
      * @var string|null
      */
-    private $closeDate;
+    private ?string $closeDate;
 
     /**
      * @ORM\Column(name="waiting_date", type="string")
      *
      * @var string|null
      */
-    private $waitingDate;
+    private ?string $waitingDate;
 
     /**
      * @ORM\Column(name="waiting_reset_date", type="string")
      *
      * @var string|null
      */
-    private $waitingResetDate;
+    private ?string $waitingResetDate;
 
     /**
      * @ORM\OneToOne(targetEntity="ServiceLevel\Entity\SlaTarget")
      * @ORM\JoinColumn(name="sla_target_id", referencedColumnName="id")
      *
-     * @var SlaTarget|null
      */
-    private $slaTarget;
+    private ?SlaTarget $slaTarget = null;
 
     public function __construct()
     {
@@ -524,7 +524,7 @@ class Ticket
         $this->slaTarget = $slaTarget;
     }
 
-    public function getSlaTarget(): SlaTarget
+    public function getSlaTarget(): ?SlaTarget
     {
         return $this->slaTarget;
     }
