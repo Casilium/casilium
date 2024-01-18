@@ -9,12 +9,11 @@ be used as it is currently in development, not even at Alpha stage.
 Requirements
 ------------
   * HTTP server running Apache / Nginx / IIS
-  * PHP Version 7.4:
+  * PHP Version 8.2:
     * curl
     * gd
     * iconv
     * intl
-    * json
     * mbsring
     * mysqli
     * pdo
@@ -25,7 +24,7 @@ Requirements
     * simplexml
     * sodium
     * xml
-  * Mysql Server v5.7
+  * Mysql Server v5.7 / v8.0
   
 Installation
 ------------
