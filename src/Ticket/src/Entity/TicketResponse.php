@@ -29,13 +29,13 @@ class TicketResponse
      * @ORM\OneToOne(targetEntity="Agent")
      * @ORM\JoinColumn(name="agent_id", referencedColumnName="id", nullable=true)
      */
-    private ?Agent $agent;
+    private ?Agent $agent = null;
 
     /**
      * @ORM\OneToOne(targetEntity="\OrganisationContact\Entity\Contact")
      * @ORM\JoinColumn(name="contact_id", referencedColumnName="id")
      */
-    private ?Contact $contact;
+    private ?Contact $contact = null;
 
     /** @ORM\Column(name="response", type="string") */
     private string $response;
