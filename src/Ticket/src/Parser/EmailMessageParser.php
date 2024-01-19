@@ -85,7 +85,7 @@ class EmailMessageParser
             $body = self::sanitiseLineBreaks($body);
             $body = self::stripSignature($body);
 
-            return filter_var($body, FILTER_SANITIZE_STRING);
+            return htmlspecialchars($body);
         }
 
         return null;
