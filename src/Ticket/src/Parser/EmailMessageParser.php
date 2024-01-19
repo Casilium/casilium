@@ -21,7 +21,6 @@ use function strrpos;
 use function strtok;
 use function substr;
 
-use const FILTER_SANITIZE_STRING;
 use const FILTER_VALIDATE_EMAIL;
 
 class EmailMessageParser
