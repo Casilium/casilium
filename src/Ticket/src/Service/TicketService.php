@@ -27,11 +27,8 @@ use Ticket\Entity\Type;
 use User\Entity\User;
 use User\Service\UserManager;
 
-use function filter_var;
 use function gmdate;
 use function sprintf;
-
-use const FILTER_SANITIZE_STRING;
 
 class TicketService
 {
@@ -41,29 +38,21 @@ class TicketService
     public const DUE_PERIOD_WEEKS   = 4;
     public const DUE_PERIOD_MONTHS  = 5;
 
-    /** @var EventManagerInterface */
-    protected $eventManager;
+    protected EventManagerInterface $eventManager;
 
-    /** @var EntityManager */
-    protected $entityManager;
+    protected EntityManager $entityManager;
 
-    /** @var OrganisationManager */
-    protected $organisationManager;
+    protected OrganisationManager $organisationManager;
 
-    /** @var SiteManager */
-    protected $siteManager;
+    protected SiteManager $siteManager;
 
-    /** @var ContactService */
-    protected $contactManager;
+    protected ContactService $contactManager;
 
-    /** @var QueueManager */
-    protected $queueManager;
+    protected QueueManager $queueManager;
 
-    /** @var UserManager */
-    protected $userManager;
+    protected UserManager $userManager;
 
-   /** @var MailService  */
-    protected $mailService;
+    protected MailService $mailService;
 
     public function __construct(
         EventManagerInterface $eventManager,
@@ -445,8 +434,8 @@ class TicketService
                 'Ticket %s (%s) raised by %s at %s is due in %s',
                 $ticket->getId(),
                 $ticketTitle,
-                filter_var($ticket->getContact()->getFirstName(), FILTER_SANITIZE_STRING),
-                filter_var($ticket->getOrganisation()->getName(), FILTER_SANITIZE_STRING),
+                htmlspecialchars($ticket->getContact()->getFirstName()),
+                htmlspecialchars($ticket->getOrganisation()->getName()),
                 $due
             );
 
@@ -467,8 +456,8 @@ class TicketService
             'Ticket #%s (%s) raised by %s from %s is now overdue and requires attention',
             $ticket->getId(),
             $ticket->getShortDescription(),
-            filter_var($ticket->getContact()->getFirstName(), FILTER_SANITIZE_STRING),
-            filter_var($ticket->getOrganisation()->getName(), FILTER_SANITIZE_STRING),
+            htmlspecialchars($ticket->getContact()->getFirstName()),
+            htmlspecialchars($ticket->getOrganisation()->getName()),
         );
 
         /** @var Agent $member */
