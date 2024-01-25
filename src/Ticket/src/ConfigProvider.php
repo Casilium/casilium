@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace Ticket;
 
-use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Mezzio\Application;
 
 class ConfigProvider
@@ -99,7 +99,7 @@ class ConfigProvider
         return [
             'routes' => [
                 'ticket' => [
-                    ['allow' => '@'],
+                    ['allow' => '+ticket.manage'],
                 ],
             ],
         ];

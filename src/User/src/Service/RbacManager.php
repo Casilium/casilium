@@ -53,7 +53,8 @@ class RbacManager
 
         $rbacCache = $this->cache->getItem('rbac_container');
         if ($rbacCache->isHit()) {
-            $this->rbac = unserialize($rbacCache->get());
+            $rbac       = unserialize($rbacCache->get());
+            $this->rbac = $rbac;
         }
 
         if (! $this->rbac instanceof Rbac) {
@@ -79,6 +80,7 @@ class RbacManager
 
             // save Rbac container to the cache
             $rbacCache->set(serialize($this->rbac));
+            $this->cache->save($rbacCache);
         }
 
         return true;
@@ -97,7 +99,6 @@ class RbacManager
 
         /** @var User $user */
         $user = $this->entityManager->getRepository(User::class)->find($identity);
-
         if ($user === null) {
             throw new Exception(sprintf('No such user "%s"', $identity));
         }

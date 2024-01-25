@@ -3,8 +3,13 @@
 declare(strict_types=1);
 
 return [
-    'mfa' => [
+    'mfa'   => [
         'enabled' => true,
         'issuer'  => 'casilium.com',
+    ],
+    'cache' => [
+        'namespace' => '',
+        'ttl'       => 0,
+        'directory' => './data/cache',
     ],
 ];

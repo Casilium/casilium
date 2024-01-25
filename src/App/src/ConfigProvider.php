@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Laminas\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory;
 use Laminas\ServiceManager\Factory\InvokableFactory;
 use Roave\PsrContainerDoctrine\EntityManagerFactory;
+use Symfony\Component\Cache\Adapter\AdapterInterface as CacheAdapterInterface;
 
 /**
  * The configuration provider for the App module
@@ -42,6 +43,7 @@ class ConfigProvider
                 Command\CreateSodiumKey::class,
             ],
             'factories'  => [
+                CacheAdapterInterface::class                       => Cache\FileSystemCacheFactory::class,
                 EntityManager::class                               => EntityManagerFactory::class,
                 Handler\HomePageHandler::class                     => Handler\Factory\HomePageHandlerFactory::class,
                 Handler\AdminPageHandler::class                    => Handler\Factory\AdminPageHandlerFactory::class,
