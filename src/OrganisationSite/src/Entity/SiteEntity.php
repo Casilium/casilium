@@ -79,7 +79,7 @@ class SiteEntity
      * @ORM\OneToOne(targetEntity="OrganisationSite\Entity\CountryEntity")
      * @ORM\JoinColumn(name="country_id", referencedColumnName="id", nullable=false)
      */
-    protected ?CountryEntity $country;
+    protected ?CountryEntity $country = null;
 
     /**
      * @ORM\OneToOne(targetEntity="Organisation\Entity\Organisation")
