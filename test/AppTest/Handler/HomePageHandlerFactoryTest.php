@@ -7,46 +7,34 @@ namespace AppTest\Handler;
 use App\Handler\Factory\HomePageHandlerFactory;
 use App\Handler\HomePageHandler;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Mezzio\Template\TemplateRendererInterface;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Psr\Container\ContainerInterface;
+use Ticket\Entity\Ticket;
 use Ticket\Repository\TicketRepository;
 
 class HomePageHandlerFactoryTest extends TestCase
 {
     use ProphecyTrait;
 
-    /** @var ContainerInterface|ObjectProphecy */
-    protected $container;
-
-    protected function setUp(): void
-    {
-        // Setup container
-        $this->container = $this->prophesize(ContainerInterface::class);
-
-        $this->container
-            ->get(TemplateRendererInterface::class)
-            ->willReturn($this->prophesize(TemplateRendererInterface::class));
-
-        $ticketRepository = $this->prophesize(TicketRepository::class);
-        $entityManager    = $this->prophesize(EntityManager::class);
-        $entityManager
-            ->getRepository(Argument::any())
-            ->willReturn($ticketRepository->reveal());
-
-        $this->container->get(EntityManager::class)
-            ->willReturn($entityManager->reveal());
-    }
-
     public function testInstantiateFactory()
     {
-        $factory = new HomePageHandlerFactory();
+        $templateRenderInterface = $this->prophesize(TemplateRendererInterface::class);
+        $ticketRepository        = $this->prophesize(TicketRepository::class);
 
-        $homePage = $factory($this->container->reveal());
+        $entityManager = $this->prophesize(EntityManager::class);
+        $entityManager->getRepository(Ticket::class)->willReturn($ticketRepository->reveal());
 
-        self::assertInstanceOf(HomePageHandler::class, $homePage);
+        $container = $this->prophesize(ContainerInterface::class);
+        $container->get(EntityManagerInterface::class)->wilLReturn($entityManager->reveal());
+        $container->get(TemplateRendererInterface::class)->willReturn($templateRenderInterface->reveal());
+
+        $factory  = new HomePageHandlerFactory();
+        $homePage = $factory($container->reveal());
+        $this->assertInstanceOf(HomePageHandler::class, $homePage);
     }
 }
