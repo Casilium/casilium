@@ -5,16 +5,17 @@ declare(strict_types=1);
 namespace User\Service\Factory;
 
 use Doctrine\ORM\EntityManagerInterface;
-use Laminas\Cache\Storage\StorageInterface;
 use Psr\Container\ContainerInterface;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
+use Symfony\Component\Cache\Adapter\FilesystemAdapter;
 use User\Service\RbacManager;
 
 class RbacManagerFactory
 {
     public function __invoke(ContainerInterface $container): RbacManager
     {
-        /** @var StorageInterface $cache */
-        $cache = $container->get(StorageInterface::class);
+        /** @var AdapterInterface $cache */
+        $cache = new FilesystemAdapter();
 
         /** @var EntityManagerInterface $em */
         $em = $container->get('doctrine.entity_manager.orm_default');

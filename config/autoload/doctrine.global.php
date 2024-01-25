@@ -7,17 +7,16 @@ use Doctrine\Migrations\Configuration\Migration\ConfigurationLoader;
 use Doctrine\Migrations\DependencyFactory;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
-use Laminas\Cache\Storage\StorageInterface;
 use Ramsey\Uuid\Doctrine\UuidType;
 use Roave\PsrContainerDoctrine\EntityManagerFactory;
 use Roave\PsrContainerDoctrine\Migrations\ConfigurationLoaderFactory;
 use Roave\PsrContainerDoctrine\Migrations\DependencyFactoryFactory;
+use Symfony\Component\Cache\Adapter\ArrayAdapter;
 
 return [
     'dependencies' => [
         'aliases'   => [
             EntityManagerInterface::class => 'doctrine.entity_manager.orm_default',
-            StorageInterface::class       => 'FileSystemCache',
         ],
         'factories' => [
             'doctrine.entity_manager.orm_default' => EntityManagerFactory::class,
@@ -28,8 +27,33 @@ return [
     'doctrine'     => [
         'driver'        => [
             'orm_default' => [
-                'class'   => MappingDriverChain::class,
-                'drivers' => [],
+                'class' => MappingDriverChain::class,
+            ],
+        ],
+        'connection'    => [
+            'orm_default' => [
+                'charset'   => 'UTF8mb4',
+                'collation' => 'UTF8mb4_unicode_ci',
+            ],
+        ],
+        'configuration' => [
+            'orm_default' => [
+                'result_cache'       => 'array',
+                'metadata_cache'     => 'array',
+                'query_cache'        => 'array',
+                'hydration_cache'    => 'array',
+                'second_level_cache' => [
+                    'enabled'                    => false,
+                    'default_lifetime'           => 3600,
+                    'default_lock_lifetime'      => 60,
+                    'file_lock_region_directory' => '',
+                    'regions'                    => [],
+                ],
+            ],
+        ],
+        'cache'         => [
+            'array' => [
+                'class' => ArrayAdapter::class,
             ],
         ],
         'migrations'    => [
@@ -46,21 +70,6 @@ return [
                 ],
                 'all_or_nothing'          => true,
                 'check_database_platform' => true,
-            ],
-        ],
-        'configuration' => [
-            'orm_default' => [
-                'result_cache'       => 'array',
-                'metadata_cache'     => 'array',
-                'query_cache'        => 'array',
-                'hydration_cache'    => 'array',
-                'second_level_cache' => [
-                    'enabled'                    => false,
-                    'default_lifetime'           => 3600,
-                    'default_lock_lifetime'      => 60,
-                    'file_lock_region_directory' => '',
-                    'regions'                    => [],
-                ],
             ],
         ],
         'types'         => [

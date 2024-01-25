@@ -2,8 +2,6 @@
 
 declare(strict_types=1);
 
-use Laminas\Cache\Storage\Adapter\Apcu;
-use Laminas\Cache\Storage\Adapter\Filesystem;
 use Laminas\ConfigAggregator\ConfigAggregator;
 
 return [
@@ -21,18 +19,6 @@ return [
         'error_handler' => [
             'template_404'   => 'error::404',
             'template_error' => 'error::error',
-        ],
-    ],
-    'caches' => [
-        'FileSystemCache' => [
-            'adapter' => Filesystem::class,
-            'options' => [
-                'cache_dir' => './data/cache',
-                'ttl'       => 60 * 60 * 1,
-            ],
-        ],
-        'ApcCache'        => [
-            'adapter' => Apcu::class,
         ],
     ],
 ];

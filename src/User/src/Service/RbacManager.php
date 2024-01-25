@@ -6,10 +6,9 @@ namespace User\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Laminas\Cache\Exception\ExceptionInterface;
-use Laminas\Cache\Storage\StorageInterface;
 use Laminas\Permissions\Rbac\AssertionInterface;
 use Laminas\Permissions\Rbac\Rbac;
+use Symfony\Component\Cache\Adapter\AdapterInterface;
 use User\Entity\Role;
 use User\Entity\User;
 
@@ -21,13 +20,13 @@ class RbacManager
 {
     private array $assertionManagers = [];
 
-    private StorageInterface $cache;
+    private AdapterInterface $cache;
 
     private EntityManagerInterface $entityManager;
 
     private ?Rbac $rbac;
 
-    public function __construct(StorageInterface $cache, EntityManagerInterface $entityManager)
+    public function __construct(AdapterInterface $cache, EntityManagerInterface $entityManager)
     {
         $this->cache         = $cache;
         $this->entityManager = $entityManager;
@@ -38,7 +37,6 @@ class RbacManager
      * Initialize the RBAC container
      *
      * @param bool $forceCreate Force creation if already initialized
-     * @throws ExceptionInterface
      */
     public function init(bool $forceCreate = false): bool
     {
@@ -48,13 +46,14 @@ class RbacManager
 
         // If user wants us to init RBAC container, clear cache now
         if ($forceCreate) {
-            $this->cache->removeItem('rbac_container');
+            if ($this->cache->hasItem('rbac_container')) {
+                $this->cache->deleteItem('rbac_container');
+            }
         }
 
-        // try to load Rbac container from cache
-        $result = $this->cache->getItem('rbac_container', $result);
-        if (null !== $result) {
-            $this->rbac = unserialize($result);
+        $rbacCache = $this->cache->getItem('rbac_container');
+        if ($rbacCache->isHit()) {
+            $this->rbac = unserialize($rbacCache->get());
         }
 
         if (! $this->rbac instanceof Rbac) {
@@ -79,7 +78,7 @@ class RbacManager
             }
 
             // save Rbac container to the cache
-            $this->cache->setItem('rbac_container', serialize($this->rbac));
+            $rbacCache->set(serialize($this->rbac));
         }
 
         return true;
