@@ -8,7 +8,7 @@
 ## Requirements
 
   * HTTP server running (apache/nginx)
-  * PHP Version 8.2 with following extensions:
+  * PHP 8.2/8.3 with following extensions:
     * apcu
     * dom
     * iconv
