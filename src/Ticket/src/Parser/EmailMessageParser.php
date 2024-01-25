@@ -11,6 +11,7 @@ use RecursiveIteratorIterator;
 use function base64_decode;
 use function filter_var;
 use function gettype;
+use function htmlspecialchars;
 use function is_string;
 use function preg_match_all;
 use function preg_replace;

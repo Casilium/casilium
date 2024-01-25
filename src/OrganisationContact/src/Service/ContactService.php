@@ -36,7 +36,7 @@ class ContactService
             return $contact;
         }
 
-        $orgId = $contact->getOrganisation()->getId();
+        $orgId     = $contact->getOrganisation()->getId();
         $reference = $this->entityManager->getReference(Organisation::class, $orgId);
         $contact->setOrganisation($reference);
 

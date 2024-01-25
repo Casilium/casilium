@@ -28,6 +28,7 @@ use User\Entity\User;
 use User\Service\UserManager;
 
 use function gmdate;
+use function htmlspecialchars;
 use function sprintf;
 
 class TicketService
