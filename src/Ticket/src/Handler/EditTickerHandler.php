@@ -14,6 +14,7 @@ use OrganisationSite\Entity\SiteEntity;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Ticket\Entity\Agent;
 use Ticket\Entity\Queue;
 use Ticket\Form\TicketForm;
 use Ticket\Hydrator\TicketHydrator;
@@ -49,13 +50,17 @@ class EditTickerHandler implements RequestHandlerInterface
         $ticket     = $this->ticketService->getTicketByUuid($ticketUuid);
 
         $form = new TicketForm();
-        $form->get('agent_id')->setValue($ticket->getAgent()->getId());
+        if ($ticket->getAgent() instanceof Agent) {
+            $form->get('agent_id')->setValue($ticket->getAgent()->getId());
+        }
         $form->get('short_description')->setValue($ticket->getShortDescription());
         $form->get('long_description')->setValue($ticket->getLongDescription());
         $form->get('source')->setValue($ticket->getSource());
         $form->get('contact_id')->setValue($ticket->getContact()->getId());
         $form->get('queue_id')->setValue($ticket->getQueue()->getId());
-        $form->get('site_id')->setValue($ticket->getSite()->getId());
+        if ($ticket->getSite() instanceof SiteEntity) {
+            $form->get('site_id')->setValue($ticket->getSite()->getId());
+        }
         $form->get('impact')->setValue($ticket->getImpact());
         $form->get('urgency')->setValue($ticket->getUrgency());
         //$form->get('priority_id')->setValue($ticket->getPriority()->getId());
@@ -69,7 +74,7 @@ class EditTickerHandler implements RequestHandlerInterface
                 $data = $form->getData();
 
                 $data['id']              = $ticket->getId();
-                $data['agent_id']        = $ticket->getAgent()->getId();
+                $data['agent_id']        = $ticket->getAgent()?->getId();
                 $data['organisation_id'] = $ticket->getOrganisation()->getId();
                 $ticket                  = $this->ticketService->save($data);
 

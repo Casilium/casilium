@@ -83,7 +83,7 @@ class Ticket
      * @ORM\OneToOne(targetEntity="Agent", cascade={"all"})
      * @ORM\JoinColumn(name="agent_id", referencedColumnName="id", nullable=true)
      */
-    private Agent $agent;
+    private ?Agent $agent;
 
     /**
      * @ORM\OneToOne(targetEntity="\OrganisationContact\Entity\Contact")
@@ -126,7 +126,7 @@ class Ticket
      * @ORM\OneToOne(targetEntity="\OrganisationSite\Entity\SiteEntity")
      * @ORM\JoinColumn(name="site_id", referencedColumnName="id", nullable=true)
      */
-    private SiteEntity $site;
+    private ?SiteEntity $site;
 
     /** @ORM\Column(name="short_description", type="string", length=255) */
     private string $shortDescription;
@@ -197,6 +197,8 @@ class Ticket
         $this->uuid    = Uuid::uuid4()->toString();
 
         $this->priority = Priority::PRIORITY_LOW;
+        $this->agent = null;
+        $this->site = null;
 
         $dateTime           = new DateTime('now', new DateTimeZone('UTC'));
         $this->createdAt    = $dateTime->format('Y-m-d H:i:s');
