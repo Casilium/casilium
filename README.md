@@ -8,10 +8,12 @@
 ## Requirements
 
   * HTTP server running (apache/nginx)
-  * PHP 8.2/8.3 with following extensions:
+  * PHP 8.2/8.3/8.4 with following extensions:
     * apcu
+    * curl
     * dom
     * iconv
+    * json
     * pdo
     * pdo_mysql
     * session
