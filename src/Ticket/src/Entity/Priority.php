@@ -6,10 +6,8 @@ namespace Ticket\Entity;
 
 use Doctrine\Orm\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="ticket_priority")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'ticket_priority')]
 class Priority
 {
     public const PRIORITY_CRITICAL = 2;
@@ -26,20 +24,12 @@ class Priority
         self::PRIORITY_LOW      => 'Low',
     ];
 
-    /**
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     *
-     * @var int
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    private int $id;
 
-    /**
-     * @ORM\Column(name="name")
-     *
-     * @var string
-     */
-    private $name;
+    #[ORM\Column(name: 'name')]
+    private string $name;
 
     public function getId(): int
     {

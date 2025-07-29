@@ -7,37 +7,23 @@ namespace Ticket\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use User\Entity\User;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="queue_member")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'queue_member')]
 
 class QueueMember
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private int $id;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Ticket\Entity\Queue")
-     * @ORM\JoinColumn(name="queue_id", referencedColumnName="id", nullable=true)
-     *
-     * @var Queue
-     */
-    private $queue;
+    #[ORM\OneToOne(targetEntity: Queue::class)]
+    #[ORM\JoinColumn(name: 'queue_id', referencedColumnName: 'id', nullable: true)]
+    private ?Queue $queue;
 
-    /**
-     * @ORM\OneToOne(targetEntity="User\Entity\User")
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=true)
-     *
-     * @var User
-     */
-    private $member;
+    #[ORM\OneToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id', nullable: true)]
+    private ?User $member;
 
     public function getId(): int
     {

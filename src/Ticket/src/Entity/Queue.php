@@ -10,82 +10,45 @@ use Doctrine\ORM\Mapping as ORM;
 
 use function get_object_vars;
 
-/**
- * @ORM\Entity(repositoryClass="Ticket\Repository\QueueRepository")
- * @ORM\Table(name="queue")
- */
+#[ORM\Entity(repositoryClass: 'Ticket\Repository\QueueRepository')]
+#[ORM\Table(name: 'queue')]
 class Queue
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private int $id;
 
-    /**
-     * @ORM\Column(name="name", type="string")
-     *
-     * @var string
-     */
-    private $name;
+    #[ORM\Column(name: 'name', type: 'string')]
+    private string $name;
 
-    /**
-     * @ORM\Column(name="email", type="string")
-     *
-     * @var string
-     */
-    private $email;
+    #[ORM\Column(name: 'email', type: 'string')]
+    private string $email;
 
-    /**
-     * @ORM\Column(name="host", type="string", nullable=true)
-     *
-     * @var string
-     */
-    private $host;
+    #[ORM\Column(name: 'host', type: 'string', nullable: true)]
+    private ?string $host;
 
-    /**
-     * @ORM\Column(name="user", type="string", nullable=true)
-     *
-     * @var string
-     */
-    private $user;
+    #[ORM\Column(name: 'user', type: 'string', nullable: true)]
+    private ?string $user;
 
-    /**
-     * @ORM\Column(name="password", type="string", nullable=true)
-     *
-     * @var string
-     */
-    private $password;
+    #[ORM\Column(name: 'password', type: 'string', nullable: true)]
+    private ?string $password;
 
-    /**
-     * @ORM\Column(name="use_ssl", type="boolean", nullable=true)
-     *
-     * @var bool
-     */
-    private $useSsl;
+    #[ORM\Column(name: 'use_ssl', type: 'boolean', nullable: true)]
+    private ?bool $useSsl;
 
-    /**
-     * @ORM\Column(name="fetch_from_mail", type="boolean", nullable=true)
-     *
-     * @var bool
-     */
-    private $fetchFromMail;
+    #[ORM\Column(name: 'fetch_from_mail', type: 'boolean', nullable: true)]
+    private ?bool $fetchFromMail;
 
-    /**
-     * @ORM\ManyToMany (targetEntity="Agent", inversedBy="queues")
-     * @ORM\JoinTable (name="queue_member",
-     *     joinColumns={@ORM\JoinColumn(name="queue_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn("user_id", referencedColumnName="id")}
-     * )
-     *
-     * @var ArrayCollection
-     */
-    protected $members;
+    #[ORM\ManyToMany(targetEntity: Agent::class, inversedBy: 'queues')]
+    #[ORM\JoinTable(
+        name: 'queue_member',
+        joinColumns: [new ORM\JoinColumn(name: 'queue_id', referencedColumnName: 'id')],
+        inverseJoinColumns: [new ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    )]
+    protected Collection $members;
 
-    public function construct()
+    public function __construct()
     {
         $this->members = new ArrayCollection();
     }

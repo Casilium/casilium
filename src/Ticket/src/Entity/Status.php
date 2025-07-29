@@ -6,10 +6,8 @@ namespace Ticket\Entity;
 
 use Doctrine\Orm\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="ticket_status")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'ticket_status')]
 class Status
 {
     public const STATUS_OPEN        = 1;
@@ -26,21 +24,13 @@ class Status
         self::STATUS_CLOSED      => 'Closed',
     ];
 
-    /**
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private int $id;
 
-    /**
-     * @ORM\Column(name="description")
-     *
-     * @var string
-     */
-    private $description;
+    #[ORM\Column(name: 'description')]
+    private string $description;
 
     public function getId(): int
     {

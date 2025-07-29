@@ -22,10 +22,8 @@ use function get_object_vars;
 use function is_string;
 use function strlen;
 
-/**
- * @ORM\Entity(repositoryClass="Ticket\Repository\TicketRepository")
- * @ORM\Table(name="ticket")
- */
+#[ORM\Entity(repositoryClass: 'Ticket\Repository\TicketRepository')]
+#[ORM\Table(name: 'ticket')]
 class Ticket
 {
     public const IMPACT_HIGH    = 1;
@@ -70,123 +68,100 @@ class Ticket
         self::STATUS_CLOSED      => 'Closed',
     ];
 
-    /**
-     * @ORM\OneToOne(targetEntity="User\Entity\User")
-     * @ORM\JoinColumn(name="assigned_agent_id", referencedColumnName="id", nullable=true)
-     */
+    #[ORM\OneToOne(targetEntity: User::class)]
+    #[ORM\JoinColumn(name: 'assigned_agent_id', referencedColumnName: 'id', nullable: true)]
     private User $assignedAgent;
 
-    /** @ORM\Column(name="created_at", type="string", length=10) */
+    #[ORM\Column(name: 'created_at', type: 'string', length: 10)]
     private string $createdAt;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Agent", cascade={"all"})
-     * @ORM\JoinColumn(name="agent_id", referencedColumnName="id", nullable=true)
-     */
+    #[ORM\OneToOne(targetEntity: Agent::class, cascade: ['all'])]
+    #[ORM\JoinColumn(name: 'agent_id', referencedColumnName: 'id', nullable: true)]
     private ?Agent $agent;
 
-    /**
-     * @ORM\OneToOne(targetEntity="\OrganisationContact\Entity\Contact")
-     * @ORM\JoinColumn(name="contact_id", referencedColumnName="id")
-     */
+    #[ORM\OneToOne(targetEntity: Contact::class)]
+    #[ORM\JoinColumn(name: 'contact_id', referencedColumnName: 'id')]
     private Contact $contact;
 
-    /**
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private int $id;
 
-    /** @ORM\Column(name="impact", type="integer") */
+    #[ORM\Column(name: 'impact', type: 'integer')]
     private int $impact;
 
-    /** @ORM\Column(name="long_description", type="string") */
+    #[ORM\Column(name: 'long_description', type: 'string')]
     private string $longDescription;
 
-    /**
-     * @ORM\OneToOne(targetEntity="\Organisation\Entity\Organisation")
-     * @ORM\JoinColumn(name="organisation_id", referencedColumnName="id")
-     */
+    #[ORM\OneToOne(targetEntity: Organisation::class)]
+    #[ORM\JoinColumn(name: 'organisation_id', referencedColumnName: 'id')]
     private Organisation $organisation;
 
-    /**
-     * @ORM\OneToOne(targetEntity="\Ticket\Entity\Priority")
-     * @ORM\JoinColumn(name="priority_id", referencedColumnName="id")
-     */
+    #[ORM\OneToOne(targetEntity: Priority::class)]
+    #[ORM\JoinColumn(name: 'priority_id', referencedColumnName: 'id')]
     private Priority|int $priority;
 
-    /**
-     * @ORM\OneToOne(targetEntity="\Ticket\Entity\Queue")
-     * @ORM\JoinColumn(name="queue_id", referencedColumnName="id")
-     */
+    #[ORM\OneToOne(targetEntity: Queue::class)]
+    #[ORM\JoinColumn(name: 'queue_id', referencedColumnName: 'id')]
     private Queue $queue;
 
-    /**
-     * @ORM\OneToOne(targetEntity="\OrganisationSite\Entity\SiteEntity")
-     * @ORM\JoinColumn(name="site_id", referencedColumnName="id", nullable=true)
-     */
+    #[ORM\OneToOne(targetEntity: SiteEntity::class)]
+    #[ORM\JoinColumn(name: 'site_id', referencedColumnName: 'id', nullable: true)]
     private ?SiteEntity $site;
 
-    /** @ORM\Column(name="short_description", type="string", length=255) */
+    #[ORM\Column(name: 'short_description', type: 'string', length: 255)]
     private string $shortDescription;
 
-    /** @ORM\Column(name="source_id", type="integer") */
+    #[ORM\Column(name: 'source_id', type: 'integer')]
     private int $source;
 
-    /** @ORM\Column(name="due_date", type="string") */
+    #[ORM\Column(name: 'due_date', type: 'string')]
     private string $dueDate;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Ticket\Entity\Status")
-     * @ORM\JoinColumn(name="status", referencedColumnName="id")
-     */
+    #[ORM\OneToOne(targetEntity: Status::class)]
+    #[ORM\JoinColumn(name: 'status', referencedColumnName: 'id')]
     private Status $status;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Ticket\Entity\Type")
-     * @ORM\JoinColumn(name="type_id", referencedColumnName="id")
-     */
+    #[ORM\OneToOne(targetEntity: Type::class)]
+    #[ORM\JoinColumn(name: 'type_id', referencedColumnName: 'id')]
     private Type $type;
 
-    /** @ORM\Column(name="urgency", type="integer") */
+    #[ORM\Column(name: 'urgency', type: 'integer')]
     private int $urgency;
 
     /**
      * Unique ticket identifier, non-user friendly to use in e-mail messages to identify tickets
-     *
-     * @ORM\Column(name="uuid", type="string")
      */
+    #[ORM\Column(name: 'uuid', type: 'string')]
     private string $uuid;
 
-    /** @ORM\Column(name="last_response_date", type="string") */
+    #[ORM\Column(name: 'last_response_date', type: 'string')]
     private ?string $lastResponseDate;
 
-    /** @ORM\Column(name="resolve_date", type="string") */
+    #[ORM\Column(name: 'resolve_date', type: 'string')]
     private ?string $resolveDate;
 
-    /** @ORM\Column(name="first_response_date", type="string") */
+    #[ORM\Column(name: 'first_response_date', type: 'string')]
     private ?string $firstResponseDate;
 
-    /** @ORM\Column(name="first_response_due", type="string") */
+    #[ORM\Column(name: 'first_response_due', type: 'string')]
     private ?string $firstResponseDue;
 
-    /** @ORM\Column(name="last_notified", type="string") */
+    #[ORM\Column(name: 'last_notified', type: 'string')]
     private ?string $lastNotified;
 
-    /** @ORM\Column(name="close_date", type="string") */
+    #[ORM\Column(name: 'close_date', type: 'string')]
     private ?string $closeDate;
 
-    /** @ORM\Column(name="waiting_date", type="string") */
+    #[ORM\Column(name: 'waiting_date', type: 'string')]
     private ?string $waitingDate;
 
-    /** @ORM\Column(name="waiting_reset_date", type="string") */
+    #[ORM\Column(name: 'waiting_reset_date', type: 'string')]
     private ?string $waitingResetDate;
 
-    /**
-     * @ORM\OneToOne(targetEntity="ServiceLevel\Entity\SlaTarget")
-     * @ORM\JoinColumn(name="sla_target_id", referencedColumnName="id")
-     */
+    #[ORM\OneToOne(targetEntity: SlaTarget::class)]
+    #[ORM\JoinColumn(name: 'sla_target_id', referencedColumnName: 'id')]
     private ?SlaTarget $slaTarget = null;
 
     public function __construct()

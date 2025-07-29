@@ -7,48 +7,26 @@ namespace Ticket\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="user")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'user')]
 class Agent
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue
-     *
-     * @var int
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue]
+    private int $id;
 
-    /**
-     * @ORM\Column(name="email")
-     *
-     * @var string
-     */
-    private $email;
+    #[ORM\Column(name: 'email')]
+    private string $email;
 
-    /**
-     * @ORM\Column(name="full_name")
-     *
-     * @var string
-     */
-    private $fullName;
+    #[ORM\Column(name: 'full_name')]
+    private string $fullName;
 
-    /**
-     * @ORM\ManyToMany (targetEntity="Queue", mappedBy="queues")
-     *
-     * @var ArrayCollection
-     */
-    protected $queues;
+    #[ORM\ManyToMany(targetEntity: Queue::class, mappedBy: 'queues')]
+    protected ArrayCollection $queues;
 
-    /**
-     * @ORM\Column(name="status")
-     *
-     * @var int
-     */
-    protected $status;
+    #[ORM\Column(name: 'status')]
+    protected int $status;
 
     public function __construct()
     {
