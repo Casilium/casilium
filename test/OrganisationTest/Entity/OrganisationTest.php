@@ -231,9 +231,7 @@ class OrganisationTest extends TestCase
 
     public function testGetSlaReturnsNullByDefault(): void
     {
-        // The SLA property is not initialized, so accessing it before setting will cause an error
-        // This test should be skipped or the entity needs to initialize SLA as null
-        $this->markTestSkipped('SLA property is not initialized in constructor');
+        $this->assertNull($this->organisation->getSla());
     }
 
     public function testHasSlaReturnsTrueWhenSlaIsSet(): void
@@ -246,9 +244,7 @@ class OrganisationTest extends TestCase
 
     public function testHasSlaReturnsFalseWhenSlaIsNull(): void
     {
-        // The SLA property is not initialized, so this will cause an error
-        // The hasSla method logic also seems incorrect (comparing with false instead of null)
-        $this->markTestSkipped('SLA property is not initialized and hasSla logic checks against false instead of null');
+        $this->assertFalse($this->organisation->hasSla());
     }
 
     public function testToStringReturnsName(): void

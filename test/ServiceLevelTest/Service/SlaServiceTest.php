@@ -33,14 +33,6 @@ class SlaServiceTest extends TestCase
         $this->slaService    = new SlaService($this->entityManager->reveal());
     }
 
-    public function testSaveBusinessHoursCreatesNewWhenNoId(): void
-    {
-        // BusinessHours entity has issues with exchangeArray() method and uninitialized properties
-        $this->markTestSkipped(
-            'BusinessHours entity has issues with exchangeArray() method and uninitialized properties'
-        );
-    }
-
     public function testSaveBusinessHoursUpdatesExistingWhenIdProvided(): void
     {
         $data = [
@@ -204,14 +196,6 @@ class SlaServiceTest extends TestCase
         $this->expectExceptionMessage('Business hours id not passed');
 
         $this->slaService->createSla($data);
-    }
-
-    public function testCreateSlaThrowsExceptionWhenBusinessHoursNotFound(): void
-    {
-        // SlaService has return type issue with findBusinessHoursById method
-        $this->markTestSkipped(
-            'SlaService findBusinessHoursById has return type mismatch - returns null but typed as BusinessHours'
-        );
     }
 
     public function testFindSlaTargetsBySlaId(): void

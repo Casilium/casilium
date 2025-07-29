@@ -86,19 +86,28 @@ class BusinessHours
 
     public function __construct()
     {
+        $this->id   = null;
+        $this->name = 'Default Business Hours';
+
         // define default timezone and active days
         $this->setTimezone('Europe/London')
              ->setMonActive(true)
              ->setTueActive(true)
              ->setWedActive(true)
              ->setThuActive(true)
-             ->setFriActive(true);
+             ->setFriActive(true)
+             ->setSatActive(false)
+             ->setSunActive(false);
 
         $this->setMonStart('09:00')->setMonEnd('17:00');
         $this->setTueStart('09:00')->setTueEnd('17:00');
         $this->setWedStart('09:00')->setWedEnd('17:00');
         $this->setThuStart('09:00')->setThuEnd('17:00');
         $this->setFriStart('09:00')->setFriEnd('17:00');
+
+        // Initialize weekend times to null (they're nullable)
+        $this->setSatStart(null)->setSatEnd(null);
+        $this->setSunStart(null)->setSunEnd(null);
     }
 
     public function getId(): ?int
@@ -288,7 +297,7 @@ class BusinessHours
         return $this;
     }
 
-    public function getMonActive(): ?bool
+    public function getMonActive(): bool
     {
         return $this->monActive;
     }
@@ -299,7 +308,7 @@ class BusinessHours
         return $this;
     }
 
-    public function getTueActive(): ?bool
+    public function getTueActive(): bool
     {
         return $this->tueActive;
     }
@@ -310,7 +319,7 @@ class BusinessHours
         return $this;
     }
 
-    public function getWedActive(): ?bool
+    public function getWedActive(): bool
     {
         return $this->wedActive;
     }
@@ -321,7 +330,7 @@ class BusinessHours
         return $this;
     }
 
-    public function getThuActive(): ?bool
+    public function getThuActive(): bool
     {
         return $this->thuActive;
     }
@@ -332,7 +341,7 @@ class BusinessHours
         return $this;
     }
 
-    public function getFriActive(): ?bool
+    public function getFriActive(): bool
     {
         return $this->friActive;
     }
@@ -343,7 +352,7 @@ class BusinessHours
         return $this;
     }
 
-    public function getSatActive(): ?bool
+    public function getSatActive(): bool
     {
         return $this->satActive;
     }
@@ -354,7 +363,7 @@ class BusinessHours
         return $this;
     }
 
-    public function getSunActive(): ?bool
+    public function getSunActive(): bool
     {
         return $this->sunActive;
     }
@@ -385,13 +394,13 @@ class BusinessHours
         $this->sunStart = $data['sun_start'] ?? null;
         $this->sunEnd   = $data['sun_end'] ?? null;
 
-        $this->monActive = $data['mon_active'] ?? null;
-        $this->tueActive = $data['tue_active'] ?? null;
-        $this->wedActive = $data['wed_active'] ?? null;
-        $this->thuActive = $data['thu_active'] ?? null;
-        $this->friActive = $data['fri_active'] ?? null;
-        $this->satActive = $data['sat_active'] ?? null;
-        $this->sunActive = $data['sun_active'] ?? null;
+        $this->monActive = $data['mon_active'] ?? false;
+        $this->tueActive = $data['tue_active'] ?? false;
+        $this->wedActive = $data['wed_active'] ?? false;
+        $this->thuActive = $data['thu_active'] ?? false;
+        $this->friActive = $data['fri_active'] ?? false;
+        $this->satActive = $data['sat_active'] ?? false;
+        $this->sunActive = $data['sun_active'] ?? false;
     }
 
     public function getArrayCopy(): array

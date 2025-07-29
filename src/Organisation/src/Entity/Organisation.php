@@ -72,6 +72,7 @@ class Organisation implements OrganisationInterface
     public function __construct()
     {
         $this->id      = null;
+        $this->sla     = null;
         $this->domains = new ArrayCollection();
 
         $this->isActive = self::STATE_ACTIVE;
@@ -215,7 +216,7 @@ class Organisation implements OrganisationInterface
 
     public function hasSla(): bool
     {
-        if ($this->sla !== false) {
+        if ($this->sla !== null) {
             return true;
         }
 

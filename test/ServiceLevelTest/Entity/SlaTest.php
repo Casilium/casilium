@@ -24,8 +24,7 @@ class SlaTest extends TestCase
     {
         $sla = new Sla();
 
-        // Sla entity doesn't initialize $id property, so we skip testing getId() in constructor test
-        $this->markTestSkipped('Sla entity $id property not initialized in constructor');
+        $this->assertNull($sla->getId());
         $this->assertInstanceOf(ArrayCollection::class, $sla->getSlaTargets());
         $this->assertCount(0, $sla->getSlaTargets());
     }

@@ -32,6 +32,9 @@ class SlaService
         } else {
             // fetch existing data
             $businessHours = $this->findBusinessHoursById((int) $id);
+            if ($businessHours === null) {
+                throw new Exception('Business Hours not found');
+            }
         }
 
         // repopulate data
@@ -54,6 +57,9 @@ class SlaService
     public function deleteBusinessHours(int $id): void
     {
         $businessHours = $this->findBusinessHoursById($id);
+        if ($businessHours === null) {
+            throw new Exception('Business Hours not found');
+        }
         $this->entityManager->remove($businessHours);
         $this->entityManager->flush();
     }
@@ -61,7 +67,7 @@ class SlaService
     /**
      * Find business hours from id
      */
-    public function findBusinessHoursById(int $id): BusinessHours
+    public function findBusinessHoursById(int $id): ?BusinessHours
     {
         return $this->entityManager->getRepository(BusinessHours::class)->find($id);
     }

@@ -29,6 +29,7 @@ class Sla
 
     public function __construct()
     {
+        $this->id         = null;
         $this->slaTargets = new ArrayCollection();
     }
 

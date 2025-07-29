@@ -6,6 +6,7 @@ namespace ServiceLevelTest\Entity;
 
 use PHPUnit\Framework\TestCase;
 use ServiceLevel\Entity\BusinessHours;
+use TypeError;
 
 class BusinessHoursTest extends TestCase
 {
@@ -20,8 +21,7 @@ class BusinessHoursTest extends TestCase
     {
         $businessHours = new BusinessHours();
 
-        // BusinessHours entity doesn't initialize $id property, so we skip testing getId() in constructor test
-        $this->markTestSkipped('BusinessHours entity $id property not initialized in constructor');
+        $this->assertNull($businessHours->getId());
         $this->assertEquals('Europe/London', $businessHours->getTimezone());
 
         // Test weekday defaults (Mon-Fri active with 9-5 hours)
@@ -32,8 +32,8 @@ class BusinessHoursTest extends TestCase
         $this->assertTrue($businessHours->getFriActive());
 
         // Weekend should be inactive by default
-        $this->assertNull($businessHours->getSatActive());
-        $this->assertNull($businessHours->getSunActive());
+        $this->assertFalse($businessHours->getSatActive());
+        $this->assertFalse($businessHours->getSunActive());
 
         // Check default working hours
         $this->assertEquals('09:00', $businessHours->getMonStart());
@@ -186,8 +186,22 @@ class BusinessHoursTest extends TestCase
 
     public function testGetArrayCopyReturnsCorrectStructure(): void
     {
-        // BusinessHours entity has uninitialized properties that cause errors in getArrayCopy()
-        $this->markTestSkipped('BusinessHours entity has uninitialized properties that cause errors in getArrayCopy()');
+        $result = $this->businessHours->getArrayCopy();
+
+        $this->assertIsArray($result);
+        $this->assertArrayHasKey('id', $result);
+        $this->assertArrayHasKey('name', $result);
+        $this->assertArrayHasKey('timezone', $result);
+
+        // Check some default values
+        $this->assertNull($result['id']);
+        $this->assertEquals('Default Business Hours', $result['name']);
+        $this->assertEquals('Europe/London', $result['timezone']);
+
+        // Check active flags are booleans
+        $this->assertIsBool($result['mon_active']);
+        $this->assertIsBool($result['sat_active']);
+        $this->assertIsBool($result['sun_active']);
     }
 
     public function testFluentInterfaceChaining(): void
@@ -211,20 +225,44 @@ class BusinessHoursTest extends TestCase
 
     public function testExchangeArrayHandlesMissingValues(): void
     {
-        // BusinessHours entity uses bool type for active properties, not nullable bool
-        $this->markTestSkipped('BusinessHours entity uses non-nullable bool for active properties');
+        $data = [
+            'id'       => 123,
+            'name'     => 'Test Hours',
+            'timezone' => 'America/New_York',
+            // Intentionally omit some active flags to test defaults
+            'mon_active' => true,
+            // tue_active missing - should default to false
+            'wed_active' => true,
+            // Other days missing - should default to false
+        ];
+
+        $this->businessHours->exchangeArray($data);
+
+        $this->assertEquals(123, $this->businessHours->getId());
+        $this->assertEquals('Test Hours', $this->businessHours->getName());
+        $this->assertEquals('America/New_York', $this->businessHours->getTimezone());
+
+        // Test active flags - missing ones should default to false
+        $this->assertTrue($this->businessHours->getMonActive());
+        $this->assertFalse($this->businessHours->getTueActive()); // Missing, defaults to false
+        $this->assertTrue($this->businessHours->getWedActive());
+        $this->assertFalse($this->businessHours->getThuActive()); // Missing, defaults to false
+        $this->assertFalse($this->businessHours->getFriActive()); // Missing, defaults to false
+        $this->assertFalse($this->businessHours->getSatActive()); // Missing, defaults to false
+        $this->assertFalse($this->businessHours->getSunActive()); // Missing, defaults to false
     }
 
     public function testSetNullTimesAndActiveStates(): void
     {
-        // Times can be set to null, but active states cannot due to bool type
+        // Times can be set to null (they're nullable)
         $this->businessHours->setMonStart(null);
         $this->businessHours->setMonEnd(null);
 
         $this->assertNull($this->businessHours->getMonStart());
         $this->assertNull($this->businessHours->getMonEnd());
 
-        // Skip testing setMonActive(null) as it's not nullable bool type
-        $this->markTestIncomplete('Active properties are not nullable in BusinessHours entity');
+        // Active states cannot be set to null (they're non-nullable bool)
+        $this->expectException(TypeError::class);
+        $this->businessHours->setMonActive(null);
     }
 }
