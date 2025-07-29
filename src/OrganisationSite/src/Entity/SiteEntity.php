@@ -17,54 +17,40 @@ use function array_filter;
 use function implode;
 use function is_string;
 
-/**
- * @ORM\Entity(repositoryClass="\OrganisationSite\Repository\SiteRepository")
- * @ORM\Table(name="organisation_site")
- */
+#[ORM\Entity(repositoryClass: '\OrganisationSite\Repository\SiteRepository')]
+#[ORM\Table(name: 'organisation_site')]
 class SiteEntity
 {
-    /**
-     * Internal Site ID
-     *
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     protected int $id;
 
-    /** @ORM\Column(type="uuid", unique=true) */
+    #[ORM\Column(type: 'uuid', unique: true)]
     protected UuidInterface $uuid;
 
-    /**
-     * Site name or identifier
-     *
-     * @ORM\Column(name="name", type="string", length=64)
-     */
+    #[ORM\Column(name: 'name', type: 'string', length: 64)]
     protected ?string $name = null;
 
-    /** @ORM\Column(name="street_address", type="string", length=64) */
+    #[ORM\Column(name: 'street_address', type: 'string', length: 64)]
     protected ?string $streetAddress = null;
 
-    /** @ORM\Column(name="street_address2", type="string", length=64) */
+    #[ORM\Column(name: 'street_address2', type: 'string', length: 64)]
     protected ?string $streetAddress2 = null;
 
-    /** @ORM\Column(name="town", type="string", length=64) */
+    #[ORM\Column(name: 'town', type: 'string', length: 64)]
     protected ?string $town = null;
 
-    /** @ORM\Column(name="city", type="string", length=64) */
+    #[ORM\Column(name: 'city', type: 'string', length: 64)]
     protected ?string $city = null;
 
-    /**
-     * County, Province or State
-     *
-     * @ORM\Column(name="county", type="string", length=64)
-     */
+    #[ORM\Column(name: 'county', type: 'string', length: 64)]
     protected ?string $county = null;
 
-    /** @ORM\Column(name="postal_code", type="string", length=10) */
+    #[ORM\Column(name: 'postal_code', type: 'string', length: 10)]
     protected ?string $postalCode = null;
 
-    /** @ORM\Column(name="telephone", type="string", length=20) */
+    #[ORM\Column(name: 'telephone', type: 'string', length: 20)]
     protected ?string $telephone = null;
 
     public function __construct()
@@ -73,18 +59,12 @@ class SiteEntity
         $this->uuid = Uuid::uuid4();
     }
 
-    /**
-     * Country
-     *
-     * @ORM\OneToOne(targetEntity="OrganisationSite\Entity\CountryEntity")
-     * @ORM\JoinColumn(name="country_id", referencedColumnName="id", nullable=false)
-     */
+    #[ORM\OneToOne(targetEntity: CountryEntity::class)]
+    #[ORM\JoinColumn(name: 'country_id', referencedColumnName: 'id', nullable: false)]
     protected ?CountryEntity $country = null;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Organisation\Entity\Organisation")
-     * @ORM\JoinColumn(name="organisation_id", referencedColumnName="id", nullable=false, onDelete="cascade")
-     */
+    #[ORM\OneToOne(targetEntity: Organisation::class)]
+    #[ORM\JoinColumn(name: 'organisation_id', referencedColumnName: 'id', nullable: false, onDelete: 'cascade')]
     protected ?Organisation $organisation = null;
 
     public function getId(): int

@@ -6,31 +6,17 @@ namespace OrganisationSite\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity(repositoryClass="\OrganisationSite\Repository\CountryRepository")
- * @ORM\Table(name="country")
- */
+#[ORM\Entity(repositoryClass: '\OrganisationSite\Repository\CountryRepository')]
+#[ORM\Table(name: 'country')]
 class CountryEntity
 {
-    /**
-     * Internal Country ID
-     *
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private int $id;
 
-    /**
-     * Country name
-     *
-     * @ORM\Column(name="name", type="string", length=64)
-     *
-     * @var string
-     */
-    private $name;
+    #[ORM\Column(name: 'name', type: 'string', length: 64)]
+    private string $name;
 
     public function getId(): int
     {
