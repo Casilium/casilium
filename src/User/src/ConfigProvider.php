@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace User;
 
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Mezzio\Application;
 
@@ -114,7 +114,7 @@ class ConfigProvider
                     ],
                 ],
                 'user_entity' => [
-                    'class' => AnnotationDriver::class,
+                    'class' => AttributeDriver::class,
                     'cache' => 'array',
                     'dir'   => __DIR__ . '/Entity/',
                 ],

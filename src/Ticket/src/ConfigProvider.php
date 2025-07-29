@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ticket;
 
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Mezzio\Application;
 
@@ -81,7 +81,7 @@ class ConfigProvider
                     ],
                 ],
                 'ticket_entity' => [
-                    'class' => AnnotationDriver::class,
+                    'class' => AttributeDriver::class,
                     'cache' => 'array',
                     'paths' => [__DIR__ . '/Entity'],
                 ],
