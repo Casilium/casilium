@@ -76,10 +76,22 @@ class CalculateBusinessHours
 
             // passed end of day working hours?
             if ($date->hour >= $this->workingHours[$dayOfWeek]['endHour']) {
-                // set hour to beginning of day
+                // move to next day
+                $date->addDay();
+                $dayOfWeek = strtolower($date->isoFormat('ddd'));
+                
+                // find next active day
+                $nextActive = $this->workingHours[$dayOfWeek]['active'] ?? false;
+                while ($nextActive === false) {
+                    $date->addDay();
+                    $dayOfWeek = strtolower($date->isoFormat('ddd'));
+                    $nextActive = $this->workingHours[$dayOfWeek]['active'] ?? false;
+                }
+                
+                // set hour to beginning of active day
                 $date->setHour($this->workingHours[$dayOfWeek]['startHour']);
                 $date->setMinute($this->workingHours[$dayOfWeek]['startMinute']);
-                $date->addDay();
+                $date->setSecond(0);
             } elseif ($date->hour < $this->workingHours[$dayOfWeek]['startHour']) {
                 // set start hour/minute to working hours
                 $date->setHour($this->workingHours[$dayOfWeek]['startHour']);
@@ -124,10 +136,22 @@ class CalculateBusinessHours
 
             // passed end of day working hours?
             if ($date->hour >= $this->workingHours[$dayOfWeek]['endHour']) {
-                // set hour to beginning of day
+                // move to next day
+                $date->addDay();
+                $dayOfWeek = strtolower($date->isoFormat('ddd'));
+                
+                // find next active day
+                $nextActive = $this->workingHours[$dayOfWeek]['active'] ?? false;
+                while ($nextActive === false) {
+                    $date->addDay();
+                    $dayOfWeek = strtolower($date->isoFormat('ddd'));
+                    $nextActive = $this->workingHours[$dayOfWeek]['active'] ?? false;
+                }
+                
+                // set hour to beginning of active day
                 $date->setHour($this->workingHours[$dayOfWeek]['startHour']);
                 $date->setMinute($this->workingHours[$dayOfWeek]['startMinute']);
-                $date->addDay();
+                $date->setSecond(0);
             }
 
             $date->addMinute();

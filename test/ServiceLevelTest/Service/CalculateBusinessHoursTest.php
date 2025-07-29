@@ -16,8 +16,26 @@ class CalculateBusinessHoursTest extends TestCase
 
     protected function setUp(): void
     {
-        // Skip all CalculateBusinessHours tests due to BusinessHours entity initialization issues
-        $this->markTestSkipped('CalculateBusinessHours tests skipped due to BusinessHours entity initialization issues');
+        // Create standard Mon-Fri 9-5 business hours for testing
+        $this->businessHours = new BusinessHours();
+        
+        // Use reflection to set the id property for testing
+        $reflection = new \ReflectionClass($this->businessHours);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setAccessible(true);
+        $idProperty->setValue($this->businessHours, 1);
+        
+        $this->businessHours->setName('Standard Business Hours')
+                           ->setTimezone('UTC')
+                           ->setMonActive(true)->setMonStart('09:00')->setMonEnd('17:00')
+                           ->setTueActive(true)->setTueStart('09:00')->setTueEnd('17:00')
+                           ->setWedActive(true)->setWedStart('09:00')->setWedEnd('17:00')
+                           ->setThuActive(true)->setThuStart('09:00')->setThuEnd('17:00')
+                           ->setFriActive(true)->setFriStart('09:00')->setFriEnd('17:00')
+                           ->setSatActive(false)->setSatStart('09:00')->setSatEnd('17:00')
+                           ->setSunActive(false)->setSunStart('09:00')->setSunEnd('17:00');
+        
+        $this->calculator = new CalculateBusinessHours($this->businessHours);
     }
 
     public function testAddHoursToWithinSameWorkingDay(): void
@@ -128,8 +146,8 @@ class CalculateBusinessHoursTest extends TestCase
         
         $result = $calculator->getHoursBetweenDates($from, $to);
         
-        // Should be 7 hours (10,11,12,13,14,15,16 - excluding start hour 9)
-        $this->assertEquals(7, $result);
+        // Should be 8 hours (10,11,12,13,14,15,16,17 - excluding start hour 9, including 17)
+        $this->assertEquals(8, $result);
     }
 
     public function testGetHoursBetweenDatesReturnsZeroWhenToIsBeforeFrom(): void
@@ -156,8 +174,8 @@ class CalculateBusinessHoursTest extends TestCase
         
         $result = $calculator->getHoursFromDate($start);
         
-        // From 9 AM to 3 PM = 5 hours (10,11,12,13,14)
-        $this->assertEquals(5, $result);
+        // From 9 AM to 3 PM = 6 hours (10,11,12,13,14,15)
+        $this->assertEquals(6, $result);
         
         Carbon::setTestNow(); // Reset
     }
@@ -187,15 +205,21 @@ class CalculateBusinessHoursTest extends TestCase
     {
         // Create custom business hours (Tuesday-Thursday, 10 AM - 6 PM)
         $customBusinessHours = new BusinessHours();
+        
+        // Use reflection to set the id property for testing
+        $reflection = new \ReflectionClass($customBusinessHours);
+        $idProperty = $reflection->getProperty('id');
+        $idProperty->setAccessible(true);
+        $idProperty->setValue($customBusinessHours, 2);
         $customBusinessHours->setName('Custom Hours')
                            ->setTimezone('UTC')
-                           ->setMonActive(false)
+                           ->setMonActive(false)->setMonStart('10:00')->setMonEnd('18:00')
                            ->setTueActive(true)->setTueStart('10:00')->setTueEnd('18:00')
                            ->setWedActive(true)->setWedStart('10:00')->setWedEnd('18:00')
                            ->setThuActive(true)->setThuStart('10:00')->setThuEnd('18:00')
-                           ->setFriActive(false)
-                           ->setSatActive(false)
-                           ->setSunActive(false);
+                           ->setFriActive(false)->setFriStart('10:00')->setFriEnd('18:00')
+                           ->setSatActive(false)->setSatStart('10:00')->setSatEnd('18:00')
+                           ->setSunActive(false)->setSunStart('10:00')->setSunEnd('18:00');
         
         $calculator = new CalculateBusinessHours($customBusinessHours);
         
@@ -229,7 +253,7 @@ class CalculateBusinessHoursTest extends TestCase
      */
     public function testKnownWeekendDueBug(): void
     {
-        $this->markTestSkipped('Known bug: tickets with Mon-Fri 9-5 hours sometimes become due on weekends');
+        // This test should be enabled when investigating/fixing the weekend due date bug
         
         // This test should be enabled when investigating/fixing the weekend due date bug
         // Test scenario: Create ticket on Friday afternoon with short SLA
@@ -241,8 +265,8 @@ class CalculateBusinessHoursTest extends TestCase
         
         $result = $this->calculator->addHoursTo($fridayAfternoon, $duration);
         
-        // Should be Monday 11:00 (Friday 16:00 + 1 hour = 17:00, then skip weekend, Monday 09:00 + 3 hours)
-        $this->assertEquals('2023-01-09 11:00:00', $result->format('Y-m-d H:i:s'));
+        // Should be Monday 12:00 (Friday 16:00 + 1 hour = 17:00, then skip weekend, Monday 09:00 + 3 hours = 12:00)
+        $this->assertEquals('2023-01-09 12:00:00', $result->format('Y-m-d H:i:s'));
         $this->assertFalse($result->isWeekend(), 'Due date should not fall on weekend');
     }
 
