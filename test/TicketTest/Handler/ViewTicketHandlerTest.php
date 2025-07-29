@@ -19,8 +19,6 @@ use Ticket\Hydrator\TicketHydrator;
 use Ticket\Service\TicketService;
 use UserAuthentication\Entity\IdentityInterface;
 
-use function array_merge;
-
 class ViewTicketHandlerTest extends TestCase
 {
     private ViewTicketHandler $handler;
@@ -118,6 +116,7 @@ class ViewTicketHandlerTest extends TestCase
         $postData = [
             'response'      => 'This is a test response',
             'ticket_status' => '2',
+            'submit'        => 'save',
         ];
 
         $request = new ServerRequest();
@@ -130,7 +129,13 @@ class ViewTicketHandlerTest extends TestCase
         $this->ticketService->method('findTicketResponses')->willReturn([]);
         $this->ticketService->method('findRecentTicketsByContact')->willReturn([]);
 
-        $expectedData = array_merge($postData, ['agent_id' => 123]);
+        $expectedData = [
+            'response'  => 'This is a test response',
+            'submit'    => 'save',
+            'agent_id'  => 123,
+            'id'        => null,
+            'is_public' => null,
+        ];
 
         $this->ticketService->expects($this->once())
             ->method('saveResponse')
@@ -223,7 +228,7 @@ class ViewTicketHandlerTest extends TestCase
         $contact->method('getId')->willReturn(789);
         $ticket->method('getContact')->willReturn($contact);
 
-        $postData = ['response' => 'Test response', 'ticket_status' => '2'];
+        $postData = ['response' => 'Test response for agent test', 'ticket_status' => '2', 'submit' => 'save'];
 
         $request = new ServerRequest();
         $request = $request->withMethod('POST')
@@ -235,7 +240,13 @@ class ViewTicketHandlerTest extends TestCase
         $this->ticketService->method('findTicketResponses')->willReturn([]);
         $this->ticketService->method('findRecentTicketsByContact')->willReturn([]);
 
-        $expectedData = array_merge($postData, ['agent_id' => $agentId]);
+        $expectedData = [
+            'response'  => 'Test response for agent test',
+            'submit'    => 'save',
+            'agent_id'  => $agentId,
+            'id'        => null,
+            'is_public' => null,
+        ];
 
         $this->ticketService->expects($this->once())
             ->method('saveResponse')
