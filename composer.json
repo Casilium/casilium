@@ -106,7 +106,20 @@
     },
     "autoload-dev": {
         "psr-4": {
-            "AppTest\\": "test/AppTest/"
+            "AppTest\\": "test/AppTest/",
+            "UserTest\\": "test/UserTest/",
+            "UserAuthenticationTest\\": "test/UserAuthenticationTest/",
+            "TicketTest\\": "test/TicketTest/",
+            "OrganisationTest\\": "test/OrganisationTest/",
+            "OrganisationContactTest\\": "test/OrganisationContactTest/",
+            "OrganisationSiteTest\\": "test/OrganisationSiteTest/",
+            "ServiceLevelTest\\": "test/ServiceLevelTest/",
+            "MfaTest\\": "test/MfaTest/",
+            "AccountTest\\": "test/AccountTest/",
+            "MailServiceTest\\": "test/MailServiceTest/",
+            "LoggerTest\\": "test/LoggerTest/",
+            "SlackIntegrationTest\\": "test/SlackIntegrationTest/",
+            "ReportTest\\": "test/ReportTest/"
         }
     },
     "scripts": {
