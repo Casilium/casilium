@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace User\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -29,7 +30,7 @@ class Permission
     #[ORM\JoinTable(name: 'role_permission')]
     #[ORM\JoinColumn(name: 'permission_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id')]
-    private ArrayCollection $roles;
+    private Collection $roles;
 
     public function __construct()
     {
@@ -80,7 +81,7 @@ class Permission
         return $this;
     }
 
-    public function getRoles(): ArrayCollection
+    public function getRoles(): Collection
     {
         return $this->roles;
     }

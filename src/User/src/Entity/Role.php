@@ -30,19 +30,19 @@ class Role
     #[ORM\JoinTable(name: 'role_hierarchy')]
     #[ORM\JoinColumn(name: 'child_role_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'parent_role_id', referencedColumnName: 'id')]
-    private ArrayCollection $parentRoles;
+    private Collection $parentRoles;
 
     #[ORM\ManyToMany(targetEntity: Role::class, mappedBy: 'parentRoles')]
     #[ORM\JoinTable(name: 'role_hierarchy')]
     #[ORM\JoinColumn(name: 'parent_role_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'child_role_id', referencedColumnName: 'id')]
-    private ArrayCollection $childRoles;
+    private Collection $childRoles;
 
     #[ORM\ManyToMany(targetEntity: Permission::class, inversedBy: 'roles')]
     #[ORM\JoinTable(name: 'role_permission')]
     #[ORM\JoinColumn(name: 'role_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'permission_id', referencedColumnName: 'id')]
-    private ArrayCollection $permissions;
+    private Collection $permissions;
 
     public function __construct()
     {

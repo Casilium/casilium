@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Ticket\Entity;
 
-use Doctrine\Orm\Mapping as ORM;
+use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
 #[ORM\Table(name: 'ticket_type')]

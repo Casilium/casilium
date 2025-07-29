@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace Ticket\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity]
@@ -23,7 +24,7 @@ class Agent
     private string $fullName;
 
     #[ORM\ManyToMany(targetEntity: Queue::class, mappedBy: 'queues')]
-    protected ArrayCollection $queues;
+    protected Collection $queues;
 
     #[ORM\Column(name: 'status')]
     protected int $status;
