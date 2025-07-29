@@ -13,14 +13,12 @@ class TicketResponseRepository extends EntityRepository
     {
         $qb = $this->createQueryBuilder('qb');
 
-        $qb->select('r')
+        return $qb->select('r')
             ->from(TicketResponse::class, 'r')
             ->where('r.ticket = :id')
             ->orderBy('r.id', 'ASC')
             ->setParameter('id', $ticketId)
             ->getQuery()
             ->getResult();
-
-        return $qb->getQuery()->getResult();
     }
 }

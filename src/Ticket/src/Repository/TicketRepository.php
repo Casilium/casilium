@@ -104,7 +104,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
                 ->setParameter('status', Ticket::STATUS_RESOLVED);
         }
 
-        return $$qb->getQuery()->getResult();
+        return $qb->getQuery()->getResult();
     }
 
     /**

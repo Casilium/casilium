@@ -40,7 +40,8 @@ class GoToTicketHandler implements RequestHandlerInterface
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
         // get ticket id from Url
-        $ticketId = intval($request->getQueryParams()['ticket_id']);
+        $queryParams = $request->getQueryParams();
+        $ticketId = intval($queryParams['ticket_id'] ?? 0);
         if (! $ticketId) {
             return new HtmlResponse($this->renderer->render('error::404'), 404);
         }
