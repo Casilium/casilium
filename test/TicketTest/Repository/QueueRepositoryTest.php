@@ -21,15 +21,15 @@ class QueueRepositoryTest extends TestCase
     protected function setUp(): void
     {
         $this->entityManager = $this->createMock(EntityManagerInterface::class);
-        $this->queryBuilder = $this->createMock(QueryBuilder::class);
-        $this->query = $this->createMock(Query::class);
-        
+        $this->queryBuilder  = $this->createMock(QueryBuilder::class);
+        $this->query         = $this->createMock(Query::class);
+
         // Create repository with mocked dependencies
         $this->repository = $this->getMockBuilder(QueueRepository::class)
             ->disableOriginalConstructor()
             ->onlyMethods(['createQueryBuilder'])
             ->getMock();
-            
+
         $this->repository->method('createQueryBuilder')->willReturn($this->queryBuilder);
     }
 
@@ -38,32 +38,32 @@ class QueueRepositoryTest extends TestCase
         $queue1 = $this->createMock(Queue::class);
         $queue2 = $this->createMock(Queue::class);
         $queues = [$queue1, $queue2];
-        
+
         $this->queryBuilder->expects($this->once())
             ->method('select')
             ->with('q')
             ->willReturn($this->queryBuilder);
-            
+
         $this->queryBuilder->expects($this->once())
             ->method('from')
             ->with(Queue::class, 'q')
             ->willReturn($this->queryBuilder);
-            
+
         $this->queryBuilder->expects($this->once())
             ->method('orderBy')
             ->with('q.name')
             ->willReturn($this->queryBuilder);
-            
+
         $this->queryBuilder->expects($this->once())
             ->method('getQuery')
             ->willReturn($this->query);
-            
+
         $this->query->expects($this->once())
             ->method('getResult')
             ->willReturn($queues);
-        
+
         $result = $this->repository->findAll();
-        
+
         $this->assertSame($queues, $result);
     }
 
@@ -73,13 +73,13 @@ class QueueRepositoryTest extends TestCase
         $this->queryBuilder->method('from')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('orderBy')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('getQuery')->willReturn($this->query);
-        
+
         $this->query->expects($this->once())
             ->method('getResult')
             ->willReturn([]);
-        
+
         $result = $this->repository->findAll();
-        
+
         $this->assertEquals([], $result);
     }
 
@@ -89,13 +89,13 @@ class QueueRepositoryTest extends TestCase
             ->method('createQueryBuilder')
             ->with('qb')
             ->willReturn($this->queryBuilder);
-        
+
         $this->queryBuilder->method('select')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('from')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('orderBy')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('getQuery')->willReturn($this->query);
         $this->query->method('getResult')->willReturn([]);
-        
+
         $this->repository->findAll();
     }
 
@@ -105,12 +105,12 @@ class QueueRepositoryTest extends TestCase
         $this->queryBuilder->method('from')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('getQuery')->willReturn($this->query);
         $this->query->method('getResult')->willReturn([]);
-        
+
         $this->queryBuilder->expects($this->once())
             ->method('orderBy')
             ->with('q.name')
             ->willReturn($this->queryBuilder);
-        
+
         $this->repository->findAll();
     }
 
@@ -120,12 +120,12 @@ class QueueRepositoryTest extends TestCase
         $this->queryBuilder->method('orderBy')->willReturn($this->queryBuilder);
         $this->queryBuilder->method('getQuery')->willReturn($this->query);
         $this->query->method('getResult')->willReturn([]);
-        
+
         $this->queryBuilder->expects($this->once())
             ->method('from')
             ->with(Queue::class, 'q')
             ->willReturn($this->queryBuilder);
-        
+
         $this->repository->findAll();
     }
 }

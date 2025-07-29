@@ -12,7 +12,6 @@ use OrganisationSite\Entity\SiteEntity;
 use OrganisationSite\Repository\SiteRepository;
 use OrganisationSite\Service\SiteManager;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use Ramsey\Uuid\UuidInterface;
@@ -27,14 +26,14 @@ class SiteManagerTest extends TestCase
     protected function setUp(): void
     {
         $this->entityManager = $this->prophesize(EntityManagerInterface::class);
-        $this->siteManager = new SiteManager($this->entityManager->reveal());
+        $this->siteManager   = new SiteManager($this->entityManager->reveal());
     }
 
     public function testGetOrganisationByUuid(): void
     {
-        $uuid = 'test-org-uuid';
+        $uuid         = 'test-org-uuid';
         $organisation = $this->createMock(Organisation::class);
-        $repository = $this->prophesize(EntityRepository::class);
+        $repository   = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(Organisation::class)
             ->willReturn($repository->reveal());
@@ -48,7 +47,7 @@ class SiteManagerTest extends TestCase
 
     public function testGetOrganisationByUuidReturnsNull(): void
     {
-        $uuid = 'non-existent-uuid';
+        $uuid       = 'non-existent-uuid';
         $repository = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(Organisation::class)
@@ -71,7 +70,7 @@ class SiteManagerTest extends TestCase
         $country2->method('getId')->willReturn(840);
         $country2->method('getName')->willReturn('United States');
 
-        $countries = [$country1, $country2];
+        $countries  = [$country1, $country2];
         $repository = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(CountryEntity::class)
@@ -102,8 +101,8 @@ class SiteManagerTest extends TestCase
 
     public function testGetCountry(): void
     {
-        $countryId = 826;
-        $country = $this->createMock(CountryEntity::class);
+        $countryId  = 826;
+        $country    = $this->createMock(CountryEntity::class);
         $repository = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(CountryEntity::class)
@@ -117,7 +116,7 @@ class SiteManagerTest extends TestCase
 
     public function testGetCountryReturnsNull(): void
     {
-        $countryId = 999;
+        $countryId  = 999;
         $repository = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(CountryEntity::class)
@@ -133,7 +132,10 @@ class SiteManagerTest extends TestCase
     {
         $site = $this->createMock(SiteEntity::class);
         $site->method('getId')->willReturn(123);
-        $site->expects($this->once())->method('setUuid')->with($this->isInstanceOf(UuidInterface::class))->willReturn($site);
+        $site->expects($this->once())
+            ->method('setUuid')
+            ->with($this->isInstanceOf(UuidInterface::class))
+            ->willReturn($site);
 
         $this->entityManager->persist($site)->shouldBeCalled();
         $this->entityManager->flush()->shouldBeCalled();
@@ -146,7 +148,7 @@ class SiteManagerTest extends TestCase
     public function testUpdateSite(): void
     {
         $countryEntity = $this->createMock(CountryEntity::class);
-        
+
         // Updated site data
         $updatedSite = $this->createMock(SiteEntity::class);
         $updatedSite->method('getId')->willReturn(456);
@@ -162,7 +164,7 @@ class SiteManagerTest extends TestCase
 
         // Current site in database
         $currentSite = $this->createMock(SiteEntity::class);
-        $repository = $this->prophesize(EntityRepository::class);
+        $repository  = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(SiteEntity::class)
             ->willReturn($repository->reveal());
@@ -170,14 +172,20 @@ class SiteManagerTest extends TestCase
 
         // Verify all setter methods are called
         $currentSite->expects($this->once())->method('setName')->with('Updated Site')->willReturn($currentSite);
-        $currentSite->expects($this->once())->method('setStreetAddress')->with('456 Updated Street')->willReturn($currentSite);
+        $currentSite->expects($this->once())
+            ->method('setStreetAddress')
+            ->with('456 Updated Street')
+            ->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setStreetAddress2')->with('Suite B')->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setTown')->with('Updated Town')->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setCity')->with('Updated City')->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setCounty')->with('Updated County')->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setCountry')->with($countryEntity)->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setPostalCode')->with('UP1 2ST')->willReturn($currentSite);
-        $currentSite->expects($this->once())->method('setTelephone')->with('+44 20 9876 5432')->willReturn($currentSite);
+        $currentSite->expects($this->once())
+            ->method('setTelephone')
+            ->with('+44 20 9876 5432')
+            ->willReturn($currentSite);
 
         $this->entityManager->flush()->shouldBeCalled();
 
@@ -187,11 +195,11 @@ class SiteManagerTest extends TestCase
     public function testFetchSitesByOrganisationId(): void
     {
         $organisationId = 789;
-        $sites = [
+        $sites          = [
             $this->createMock(SiteEntity::class),
             $this->createMock(SiteEntity::class),
         ];
-        
+
         $repository = $this->prophesize(SiteRepository::class);
 
         $this->entityManager->getRepository(SiteEntity::class)
@@ -206,7 +214,7 @@ class SiteManagerTest extends TestCase
     public function testFetchSitesByOrganisationIdReturnsEmptyArray(): void
     {
         $organisationId = 999;
-        $repository = $this->prophesize(SiteRepository::class);
+        $repository     = $this->prophesize(SiteRepository::class);
 
         $this->entityManager->getRepository(SiteEntity::class)
             ->willReturn($repository->reveal());
@@ -219,8 +227,8 @@ class SiteManagerTest extends TestCase
 
     public function testFetchSiteByUuid(): void
     {
-        $uuid = 'site-uuid-123';
-        $site = $this->createMock(SiteEntity::class);
+        $uuid       = 'site-uuid-123';
+        $site       = $this->createMock(SiteEntity::class);
         $repository = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(SiteEntity::class)
@@ -234,7 +242,7 @@ class SiteManagerTest extends TestCase
 
     public function testFetchSiteByUuidReturnsNull(): void
     {
-        $uuid = 'non-existent-uuid';
+        $uuid       = 'non-existent-uuid';
         $repository = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(SiteEntity::class)
@@ -248,8 +256,8 @@ class SiteManagerTest extends TestCase
 
     public function testFetchSiteById(): void
     {
-        $siteId = 101;
-        $site = $this->createMock(SiteEntity::class);
+        $siteId     = 101;
+        $site       = $this->createMock(SiteEntity::class);
         $repository = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(SiteEntity::class)
@@ -263,7 +271,7 @@ class SiteManagerTest extends TestCase
 
     public function testFetchSiteByIdReturnsNull(): void
     {
-        $siteId = 404;
+        $siteId     = 404;
         $repository = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(SiteEntity::class)
@@ -301,7 +309,7 @@ class SiteManagerTest extends TestCase
         $updatedSite->method('getTelephone')->willReturn('123456789');
 
         $currentSite = $this->createMock(SiteEntity::class);
-        $repository = $this->prophesize(EntityRepository::class);
+        $repository  = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(SiteEntity::class)
             ->willReturn($repository->reveal());
@@ -312,12 +320,15 @@ class SiteManagerTest extends TestCase
         $currentSite->expects($this->once())->method('setTown')->with(null)->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setCounty')->with(null)->willReturn($currentSite);
         $currentSite->expects($this->never())->method('setPostalCode');
-        
+
         // Non-null values should be set normally
         $currentSite->expects($this->once())->method('setName')->with('Site Name')->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setStreetAddress')->with('123 Street')->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setCity')->with('City')->willReturn($currentSite);
-        $currentSite->expects($this->once())->method('setCountry')->with($this->isInstanceOf(CountryEntity::class))->willReturn($currentSite);
+        $currentSite->expects($this->once())
+            ->method('setCountry')
+            ->with($this->isInstanceOf(CountryEntity::class))
+            ->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setTelephone')->with('123456789')->willReturn($currentSite);
 
         $this->entityManager->flush()->shouldBeCalled();
@@ -341,7 +352,7 @@ class SiteManagerTest extends TestCase
         $updatedSite->method('getTelephone')->willReturn('123456789');
 
         $currentSite = $this->createMock(SiteEntity::class);
-        $repository = $this->prophesize(EntityRepository::class);
+        $repository  = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(SiteEntity::class)
             ->willReturn($repository->reveal());
@@ -349,7 +360,7 @@ class SiteManagerTest extends TestCase
 
         // setPostalCode should now be called after fix
         $currentSite->expects($this->once())->method('setPostalCode')->with('T1 2ST')->willReturn($currentSite);
-        
+
         // All other setters should be called
         $currentSite->expects($this->once())->method('setName')->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setStreetAddress')->willReturn($currentSite);

@@ -19,7 +19,7 @@ class RoleTest extends TestCase
     public function testConstructorInitializesCollections(): void
     {
         $role = new Role();
-        
+
         $this->assertCount(0, $role->getParentRoles());
         $this->assertCount(0, $role->getChildRoles());
         $this->assertCount(0, $role->getPermissions());
@@ -28,16 +28,16 @@ class RoleTest extends TestCase
     public function testSetAndGetId(): void
     {
         $result = $this->role->setId(123);
-        
+
         $this->assertInstanceOf(Role::class, $result);
         $this->assertEquals(123, $this->role->getId());
     }
 
     public function testSetAndGetName(): void
     {
-        $name = 'Administrator';
+        $name   = 'Administrator';
         $result = $this->role->setName($name);
-        
+
         $this->assertInstanceOf(Role::class, $result);
         $this->assertEquals($name, $this->role->getName());
     }
@@ -45,8 +45,8 @@ class RoleTest extends TestCase
     public function testSetAndGetDescription(): void
     {
         $description = 'System administrator role';
-        $result = $this->role->setDescription($description);
-        
+        $result      = $this->role->setDescription($description);
+
         $this->assertInstanceOf(Role::class, $result);
         $this->assertEquals($description, $this->role->getDescription());
     }
@@ -54,8 +54,8 @@ class RoleTest extends TestCase
     public function testSetAndGetDateCreated(): void
     {
         $dateCreated = '2023-01-01 12:00:00';
-        $result = $this->role->setDateCreated($dateCreated);
-        
+        $result      = $this->role->setDateCreated($dateCreated);
+
         $this->assertInstanceOf(Role::class, $result);
         $this->assertEquals($dateCreated, $this->role->getDateCreated());
     }
@@ -65,9 +65,9 @@ class RoleTest extends TestCase
         $parentRole = new Role();
         $parentRole->setId(1);
         $this->role->setId(2);
-        
+
         $result = $this->role->addParent($parentRole);
-        
+
         $this->assertTrue($result);
         $this->assertCount(1, $this->role->getParentRoles());
         $this->assertCount(1, $parentRole->getChildRoles());
@@ -78,9 +78,9 @@ class RoleTest extends TestCase
     public function testAddParentWithSameRoleReturnsFalse(): void
     {
         $this->role->setId(1);
-        
+
         $result = $this->role->addParent($this->role);
-        
+
         $this->assertFalse($result);
         $this->assertCount(0, $this->role->getParentRoles());
     }
@@ -90,13 +90,13 @@ class RoleTest extends TestCase
         $parentRole = new Role();
         $parentRole->setId(1);
         $this->role->setId(2);
-        
+
         // Add parent first time
         $this->role->addParent($parentRole);
-        
+
         // Try to add same parent again
         $result = $this->role->addParent($parentRole);
-        
+
         $this->assertFalse($result);
         $this->assertCount(1, $this->role->getParentRoles());
     }
@@ -106,9 +106,9 @@ class RoleTest extends TestCase
         $parentRole = new Role();
         $parentRole->setId(1);
         $this->role->setId(2);
-        
+
         $this->role->addParent($parentRole);
-        
+
         $this->assertTrue($this->role->hasParent($parentRole));
     }
 
@@ -116,7 +116,7 @@ class RoleTest extends TestCase
     {
         $parentRole = new Role();
         $parentRole->setId(1);
-        
+
         $this->assertFalse($this->role->hasParent($parentRole));
     }
 
@@ -127,14 +127,14 @@ class RoleTest extends TestCase
         $parentRole2 = new Role();
         $parentRole2->setId(2);
         $this->role->setId(3);
-        
+
         $this->role->addParent($parentRole1);
         $this->role->addParent($parentRole2);
-        
+
         $this->assertCount(2, $this->role->getParentRoles());
-        
+
         $result = $this->role->clearParentRoles();
-        
+
         $this->assertInstanceOf(Role::class, $result);
         $this->assertCount(0, $this->role->getParentRoles());
     }
@@ -143,12 +143,12 @@ class RoleTest extends TestCase
     {
         $adminRole = new Role();
         $adminRole->setId(1)->setName('Admin');
-        
+
         $userRole = new Role();
         $userRole->setId(2)->setName('User');
-        
+
         $userRole->addParent($adminRole);
-        
+
         // Verify bidirectional relationship
         $this->assertTrue($userRole->hasParent($adminRole));
         $this->assertTrue($adminRole->getChildRoles()->contains($userRole));

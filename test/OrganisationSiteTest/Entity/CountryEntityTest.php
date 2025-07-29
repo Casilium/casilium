@@ -19,16 +19,16 @@ class CountryEntityTest extends TestCase
     public function testSetAndGetId(): void
     {
         $result = $this->country->setId(826);
-        
+
         $this->assertInstanceOf(CountryEntity::class, $result);
         $this->assertEquals(826, $this->country->getId());
     }
 
     public function testSetAndGetName(): void
     {
-        $name = 'United Kingdom';
+        $name   = 'United Kingdom';
         $result = $this->country->setName($name);
-        
+
         $this->assertInstanceOf(CountryEntity::class, $result);
         $this->assertEquals($name, $this->country->getName());
     }
@@ -38,7 +38,7 @@ class CountryEntityTest extends TestCase
         $result = $this->country
             ->setId(840)
             ->setName('United States');
-        
+
         $this->assertInstanceOf(CountryEntity::class, $result);
         $this->assertEquals(840, $this->country->getId());
         $this->assertEquals('United States', $this->country->getName());
@@ -50,7 +50,7 @@ class CountryEntityTest extends TestCase
     public function testSetCountryData(int $id, string $name): void
     {
         $this->country->setId($id)->setName($name);
-        
+
         $this->assertEquals($id, $this->country->getId());
         $this->assertEquals($name, $this->country->getName());
     }
@@ -58,20 +58,20 @@ class CountryEntityTest extends TestCase
     public function countryDataProvider(): array
     {
         return [
-            'UK' => [826, 'United Kingdom'],
-            'US' => [840, 'United States'],
-            'Germany' => [276, 'Germany'],
-            'France' => [250, 'France'],
-            'Canada' => [124, 'Canada'],
+            'UK'        => [826, 'United Kingdom'],
+            'US'        => [840, 'United States'],
+            'Germany'   => [276, 'Germany'],
+            'France'    => [250, 'France'],
+            'Canada'    => [124, 'Canada'],
             'Australia' => [36, 'Australia'],
-            'Japan' => [392, 'Japan'],
+            'Japan'     => [392, 'Japan'],
         ];
     }
 
     public function testCountryEntityPropertiesAreCorrectlyTyped(): void
     {
         $this->country->setId(826)->setName('United Kingdom');
-        
+
         $this->assertIsInt($this->country->getId());
         $this->assertIsString($this->country->getName());
     }
@@ -79,7 +79,7 @@ class CountryEntityTest extends TestCase
     public function testCountryWithEmptyName(): void
     {
         $this->country->setName('');
-        
+
         $this->assertEquals('', $this->country->getName());
     }
 
@@ -87,7 +87,7 @@ class CountryEntityTest extends TestCase
     {
         $longName = 'The United Kingdom of Great Britain and Northern Ireland';
         $this->country->setName($longName);
-        
+
         $this->assertEquals($longName, $this->country->getName());
     }
 
@@ -95,7 +95,7 @@ class CountryEntityTest extends TestCase
     {
         $nameWithSpecialChars = 'Côte d\'Ivoire';
         $this->country->setName($nameWithSpecialChars);
-        
+
         $this->assertEquals($nameWithSpecialChars, $this->country->getName());
     }
 
@@ -104,7 +104,7 @@ class CountryEntityTest extends TestCase
         // Edge case: country name that's entirely numeric
         $numericName = '123456';
         $this->country->setName($numericName);
-        
+
         $this->assertEquals($numericName, $this->country->getName());
         $this->assertIsString($this->country->getName()); // Should still be string type
     }
@@ -115,7 +115,7 @@ class CountryEntityTest extends TestCase
         $this->country->setId(100)->setName('Test Country 1');
         $this->assertEquals(100, $this->country->getId());
         $this->assertEquals('Test Country 1', $this->country->getName());
-        
+
         // Update the same instance
         $this->country->setId(200)->setName('Test Country 2');
         $this->assertEquals(200, $this->country->getId());

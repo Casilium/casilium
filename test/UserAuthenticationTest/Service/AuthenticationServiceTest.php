@@ -14,6 +14,10 @@ use Prophecy\Prophecy\ObjectProphecy;
 use UserAuthentication\Entity\Identity;
 use UserAuthentication\Service\AuthenticationService;
 
+use function password_hash;
+
+use const PASSWORD_BCRYPT;
+
 class AuthenticationServiceTest extends TestCase
 {
     use ProphecyTrait;
@@ -26,29 +30,29 @@ class AuthenticationServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->connection = $this->prophesize(Connection::class);
-        $this->statement = $this->prophesize(Statement::class);
-        $this->result = $this->prophesize(Result::class);
+        $this->statement  = $this->prophesize(Statement::class);
+        $this->result     = $this->prophesize(Result::class);
 
         $this->authService = new AuthenticationService($this->connection->reveal());
     }
 
     public function testAuthenticateWithValidCredentialsReturnsIdentity(): void
     {
-        $username = 'test@example.com';
-        $password = 'plaintext_password';
+        $username       = 'test@example.com';
+        $password       = 'plaintext_password';
         $hashedPassword = password_hash($password, PASSWORD_BCRYPT);
 
         $userData = [
-            'id' => '123',
+            'id'        => '123',
             'full_name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => $hashedPassword
+            'email'     => 'test@example.com',
+            'password'  => $hashedPassword,
         ];
 
         // Setup database mocks
         $this->connection->prepare('SELECT id,full_name,email,password FROM `user` WHERE `email` = ? LIMIT 1')
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, $username)->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
 
@@ -65,21 +69,21 @@ class AuthenticationServiceTest extends TestCase
 
     public function testAuthenticateWithInvalidPasswordReturnsNull(): void
     {
-        $username = 'test@example.com';
-        $password = 'wrong_password';
+        $username       = 'test@example.com';
+        $password       = 'wrong_password';
         $hashedPassword = password_hash('correct_password', PASSWORD_BCRYPT);
 
         $userData = [
-            'id' => '123',
+            'id'        => '123',
             'full_name' => 'Test User',
-            'email' => 'test@example.com',
-            'password' => $hashedPassword
+            'email'     => 'test@example.com',
+            'password'  => $hashedPassword,
         ];
 
         // Setup database mocks
         $this->connection->prepare(Argument::type('string'))
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, $username)->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
 
@@ -99,7 +103,7 @@ class AuthenticationServiceTest extends TestCase
         // Setup database mocks
         $this->connection->prepare(Argument::type('string'))
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, $username)->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
 
@@ -118,7 +122,7 @@ class AuthenticationServiceTest extends TestCase
         // Setup database mocks
         $this->connection->prepare(Argument::type('string'))
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, $username)->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
 
@@ -133,11 +137,11 @@ class AuthenticationServiceTest extends TestCase
     public function testAuthenticateUsesCorrectSqlQuery(): void
     {
         $expectedSql = 'SELECT id,full_name,email,password FROM `user` WHERE `email` = ? LIMIT 1';
-        
+
         $this->connection->prepare($expectedSql)
             ->shouldBeCalled()
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, 'test@example.com')->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
         $this->result->rowCount()->willReturn(0);
@@ -148,10 +152,10 @@ class AuthenticationServiceTest extends TestCase
     public function testAuthenticateBindsUsernameParameter(): void
     {
         $username = 'specific@example.com';
-        
+
         $this->connection->prepare(Argument::type('string'))
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, $username)->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
         $this->result->rowCount()->willReturn(0);
@@ -163,7 +167,7 @@ class AuthenticationServiceTest extends TestCase
     {
         $this->connection->prepare(Argument::type('string'))
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, '')->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
         $this->result->rowCount()->willReturn(0);
@@ -180,7 +184,7 @@ class AuthenticationServiceTest extends TestCase
     {
         $this->connection->prepare(Argument::type('string'))
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, $username)->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
         $this->result->rowCount()->willReturn($userExists ? 1 : 0);
@@ -197,10 +201,10 @@ class AuthenticationServiceTest extends TestCase
     public function credentialsProvider(): array
     {
         return [
-            'valid email format' => ['user@domain.com', 'password123', true],
-            'invalid email format' => ['invalid-email', 'password123', false],
-            'empty username' => ['', 'password123', false],
-            'empty password' => ['user@domain.com', '', true],
+            'valid email format'          => ['user@domain.com', 'password123', true],
+            'invalid email format'        => ['invalid-email', 'password123', false],
+            'empty username'              => ['', 'password123', false],
+            'empty password'              => ['user@domain.com', '', true],
             'special characters in email' => ['user+tag@domain.com', 'pass', false],
         ];
     }

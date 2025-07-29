@@ -11,6 +11,7 @@ use Organisation\Service\OrganisationManager;
 use OrganisationContact\Entity\Contact;
 use OrganisationContact\Repository\ContactRepository;
 use OrganisationContact\Service\ContactService;
+use OrganisationSite\Entity\SiteEntity;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -26,9 +27,9 @@ class ContactServiceTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->prophesize(EntityManagerInterface::class);
+        $this->entityManager       = $this->prophesize(EntityManagerInterface::class);
         $this->organisationService = $this->prophesize(OrganisationManager::class);
-        
+
         $this->contactService = new ContactService(
             $this->entityManager->reveal(),
             $this->organisationService->reveal()
@@ -37,7 +38,7 @@ class ContactServiceTest extends TestCase
 
     public function testGetOrganisationByUuid(): void
     {
-        $uuid = 'test-org-uuid';
+        $uuid         = 'test-org-uuid';
         $organisation = $this->createMock(Organisation::class);
 
         $this->organisationService->findOrganisationByUuid($uuid)
@@ -64,9 +65,9 @@ class ContactServiceTest extends TestCase
     {
         $organisation = $this->createMock(Organisation::class);
         $organisation->method('getId')->willReturn(123);
-        
+
         $organisationReference = $this->createMock(Organisation::class);
-        
+
         $contact = $this->createMock(Contact::class);
         $contact->method('getId')->willReturn(0); // New contact
         $contact->method('getOrganisation')->willReturn($organisation);
@@ -99,13 +100,13 @@ class ContactServiceTest extends TestCase
     public function testFetchContactsByOrganisationId(): void
     {
         $organisationId = 789;
-        $contacts = [
+        $contacts       = [
             $this->createMock(Contact::class),
             $this->createMock(Contact::class),
         ];
-        
+
         $repository = $this->prophesize(ContactRepository::class);
-        
+
         $this->entityManager->getRepository(Contact::class)
             ->willReturn($repository->reveal());
         $repository->findByCorporationId($organisationId)->willReturn($contacts);
@@ -118,9 +119,9 @@ class ContactServiceTest extends TestCase
     public function testFetchContactsByOrganisationIdReturnsNull(): void
     {
         $organisationId = 999;
-        
+
         $repository = $this->prophesize(ContactRepository::class);
-        
+
         $this->entityManager->getRepository(Contact::class)
             ->willReturn($repository->reveal());
         $repository->findByCorporationId($organisationId)->willReturn(null);
@@ -133,10 +134,10 @@ class ContactServiceTest extends TestCase
     public function testFindContactById(): void
     {
         $contactId = 101;
-        $contact = $this->createMock(Contact::class);
-        
+        $contact   = $this->createMock(Contact::class);
+
         $repository = $this->prophesize(EntityRepository::class);
-        
+
         $this->entityManager->getRepository(Contact::class)
             ->willReturn($repository->reveal());
         $repository->find($contactId)->willReturn($contact);
@@ -149,9 +150,9 @@ class ContactServiceTest extends TestCase
     public function testFindContactByIdReturnsNull(): void
     {
         $contactId = 404;
-        
+
         $repository = $this->prophesize(EntityRepository::class);
-        
+
         $this->entityManager->getRepository(Contact::class)
             ->willReturn($repository->reveal());
         $repository->find($contactId)->willReturn(null);
@@ -164,11 +165,11 @@ class ContactServiceTest extends TestCase
     public function testUpdateContact(): void
     {
         $contactId = 202;
-        $site = $this->createMock(\OrganisationSite\Entity\SiteEntity::class);
-        
+        $site      = $this->createMock(SiteEntity::class);
+
         // Current contact in database
         $currentContact = $this->createMock(Contact::class);
-        
+
         // Updated contact data
         $updatedContact = $this->createMock(Contact::class);
         $updatedContact->method('getId')->willReturn($contactId);
@@ -183,7 +184,7 @@ class ContactServiceTest extends TestCase
         $updatedContact->method('getWorkEmail')->willReturn('john@company.com');
 
         $repository = $this->prophesize(EntityRepository::class);
-        
+
         $this->entityManager->getRepository(Contact::class)
             ->willReturn($repository->reveal());
         $repository->find($contactId)->willReturn($currentContact);
@@ -193,11 +194,23 @@ class ContactServiceTest extends TestCase
         $currentContact->expects($this->once())->method('setFirstName')->with('John')->willReturn($currentContact);
         $currentContact->expects($this->once())->method('setMiddleName')->with('David')->willReturn($currentContact);
         $currentContact->expects($this->once())->method('setLastName')->with('Smith')->willReturn($currentContact);
-        $currentContact->expects($this->once())->method('setWorkTelephone')->with('+44 20 1234 5678')->willReturn($currentContact);
+        $currentContact->expects($this->once())
+            ->method('setWorkTelephone')
+            ->with('+44 20 1234 5678')
+            ->willReturn($currentContact);
         $currentContact->expects($this->once())->method('setWorkExtension')->with('1234')->willReturn($currentContact);
-        $currentContact->expects($this->once())->method('setMobileTelephone')->with('+44 7700 123456')->willReturn($currentContact);
-        $currentContact->expects($this->once())->method('setHomeTelephone')->with('+44 20 8765 4321')->willReturn($currentContact);
-        $currentContact->expects($this->once())->method('setWorkEmail')->with('john@company.com')->willReturn($currentContact);
+        $currentContact->expects($this->once())
+            ->method('setMobileTelephone')
+            ->with('+44 7700 123456')
+            ->willReturn($currentContact);
+        $currentContact->expects($this->once())
+            ->method('setHomeTelephone')
+            ->with('+44 20 8765 4321')
+            ->willReturn($currentContact);
+        $currentContact->expects($this->once())
+            ->method('setWorkEmail')
+            ->with('john@company.com')
+            ->willReturn($currentContact);
 
         $this->entityManager->flush()->shouldBeCalled();
 
@@ -217,7 +230,7 @@ class ContactServiceTest extends TestCase
     public function testUpdateContactDoesNotSetGender(): void
     {
         $contactId = 303;
-        
+
         $currentContact = $this->createMock(Contact::class);
         $updatedContact = $this->createMock(Contact::class);
         $updatedContact->method('getId')->willReturn($contactId);
@@ -232,18 +245,21 @@ class ContactServiceTest extends TestCase
         $updatedContact->method('getWorkEmail')->willReturn('jane@test.com');
 
         $repository = $this->prophesize(EntityRepository::class);
-        
+
         $this->entityManager->getRepository(Contact::class)
             ->willReturn($repository->reveal());
         $repository->find($contactId)->willReturn($currentContact);
 
         // Gender setter should NOT be called (commented out in service)
         $currentContact->expects($this->never())->method('setGender');
-        
+
         // Other setters should still be called
         $currentContact->expects($this->once())->method('setFirstName')->with('Jane')->willReturn($currentContact);
         $currentContact->expects($this->once())->method('setLastName')->with('Doe')->willReturn($currentContact);
-        $currentContact->expects($this->once())->method('setWorkEmail')->with('jane@test.com')->willReturn($currentContact);
+        $currentContact->expects($this->once())
+            ->method('setWorkEmail')
+            ->with('jane@test.com')
+            ->willReturn($currentContact);
         $currentContact->expects($this->once())->method('setSite')->with(null)->willReturn($currentContact);
         $currentContact->expects($this->once())->method('setMiddleName')->with('')->willReturn($currentContact);
         $currentContact->expects($this->once())->method('setWorkTelephone')->with('')->willReturn($currentContact);
@@ -259,7 +275,7 @@ class ContactServiceTest extends TestCase
     public function testUpdateContactDoesNotSetOtherEmail(): void
     {
         $contactId = 404;
-        
+
         $currentContact = $this->createMock(Contact::class);
         $updatedContact = $this->createMock(Contact::class);
         $updatedContact->method('getId')->willReturn($contactId);
@@ -274,17 +290,20 @@ class ContactServiceTest extends TestCase
         $updatedContact->method('getWorkEmail')->willReturn('test@work.com');
 
         $repository = $this->prophesize(EntityRepository::class);
-        
+
         $this->entityManager->getRepository(Contact::class)
             ->willReturn($repository->reveal());
         $repository->find($contactId)->willReturn($currentContact);
 
         // Other email setter should NOT be called (missing from service)
         $currentContact->expects($this->never())->method('setOtherEmail');
-        
+
         // Work email should be set
-        $currentContact->expects($this->once())->method('setWorkEmail')->with('test@work.com')->willReturn($currentContact);
-        
+        $currentContact->expects($this->once())
+            ->method('setWorkEmail')
+            ->with('test@work.com')
+            ->willReturn($currentContact);
+
         // All other standard setters should be called
         $currentContact->expects($this->once())->method('setSite')->willReturn($currentContact);
         $currentContact->expects($this->once())->method('setFirstName')->willReturn($currentContact);

@@ -15,6 +15,8 @@ use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 use UserAuthentication\Entity\IdentityInterface;
 
+use function urlencode;
+
 class MfaServiceTest extends TestCase
 {
     use ProphecyTrait;
@@ -29,13 +31,13 @@ class MfaServiceTest extends TestCase
     protected function setUp(): void
     {
         $this->connection = $this->prophesize(Connection::class);
-        $this->statement = $this->prophesize(Statement::class);
-        $this->result = $this->prophesize(Result::class);
-        $this->identity = $this->prophesize(IdentityInterface::class);
+        $this->statement  = $this->prophesize(Statement::class);
+        $this->result     = $this->prophesize(Result::class);
+        $this->identity   = $this->prophesize(IdentityInterface::class);
 
         $this->config = [
             'enabled' => true,
-            'issuer' => 'Test App'
+            'issuer'  => 'Test App',
         ];
 
         $this->mfaService = new MfaService($this->connection->reveal(), $this->config);
@@ -47,10 +49,10 @@ class MfaServiceTest extends TestCase
 
         $this->connection->prepare('SELECT mfa_enabled from `user` WHERE id = ? LIMIT 1')
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, 123)->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
-        
+
         $this->result->rowCount()->willReturn(1);
         $this->result->fetchOne()->willReturn(1);
 
@@ -65,10 +67,10 @@ class MfaServiceTest extends TestCase
 
         $this->connection->prepare(Argument::type('string'))
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, 123)->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
-        
+
         $this->result->rowCount()->willReturn(1);
         $this->result->fetchOne()->willReturn(0);
 
@@ -83,10 +85,10 @@ class MfaServiceTest extends TestCase
 
         $this->connection->prepare(Argument::type('string'))
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, 999)->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
-        
+
         $this->result->rowCount()->willReturn(0);
 
         $result = $this->mfaService->hasMfa($this->identity->reveal());
@@ -100,7 +102,7 @@ class MfaServiceTest extends TestCase
 
         $this->connection->prepare('UPDATE `user` SET mfa_enabled = 1 WHERE id = ?')
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, 123)->shouldBeCalled();
         $this->statement->executeStatement()->willReturn(1);
 
@@ -115,7 +117,7 @@ class MfaServiceTest extends TestCase
 
         $this->connection->prepare(Argument::type('string'))
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, 123)->shouldBeCalled();
         $this->statement->executeStatement()->willReturn(0);
 
@@ -130,7 +132,7 @@ class MfaServiceTest extends TestCase
 
         $this->connection->prepare('UPDATE `user` SET mfa_enabled = 0, secret_key = null WHERE id = ?')
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, 123)->shouldBeCalled();
         $this->statement->executeStatement()->willReturn(1);
 
@@ -147,7 +149,7 @@ class MfaServiceTest extends TestCase
 
     public function testIsMfaEnabledReturnsFalseWhenDisabledInConfig(): void
     {
-        $config = ['enabled' => false, 'issuer' => 'Test App'];
+        $config     = ['enabled' => false, 'issuer' => 'Test App'];
         $mfaService = new MfaService($this->connection->reveal(), $config);
 
         $result = $mfaService->isMfaEnabled();
@@ -156,7 +158,7 @@ class MfaServiceTest extends TestCase
 
     public function testIsMfaEnabledReturnsFalseWhenNotConfigured(): void
     {
-        $config = ['issuer' => 'Test App'];
+        $config     = ['issuer' => 'Test App'];
         $mfaService = new MfaService($this->connection->reveal(), $config);
 
         $result = $mfaService->isMfaEnabled();
@@ -170,10 +172,10 @@ class MfaServiceTest extends TestCase
 
         $this->connection->prepare('SELECT secret_key from `user` WHERE id = ? LIMIT 1')
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, 123)->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
-        
+
         $this->result->rowCount()->willReturn(1);
         $this->result->fetchOne()->willReturn($existingKey);
 
@@ -189,10 +191,10 @@ class MfaServiceTest extends TestCase
         // Setup for getting existing key (returns null)
         $this->connection->prepare('SELECT secret_key from `user` WHERE id = ? LIMIT 1')
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, 123)->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
-        
+
         $this->result->rowCount()->willReturn(1);
         $this->result->fetchOne()->willReturn(null);
 
@@ -200,7 +202,7 @@ class MfaServiceTest extends TestCase
         $saveStatement = $this->prophesize(Statement::class);
         $this->connection->prepare('UPDATE `user` SET secret_key = ? WHERE id = ?')
             ->willReturn($saveStatement->reveal());
-        
+
         $saveStatement->bindValue(1, Argument::type('string'))->shouldBeCalled();
         $saveStatement->bindValue(2, 123)->shouldBeCalled();
         $saveStatement->executeStatement()->willReturn(1);
@@ -217,10 +219,10 @@ class MfaServiceTest extends TestCase
 
         $this->connection->prepare(Argument::type('string'))
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, 999)->shouldBeCalled();
         $this->statement->executeQuery()->willReturn($this->result->reveal());
-        
+
         $this->result->rowCount()->willReturn(0);
 
         $result = $this->mfaService->getSecretKey($this->identity->reveal());
@@ -243,7 +245,7 @@ class MfaServiceTest extends TestCase
 
         $this->connection->prepare('UPDATE `user` SET secret_key = ? WHERE id = ?')
             ->willReturn($this->statement->reveal());
-        
+
         $this->statement->bindValue(1, $secretKey)->shouldBeCalled();
         $this->statement->bindValue(2, 123)->shouldBeCalled();
         $this->statement->executeStatement()->willReturn(1);
@@ -258,11 +260,11 @@ class MfaServiceTest extends TestCase
         // This test uses the actual GoogleAuthenticator functionality
         // We'll test with known valid combinations
         $secretKey = $this->mfaService->generateSecretKey();
-        
+
         // Since we can't predict the time-based code, we'll test the method exists
         // and returns a boolean
         $result = $this->mfaService->isValidCode($secretKey, '123456');
-        
+
         $this->assertIsBool($result);
     }
 
@@ -274,7 +276,7 @@ class MfaServiceTest extends TestCase
 
     public function testGetIssuerThrowsExceptionWhenNotConfigured(): void
     {
-        $config = ['enabled' => true];
+        $config     = ['enabled' => true];
         $mfaService = new MfaService($this->connection->reveal(), $config);
 
         $this->expectException(Exception::class);
@@ -286,7 +288,7 @@ class MfaServiceTest extends TestCase
     public function testGetQrCodeUrlReturnsValidUrl(): void
     {
         $email = 'test@example.com';
-        $key = 'SECRET_KEY_123';
+        $key   = 'SECRET_KEY_123';
 
         $result = $this->mfaService->getQrCodeUrl($email, $key);
 
@@ -300,9 +302,9 @@ class MfaServiceTest extends TestCase
     /**
      * @dataProvider booleanConfigProvider
      */
-    public function testIsMfaEnabledWithVariousConfigurations($configValue, bool $expected): void
+    public function testIsMfaEnabledWithVariousConfigurations(mixed $configValue, bool $expected): void
     {
-        $config = ['enabled' => $configValue, 'issuer' => 'Test'];
+        $config     = ['enabled' => $configValue, 'issuer' => 'Test'];
         $mfaService = new MfaService($this->connection->reveal(), $config);
 
         $this->assertEquals($expected, $mfaService->isMfaEnabled());
@@ -311,12 +313,12 @@ class MfaServiceTest extends TestCase
     public function booleanConfigProvider(): array
     {
         return [
-            'true boolean' => [true, true],
-            'false boolean' => [false, false],
-            'truthy string' => ['1', true],
-            'falsy string' => ['0', false],
+            'true boolean'   => [true, true],
+            'false boolean'  => [false, false],
+            'truthy string'  => ['1', true],
+            'falsy string'   => ['0', false],
             'truthy integer' => [1, true],
-            'falsy integer' => [0, false],
+            'falsy integer'  => [0, false],
         ];
     }
 }

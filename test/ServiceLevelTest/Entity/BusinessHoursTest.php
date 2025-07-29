@@ -19,22 +19,22 @@ class BusinessHoursTest extends TestCase
     public function testConstructorSetsDefaults(): void
     {
         $businessHours = new BusinessHours();
-        
+
         // BusinessHours entity doesn't initialize $id property, so we skip testing getId() in constructor test
         $this->markTestSkipped('BusinessHours entity $id property not initialized in constructor');
         $this->assertEquals('Europe/London', $businessHours->getTimezone());
-        
+
         // Test weekday defaults (Mon-Fri active with 9-5 hours)
         $this->assertTrue($businessHours->getMonActive());
         $this->assertTrue($businessHours->getTueActive());
         $this->assertTrue($businessHours->getWedActive());
         $this->assertTrue($businessHours->getThuActive());
         $this->assertTrue($businessHours->getFriActive());
-        
+
         // Weekend should be inactive by default
         $this->assertNull($businessHours->getSatActive());
         $this->assertNull($businessHours->getSunActive());
-        
+
         // Check default working hours
         $this->assertEquals('09:00', $businessHours->getMonStart());
         $this->assertEquals('17:00', $businessHours->getMonEnd());
@@ -51,16 +51,16 @@ class BusinessHoursTest extends TestCase
     public function testSetAndGetId(): void
     {
         $result = $this->businessHours->setId(123);
-        
+
         $this->assertInstanceOf(BusinessHours::class, $result);
         $this->assertEquals(123, $this->businessHours->getId());
     }
 
     public function testSetAndGetName(): void
     {
-        $name = 'Standard Business Hours';
+        $name   = 'Standard Business Hours';
         $result = $this->businessHours->setName($name);
-        
+
         $this->assertInstanceOf(BusinessHours::class, $result);
         $this->assertEquals($name, $this->businessHours->getName());
     }
@@ -68,8 +68,8 @@ class BusinessHoursTest extends TestCase
     public function testSetAndGetTimezone(): void
     {
         $timezone = 'America/New_York';
-        $result = $this->businessHours->setTimezone($timezone);
-        
+        $result   = $this->businessHours->setTimezone($timezone);
+
         $this->assertInstanceOf(BusinessHours::class, $result);
         $this->assertEquals($timezone, $this->businessHours->getTimezone());
     }
@@ -79,17 +79,17 @@ class BusinessHoursTest extends TestCase
      */
     public function testSetAndGetDayTimes(string $day): void
     {
-        $startMethod = "set{$day}Start";
-        $endMethod = "set{$day}End";
+        $startMethod    = "set{$day}Start";
+        $endMethod      = "set{$day}End";
         $getStartMethod = "get{$day}Start";
-        $getEndMethod = "get{$day}End";
-        
+        $getEndMethod   = "get{$day}End";
+
         $startTime = '08:30';
-        $endTime = '18:00';
-        
+        $endTime   = '18:00';
+
         $startResult = $this->businessHours->$startMethod($startTime);
-        $endResult = $this->businessHours->$endMethod($endTime);
-        
+        $endResult   = $this->businessHours->$endMethod($endTime);
+
         $this->assertInstanceOf(BusinessHours::class, $startResult);
         $this->assertInstanceOf(BusinessHours::class, $endResult);
         $this->assertEquals($startTime, $this->businessHours->$getStartMethod());
@@ -99,13 +99,13 @@ class BusinessHoursTest extends TestCase
     public function dayProvider(): array
     {
         return [
-            'Monday' => ['Mon'],
-            'Tuesday' => ['Tue'],
+            'Monday'    => ['Mon'],
+            'Tuesday'   => ['Tue'],
             'Wednesday' => ['Wed'],
-            'Thursday' => ['Thu'],
-            'Friday' => ['Fri'],
-            'Saturday' => ['Sat'],
-            'Sunday' => ['Sun'],
+            'Thursday'  => ['Thu'],
+            'Friday'    => ['Fri'],
+            'Saturday'  => ['Sat'],
+            'Sunday'    => ['Sun'],
         ];
     }
 
@@ -114,13 +114,13 @@ class BusinessHoursTest extends TestCase
      */
     public function testSetAndGetDayActive(string $day): void
     {
-        $activeMethod = "set{$day}Active";
+        $activeMethod    = "set{$day}Active";
         $getActiveMethod = "get{$day}Active";
-        
+
         $activeResult = $this->businessHours->$activeMethod(true);
         $this->assertInstanceOf(BusinessHours::class, $activeResult);
         $this->assertTrue($this->businessHours->$getActiveMethod());
-        
+
         $inactiveResult = $this->businessHours->$activeMethod(false);
         $this->assertInstanceOf(BusinessHours::class, $inactiveResult);
         $this->assertFalse($this->businessHours->$getActiveMethod());
@@ -129,36 +129,36 @@ class BusinessHoursTest extends TestCase
     public function dayActiveProvider(): array
     {
         return [
-            'Monday' => ['Mon'],
-            'Tuesday' => ['Tue'],
+            'Monday'    => ['Mon'],
+            'Tuesday'   => ['Tue'],
             'Wednesday' => ['Wed'],
-            'Thursday' => ['Thu'],
-            'Friday' => ['Fri'],
-            'Saturday' => ['Sat'],
-            'Sunday' => ['Sun'],
+            'Thursday'  => ['Thu'],
+            'Friday'    => ['Fri'],
+            'Saturday'  => ['Sat'],
+            'Sunday'    => ['Sun'],
         ];
     }
 
     public function testExchangeArraySetsAllProperties(): void
     {
         $data = [
-            'id' => 456,
-            'name' => 'Test Hours',
-            'timezone' => 'Asia/Tokyo',
-            'mon_start' => '10:00',
-            'mon_end' => '19:00',
-            'tue_start' => '10:00',
-            'tue_end' => '19:00',
-            'wed_start' => '10:00',
-            'wed_end' => '19:00',
-            'thu_start' => '10:00',
-            'thu_end' => '19:00',
-            'fri_start' => '10:00',
-            'fri_end' => '19:00',
-            'sat_start' => '12:00',
-            'sat_end' => '16:00',
-            'sun_start' => null,
-            'sun_end' => null,
+            'id'         => 456,
+            'name'       => 'Test Hours',
+            'timezone'   => 'Asia/Tokyo',
+            'mon_start'  => '10:00',
+            'mon_end'    => '19:00',
+            'tue_start'  => '10:00',
+            'tue_end'    => '19:00',
+            'wed_start'  => '10:00',
+            'wed_end'    => '19:00',
+            'thu_start'  => '10:00',
+            'thu_end'    => '19:00',
+            'fri_start'  => '10:00',
+            'fri_end'    => '19:00',
+            'sat_start'  => '12:00',
+            'sat_end'    => '16:00',
+            'sun_start'  => null,
+            'sun_end'    => null,
             'mon_active' => true,
             'tue_active' => true,
             'wed_active' => true,
@@ -167,9 +167,9 @@ class BusinessHoursTest extends TestCase
             'sat_active' => true,
             'sun_active' => false,
         ];
-        
+
         $this->businessHours->exchangeArray($data);
-        
+
         $this->assertEquals(456, $this->businessHours->getId());
         $this->assertEquals('Test Hours', $this->businessHours->getName());
         $this->assertEquals('Asia/Tokyo', $this->businessHours->getTimezone());
@@ -199,7 +199,7 @@ class BusinessHoursTest extends TestCase
             ->setMonStart('09:30')
             ->setMonEnd('17:30')
             ->setMonActive(true);
-        
+
         $this->assertInstanceOf(BusinessHours::class, $result);
         $this->assertEquals(101, $this->businessHours->getId());
         $this->assertEquals('Chained Hours', $this->businessHours->getName());
@@ -220,10 +220,10 @@ class BusinessHoursTest extends TestCase
         // Times can be set to null, but active states cannot due to bool type
         $this->businessHours->setMonStart(null);
         $this->businessHours->setMonEnd(null);
-        
+
         $this->assertNull($this->businessHours->getMonStart());
         $this->assertNull($this->businessHours->getMonEnd());
-        
+
         // Skip testing setMonActive(null) as it's not nullable bool type
         $this->markTestIncomplete('Active properties are not nullable in BusinessHours entity');
     }

@@ -21,7 +21,7 @@ class ContactTest extends TestCase
     public function testSetAndGetId(): void
     {
         $result = $this->contact->setId(123);
-        
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals(123, $this->contact->getId());
     }
@@ -29,8 +29,8 @@ class ContactTest extends TestCase
     public function testSetAndGetOrganisation(): void
     {
         $organisation = $this->createMock(Organisation::class);
-        $result = $this->contact->setOrganisation($organisation);
-        
+        $result       = $this->contact->setOrganisation($organisation);
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertSame($organisation, $this->contact->getOrganisation());
     }
@@ -43,9 +43,9 @@ class ContactTest extends TestCase
 
     public function testSetAndGetSite(): void
     {
-        $site = $this->createMock(SiteEntity::class);
+        $site   = $this->createMock(SiteEntity::class);
         $result = $this->contact->setSite($site);
-        
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertSame($site, $this->contact->getSite());
     }
@@ -53,7 +53,7 @@ class ContactTest extends TestCase
     public function testSetSiteWithNull(): void
     {
         $result = $this->contact->setSite(null);
-        
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertNull($this->contact->getSite());
     }
@@ -67,8 +67,8 @@ class ContactTest extends TestCase
     public function testSetAndGetFirstName(): void
     {
         $firstName = 'John';
-        $result = $this->contact->setFirstName($firstName);
-        
+        $result    = $this->contact->setFirstName($firstName);
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals($firstName, $this->contact->getFirstName());
     }
@@ -76,8 +76,8 @@ class ContactTest extends TestCase
     public function testSetAndGetMiddleName(): void
     {
         $middleName = 'Michael';
-        $result = $this->contact->setMiddleName($middleName);
-        
+        $result     = $this->contact->setMiddleName($middleName);
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals($middleName, $this->contact->getMiddleName());
     }
@@ -85,8 +85,8 @@ class ContactTest extends TestCase
     public function testSetAndGetLastName(): void
     {
         $lastName = 'Smith';
-        $result = $this->contact->setLastName($lastName);
-        
+        $result   = $this->contact->setLastName($lastName);
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals($lastName, $this->contact->getLastName());
     }
@@ -94,8 +94,8 @@ class ContactTest extends TestCase
     public function testSetAndGetWorkTelephone(): void
     {
         $workTelephone = '+44 20 7946 0958';
-        $result = $this->contact->setWorkTelephone($workTelephone);
-        
+        $result        = $this->contact->setWorkTelephone($workTelephone);
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals($workTelephone, $this->contact->getWorkTelephone());
     }
@@ -103,8 +103,8 @@ class ContactTest extends TestCase
     public function testSetAndGetWorkExtension(): void
     {
         $workExtension = '1234';
-        $result = $this->contact->setWorkExtension($workExtension);
-        
+        $result        = $this->contact->setWorkExtension($workExtension);
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals($workExtension, $this->contact->getWorkExtension());
     }
@@ -112,8 +112,8 @@ class ContactTest extends TestCase
     public function testSetAndGetMobileTelephone(): void
     {
         $mobileTelephone = '+44 7700 900123';
-        $result = $this->contact->setMobileTelephone($mobileTelephone);
-        
+        $result          = $this->contact->setMobileTelephone($mobileTelephone);
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals($mobileTelephone, $this->contact->getMobileTelephone());
     }
@@ -121,8 +121,8 @@ class ContactTest extends TestCase
     public function testSetAndGetHomeTelephone(): void
     {
         $homeTelephone = '+44 20 7946 0123';
-        $result = $this->contact->setHomeTelephone($homeTelephone);
-        
+        $result        = $this->contact->setHomeTelephone($homeTelephone);
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals($homeTelephone, $this->contact->getHomeTelephone());
     }
@@ -130,8 +130,8 @@ class ContactTest extends TestCase
     public function testSetAndGetWorkEmail(): void
     {
         $workEmail = 'john@company.com';
-        $result = $this->contact->setWorkEmail($workEmail);
-        
+        $result    = $this->contact->setWorkEmail($workEmail);
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals($workEmail, $this->contact->getWorkEmail());
     }
@@ -139,8 +139,8 @@ class ContactTest extends TestCase
     public function testSetAndGetOtherEmail(): void
     {
         $otherEmail = 'john.personal@example.com';
-        $result = $this->contact->setOtherEmail($otherEmail);
-        
+        $result     = $this->contact->setOtherEmail($otherEmail);
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals($otherEmail, $this->contact->getOtherEmail());
     }
@@ -149,7 +149,7 @@ class ContactTest extends TestCase
     {
         $gender = 'M';
         $result = $this->contact->setGender($gender);
-        
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals($gender, $this->contact->getGender());
     }
@@ -163,8 +163,8 @@ class ContactTest extends TestCase
     public function testGetArrayCopyReturnsCorrectStructure(): void
     {
         $organisation = $this->createMock(Organisation::class);
-        $site = $this->createMock(SiteEntity::class);
-        
+        $site         = $this->createMock(SiteEntity::class);
+
         $this->contact->setId(456)
                      ->setOrganisation($organisation)
                      ->setSite($site)
@@ -178,9 +178,9 @@ class ContactTest extends TestCase
                      ->setWorkEmail('jane@company.com')
                      ->setOtherEmail('jane@personal.com')
                      ->setGender('F');
-        
+
         $arrayCopy = $this->contact->getArrayCopy();
-        
+
         $this->assertIsArray($arrayCopy);
         $this->assertEquals(456, $arrayCopy['id']);
         $this->assertSame($organisation, $arrayCopy['organisation']);
@@ -200,26 +200,26 @@ class ContactTest extends TestCase
     public function testExchangeArraySetsAllProperties(): void
     {
         $organisation = $this->createMock(Organisation::class);
-        $site = $this->createMock(SiteEntity::class);
-        
+        $site         = $this->createMock(SiteEntity::class);
+
         $data = [
-            'id' => 789,
-            'organisation' => $organisation,
-            'site' => $site,
-            'first_name' => 'Bob',
-            'middle_name' => 'William',
-            'last_name' => 'Johnson',
-            'work_telephone' => '+1 555 123 4567',
-            'work_extension' => '9999',
+            'id'               => 789,
+            'organisation'     => $organisation,
+            'site'             => $site,
+            'first_name'       => 'Bob',
+            'middle_name'      => 'William',
+            'last_name'        => 'Johnson',
+            'work_telephone'   => '+1 555 123 4567',
+            'work_extension'   => '9999',
             'mobile_telephone' => '+1 555 987 6543',
-            'home_telephone' => '+1 555 246 8135',
-            'work_email' => 'bob@work.com',
-            'other_email' => 'bob@home.com',
-            'gender' => 'M',
+            'home_telephone'   => '+1 555 246 8135',
+            'work_email'       => 'bob@work.com',
+            'other_email'      => 'bob@home.com',
+            'gender'           => 'M',
         ];
-        
+
         $result = $this->contact->exchangeArray($data);
-        
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals(789, $this->contact->getId());
         $this->assertSame($organisation, $this->contact->getOrganisation());
@@ -240,25 +240,25 @@ class ContactTest extends TestCase
     {
         $data = [
             'first_name' => 'Alice',
-            'last_name' => 'Cooper',
+            'last_name'  => 'Cooper',
         ];
-        
+
         $result = $this->contact->exchangeArray($data);
-        
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals('Alice', $this->contact->getFirstName());
         $this->assertEquals('Cooper', $this->contact->getLastName());
-        
+
         // Missing string properties should default to empty strings
         $this->assertEquals('', $this->contact->getMiddleName());
         $this->assertEquals('', $this->contact->getWorkTelephone());
         $this->assertEquals('', $this->contact->getWorkEmail());
-        
+
         // Missing nullable properties should be null
         $this->assertNull($this->contact->getOrganisation());
         $this->assertNull($this->contact->getSite());
         $this->assertNull($this->contact->getGender());
-        
+
         // Missing ID should default to 0
         $this->assertEquals(0, $this->contact->getId());
     }
@@ -266,8 +266,8 @@ class ContactTest extends TestCase
     public function testFluentInterfaceChaining(): void
     {
         $organisation = $this->createMock(Organisation::class);
-        $site = $this->createMock(SiteEntity::class);
-        
+        $site         = $this->createMock(SiteEntity::class);
+
         $result = $this->contact
             ->setId(101)
             ->setOrganisation($organisation)
@@ -282,7 +282,7 @@ class ContactTest extends TestCase
             ->setWorkEmail('charlie@work.co.uk')
             ->setOtherEmail('charlie@home.co.uk')
             ->setGender('M');
-        
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals(101, $this->contact->getId());
         $this->assertSame($organisation, $this->contact->getOrganisation());
@@ -305,7 +305,7 @@ class ContactTest extends TestCase
     public function testSetGenderWithValidValues(string $gender): void
     {
         $result = $this->contact->setGender($gender);
-        
+
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals($gender, $this->contact->getGender());
     }
@@ -313,9 +313,9 @@ class ContactTest extends TestCase
     public function genderProvider(): array
     {
         return [
-            'Male' => ['M'],
-            'Female' => ['F'],
-            'Other' => ['O'],
+            'Male'    => ['M'],
+            'Female'  => ['F'],
+            'Other'   => ['O'],
             'Unknown' => ['U'],
         ];
     }
@@ -332,7 +332,7 @@ class ContactTest extends TestCase
                      ->setHomeTelephone('+44 111 222 3333')
                      ->setWorkEmail('test@work.com')
                      ->setOtherEmail('test@personal.com');
-        
+
         // All string getters should return strings
         $this->assertIsString($this->contact->getFirstName());
         $this->assertIsString($this->contact->getMiddleName());
@@ -349,13 +349,13 @@ class ContactTest extends TestCase
     {
         // Test behavior when ID is null in exchangeArray
         $data = [
-            'id' => null,
+            'id'         => null,
             'first_name' => 'Test',
-            'last_name' => 'User',
+            'last_name'  => 'User',
         ];
-        
+
         $this->contact->exchangeArray($data);
-        
+
         $this->assertEquals(0, $this->contact->getId());
         $this->assertEquals('Test', $this->contact->getFirstName());
         $this->assertEquals('User', $this->contact->getLastName());

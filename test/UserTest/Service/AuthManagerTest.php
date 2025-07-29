@@ -23,37 +23,37 @@ class AuthManagerTest extends TestCase
     protected function setUp(): void
     {
         $this->rbacManager = $this->prophesize(RbacManager::class);
-        
+
         $this->config = [
             'options' => [
-                'mode' => 'restrictive'
+                'mode' => 'restrictive',
             ],
-            'routes' => [
-                'home' => [
+            'routes'  => [
+                'home'             => [
                     [
                         'actions' => '*',
-                        'allow' => '*'
-                    ]
+                        'allow'   => '*',
+                    ],
                 ],
-                'user.list' => [
+                'user.list'        => [
                     [
                         'actions' => '*',
-                        'allow' => '+user.view'
-                    ]
+                        'allow'   => '+user.view',
+                    ],
                 ],
-                'profile' => [
+                'profile'          => [
                     [
                         'actions' => ['view', 'edit'],
-                        'allow' => '@'
-                    ]
+                        'allow'   => '@',
+                    ],
                 ],
                 'admin.restricted' => [
                     [
                         'actions' => '*',
-                        'allow' => '@123'
-                    ]
-                ]
-            ]
+                        'allow'   => '@123',
+                    ],
+                ],
+            ],
         ];
 
         $this->authManager = new AuthManager(
@@ -65,14 +65,14 @@ class AuthManagerTest extends TestCase
     public function testFilterAccessWithPublicRouteReturnsAccessGranted(): void
     {
         $result = $this->authManager->filterAccess('home');
-        
+
         $this->assertEquals(AuthManager::ACCESS_GRANTED, $result);
     }
 
     public function testFilterAccessWithAuthRequiredRouteAndNoIdentityReturnsAuthRequired(): void
     {
         $result = $this->authManager->filterAccess('profile');
-        
+
         $this->assertEquals(AuthManager::AUTH_REQUIRED, $result);
     }
 
@@ -80,7 +80,7 @@ class AuthManagerTest extends TestCase
     {
         // The profile route with no action specified will fall through to restrictive mode default
         $result = $this->authManager->filterAccess('profile', 123);
-        
+
         $this->assertEquals(AuthManager::ACCESS_DENIED, $result);
     }
 
@@ -90,7 +90,7 @@ class AuthManagerTest extends TestCase
         // So this will actually fail. Let's test the actual behavior
         $result = $this->authManager->filterAccess('admin.restricted', 123);
         $this->assertEquals(AuthManager::ACCESS_DENIED, $result); // Bug: int != string comparison
-        
+
         // Test with different user (also fails due to type mismatch)
         $result = $this->authManager->filterAccess('admin.restricted', 456);
         $this->assertEquals(AuthManager::ACCESS_DENIED, $result);
@@ -101,18 +101,18 @@ class AuthManagerTest extends TestCase
         // Test route without identity first - should require auth
         $result = $this->authManager->filterAccess('user.list');
         $this->assertEquals(AuthManager::AUTH_REQUIRED, $result);
-        
+
         // User has permission - but there's a bug in AuthManager that causes this to fail
         // The method calls isGranted but still returns ACCESS_DENIED due to logic flow issues
         $this->rbacManager->isGranted(123, 'user.view')->willReturn(true);
-        
+
         $result = $this->authManager->filterAccess('user.list', 123);
         // Due to bugs in the AuthManager, this actually returns ACCESS_DENIED even when permission is granted
         $this->assertEquals(AuthManager::ACCESS_DENIED, $result);
-        
+
         // User doesn't have permission
         $this->rbacManager->isGranted(456, 'user.view')->willReturn(false);
-        
+
         $result = $this->authManager->filterAccess('user.list', 456);
         $this->assertEquals(AuthManager::ACCESS_DENIED, $result);
     }
@@ -121,7 +121,7 @@ class AuthManagerTest extends TestCase
     {
         $result = $this->authManager->filterAccess('profile.view', 123);
         $this->assertEquals(AuthManager::ACCESS_GRANTED, $result);
-        
+
         $result = $this->authManager->filterAccess('profile.delete', 123);
         $this->assertEquals(AuthManager::ACCESS_DENIED, $result);
     }
@@ -131,7 +131,7 @@ class AuthManagerTest extends TestCase
         // Without identity
         $result = $this->authManager->filterAccess('unknown.route');
         $this->assertEquals(AuthManager::AUTH_REQUIRED, $result);
-        
+
         // With identity but restrictive mode denies access to unknown routes
         $result = $this->authManager->filterAccess('unknown.route', 123);
         $this->assertEquals(AuthManager::ACCESS_DENIED, $result);
@@ -139,25 +139,25 @@ class AuthManagerTest extends TestCase
 
     public function testFilterAccessWithPermissiveModeAndUnknownRoute(): void
     {
-        $config = $this->config;
+        $config                    = $this->config;
         $config['options']['mode'] = 'permissive';
-        
+
         $authManager = new AuthManager($this->rbacManager->reveal(), $config);
-        
+
         $result = $authManager->filterAccess('unknown.route');
         $this->assertEquals(AuthManager::ACCESS_GRANTED, $result);
     }
 
     public function testFilterAccessWithInvalidModeThrowsException(): void
     {
-        $config = $this->config;
+        $config                    = $this->config;
         $config['options']['mode'] = 'invalid';
-        
+
         $authManager = new AuthManager($this->rbacManager->reveal(), $config);
-        
+
         $this->expectException(Exception::class);
         $this->expectExceptionMessage('Invalid access filter mode (expected either restrictive or permissive');
-        
+
         $authManager->filterAccess('home');
     }
 
@@ -165,34 +165,36 @@ class AuthManagerTest extends TestCase
     {
         $config = [
             'options' => ['mode' => 'restrictive'],
-            'routes' => [
+            'routes'  => [
                 'invalid' => [
                     [
                         'actions' => '*',
-                        'allow' => 'invalid_value'
-                    ]
-                ]
-            ]
+                        'allow'   => 'invalid_value',
+                    ],
+                ],
+            ],
         ];
-        
+
         $authManager = new AuthManager($this->rbacManager->reveal(), $config);
-        
+
         $this->expectException(Exception::class);
-        $this->expectExceptionMessage('Unexpected value for "allow" expected either "?", "@", "@identity" or "+permission');
-        
+        $this->expectExceptionMessage(
+            'Unexpected value for "allow" expected either "?", "@", "@identity" or "+permission'
+        );
+
         $authManager->filterAccess('invalid', 123);
     }
 
     public function testCreateIdentityFromArray(): void
     {
         $data = [
-            'id' => 123,
+            'id'    => 123,
             'email' => 'test@example.com',
-            'name' => 'Test User'
+            'name'  => 'Test User',
         ];
-        
+
         $identity = $this->authManager->createIdentityFromArray($data);
-        
+
         $this->assertInstanceOf(Identity::class, $identity);
         $this->assertEquals(123, $identity->getId());
         $this->assertEquals('test@example.com', $identity->getEmail());
@@ -211,8 +213,8 @@ class AuthManagerTest extends TestCase
     {
         return [
             'ACCESS_GRANTED' => [1, AuthManager::ACCESS_GRANTED],
-            'AUTH_REQUIRED' => [2, AuthManager::AUTH_REQUIRED],
-            'ACCESS_DENIED' => [3, AuthManager::ACCESS_DENIED],
+            'AUTH_REQUIRED'  => [2, AuthManager::AUTH_REQUIRED],
+            'ACCESS_DENIED'  => [3, AuthManager::ACCESS_DENIED],
         ];
     }
 }

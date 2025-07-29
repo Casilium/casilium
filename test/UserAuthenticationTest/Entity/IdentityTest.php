@@ -6,6 +6,7 @@ namespace UserAuthenticationTest\Entity;
 
 use PHPUnit\Framework\TestCase;
 use UserAuthentication\Entity\Identity;
+use UserAuthentication\Entity\IdentityInterface;
 
 class IdentityTest extends TestCase
 {
@@ -18,13 +19,13 @@ class IdentityTest extends TestCase
 
     public function testImplementsIdentityInterface(): void
     {
-        $this->assertInstanceOf(\UserAuthentication\Entity\IdentityInterface::class, $this->identity);
+        $this->assertInstanceOf(IdentityInterface::class, $this->identity);
     }
 
     public function testSetAndGetId(): void
     {
         $result = $this->identity->setId(123);
-        
+
         $this->assertInstanceOf(Identity::class, $result);
         $this->assertEquals(123, $this->identity->getId());
     }
@@ -36,9 +37,9 @@ class IdentityTest extends TestCase
 
     public function testSetAndGetEmail(): void
     {
-        $email = 'test@example.com';
+        $email  = 'test@example.com';
         $result = $this->identity->setEmail($email);
-        
+
         $this->assertInstanceOf(Identity::class, $result);
         $this->assertEquals($email, $this->identity->getEmail());
     }
@@ -50,9 +51,9 @@ class IdentityTest extends TestCase
 
     public function testSetAndGetName(): void
     {
-        $name = 'John Doe';
+        $name   = 'John Doe';
         $result = $this->identity->setName($name);
-        
+
         $this->assertInstanceOf(Identity::class, $result);
         $this->assertEquals($name, $this->identity->getName());
     }
@@ -65,7 +66,7 @@ class IdentityTest extends TestCase
     public function testSetRolesWithSingleRole(): void
     {
         $result = $this->identity->setRoles('admin');
-        
+
         $this->assertInstanceOf(Identity::class, $result);
         $this->assertTrue($this->identity->hasRole('admin'));
     }
@@ -73,7 +74,7 @@ class IdentityTest extends TestCase
     public function testSetRolesWithMultipleRoles(): void
     {
         $this->identity->setRoles('admin,user,moderator');
-        
+
         $this->assertTrue($this->identity->hasRole('admin'));
         $this->assertTrue($this->identity->hasRole('user'));
         $this->assertTrue($this->identity->hasRole('moderator'));
@@ -82,7 +83,7 @@ class IdentityTest extends TestCase
     public function testHasRoleWithExistingRole(): void
     {
         $this->identity->setRoles('admin,user');
-        
+
         $this->assertTrue($this->identity->hasRole('admin'));
         $this->assertTrue($this->identity->hasRole('user'));
     }
@@ -90,7 +91,7 @@ class IdentityTest extends TestCase
     public function testHasRoleWithNonExistentRole(): void
     {
         $this->identity->setRoles('admin,user');
-        
+
         $this->assertFalse($this->identity->hasRole('moderator'));
         $this->assertFalse($this->identity->hasRole('guest'));
     }
@@ -98,7 +99,7 @@ class IdentityTest extends TestCase
     public function testHasRoleIsCaseInsensitive(): void
     {
         $this->identity->setRoles('Admin,USER');
-        
+
         $this->assertTrue($this->identity->hasRole('admin'));
         $this->assertTrue($this->identity->hasRole('ADMIN'));
         $this->assertTrue($this->identity->hasRole('user'));
@@ -113,7 +114,7 @@ class IdentityTest extends TestCase
     public function testSetRolesWithEmptyString(): void
     {
         $this->identity->setRoles('');
-        
+
         $this->assertTrue($this->identity->hasRole(''));
         $this->assertFalse($this->identity->hasRole('admin'));
     }
@@ -125,7 +126,7 @@ class IdentityTest extends TestCase
             ->setEmail('test@example.com')
             ->setName('Test User')
             ->setRoles('admin,user');
-            
+
         $this->assertInstanceOf(Identity::class, $result);
         $this->assertEquals(123, $this->identity->getId());
         $this->assertEquals('test@example.com', $this->identity->getEmail());
@@ -146,14 +147,14 @@ class IdentityTest extends TestCase
     public function roleDataProvider(): array
     {
         return [
-            'single exact match' => ['admin', 'admin', true],
-            'single no match' => ['admin', 'user', false],
-            'multiple with match' => ['admin,user,guest', 'user', true],
-            'multiple no match' => ['admin,user,guest', 'moderator', false],
-            'case insensitive match' => ['Admin,User', 'admin', true],
+            'single exact match'        => ['admin', 'admin', true],
+            'single no match'           => ['admin', 'user', false],
+            'multiple with match'       => ['admin,user,guest', 'user', true],
+            'multiple no match'         => ['admin,user,guest', 'moderator', false],
+            'case insensitive match'    => ['Admin,User', 'admin', true],
             'case insensitive no match' => ['Admin,User', 'guest', false],
-            'empty roles' => ['', 'admin', false],
-            'whitespace in roles' => ['admin, user, guest', ' user', true],
+            'empty roles'               => ['', 'admin', false],
+            'whitespace in roles'       => ['admin, user, guest', ' user', true],
         ];
     }
 }

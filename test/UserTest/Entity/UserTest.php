@@ -20,7 +20,7 @@ class UserTest extends TestCase
     public function testConstructorInitializesDefaults(): void
     {
         $user = new User();
-        
+
         $this->assertFalse($user->isMfaEnabled());
         $this->assertCount(0, $user->getRoles());
     }
@@ -65,8 +65,8 @@ class UserTest extends TestCase
     {
         return [
             'inactive' => [User::STATUS_INACTIVE],
-            'active' => [User::STATUS_ACTIVE],
-            'retired' => [User::STATUS_RETIRED],
+            'active'   => [User::STATUS_ACTIVE],
+            'retired'  => [User::STATUS_RETIRED],
         ];
     }
 
@@ -74,10 +74,10 @@ class UserTest extends TestCase
     {
         $expected = [
             User::STATUS_INACTIVE => 'Inactive',
-            User::STATUS_ACTIVE => 'Active',
-            User::STATUS_RETIRED => 'Retired',
+            User::STATUS_ACTIVE   => 'Active',
+            User::STATUS_RETIRED  => 'Retired',
         ];
-        
+
         $this->assertEquals($expected, User::getStatusList());
     }
 
@@ -94,9 +94,9 @@ class UserTest extends TestCase
     {
         return [
             'inactive status' => [User::STATUS_INACTIVE, 'Inactive'],
-            'active status' => [User::STATUS_ACTIVE, 'Active'],
-            'retired status' => [User::STATUS_RETIRED, 'Retired'],
-            'unknown status' => [999, 'Unknown'],
+            'active status'   => [User::STATUS_ACTIVE, 'Active'],
+            'retired status'  => [User::STATUS_RETIRED, 'Retired'],
+            'unknown status'  => [999, 'Unknown'],
         ];
     }
 
@@ -136,17 +136,17 @@ class UserTest extends TestCase
     public function testSetAndGetSecretKey(): void
     {
         $secretKey = 'secret_key_123';
-        $result = $this->user->setSecretKey($secretKey);
-        
+        $result    = $this->user->setSecretKey($secretKey);
+
         $this->assertInstanceOf(User::class, $result);
         $this->assertEquals($secretKey, $this->user->getSecretKey());
     }
 
     public function testAddRoleReturnsUserInstance(): void
     {
-        $role = $this->createMock(Role::class);
+        $role   = $this->createMock(Role::class);
         $result = $this->user->addRole($role);
-        
+
         $this->assertInstanceOf(User::class, $result);
         $this->assertCount(1, $this->user->getRoles());
     }
@@ -160,7 +160,7 @@ class UserTest extends TestCase
     {
         $role = $this->createMock(Role::class);
         $role->method('getName')->willReturn('Admin');
-        
+
         $this->user->addRole($role);
         $this->assertEquals('Admin', $this->user->getRolesAsString());
     }
@@ -169,13 +169,13 @@ class UserTest extends TestCase
     {
         $role1 = $this->createMock(Role::class);
         $role1->method('getName')->willReturn('Admin');
-        
+
         $role2 = $this->createMock(Role::class);
         $role2->method('getName')->willReturn('User');
-        
+
         $this->user->addRole($role1);
         $this->user->addRole($role2);
-        
+
         $this->assertEquals('Admin,User', $this->user->getRolesAsString());
     }
 }

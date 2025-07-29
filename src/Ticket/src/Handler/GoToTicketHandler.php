@@ -41,7 +41,7 @@ class GoToTicketHandler implements RequestHandlerInterface
     {
         // get ticket id from Url
         $queryParams = $request->getQueryParams();
-        $ticketId = intval($queryParams['ticket_id'] ?? 0);
+        $ticketId    = intval($queryParams['ticket_id'] ?? 0);
         if (! $ticketId) {
             return new HtmlResponse($this->renderer->render('error::404'), 404);
         }

@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace UserTest\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
-use User\Repository\UserRepository;
+use Doctrine\ORM\EntityRepository;
 use Exception;
 use Mezzio\Template\TemplateRendererInterface;
 use PHPUnit\Framework\TestCase;
@@ -15,9 +15,15 @@ use Prophecy\Prophecy\ObjectProphecy;
 use User\Entity\Role;
 use User\Entity\User;
 use User\Exception\PasswordMismatchException;
+use User\Repository\UserRepository;
 use User\Service\PermissionManager;
 use User\Service\RoleManager;
 use User\Service\UserManager;
+
+use function password_hash;
+use function password_verify;
+
+use const PASSWORD_BCRYPT;
 
 class UserManagerTest extends TestCase
 {
@@ -33,12 +39,12 @@ class UserManagerTest extends TestCase
 
     protected function setUp(): void
     {
-        $this->entityManager = $this->prophesize(EntityManagerInterface::class);
-        $this->roleManager = $this->prophesize(RoleManager::class);
+        $this->entityManager     = $this->prophesize(EntityManagerInterface::class);
+        $this->roleManager       = $this->prophesize(RoleManager::class);
         $this->permissionManager = $this->prophesize(PermissionManager::class);
-        $this->renderer = $this->prophesize(TemplateRendererInterface::class);
-        $this->userRepository = $this->prophesize(UserRepository::class);
-        $this->roleRepository = $this->prophesize(\Doctrine\ORM\EntityRepository::class);
+        $this->renderer          = $this->prophesize(TemplateRendererInterface::class);
+        $this->userRepository    = $this->prophesize(UserRepository::class);
+        $this->roleRepository    = $this->prophesize(EntityRepository::class);
 
         $this->entityManager->getRepository(User::class)
             ->willReturn($this->userRepository->reveal());
@@ -59,11 +65,11 @@ class UserManagerTest extends TestCase
     public function testAddUserWithValidDataCreatesUser(): void
     {
         $userData = [
-            'email' => 'test@example.com',
+            'email'     => 'test@example.com',
             'full_name' => 'Test User',
-            'password' => 'password123',
-            'status' => User::STATUS_ACTIVE,
-            'roles' => [1, 2]
+            'password'  => 'password123',
+            'status'    => User::STATUS_ACTIVE,
+            'roles'     => [1, 2],
         ];
 
         $role1 = new Role();
@@ -90,11 +96,11 @@ class UserManagerTest extends TestCase
     public function testAddUserWithExistingEmailThrowsException(): void
     {
         $userData = [
-            'email' => 'existing@example.com',
+            'email'     => 'existing@example.com',
             'full_name' => 'Test User',
-            'password' => 'password123',
-            'status' => User::STATUS_ACTIVE,
-            'roles' => []
+            'password'  => 'password123',
+            'status'    => User::STATUS_ACTIVE,
+            'roles'     => [],
         ];
 
         $existingUser = new User();
@@ -110,7 +116,7 @@ class UserManagerTest extends TestCase
     public function testGetPasswordHashReturnsValidHash(): void
     {
         $password = 'testpassword123';
-        $hash = $this->userManager->getPasswordHash($password);
+        $hash     = $this->userManager->getPasswordHash($password);
 
         $this->assertNotEmpty($hash);
         $this->assertTrue(password_verify($password, $hash));
@@ -123,11 +129,11 @@ class UserManagerTest extends TestCase
         $user->setEmail('old@example.com');
 
         $updateData = [
-            'email' => 'new@example.com',
-            'full_name' => 'Updated Name',
-            'status' => User::STATUS_ACTIVE,
+            'email'       => 'new@example.com',
+            'full_name'   => 'Updated Name',
+            'status'      => User::STATUS_ACTIVE,
             'mfa_enabled' => true,
-            'roles' => [1]
+            'roles'       => [1],
         ];
 
         $role = new Role();
@@ -154,16 +160,16 @@ class UserManagerTest extends TestCase
         $user->setEmail('user@example.com');
 
         $updateData = [
-            'email' => 'existing@example.com',
-            'full_name' => 'Updated Name',
-            'status' => User::STATUS_ACTIVE,
+            'email'       => 'existing@example.com',
+            'full_name'   => 'Updated Name',
+            'status'      => User::STATUS_ACTIVE,
             'mfa_enabled' => false,
-            'roles' => []
+            'roles'       => [],
         ];
 
         $existingUser = new User();
         $existingUser->setId(2);
-        
+
         $this->userRepository->findOneByEmail($updateData['email'])
             ->willReturn($existingUser);
 
@@ -175,7 +181,7 @@ class UserManagerTest extends TestCase
 
     public function testAssignRolesWithValidRoles(): void
     {
-        $user = new User();
+        $user    = new User();
         $roleIds = [1, 2];
 
         $role1 = new Role();
@@ -193,7 +199,7 @@ class UserManagerTest extends TestCase
 
     public function testAssignRolesWithInvalidRoleThrowsException(): void
     {
-        $user = new User();
+        $user    = new User();
         $roleIds = [999]; // Non-existent role ID
 
         $this->roleRepository->find(999)->willReturn(null);
@@ -207,7 +213,7 @@ class UserManagerTest extends TestCase
     public function testCheckUserExistsReturnsTrueForExistingUser(): void
     {
         $email = 'existing@example.com';
-        $user = new User();
+        $user  = new User();
 
         $this->userRepository->findOneByEmail($email)->willReturn($user);
 
@@ -255,7 +261,7 @@ class UserManagerTest extends TestCase
     {
         $user = new User();
         $user->setId(1);
-        $currentPassword = 'currentpass';
+        $currentPassword       = 'currentpass';
         $hashedCurrentPassword = password_hash($currentPassword, PASSWORD_BCRYPT);
         $user->setPassword($hashedCurrentPassword);
 

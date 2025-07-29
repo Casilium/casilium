@@ -79,15 +79,15 @@ class CalculateBusinessHours
                 // move to next day
                 $date->addDay();
                 $dayOfWeek = strtolower($date->isoFormat('ddd'));
-                
+
                 // find next active day
                 $nextActive = $this->workingHours[$dayOfWeek]['active'] ?? false;
                 while ($nextActive === false) {
                     $date->addDay();
-                    $dayOfWeek = strtolower($date->isoFormat('ddd'));
+                    $dayOfWeek  = strtolower($date->isoFormat('ddd'));
                     $nextActive = $this->workingHours[$dayOfWeek]['active'] ?? false;
                 }
-                
+
                 // set hour to beginning of active day
                 $date->setHour($this->workingHours[$dayOfWeek]['startHour']);
                 $date->setMinute($this->workingHours[$dayOfWeek]['startMinute']);
@@ -139,15 +139,15 @@ class CalculateBusinessHours
                 // move to next day
                 $date->addDay();
                 $dayOfWeek = strtolower($date->isoFormat('ddd'));
-                
+
                 // find next active day
                 $nextActive = $this->workingHours[$dayOfWeek]['active'] ?? false;
                 while ($nextActive === false) {
                     $date->addDay();
-                    $dayOfWeek = strtolower($date->isoFormat('ddd'));
+                    $dayOfWeek  = strtolower($date->isoFormat('ddd'));
                     $nextActive = $this->workingHours[$dayOfWeek]['active'] ?? false;
                 }
-                
+
                 // set hour to beginning of active day
                 $date->setHour($this->workingHours[$dayOfWeek]['startHour']);
                 $date->setMinute($this->workingHours[$dayOfWeek]['startMinute']);
