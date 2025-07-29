@@ -10,61 +10,51 @@ use OrganisationSite\Entity\SiteEntity;
 
 use function get_object_vars;
 
-/**
- * @ORM\Entity(repositoryClass="OrganisationContact\Repository\ContactRepository")
- * @ORM\Table(name="organisation_contact")
- */
+#[ORM\Entity(repositoryClass: 'OrganisationContact\Repository\ContactRepository')]
+#[ORM\Table(name: 'organisation_contact')]
 class Contact
 {
-    /**
-     * Internal Contact ID
-     *
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private int $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Organisation\Entity\Organisation")
-     * @ORM\JoinColumn(name="organisation_id", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: Organisation::class)]
+    #[ORM\JoinColumn(name: 'organisation_id', referencedColumnName: 'id')]
     private ?Organisation $organisation = null;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="OrganisationSite\Entity\SiteEntity")
-     * @ORM\JoinColumn(name="site_id", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: SiteEntity::class)]
+    #[ORM\JoinColumn(name: 'site_id', referencedColumnName: 'id')]
     private ?SiteEntity $site = null;
 
-    /** @ORM\Column(name="first_name", type="string", length=32) */
+    #[ORM\Column(name: 'first_name', type: 'string', length: 32)]
     private string $firstName;
 
-    /** @ORM\Column(name="middle_name", type="string", length=32) */
+    #[ORM\Column(name: 'middle_name', type: 'string', length: 32)]
     private string $middleName;
 
-    /** @ORM\Column(name="last_name", type="string", length=32) */
+    #[ORM\Column(name: 'last_name', type: 'string', length: 32)]
     private string $lastName;
 
-    /** @ORM\Column(name="work_telephone", type="string", length=32) */
+    #[ORM\Column(name: 'work_telephone', type: 'string', length: 32)]
     private string $workTelephone;
 
-    /** @ORM\Column(name="work_extension", type="string", length=20) */
+    #[ORM\Column(name: 'work_extension', type: 'string', length: 20)]
     private string $workExtension;
 
-    /** @ORM\Column(name="mobile_telephone", type="string", length=20) */
+    #[ORM\Column(name: 'mobile_telephone', type: 'string', length: 20)]
     private string $mobileTelephone;
 
-    /** @ORM\Column(name="home_telephone", type="string", length=20) */
+    #[ORM\Column(name: 'home_telephone', type: 'string', length: 20)]
     private string $homeTelephone;
 
-    /** @ORM\Column(name="work_email", type="string", length=20) */
+    #[ORM\Column(name: 'work_email', type: 'string', length: 20)]
     private string $workEmail;
 
-    /** @ORM\Column(name="other_email", type="string", length=20) */
+    #[ORM\Column(name: 'other_email', type: 'string', length: 20)]
     private string $otherEmail;
 
-    /** @ORM\Column(name="gender", type="string", length=1) */
+    #[ORM\Column(name: 'gender', type: 'string', length: 1)]
     private ?string $gender = null;
 
     public function getId(): int
