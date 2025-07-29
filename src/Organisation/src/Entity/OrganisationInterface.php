@@ -7,15 +7,11 @@ namespace Organisation\Entity;
 use DateTime;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
-use Doctrine\ORM\Mapping as ORM;
 use Exception;
 use Ramsey\Uuid\UuidInterface;
 
 /**
- * https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/basic-mapping.html
- *
- * @ORM\Entity(repositoryClass="Organisation\Repository\OrganisationRepository")
- * @ORM\Table(name="organisation")
+ * Interface for Organisation entities
  */
 interface OrganisationInterface
 {

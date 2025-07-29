@@ -6,28 +6,20 @@ namespace Organisation\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/basic-mapping.html
- *
- * @ORM\Entity(repositoryClass="Organisation\Repository\DomainRepository")
- * @ORM\Table(name="organisation_domain")
- */
+#[ORM\Entity(repositoryClass: 'Organisation\Repository\DomainRepository')]
+#[ORM\Table(name: 'organisation_domain')]
 class Domain
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id", unique=true)
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', name: 'id', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     protected int $id;
 
-    /** @ORM\Column(type="string", name="name", nullable=false) */
+    #[ORM\Column(type: 'string', name: 'name', nullable: false)]
     protected string $name;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Organisation", inversedBy="domains")
-     * @ORM\JoinColumn("organisation_id", referencedColumnName="id", onDelete="cascade")
-     */
+    #[ORM\ManyToOne(targetEntity: Organisation::class, inversedBy: 'domains')]
+    #[ORM\JoinColumn(name: 'organisation_id', referencedColumnName: 'id', onDelete: 'cascade')]
     protected Organisation $organisation;
 
     public function getId(): ?int

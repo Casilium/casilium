@@ -18,12 +18,8 @@ use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use ServiceLevel\Entity\Sla;
 
-/**
- * https://www.doctrine-project.org/projects/doctrine-orm/en/2.6/reference/basic-mapping.html
- *
- * @ORM\Entity(repositoryClass="Organisation\Repository\OrganisationRepository")
- * @ORM\Table(name="organisation")
- */
+#[ORM\Entity(repositoryClass: 'Organisation\Repository\OrganisationRepository')]
+#[ORM\Table(name: 'organisation')]
 class Organisation implements OrganisationInterface
 {
     public const STATE_INACTIVE = 0;
@@ -34,42 +30,34 @@ class Organisation implements OrganisationInterface
     public const TYPE_SUPPLIER = 2;
     public const TYPE_BOTH     = 3;
 
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id", unique=true)
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', name: 'id', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     protected ?int $id;
 
-    /** @ORM\Column(type="uuid", unique=true) */
+    #[ORM\Column(type: 'uuid', unique: true)]
     protected UuidInterface $uuid;
 
-    /** @ORM\Column(type="utcdatetime", nullable=false) */
+    #[ORM\Column(type: 'utcdatetime', nullable: false)]
     protected DateTime $created;
 
-    /** @ORM\Column(name="is_active", type="integer", nullable=false) */
+    #[ORM\Column(name: 'is_active', type: 'integer', nullable: false)]
     protected int $isActive;
 
-    /**
-     * @ORM\OneToOne(targetEntity="ServiceLevel\Entity\Sla")
-     * @ORM\JoinColumn(name="sla_id", referencedColumnName="id", nullable=true)
-     */
+    #[ORM\OneToOne(targetEntity: Sla::class)]
+    #[ORM\JoinColumn(name: 'sla_id', referencedColumnName: 'id', nullable: true)]
     protected ?Sla $sla;
 
-    /**
-     * @ORM\Column(type="utcdatetime", nullable=false)
-     *
-     * @var DateTime
-     */
+    #[ORM\Column(type: 'utcdatetime', nullable: false)]
     protected DateTimeInterface $modified;
 
-    /** @ORM\Column(type="string", name="name", nullable=false) */
+    #[ORM\Column(type: 'string', name: 'name', nullable: false)]
     protected string $name;
 
-    /** @ORM\Column(name="type_id", type="integer", nullable=false) */
+    #[ORM\Column(name: 'type_id', type: 'integer', nullable: false)]
     protected int $typeId;
 
-    /** @ORM\OneToMany(targetEntity="Domain", mappedBy="organisation", orphanRemoval=true, cascade={"persist", "remove"}) */
+    #[ORM\OneToMany(targetEntity: Domain::class, mappedBy: 'organisation', orphanRemoval: true, cascade: ['persist', 'remove'])]
     protected array|Collection $domains;
 
     /**
