@@ -84,6 +84,7 @@ class SiteManager
         $site->setCity($entity->getCity());
         $site->setCounty($entity->getCounty());
         $site->setCountry($entity->getCountry());
+        $site->setPostalCode($entity->getPostalCode());
         $site->setTelephone($entity->getTelephone());
 
         // save
@@ -95,10 +96,10 @@ class SiteManager
      *
      * @return array
      */
-    public function fetchSitesByOrganisationId(int $id): ?array
+    public function fetchSitesByOrganisationId(int $id): array
     {
         return $this->entityManager->getRepository(SiteEntity::class)
-            ->findByOrganisationId($id);
+            ->findByOrganisationId($id) ?? [];
     }
 
     /**

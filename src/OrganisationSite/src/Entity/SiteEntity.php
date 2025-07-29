@@ -207,7 +207,7 @@ class SiteEntity
         $address[] = $this->getTown();
         $address[] = $this->getCity();
         $address[] = $this->getCounty();
-        $address[] = $this->getCountry()->getName();
+        $address[] = $this->getCountry()?->getName();
         $address[] = $this->getPostalCode();
         return implode(', ', array_filter($address));
     }
