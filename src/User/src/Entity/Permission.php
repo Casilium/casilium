@@ -7,52 +7,29 @@ namespace User\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="permission")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'permission')]
 class Permission
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue()
-     *
-     * @var int
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue]
+    private int $id;
 
-    /**
-     * @ORM\Column(name="name")
-     *
-     * @var string
-     */
-    private $name;
+    #[ORM\Column(name: 'name')]
+    private string $name;
 
-    /**
-     * @ORM\Column(name="description")
-     *
-     * @var string
-     */
-    private $description;
+    #[ORM\Column(name: 'description')]
+    private string $description;
 
-    /**
-     * @ORM\Column(name="date_created")
-     *
-     * @var string
-     */
-    private $dateCreated;
+    #[ORM\Column(name: 'date_created')]
+    private string $dateCreated;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="User\Entity\Role", mappedBy="permissions")
-     * @ORM\JoinTable(name="role_permission",
-     *     joinColumns={@ORM\JoinColumn(name="permission_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id")}
-     * )
-     *
-     * @var ArrayCollection
-     */
-    private $roles;
+    #[ORM\ManyToMany(targetEntity: Role::class, mappedBy: 'permissions')]
+    #[ORM\JoinTable(name: 'role_permission')]
+    #[ORM\JoinColumn(name: 'permission_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id')]
+    private ArrayCollection $roles;
 
     public function __construct()
     {

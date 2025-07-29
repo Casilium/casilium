@@ -10,98 +10,51 @@ use Doctrine\ORM\Mapping as ORM;
 
 use function count;
 
-/**
- * @ORM\Entity(repositoryClass="User\Repository\UserRepository")
- * @ORM\Table(name="user")
- */
+#[ORM\Entity(repositoryClass: 'User\Repository\UserRepository')]
+#[ORM\Table(name: 'user')]
 class User
 {
     public const STATUS_INACTIVE = 0; // Inactive user
     public const STATUS_ACTIVE   = 1; // Active user
     public const STATUS_RETIRED  = 2; // Retired user
 
-    /**
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue
-     *
-     * @var int
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue]
+    private int $id;
 
-    /**
-     * @ORM\Column(name="email")
-     *
-     * @var string
-     */
-    private $email;
+    #[ORM\Column(name: 'email')]
+    private string $email;
 
-    /**
-     * @ORM\Column(name="full_name")
-     *
-     * @var string
-     */
-    private $fullName;
+    #[ORM\Column(name: 'full_name')]
+    private string $fullName;
 
-    /**
-     * @ORM\Column(name="password")
-     *
-     * @var string
-     */
-    private $password;
+    #[ORM\Column(name: 'password')]
+    private string $password;
 
-    /**
-     * @ORM\Column(name="status", type="integer")
-     *
-     * @var int
-     */
-    private $status;
+    #[ORM\Column(name: 'status', type: 'integer')]
+    private int $status;
 
-    /**
-     * @ORM\Column(name="date_created")
-     *
-     * @var string
-     */
-    private $dateCreated;
+    #[ORM\Column(name: 'date_created')]
+    private string $dateCreated;
 
-    /**
-     * @ORM\Column(name="pwd_reset_token")
-     *
-     * @var string
-     */
-    private $passwordResetToken;
+    #[ORM\Column(name: 'pwd_reset_token')]
+    private string $passwordResetToken;
 
-    /**
-     * @ORM\Column(name="pwd_reset_token_creation_date")
-     *
-     * @var string
-     */
-    private $passwordResetTokenCreationDate;
+    #[ORM\Column(name: 'pwd_reset_token_creation_date')]
+    private string $passwordResetTokenCreationDate;
 
-    /**
-     * @ORM\Column(name="secret_key")
-     *
-     * @var string|null
-     */
-    private $secretKey = '';
+    #[ORM\Column(name: 'secret_key')]
+    private ?string $secretKey = '';
 
-    /**
-     * @ORM\Column(name="mfa_enabled", type="boolean")
-     *
-     * @var bool
-     */
-    private $mfaEnabled;
+    #[ORM\Column(name: 'mfa_enabled', type: 'boolean')]
+    private bool $mfaEnabled;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="User\Entity\Role")
-     * @ORM\JoinTable(name="user_role",
-     *     joinColumns={@ORM\JoinColumn(name="user_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id")}
-     * )
-     *
-     * @var ArrayCollection
-     */
-    private $roles;
+    #[ORM\ManyToMany(targetEntity: Role::class)]
+    #[ORM\JoinTable(name: 'user_role')]
+    #[ORM\JoinColumn(name: 'user_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id')]
+    private Collection $roles;
 
     public function __construct()
     {

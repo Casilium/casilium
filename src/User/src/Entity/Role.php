@@ -8,74 +8,41 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity()
- * @ORM\Table(name="role")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'role')]
 class Role
 {
-    /**
-     * @ORM\Id()
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue()
-     *
-     * @var int
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue]
+    private int $id;
 
-    /**
-     * @ORM\Column(name="name")
-     *
-     * @var string
-     */
-    private $name;
+    #[ORM\Column(name: 'name')]
+    private string $name;
 
-    /**
-     * @ORM\Column(name="description")
-     *
-     * @var string
-     */
-    private $description;
+    #[ORM\Column(name: 'description')]
+    private string $description;
 
-    /**
-     * @ORM\Column(name="date_created")
-     *
-     * @var string
-     */
-    private $dateCreated;
+    #[ORM\Column(name: 'date_created')]
+    private string $dateCreated;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="User\Entity\Role", inversedBy="childRoles")
-     * @ORM\JoinTable(name="role_hierarchy",
-     *     joinColumns={@ORM\JoinColumn(name="child_role_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="parent_role_id", referencedColumnName="id")}
-     * )
-     *
-     * @var ArrayCollection
-     */
-    private $parentRoles;
+    #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'childRoles')]
+    #[ORM\JoinTable(name: 'role_hierarchy')]
+    #[ORM\JoinColumn(name: 'child_role_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'parent_role_id', referencedColumnName: 'id')]
+    private ArrayCollection $parentRoles;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="User\Entity\Role", mappedBy="parentRoles")
-     * @ORM\JoinTable(name="role_hierarchy",
-     *     joinColumns={@ORM\JoinColumn(name="parent_role_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="child_role_id", referencedColumnName="id")}
-     * )
-     *
-     * @var ArrayCollection
-     */
-    private $childRoles;
+    #[ORM\ManyToMany(targetEntity: Role::class, mappedBy: 'parentRoles')]
+    #[ORM\JoinTable(name: 'role_hierarchy')]
+    #[ORM\JoinColumn(name: 'parent_role_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'child_role_id', referencedColumnName: 'id')]
+    private ArrayCollection $childRoles;
 
-    /**
-     * @ORM\ManyToMany(targetEntity="User\Entity\Permission", inversedBy="roles")
-     * @ORM\JoinTable(name="role_permission",
-     *     joinColumns={@ORM\JoinColumn(name="role_id", referencedColumnName="id")},
-     *     inverseJoinColumns={@ORM\JoinColumn(name="permission_id", referencedColumnName="id")}
-     * )
-     *
-     * @var ArrayCollection
-     */
-    private $permissions;
+    #[ORM\ManyToMany(targetEntity: Permission::class, inversedBy: 'roles')]
+    #[ORM\JoinTable(name: 'role_permission')]
+    #[ORM\JoinColumn(name: 'role_id', referencedColumnName: 'id')]
+    #[ORM\InverseJoinColumn(name: 'permission_id', referencedColumnName: 'id')]
+    private ArrayCollection $permissions;
 
     public function __construct()
     {
