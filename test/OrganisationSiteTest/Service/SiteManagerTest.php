@@ -157,6 +157,7 @@ class SiteManagerTest extends TestCase
         $updatedSite->method('getCity')->willReturn('Updated City');
         $updatedSite->method('getCounty')->willReturn('Updated County');
         $updatedSite->method('getCountry')->willReturn($countryEntity);
+        $updatedSite->method('getPostalCode')->willReturn('UP1 2ST');
         $updatedSite->method('getTelephone')->willReturn('+44 20 9876 5432');
 
         // Current site in database
@@ -175,6 +176,7 @@ class SiteManagerTest extends TestCase
         $currentSite->expects($this->once())->method('setCity')->with('Updated City')->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setCounty')->with('Updated County')->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setCountry')->with($countryEntity)->willReturn($currentSite);
+        $currentSite->expects($this->once())->method('setPostalCode')->with('UP1 2ST')->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setTelephone')->with('+44 20 9876 5432')->willReturn($currentSite);
 
         $this->entityManager->flush()->shouldBeCalled();
@@ -208,7 +210,7 @@ class SiteManagerTest extends TestCase
 
         $this->entityManager->getRepository(SiteEntity::class)
             ->willReturn($repository->reveal());
-        $repository->findByOrganisationId($organisationId)->willReturn(null);
+        $repository->findByOrganisationId($organisationId)->willReturn([]);
 
         $result = $this->siteManager->fetchSitesByOrganisationId($organisationId);
 
@@ -295,6 +297,7 @@ class SiteManagerTest extends TestCase
         $updatedSite->method('getCity')->willReturn('City');
         $updatedSite->method('getCounty')->willReturn(null);
         $updatedSite->method('getCountry')->willReturn($this->createMock(CountryEntity::class));
+        $updatedSite->method('getPostalCode')->willReturn(null);
         $updatedSite->method('getTelephone')->willReturn('123456789');
 
         $currentSite = $this->createMock(SiteEntity::class);
@@ -304,10 +307,11 @@ class SiteManagerTest extends TestCase
             ->willReturn($repository->reveal());
         $repository->find(456)->willReturn($currentSite);
 
-        // Should handle null values properly
+        // Should handle null values properly (null postal code won't call setter)
         $currentSite->expects($this->once())->method('setStreetAddress2')->with(null)->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setTown')->with(null)->willReturn($currentSite);
         $currentSite->expects($this->once())->method('setCounty')->with(null)->willReturn($currentSite);
+        $currentSite->expects($this->never())->method('setPostalCode');
         
         // Non-null values should be set normally
         $currentSite->expects($this->once())->method('setName')->with('Site Name')->willReturn($currentSite);

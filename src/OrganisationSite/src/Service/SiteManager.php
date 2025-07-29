@@ -78,14 +78,22 @@ class SiteManager
 
         // copy data
         $site->setName($entity->getName());
-        $site->setStreetAddress($entity->getStreetAddress());
+        if ($entity->getStreetAddress() !== null) {
+            $site->setStreetAddress($entity->getStreetAddress());
+        }
         $site->setStreetAddress2($entity->getStreetAddress2());
         $site->setTown($entity->getTown());
-        $site->setCity($entity->getCity());
+        if ($entity->getCity() !== null) {
+            $site->setCity($entity->getCity());
+        }
         $site->setCounty($entity->getCounty());
         $site->setCountry($entity->getCountry());
-        $site->setPostalCode($entity->getPostalCode());
-        $site->setTelephone($entity->getTelephone());
+        if ($entity->getPostalCode() !== null) {
+            $site->setPostalCode($entity->getPostalCode());
+        }
+        if ($entity->getTelephone() !== null) {
+            $site->setTelephone($entity->getTelephone());
+        }
 
         // save
         $this->entityManager->flush();
