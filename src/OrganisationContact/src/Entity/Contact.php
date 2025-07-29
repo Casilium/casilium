@@ -214,18 +214,18 @@ class Contact
      */
     public function exchangeArray(array $data): Contact
     {
-        $this->id              = (int) $data['id'] ?? null;
+        $this->id              = isset($data['id']) ? (int) $data['id'] : 0;
         $this->organisation    = $data['organisation'] ?? null;
         $this->site            = $data['site'] ?? null;
-        $this->firstName       = $data['first_name'] ?? null;
-        $this->middleName      = $data['middle_name'] ?? null;
-        $this->lastName        = $data['last_name'] ?? null;
-        $this->workTelephone   = $data['work_telephone'] ?? null;
-        $this->workExtension   = $data['work_extension'] ?? null;
-        $this->mobileTelephone = $data['mobile_telephone'] ?? null;
-        $this->homeTelephone   = $data['home_telephone'] ?? null;
-        $this->workEmail       = $data['work_email'] ?? null;
-        $this->otherEmail      = $data['other_email'] ?? null;
+        $this->firstName       = $data['first_name'] ?? '';
+        $this->middleName      = $data['middle_name'] ?? '';
+        $this->lastName        = $data['last_name'] ?? '';
+        $this->workTelephone   = $data['work_telephone'] ?? '';
+        $this->workExtension   = $data['work_extension'] ?? '';
+        $this->mobileTelephone = $data['mobile_telephone'] ?? '';
+        $this->homeTelephone   = $data['home_telephone'] ?? '';
+        $this->workEmail       = $data['work_email'] ?? '';
+        $this->otherEmail      = $data['other_email'] ?? '';
         $this->gender          = $data['gender'] ?? null;
         return $this;
     }

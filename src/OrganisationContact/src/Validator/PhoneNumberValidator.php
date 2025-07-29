@@ -53,8 +53,8 @@ class PhoneNumberValidator extends AbstractValidator
             return false;
         }
 
-        $pattern = '/^(\+\d{2,3}\.)?\d{5,15}$/';
-        if (preg_match($pattern, $value) !== false) {
+        $pattern = '/^(\+\d{1,3}\.)?\d{5,15}$/';
+        if (preg_match($pattern, $value) === 1) {
             return true;
         }
 
