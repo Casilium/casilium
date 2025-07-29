@@ -48,7 +48,7 @@ class ChangePasswordHandler implements RequestHandlerInterface
         // get user from session
         $user   = $request->getAttribute(IdentityInterface::class);
         $userId = $user->getId();
-        if (null === 0) {
+        if ($userId === null) {
             throw new Exception('User not logged!?');
         }
 
