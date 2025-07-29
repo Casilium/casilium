@@ -6,181 +6,83 @@ namespace ServiceLevel\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="business_hours")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'business_hours')]
 class BusinessHours
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id", unique=true)
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int|null
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', name: 'id', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    protected ?int $id;
 
-    /**
-     * @ORM\Column(type="string", name="name", nullable=false)
-     *
-     * @var string
-     */
-    protected $name;
+    #[ORM\Column(type: 'string', name: 'name', nullable: false)]
+    protected string $name;
 
-    /**
-     * @ORM\Column(type="string", name="timezone", nullable=false)
-     *
-     * @var string
-     */
-    protected $timezone;
+    #[ORM\Column(type: 'string', name: 'timezone', nullable: false)]
+    protected string $timezone;
 
-    /**
-     * @ORM\Column(type="string", name="mon_start", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $monStart;
+    #[ORM\Column(type: 'string', name: 'mon_start', nullable: true)]
+    protected ?string $monStart;
 
-    /**
-     * @ORM\Column(type="string", name="mon_end", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $monEnd;
+    #[ORM\Column(type: 'string', name: 'mon_end', nullable: true)]
+    protected ?string $monEnd;
 
-    /**
-     * @ORM\Column(type="string", name="tue_start", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $tueStart;
+    #[ORM\Column(type: 'string', name: 'tue_start', nullable: true)]
+    protected ?string $tueStart;
 
-    /**
-     * @ORM\Column(type="string", name="tue_end", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $tueEnd;
+    #[ORM\Column(type: 'string', name: 'tue_end', nullable: true)]
+    protected ?string $tueEnd;
 
-    /**
-     * @ORM\Column(type="string", name="wed_start", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $wedStart;
+    #[ORM\Column(type: 'string', name: 'wed_start', nullable: true)]
+    protected ?string $wedStart;
 
-    /**
-     * @ORM\Column(type="string", name="wed_end", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $wedEnd;
+    #[ORM\Column(type: 'string', name: 'wed_end', nullable: true)]
+    protected ?string $wedEnd;
 
-    /**
-     * @ORM\Column(type="string", name="thu_start", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $thuStart;
+    #[ORM\Column(type: 'string', name: 'thu_start', nullable: true)]
+    protected ?string $thuStart;
 
-    /**
-     * @ORM\Column(type="string", name="thu_end", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $thuEnd;
+    #[ORM\Column(type: 'string', name: 'thu_end', nullable: true)]
+    protected ?string $thuEnd;
 
-    /**
-     * @ORM\Column(type="string", name="fri_start", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $friStart;
+    #[ORM\Column(type: 'string', name: 'fri_start', nullable: true)]
+    protected ?string $friStart;
 
-    /**
-     * @ORM\Column(type="string", name="fri_end", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $friEnd;
+    #[ORM\Column(type: 'string', name: 'fri_end', nullable: true)]
+    protected ?string $friEnd;
 
-    /**
-     * @ORM\Column(type="string", name="sat_start", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $satStart;
+    #[ORM\Column(type: 'string', name: 'sat_start', nullable: true)]
+    protected ?string $satStart;
 
-    /**
-     * @ORM\Column(type="string", name="sat_end", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $satEnd;
+    #[ORM\Column(type: 'string', name: 'sat_end', nullable: true)]
+    protected ?string $satEnd;
 
-    /**
-     * @ORM\Column(type="string", name="sun_start", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $sunStart;
+    #[ORM\Column(type: 'string', name: 'sun_start', nullable: true)]
+    protected ?string $sunStart;
 
-    /**
-     * @ORM\Column(type="string", name="sun_end", nullable=true)
-     *
-     * @var string|null
-     */
-    protected $sunEnd;
+    #[ORM\Column(type: 'string', name: 'sun_end', nullable: true)]
+    protected ?string $sunEnd;
 
-    /**
-     * @ORM\Column(type="integer", name="mon_active", nullable=false)
-     *
-     * @var bool
-     */
-    protected $monActive;
+    #[ORM\Column(type: 'integer', name: 'mon_active', nullable: false)]
+    protected bool $monActive;
 
-    /**
-     * @ORM\Column(type="integer", name="tue_active", nullable=false)
-     *
-     * @var bool
-     */
-    protected $tueActive;
+    #[ORM\Column(type: 'integer', name: 'tue_active', nullable: false)]
+    protected bool $tueActive;
 
-    /**
-     * @ORM\Column(type="integer", name="wed_active", nullable=false)
-     *
-     * @var bool
-     */
-    protected $wedActive;
+    #[ORM\Column(type: 'integer', name: 'wed_active', nullable: false)]
+    protected bool $wedActive;
 
-    /**
-     * @ORM\Column(type="integer", name="thu_active", nullable=false)
-     *
-     * @var bool
-     */
-    protected $thuActive;
+    #[ORM\Column(type: 'integer', name: 'thu_active', nullable: false)]
+    protected bool $thuActive;
 
-    /**
-     * @ORM\Column(type="integer", name="fri_active", nullable=false)
-     *
-     * @var bool
-     */
-    protected $friActive;
+    #[ORM\Column(type: 'integer', name: 'fri_active', nullable: false)]
+    protected bool $friActive;
 
-    /**
-     * @ORM\Column(type="integer", name="sat_active", nullable=false)
-     *
-     * @var bool
-     */
-    protected $satActive;
+    #[ORM\Column(type: 'integer', name: 'sat_active', nullable: false)]
+    protected bool $satActive;
 
-    /**
-     * @ORM\Column(type="integer", name="sun_active", nullable=false)
-     *
-     * @var bool
-     */
-    protected $sunActive;
+    #[ORM\Column(type: 'integer', name: 'sun_active', nullable: false)]
+    protected bool $sunActive;
 
     public function __construct()
     {
@@ -358,9 +260,9 @@ class BusinessHours
         return $this->satEnd;
     }
 
-    public function setSatEnd(?string $statEnd): BusinessHours
+    public function setSatEnd(?string $satEnd): BusinessHours
     {
-        $this->statEnd = $statEnd;
+        $this->satEnd = $satEnd;
         return $this;
     }
 

@@ -10,50 +10,28 @@ use Ticket\Entity\Priority;
 
 use function preg_match;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="sla_target")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'sla_target')]
 class SlaTarget
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id", unique=true)
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int|null
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', name: 'id', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    protected ?int $id;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Sla", inversedBy="target_sla")
-     * @ORM\JoinColumn(name="sla_id", referencedColumnName="id")
-     *
-     * @var Sla
-     */
-    protected $sla;
+    #[ORM\ManyToOne(targetEntity: Sla::class, inversedBy: 'target_sla')]
+    #[ORM\JoinColumn(name: 'sla_id', referencedColumnName: 'id')]
+    protected Sla $sla;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Ticket\Entity\Priority")
-     * @ORM\JoinColumn(name="priority_id", referencedColumnName="id", nullable=false)
-     *
-     * @var Priority
-     */
-    protected $priority;
+    #[ORM\OneToOne(targetEntity: Priority::class)]
+    #[ORM\JoinColumn(name: 'priority_id', referencedColumnName: 'id', nullable: false)]
+    protected Priority $priority;
 
-    /**
-     * @ORM\Column(name="response_time", type="string", nullable=true)
-     *
-     * @var string
-     */
-    protected $responseTime;
+    #[ORM\Column(name: 'response_time', type: 'string', nullable: true)]
+    protected string $responseTime;
 
-    /**
-     * @ORM\Column(name="resolve_time", type="string", nullable=true)
-     *
-     * @var string
-     */
-    protected $resolveTime;
+    #[ORM\Column(name: 'resolve_time', type: 'string', nullable: true)]
+    protected string $resolveTime;
 
     public function getId(): ?int
     {
