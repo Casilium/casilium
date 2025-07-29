@@ -8,42 +8,24 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="sla")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'sla')]
 class Sla
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(type="integer", name="id", unique=true)
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int|null
-     */
-    protected $id;
+    #[ORM\Id]
+    #[ORM\Column(type: 'integer', name: 'id', unique: true)]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    protected ?int $id;
 
-    /**
-     * @ORM\Column(name="name", type="string")
-     *
-     * @var string Name of SLA
-     */
-    protected $name;
+    #[ORM\Column(name: 'name', type: 'string')]
+    protected string $name;
 
-    /**
-     * @ORM\OneToOne(targetEntity="BusinessHours")
-     * @ORM\JoinColumn(name="business_hours_id", referencedColumnName="id", nullable=false)
-     *
-     * @var BusinessHours
-     */
-    protected $businessHours;
+    #[ORM\OneToOne(targetEntity: BusinessHours::class)]
+    #[ORM\JoinColumn(name: 'business_hours_id', referencedColumnName: 'id', nullable: false)]
+    protected BusinessHours $businessHours;
 
-    /**
-     * @ORM\OneToMany(targetEntity="SlaTarget", mappedBy="sla", cascade={"persist"})
-     *
-     * @var ArrayCollection
-     */
-    protected $slaTargets;
+    #[ORM\OneToMany(targetEntity: SlaTarget::class, mappedBy: 'sla', cascade: ['persist'])]
+    protected Collection $slaTargets;
 
     public function __construct()
     {
