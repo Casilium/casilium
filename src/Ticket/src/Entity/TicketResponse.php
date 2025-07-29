@@ -12,55 +12,39 @@ use function date;
 use function get_object_vars;
 use function time;
 
-/**
- * @ORM\Entity(repositoryClass="Ticket\Repository\TicketResponseRepository")
- * @ORM\Table(name="ticket_response")
- */
+#[ORM\Entity(repositoryClass: 'Ticket\Repository\TicketResponseRepository')]
+#[ORM\Table(name: 'ticket_response')]
 class TicketResponse
 {
-    /**
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     */
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     private int $id;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Agent")
-     * @ORM\JoinColumn(name="agent_id", referencedColumnName="id", nullable=true)
-     */
+    #[ORM\OneToOne(targetEntity: Agent::class)]
+    #[ORM\JoinColumn(name: 'agent_id', referencedColumnName: 'id', nullable: true)]
     private ?Agent $agent = null;
 
-    /**
-     * @ORM\OneToOne(targetEntity="\OrganisationContact\Entity\Contact")
-     * @ORM\JoinColumn(name="contact_id", referencedColumnName="id")
-     */
+    #[ORM\OneToOne(targetEntity: Contact::class)]
+    #[ORM\JoinColumn(name: 'contact_id', referencedColumnName: 'id')]
     private ?Contact $contact = null;
 
-    /** @ORM\Column(name="response", type="string") */
+    #[ORM\Column(name: 'response', type: 'string')]
     private string $response;
 
-    /** @ORM\Column(name="response_date", type="string") */
+    #[ORM\Column(name: 'response_date', type: 'string')]
     private string $responseDate;
 
-    /**
-     * @ORM\ManyToOne(targetEntity="Ticket\Entity\Ticket", inversedBy="response")
-     * @ORM\JoinColumn(name="ticket_id", referencedColumnName="id")
-     */
+    #[ORM\ManyToOne(targetEntity: Ticket::class, inversedBy: 'response')]
+    #[ORM\JoinColumn(name: 'ticket_id', referencedColumnName: 'id')]
     private Ticket $ticket;
 
-    /**
-     * @ORM\OneToOne(targetEntity="Ticket\Entity\Status")
-     * @ORM\JoinColumn(name="ticket_status", referencedColumnName="id")
-     */
+    #[ORM\OneToOne(targetEntity: Status::class)]
+    #[ORM\JoinColumn(name: 'ticket_status', referencedColumnName: 'id')]
     private Status $ticketStatus;
 
-    /**
-     * @ORM\Column(name="is_public")
-     *
-     * @var int
-     */
-    private $isPublic;
+    #[ORM\Column(name: 'is_public')]
+    private int $isPublic;
 
     public function __construct()
     {

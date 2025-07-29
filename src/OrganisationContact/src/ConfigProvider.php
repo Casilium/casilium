@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace OrganisationContact;
 
 use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
+use Doctrine\ORM\Mapping\Driver\AttributeDriver;
 use Mezzio\Application;
 
 class ConfigProvider
@@ -59,7 +59,7 @@ class ConfigProvider
                     ],
                 ],
                 'organisation_contact' => [
-                    'class' => AnnotationDriver::class,
+                    'class' => AttributeDriver::class,
                     'cache' => 'array',
                     'paths' => [__DIR__ . '/Entity'],
                 ],

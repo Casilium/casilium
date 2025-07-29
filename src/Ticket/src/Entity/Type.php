@@ -6,10 +6,8 @@ namespace Ticket\Entity;
 
 use Doctrine\Orm\Mapping as ORM;
 
-/**
- * @ORM\Entity
- * @ORM\Table(name="ticket_type")
- */
+#[ORM\Entity]
+#[ORM\Table(name: 'ticket_type')]
 class Type
 {
     public const TYPE_REQUEST  = 1;
@@ -22,21 +20,13 @@ class Type
         3 => 'Problem',
     ];
 
-    /**
-     * @ORM\Id
-     * @ORM\Column(name="id", type="integer")
-     * @ORM\GeneratedValue(strategy="IDENTITY")
-     *
-     * @var int
-     */
-    private $id;
+    #[ORM\Id]
+    #[ORM\Column(name: 'id', type: 'integer')]
+    #[ORM\GeneratedValue(strategy: 'IDENTITY')]
+    private int $id;
 
-    /**
-     * @ORM\Column(name="description")
-     *
-     * @var string
-     */
-    private $description;
+    #[ORM\Column(name: 'description')]
+    private string $description;
 
     public function getId(): int
     {
