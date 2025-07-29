@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace Organisation\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use Organisation\Repository\DomainRepository;
 
-#[ORM\Entity(repositoryClass: 'Organisation\Repository\DomainRepository')]
+#[ORM\Entity(repositoryClass: DomainRepository::class)]
 #[ORM\Table(name: 'organisation_domain')]
 class Domain
 {

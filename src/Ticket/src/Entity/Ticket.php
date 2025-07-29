@@ -15,6 +15,7 @@ use OrganisationSite\Entity\SiteEntity;
 use Ramsey\Uuid\Uuid;
 use ServiceLevel\Entity\SlaTarget;
 use ServiceLevel\Service\CalculateBusinessHours;
+use Ticket\Repository\TicketRepository;
 use User\Entity\User;
 
 use function date;
@@ -22,7 +23,7 @@ use function get_object_vars;
 use function is_string;
 use function strlen;
 
-#[ORM\Entity(repositoryClass: 'Ticket\Repository\TicketRepository')]
+#[ORM\Entity(repositoryClass: TicketRepository::class)]
 #[ORM\Table(name: 'ticket')]
 class Ticket
 {
@@ -172,8 +173,8 @@ class Ticket
         $this->uuid    = Uuid::uuid4()->toString();
 
         $this->priority = Priority::PRIORITY_LOW;
-        $this->agent = null;
-        $this->site = null;
+        $this->agent    = null;
+        $this->site     = null;
 
         $dateTime           = new DateTime('now', new DateTimeZone('UTC'));
         $this->createdAt    = $dateTime->format('Y-m-d H:i:s');

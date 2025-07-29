@@ -7,10 +7,11 @@ namespace User\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use User\Repository\UserRepository;
 
 use function count;
 
-#[ORM\Entity(repositoryClass: 'User\Repository\UserRepository')]
+#[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'user')]
 class User
 {

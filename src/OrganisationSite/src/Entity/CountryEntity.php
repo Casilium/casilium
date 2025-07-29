@@ -5,8 +5,9 @@ declare(strict_types=1);
 namespace OrganisationSite\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
+use OrganisationSite\Repository\CountryRepository;
 
-#[ORM\Entity(repositoryClass: '\OrganisationSite\Repository\CountryRepository')]
+#[ORM\Entity(repositoryClass: CountryRepository::class)]
 #[ORM\Table(name: 'country')]
 class CountryEntity
 {

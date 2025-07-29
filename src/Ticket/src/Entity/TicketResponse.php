@@ -7,12 +7,13 @@ namespace Ticket\Entity;
 use Doctrine\ORM\Mapping as ORM;
 use OrganisationContact\Entity\Contact;
 use Ticket\Entity\Ticket;
+use Ticket\Repository\TicketResponseRepository;
 
 use function date;
 use function get_object_vars;
 use function time;
 
-#[ORM\Entity(repositoryClass: 'Ticket\Repository\TicketResponseRepository')]
+#[ORM\Entity(repositoryClass: TicketResponseRepository::class)]
 #[ORM\Table(name: 'ticket_response')]
 class TicketResponse
 {

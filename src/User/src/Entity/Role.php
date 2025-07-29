@@ -26,13 +26,13 @@ class Role
     #[ORM\Column(name: 'date_created')]
     private string $dateCreated;
 
-    #[ORM\ManyToMany(targetEntity: Role::class, inversedBy: 'childRoles')]
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'childRoles')]
     #[ORM\JoinTable(name: 'role_hierarchy')]
     #[ORM\JoinColumn(name: 'child_role_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'parent_role_id', referencedColumnName: 'id')]
     private Collection $parentRoles;
 
-    #[ORM\ManyToMany(targetEntity: Role::class, mappedBy: 'parentRoles')]
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'parentRoles')]
     #[ORM\JoinTable(name: 'role_hierarchy')]
     #[ORM\JoinColumn(name: 'parent_role_id', referencedColumnName: 'id')]
     #[ORM\InverseJoinColumn(name: 'child_role_id', referencedColumnName: 'id')]

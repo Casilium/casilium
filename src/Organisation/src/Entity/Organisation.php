@@ -13,12 +13,13 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Exception;
 use Organisation\Exception\OrganisationNameException;
+use Organisation\Repository\OrganisationRepository;
 use Organisation\Validator\OrganisationNameValidator;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use ServiceLevel\Entity\Sla;
 
-#[ORM\Entity(repositoryClass: 'Organisation\Repository\OrganisationRepository')]
+#[ORM\Entity(repositoryClass: OrganisationRepository::class)]
 #[ORM\Table(name: 'organisation')]
 class Organisation implements OrganisationInterface
 {
@@ -57,7 +58,12 @@ class Organisation implements OrganisationInterface
     #[ORM\Column(name: 'type_id', type: 'integer', nullable: false)]
     protected int $typeId;
 
-    #[ORM\OneToMany(targetEntity: Domain::class, mappedBy: 'organisation', orphanRemoval: true, cascade: ['persist', 'remove'])]
+    #[ORM\OneToMany(
+        targetEntity: Domain::class,
+        mappedBy: 'organisation',
+        orphanRemoval: true,
+        cascade: ['persist', 'remove']
+    )]
     protected array|Collection $domains;
 
     /**

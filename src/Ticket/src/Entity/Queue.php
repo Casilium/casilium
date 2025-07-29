@@ -7,10 +7,11 @@ namespace Ticket\Entity;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Ticket\Repository\QueueRepository;
 
 use function get_object_vars;
 
-#[ORM\Entity(repositoryClass: 'Ticket\Repository\QueueRepository')]
+#[ORM\Entity(repositoryClass: QueueRepository::class)]
 #[ORM\Table(name: 'queue')]
 class Queue
 {

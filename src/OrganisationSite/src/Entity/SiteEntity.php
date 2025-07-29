@@ -10,6 +10,7 @@ use Laminas\InputFilter\Factory as InputFilterFactory;
 use Laminas\InputFilter\InputFilterInterface;
 use Laminas\Validator;
 use Organisation\Entity\Organisation;
+use OrganisationSite\Repository\SiteRepository;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 
@@ -17,7 +18,7 @@ use function array_filter;
 use function implode;
 use function is_string;
 
-#[ORM\Entity(repositoryClass: '\OrganisationSite\Repository\SiteRepository')]
+#[ORM\Entity(repositoryClass: SiteRepository::class)]
 #[ORM\Table(name: 'organisation_site')]
 class SiteEntity
 {

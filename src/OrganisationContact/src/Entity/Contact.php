@@ -6,11 +6,12 @@ namespace OrganisationContact\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Organisation\Entity\Organisation;
+use OrganisationContact\Repository\ContactRepository;
 use OrganisationSite\Entity\SiteEntity;
 
 use function get_object_vars;
 
-#[ORM\Entity(repositoryClass: 'OrganisationContact\Repository\ContactRepository')]
+#[ORM\Entity(repositoryClass: ContactRepository::class)]
 #[ORM\Table(name: 'organisation_contact')]
 class Contact
 {

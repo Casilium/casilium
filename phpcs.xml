@@ -21,7 +21,13 @@
     <exclude-pattern>config/app/auth.local.php</exclude-pattern>
 
     <!-- Include all rules from the Laminsas Coding Standard -->
-    <rule ref="LaminasCodingStandard"/>
+    <rule ref="LaminasCodingStandard">
+        <!-- Exclude deprecated sniff and use the replacement -->
+        <exclude name="Squiz.WhiteSpace.LanguageConstructSpacing"/>
+    </rule>
+    
+    <!-- Use the non-deprecated replacement -->
+    <rule ref="Generic.WhiteSpace.LanguageConstructSpacing"/>
 
     <rule ref="Squiz.Classes.ClassFileName.NoMatch">
         <exclude-pattern>src/ConfigProvider.*.php</exclude-pattern>
