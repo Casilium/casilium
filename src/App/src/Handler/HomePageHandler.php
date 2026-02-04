@@ -30,6 +30,9 @@ class HomePageHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
+        $endOfMonth   = Carbon::now('UTC')->endOfMonth();
+        $startOfMonth = Carbon::now('UTC')->startOfMonth();
+
         $stats = [
             'unresolved' => $this->ticketRepo->findUnresolvedTicketCount(),
             'overdue'    => $this->ticketRepo->findOverdueTicketCount(),
@@ -41,8 +44,9 @@ class HomePageHandler implements RequestHandlerInterface
             'closed'     => $this->ticketRepo->findClosedTicketCount(),
         ];
 
-        $endOfMonth   = Carbon::now('UTC')->endOfMonth();
-        $startOfMonth = Carbon::now('UTC')->startOfMonth();
+        // New metrics
+        $stats['avgResolutionTime'] = $this->ticketRepo->findAverageResolutionTime($startOfMonth, $endOfMonth);
+        $stats['slaCompliance']     = $this->ticketRepo->findSlaComplianceRate($startOfMonth, $endOfMonth);
 
         $agentStats     = $this->ticketRepo->findAllAgentStats($startOfMonth, $endOfMonth);
         $stats['agent'] = $agentStats;

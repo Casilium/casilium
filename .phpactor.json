@@ -1,0 +1,5 @@
+{
+    "$schema": "/phpactor.schema.json",
+    "php_code_sniffer.enabled": true,
+    "prophecy.enabled": true
+}

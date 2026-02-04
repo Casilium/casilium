@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ticket\Repository;
 
+use Carbon\CarbonInterface;
 use Doctrine\ORM\Query;
 use Ticket\Entity\Ticket;
 
@@ -58,4 +59,28 @@ interface TicketRepositoryInterface
     public function findByOrganisationUuid(string $uuid): array;
 
     public function findUnresolvedTicketCount(): int;
+
+    /**
+     * Find average resolution time in hours
+     *
+     * @param CarbonInterface|null $periodStart Start of period
+     * @param CarbonInterface|null $periodEnd End of period
+     * @return float Average resolution time in hours
+     */
+    public function findAverageResolutionTime(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null
+    ): float;
+
+    /**
+     * Find SLA compliance rate as a percentage
+     *
+     * @param CarbonInterface|null $periodStart Start of period
+     * @param CarbonInterface|null $periodEnd End of period
+     * @return float SLA compliance rate (0-100)
+     */
+    public function findSlaComplianceRate(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null
+    ): float;
 }

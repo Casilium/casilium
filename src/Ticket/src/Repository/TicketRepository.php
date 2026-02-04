@@ -22,6 +22,7 @@ use Ticket\Entity\TicketResponse;
 use Ticket\Service\TicketService;
 
 use function array_map;
+use function count;
 use function intval;
 
 class TicketRepository extends EntityRepository implements TicketRepositoryInterface
@@ -156,6 +157,34 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             $qb->leftJoin('t.organisation', 'o')
                 ->andWhere('o.uuid = :uuid')
                 ->setParameter('uuid', $organisationUuid);
+        }
+
+        // if filtering by overdue tickets
+        if (isset($options['overdue']) && $options['overdue'] === true) {
+            $now = new DateTime('now', new DateTimeZone('UTC'));
+            $qb->andWhere('t.dueDate < :now')
+                ->andWhere('t.status < :resolvedStatus')
+                ->setParameter('now', $now->format('Y-m-d H:i:s'))
+                ->setParameter('resolvedStatus', Ticket::STATUS_RESOLVED);
+        }
+
+        // if filtering by due today tickets
+        if (isset($options['due_today']) && $options['due_today'] === true) {
+            $today = new DateTime('now', new DateTimeZone('UTC'));
+            $qb->andWhere('t.dueDate BETWEEN :dateMin AND :dateMax')
+                ->andWhere('t.status < :resolvedStatus')
+                ->setParameter('dateMin', $today->format('Y-m-d 00:00:00'))
+                ->setParameter('dateMax', $today->format('Y-m-d 23:59:59'))
+                ->setParameter('resolvedStatus', Ticket::STATUS_RESOLVED);
+        }
+
+        // if filtering by unresolved tickets (New + In Progress)
+        if (isset($options['unresolved']) && $options['unresolved'] === true) {
+            $qb->andWhere('t.status IN (:unresolvedStatuses)')
+                ->setParameter('unresolvedStatuses', [
+                    Ticket::STATUS_NEW,
+                    Ticket::STATUS_IN_PROGRESS,
+                ]);
         }
 
         return $qb->getQuery()->setMaxResults($limit)->setFirstResult($offset);
@@ -501,5 +530,89 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         }
 
         return $stats;
+    }
+
+    /**
+     * Find average resolution time in hours for resolved tickets
+     *
+     * @param CarbonInterface|null $periodStart Start of period
+     * @param CarbonInterface|null $periodEnd End of period
+     * @return float Average resolution time in hours
+     */
+    public function findAverageResolutionTime(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null
+    ): float {
+        $qb = $this->createQueryBuilder('t')
+            ->where('t.status = :status')
+            ->andWhere('t.resolveDate IS NOT NULL')
+            ->setParameter('status', Ticket::STATUS_RESOLVED);
+
+        if ($periodStart && $periodEnd) {
+            $qb->andWhere('t.resolveDate BETWEEN :start AND :end')
+                ->setParameter('start', $periodStart->format('Y-m-d H:i:s'))
+                ->setParameter('end', $periodEnd->format('Y-m-d H:i:s'));
+        }
+
+        /** @var Ticket[] $tickets */
+        $tickets = $qb->getQuery()->getResult();
+
+        if (empty($tickets)) {
+            return 0.0;
+        }
+
+        $totalHours = 0;
+
+        foreach ($tickets as $ticket) {
+            $createdAt   = Carbon::parse($ticket->getCreatedAt(), 'UTC');
+            $resolveDate = Carbon::parse($ticket->getResolveDate(), 'UTC');
+            $totalHours += $createdAt->diffInHours($resolveDate);
+        }
+
+        return $totalHours / count($tickets);
+    }
+
+    /**
+     * Find SLA compliance rate as a percentage
+     *
+     * @param CarbonInterface|null $periodStart Start of period
+     * @param CarbonInterface|null $periodEnd End of period
+     * @return float SLA compliance rate (0-100)
+     */
+    public function findSlaComplianceRate(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null
+    ): float {
+        $qb = $this->createQueryBuilder('t')
+            ->where('t.status IN (:statuses)')
+            ->andWhere('t.dueDate IS NOT NULL')
+            ->andWhere('t.resolveDate IS NOT NULL')
+            ->setParameter('statuses', [Ticket::STATUS_RESOLVED, Ticket::STATUS_CLOSED]);
+
+        if ($periodStart && $periodEnd) {
+            $qb->andWhere('t.resolveDate BETWEEN :start AND :end')
+                ->setParameter('start', $periodStart->format('Y-m-d H:i:s'))
+                ->setParameter('end', $periodEnd->format('Y-m-d H:i:s'));
+        }
+
+        /** @var Ticket[] $tickets */
+        $tickets = $qb->getQuery()->getResult();
+
+        if (empty($tickets)) {
+            return 0.0;
+        }
+
+        $withinSla = 0;
+
+        foreach ($tickets as $ticket) {
+            $resolveDate = Carbon::parse($ticket->getResolveDate(), 'UTC');
+            $dueDate     = Carbon::parse($ticket->getDueDate(), 'UTC');
+
+            if ($resolveDate->lte($dueDate)) {
+                $withinSla++;
+            }
+        }
+
+        return ($withinSla / count($tickets)) * 100;
     }
 }

@@ -34,6 +34,7 @@ class ListTicketHandler implements RequestHandlerInterface
         $queryParams   = $request->getQueryParams();
         $page          = $queryParams['page'] ?? 1;
         $hideCompleted = isset($queryParams['show']) ? false : true;
+        $filter        = $queryParams['filter'] ?? null;
 
         if ($organisationUuid = $request->getAttribute('org_id')) {
             $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
@@ -51,6 +52,21 @@ class ListTicketHandler implements RequestHandlerInterface
             $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
                 ->findTicketsByPagination([
                     'status_id' => (int) $statusId,
+                ]);
+        } elseif ($filter === 'overdue') {
+            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
+                ->findTicketsByPagination([
+                    'overdue' => true,
+                ]);
+        } elseif ($filter === 'duetoday') {
+            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
+                ->findTicketsByPagination([
+                    'due_today' => true,
+                ]);
+        } elseif ($filter === 'unresolved') {
+            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
+                ->findTicketsByPagination([
+                    'unresolved' => true,
                 ]);
         } else {
             $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
