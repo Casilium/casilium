@@ -1,5 +1,11 @@
 # Casilium
 
+![CI](https://github.com/Casilium/casilium/actions/workflows/ci.yml/badge.svg?branch=main)
+![Release](https://img.shields.io/github/v/release/Casilium/casilium)
+![PHP](https://img.shields.io/badge/PHP-8.2%2B-777bb4)
+![License](https://img.shields.io/github/license/Casilium/casilium)
+[![Buy Me a Coffee](https://img.shields.io/badge/Buy%20Me%20a%20Coffee-support-ffdd00?logo=buymeacoffee)](https://buymeacoffee.com/sheridans)
+
 
 Casilium is a self-hosted helpdesk and ticketing platform built on Mezzio and
 Doctrine ORM. It is designed for teams that want a lightweight, configurable
