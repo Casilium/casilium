@@ -8,6 +8,8 @@ use Ramsey\Uuid\UuidInterface;
 use Throwable;
 
 use function array_reduce;
+use function gmp_init;
+use function gmp_strval;
 use function str_pad;
 use function str_replace;
 use function substr_replace;
