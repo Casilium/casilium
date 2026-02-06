@@ -6,10 +6,12 @@ namespace Ticket\Command;
 
 use Carbon\Carbon;
 use MailService\Service\MailService;
+use Monolog\Logger;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
+use Throwable;
 use Ticket\Entity\Ticket;
 use Ticket\Service\TicketService;
 
@@ -25,12 +27,16 @@ class Notifications extends Command
     /** @var MailService */
     protected $mailService;
 
-    public function __construct(TicketService $service, MailService $mailService)
+    /** @var Logger */
+    protected $logger;
+
+    public function __construct(TicketService $service, MailService $mailService, Logger $logger)
     {
         parent::__construct();
 
         $this->ticketService = $service;
         $this->mailService   = $mailService;
+        $this->logger        = $logger;
     }
 
     /**
@@ -52,62 +58,184 @@ class Notifications extends Command
      */
     public function execute(InputInterface $input, OutputInterface $output): int
     {
-        $target     = null;
-        $targetType = null;
+        try {
+            $target         = (int) $input->getArgument('target');
+            $periodArgument = strtolower($input->getArgument('period'));
 
-        $target         = (int) $input->getArgument('target');
-        $periodArgument = strtolower($input->getArgument('period'));
+            $targetType = $this->validatePeriod($periodArgument);
+            if ($targetType === null) {
+                $output->writeln('<error>Invalid argument, use minutes|hours|days|weeks|months</error>');
+                $this->logger->warning('Invalid period argument', ['period' => $periodArgument]);
+                return Command::FAILURE;
+            }
 
-        switch ($periodArgument) {
-            case 'minutes':
-                $targetType = TicketService::DUE_PERIOD_MINUTES;
-                break;
-            case 'hours':
-                $targetType = TicketService::DUE_PERIOD_HOURS;
-                break;
-            case 'days':
-                $targetType = TicketService::DUE_PERIOD_DAYS;
-                break;
-            case 'weeks':
-                $targetType = TicketService::DUE_PERIOD_WEEKS;
-                break;
-            case 'months':
-                $targetType = TicketService::DUE_PERIOD_MONTHS;
-                break;
+            $this->logger->info('Starting ticket notification process', [
+                'target' => $target,
+                'period' => $periodArgument,
+            ]);
+
+            $successCount = 0;
+            $failCount    = 0;
+
+            // Process due tickets
+            $dueCounts     = $this->processDueTickets($target, $targetType, $output);
+            $successCount += $dueCounts['success'];
+            $failCount    += $dueCounts['failed'];
+
+            // Process overdue tickets
+            $overdueCounts = $this->processOverdueTickets($output);
+            $successCount += $overdueCounts['success'];
+            $failCount    += $overdueCounts['failed'];
+
+            $output->writeln(sprintf(
+                '<info>Sent %d notifications (%d failed)</info>',
+                $successCount,
+                $failCount
+            ));
+
+            $this->logger->info('Notification process completed', [
+                'success' => $successCount,
+                'failed'  => $failCount,
+            ]);
+
+            return Command::SUCCESS;
+        } catch (Throwable $e) {
+            $output->writeln(sprintf('<error>Fatal error: %s</error>', $e->getMessage()));
+            $this->logger->critical('Notification process failed', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+            ]);
+            return Command::FAILURE;
         }
-        if ($targetType === null) {
-            $output->writeln('Invalid argument, use minutes|hours|days|weeks|months');
-            return 1;
-        }
+    }
 
-        /** @var Ticket[] $tickets */
-        $tickets = $this->ticketService->findTicketsDueWithin($target, $targetType);
+    /**
+     * Validate and convert period argument to constant
+     */
+    private function validatePeriod(string $period): ?int
+    {
+        return match ($period) {
+            'minutes' => TicketService::DUE_PERIOD_MINUTES,
+            'hours'   => TicketService::DUE_PERIOD_HOURS,
+            'days'    => TicketService::DUE_PERIOD_DAYS,
+            'weeks'   => TicketService::DUE_PERIOD_WEEKS,
+            'months'  => TicketService::DUE_PERIOD_MONTHS,
+            default   => null,
+        };
+    }
 
-        if (! empty($tickets)) {
+    /**
+     * Process tickets that are due within target period
+     */
+    private function processDueTickets(int $target, int $targetType, OutputInterface $output): array
+    {
+        $successCount = 0;
+        $failCount    = 0;
+
+        try {
+            /** @var Ticket[] $tickets */
+            $tickets = $this->ticketService->findTicketsDueWithin($target, $targetType);
+
+            if (empty($tickets)) {
+                $output->writeln('<comment>No tickets due within target period</comment>');
+                return ['success' => 0, 'failed' => 0];
+            }
+
             foreach ($tickets as $ticket) {
-                $now     = Carbon::now('UTC');
-                $due     = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate());
-                $seconds = $now->diffInSeconds($due);
+                try {
+                    $now     = Carbon::now('UTC');
+                    $due     = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate());
+                    $seconds = $now->diffInSeconds($due);
 
-                $output->writeln(
-                    sprintf(
-                        'Ticket #%s is due in %s',
+                    $output->writeln(sprintf(
+                        'Sending notification for ticket #%s (due in %s)',
                         $ticket->getId(),
                         gmdate('H:i:s', $seconds)
-                    )
-                );
+                    ));
 
-                $this->ticketService->sendNotificationEmail($ticket, $target, $targetType);
+                    $this->ticketService->sendNotificationEmail($ticket, $target, $targetType);
+
+                    $successCount++;
+                    $this->logger->info('Due ticket notification sent', [
+                        'ticket_id' => $ticket->getId(),
+                        'due_in'    => gmdate('H:i:s', $seconds),
+                    ]);
+                } catch (Throwable $e) {
+                    $failCount++;
+                    $output->writeln(sprintf(
+                        '<error>Failed to send notification for ticket #%s: %s</error>',
+                        $ticket->getId(),
+                        $e->getMessage()
+                    ));
+                    $this->logger->error('Due ticket notification failed', [
+                        'ticket_id' => $ticket->getId(),
+                        'error'     => $e->getMessage(),
+                    ]);
+                    // Continue processing other tickets
+                }
             }
+        } catch (Throwable $e) {
+            $this->logger->error('Failed to fetch due tickets', [
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
         }
 
-        $tickets = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-            ->findOverdueTickets();
+        return ['success' => $successCount, 'failed' => $failCount];
+    }
 
-        foreach ($tickets as $ticket) {
-            $output->writeln(sprintf('Ticket #%s is now overdue', $ticket->getId()));
-            $this->ticketService->sendOverdueNotificationEmail($ticket);
+    /**
+     * Process tickets that are now overdue
+     */
+    private function processOverdueTickets(OutputInterface $output): array
+    {
+        $successCount = 0;
+        $failCount    = 0;
+
+        try {
+            $tickets = $this->ticketService->getEntityManager()
+                ->getRepository(Ticket::class)
+                ->findOverdueTickets();
+
+            if (empty($tickets)) {
+                $output->writeln('<comment>No overdue tickets</comment>');
+                return ['success' => 0, 'failed' => 0];
+            }
+
+            foreach ($tickets as $ticket) {
+                try {
+                    $output->writeln(sprintf(
+                        'Sending overdue notification for ticket #%s',
+                        $ticket->getId()
+                    ));
+
+                    $this->ticketService->sendOverdueNotificationEmail($ticket);
+
+                    $successCount++;
+                    $this->logger->info('Overdue ticket notification sent', [
+                        'ticket_id' => $ticket->getId(),
+                    ]);
+                } catch (Throwable $e) {
+                    $failCount++;
+                    $output->writeln(sprintf(
+                        '<error>Failed to send overdue notification for ticket #%s: %s</error>',
+                        $ticket->getId(),
+                        $e->getMessage()
+                    ));
+                    $this->logger->error('Overdue ticket notification failed', [
+                        'ticket_id' => $ticket->getId(),
+                        'error'     => $e->getMessage(),
+                    ]);
+                    // Continue processing other tickets
+                }
+            }
+        } catch (Throwable $e) {
+            $this->logger->error('Failed to fetch overdue tickets', [
+                'error' => $e->getMessage(),
+            ]);
+            throw $e;
         }
-        return 0;
+
+        return ['success' => $successCount, 'failed' => $failCount];
     }
 }

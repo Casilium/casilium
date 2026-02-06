@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ticket\Command\Factory;
 
+use Logger\Service\LogService;
 use MailService\Service\MailService;
 use Psr\Container\ContainerInterface;
 use Ticket\Command\Notifications;
@@ -13,8 +14,10 @@ class NotificationsFactory
 {
     public function __invoke(ContainerInterface $container): Notifications
     {
-        $ticketService = $container->get(TicketService::class);
-        $mailServce    = $container->get(MailService::class);
-        return new Notifications($ticketService, $mailServce);
+        return new Notifications(
+            $container->get(TicketService::class),
+            $container->get(MailService::class),
+            $container->get(LogService::class)
+        );
     }
 }
