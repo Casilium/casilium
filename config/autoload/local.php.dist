@@ -4,6 +4,13 @@
  * Edit to your needs
  */
 return [
+    'encryption' => [
+        'key' => 'YOUR_HEX_KEY',
+    ],
+    'mfa' => [
+        'issuer' => 'YOUR_ISSUER',
+    ],
+    'app_url' => 'http://localhost:8080',
     // Credentials to allow doctrine to access database
     'doctrine' => [
         'connection' => [

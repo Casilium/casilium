@@ -1,0 +1,9 @@
+.git
+.github
+.idea
+.vscode
+vendor
+node_modules
+config/autoload/*.local.php
+data/cache
+data/logs

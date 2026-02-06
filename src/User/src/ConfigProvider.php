@@ -28,6 +28,7 @@ class ConfigProvider
             'templates'    => $this->getTemplates(),
             'view_helpers' => $this->getViewHelperConfig(),
             'doctrine'     => $this->getDoctrineConfig(),
+            'console'      => $this->getConsoleCommands(),
         ];
     }
 
@@ -44,6 +45,8 @@ class ConfigProvider
             ],
             'invokables' => [],
             'factories'  => [
+                Command\CreateUser::class => Command\Factory\CreateUserFactory::class,
+                Command\CountUser::class  => Command\Factory\CountUserFactory::class,
                 // Role Pages
                 Handler\AddRolePageHandler::class    => Handler\Factory\AddRolePageHandlerFactory::class,
                 Handler\DeleteRolePageHandler::class => Handler\Factory\DeleteRolePageHandlerFactory::class,
@@ -118,6 +121,16 @@ class ConfigProvider
                     'cache' => 'array',
                     'dir'   => __DIR__ . '/Entity/',
                 ],
+            ],
+        ];
+    }
+
+    public function getConsoleCommands(): array
+    {
+        return [
+            'commands' => [
+                Command\CreateUser::class,
+                Command\CountUser::class,
             ],
         ];
     }

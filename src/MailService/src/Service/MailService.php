@@ -47,6 +47,9 @@ class MailService
         $options = array_merge($options, [
             'layout' => 'layout::email',
         ]);
+        if (isset($this->options['app_url'])) {
+            $options['app_url'] = $this->options['app_url'];
+        }
 
         return $this->renderer->render($template, $options);
     }

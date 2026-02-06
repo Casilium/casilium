@@ -394,13 +394,13 @@ class BusinessHours
         $this->sunStart = $data['sun_start'] ?? null;
         $this->sunEnd   = $data['sun_end'] ?? null;
 
-        $this->monActive = $data['mon_active'] ?? false;
-        $this->tueActive = $data['tue_active'] ?? false;
-        $this->wedActive = $data['wed_active'] ?? false;
-        $this->thuActive = $data['thu_active'] ?? false;
-        $this->friActive = $data['fri_active'] ?? false;
-        $this->satActive = $data['sat_active'] ?? false;
-        $this->sunActive = $data['sun_active'] ?? false;
+        $this->monActive = (bool) ($data['mon_active'] ?? false);
+        $this->tueActive = (bool) ($data['tue_active'] ?? false);
+        $this->wedActive = (bool) ($data['wed_active'] ?? false);
+        $this->thuActive = (bool) ($data['thu_active'] ?? false);
+        $this->friActive = (bool) ($data['fri_active'] ?? false);
+        $this->satActive = (bool) ($data['sat_active'] ?? false);
+        $this->sunActive = (bool) ($data['sun_active'] ?? false);
     }
 
     public function getArrayCopy(): array

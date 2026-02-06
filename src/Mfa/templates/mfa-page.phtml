@@ -2,7 +2,10 @@
 $this->headTitle('Multi-factor Authentication');
 $form = $this->form->prepare();
 $form->get('csrf')->setValue($this->token);
-$form->get('secret_key')->setValue($this->secret_key);
+$showSecret = $this->show_secret ?? true;
+if ($showSecret) {
+    $form->get('secret_key')->setValue($this->secret_key);
+}
 ?>
 <div class="container">
     <div class="row mb-4">
@@ -14,8 +17,10 @@ $form->get('secret_key')->setValue($this->secret_key);
         <div class="col-xs-3 mx-auto text-center">
             <?= $this->form()->openTag($form); ?>
             <div class="form-group">
-                <?= $this->escapeHtml($this->secret_key); ?><br/>
-                <img src="<?= $this->qrcode_url; ?>" alt="enter pin">
+                <?php if ($showSecret): ?>
+                    <?= $this->escapeHtml($this->secret_key); ?><br/>
+                    <img src="<?= $this->qrcode_url; ?>" alt="enter pin">
+                <?php endif; ?>
             </div>
             <div class="form-group">
                 <?= $this->formLabel($form->get('pin')); ?>
@@ -28,7 +33,9 @@ $form->get('secret_key')->setValue($this->secret_key);
                 <?= $this->formElement($form->get('submit')); ?>
                 <?php if (!empty($this->error)) echo $this->error; ?>
             </div>
-            <?= $this->FormElement($form->get('secret_key')); ?>
+            <?php if ($showSecret): ?>
+                <?= $this->FormElement($form->get('secret_key')); ?>
+            <?php endif; ?>
             <?= $this->form()->closeTag($form); ?>
         </div>
 

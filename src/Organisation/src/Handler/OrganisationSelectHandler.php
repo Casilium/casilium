@@ -56,6 +56,16 @@ class OrganisationSelectHandler implements RequestHandlerInterface
 
                 $organisationId = $data['organisation'];
                 $organisation   = $this->organisationManager->findOrganisationById($organisationId);
+                if ($organisation === null) {
+                    $form->setMessages([
+                        'organisation' => [
+                            'Please select a valid organisation from the list.',
+                        ],
+                    ]);
+                    return new HtmlResponse($this->renderer->render('organisation::select', [
+                        'form' => $form,
+                    ]));
+                }
 
                 try {
                     $uri = $this->router->generateUri($route, ['org_id' => $organisation->getUuid()]);

@@ -23,7 +23,6 @@ class CalculateBusinessHoursTest extends TestCase
         // Use reflection to set the id property for testing
         $reflection = new ReflectionClass($this->businessHours);
         $idProperty = $reflection->getProperty('id');
-        $idProperty->setAccessible(true);
         $idProperty->setValue($this->businessHours, 1);
 
         $this->businessHours->setName('Standard Business Hours')
@@ -210,7 +209,6 @@ class CalculateBusinessHoursTest extends TestCase
         // Use reflection to set the id property for testing
         $reflection = new ReflectionClass($customBusinessHours);
         $idProperty = $reflection->getProperty('id');
-        $idProperty->setAccessible(true);
         $idProperty->setValue($customBusinessHours, 2);
         $customBusinessHours->setName('Custom Hours')
                            ->setTimezone('UTC')
@@ -276,7 +274,6 @@ class CalculateBusinessHoursTest extends TestCase
         // Test that the internal conversion works correctly
         $reflection = new ReflectionClass($this->calculator);
         $method     = $reflection->getMethod('businessHoursToArray');
-        $method->setAccessible(true);
 
         $result = $method->invoke($this->calculator, $this->businessHours);
 
@@ -299,7 +296,6 @@ class CalculateBusinessHoursTest extends TestCase
     {
         $reflection = new ReflectionClass($this->calculator);
         $method     = $reflection->getMethod('getHoursAndMinutesFromString');
-        $method->setAccessible(true);
 
         $result = $method->invoke($this->calculator, '09:30');
         $this->assertEquals(['hours' => '09', 'minutes' => '30'], $result);

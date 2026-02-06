@@ -1,0 +1,45 @@
+services:
+  app:
+    build: .
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+    environment:
+      AUTO_MIGRATE: "1"
+      DB_HOST: db
+      DB_NAME: casilium
+      DB_USER: casilium
+      DB_PASSWORD: casilium_password
+      DEV_MODE: "true"
+      MFA_ISSUER: "casilium.local"
+      MAIL_ENABLED: "false"
+      APP_URL: "http://localhost:8080"
+      ADMIN_EMAIL: "admin@example.com"
+      ADMIN_NAME: "Administrator"
+      MAIL_SENDER: "helpdesk@example.com"
+      MAIL_SMTP_NAME: "localhost"
+      MAIL_SMTP_HOST: "127.0.0.1"
+      MAIL_SMTP_PORT: "25"
+      MAIL_SMTP_CONNECTION_CLASS: "plain"
+      MAIL_SMTP_USERNAME: "helpdesk@example.com"
+      MAIL_SMTP_PASSWORD: "change_me"
+      MAIL_SMTP_SSL: ""
+    volumes:
+      - ./:/var/www/html
+      - vendor:/var/www/html/vendor
+      - data:/var/www/html/data
+  db:
+    image: mariadb:10.11
+    environment:
+      MARIADB_DATABASE: casilium
+      MARIADB_USER: casilium
+      MARIADB_PASSWORD: casilium_password
+      MARIADB_ROOT_PASSWORD: root_password
+    volumes:
+      - db_data:/var/lib/mysql
+
+volumes:
+  db_data:
+  vendor:
+  data:

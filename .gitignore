@@ -8,3 +8,4 @@
 **/.sass-cache
 /phpunit.phar
 /.phpunit.cache
+config/autoload/local.php.test

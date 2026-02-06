@@ -48,18 +48,6 @@ final class Version20181119211033 extends AbstractMigration
         $table->addOption('engine', 'InnoDB');
     }
 
-    public function postUp(Schema $schema): void
-    {
-        // create initial admin user, password = Password1
-        $this->connection->insert('user', [
-            'email'        => 'admin@example.com',
-            'password'     => '$2y$12$lZHLgnuwJSyTRgErOESY6OX2SXJuyYYqpAisdRfQEvrPN4QLg.jjW',
-            'full_name'    => 'Administrator',
-            'date_created' => date('Y-m-d H:i:s'),
-            'status'       => 1,
-        ]);
-    }
-
     /**
      * Reverts the schema changes.
      *
