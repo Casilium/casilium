@@ -5,6 +5,10 @@
 
 **Casilium** is a work in-progress open-source ticket system.
 
+## Documentation
+
+- Cron jobs: `docs/cron.md`
+
 ## Requirements
 
   * HTTP server running (apache/nginx)
@@ -156,4 +160,3 @@ Casilium is uses several open source projects, including
 [Bootstrap](https://getbootstrap.com/),
 [Font-Awesome](https://fontawesome.com/),
 [jQuery](https://jquery.com/).
-

@@ -441,6 +441,20 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->getResult();
     }
 
+    public function findOverdueTicketsForDigest(): array
+    {
+        $now = Carbon::now('UTC');
+
+        return $this->getEntityManager()->createQueryBuilder('q')
+            ->select('t')
+            ->from(Ticket::class, 't')
+            ->andWhere('t.dueDate < :today')
+            ->setParameter('today', $now->format('Y-m-d H:i:s'))
+            ->andWhere('t.status <= 3')
+            ->getQuery()
+            ->getResult();
+    }
+
     public function findWaitingTicketsToUpdateById(): array
     {
         $now = Carbon::now('UTC');

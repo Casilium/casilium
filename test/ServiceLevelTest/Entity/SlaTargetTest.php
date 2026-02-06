@@ -73,7 +73,7 @@ class SlaTargetTest extends TestCase
         $this->assertEquals($expectedSeconds, $result);
     }
 
-    public function validTimeFormatProvider(): array
+    public static function validTimeFormatProvider(): array
     {
         return [
             '1 hour'              => ['01:00', 3600],
@@ -96,7 +96,7 @@ class SlaTargetTest extends TestCase
         $this->slaTarget->getTimeInSeconds($invalidTimeString);
     }
 
-    public function invalidTimeFormatProvider(): array
+    public static function invalidTimeFormatProvider(): array
     {
         return [
             'single digit hour'   => ['1:30'],

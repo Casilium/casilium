@@ -310,7 +310,7 @@ class ContactTest extends TestCase
         $this->assertEquals($gender, $this->contact->getGender());
     }
 
-    public function genderProvider(): array
+    public static function genderProvider(): array
     {
         return [
             'Male'    => ['M'],

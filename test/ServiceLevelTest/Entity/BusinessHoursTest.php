@@ -96,7 +96,7 @@ class BusinessHoursTest extends TestCase
         $this->assertEquals($endTime, $this->businessHours->$getEndMethod());
     }
 
-    public function dayProvider(): array
+    public static function dayProvider(): array
     {
         return [
             'Monday'    => ['Mon'],
@@ -126,7 +126,7 @@ class BusinessHoursTest extends TestCase
         $this->assertFalse($this->businessHours->$getActiveMethod());
     }
 
-    public function dayActiveProvider(): array
+    public static function dayActiveProvider(): array
     {
         return [
             'Monday'    => ['Mon'],

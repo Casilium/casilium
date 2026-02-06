@@ -55,7 +55,7 @@ class CountryEntityTest extends TestCase
         $this->assertEquals($name, $this->country->getName());
     }
 
-    public function countryDataProvider(): array
+    public static function countryDataProvider(): array
     {
         return [
             'UK'        => [826, 'United Kingdom'],

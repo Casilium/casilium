@@ -28,7 +28,7 @@ class PhoneNumberValidatorTest extends TestCase
         $this->assertEmpty($this->validator->getMessages());
     }
 
-    public function validPhoneNumberProvider(): array
+    public static function validPhoneNumberProvider(): array
     {
         return [
             'UK mobile'          => ['+44.07700123456'],
@@ -53,7 +53,7 @@ class PhoneNumberValidatorTest extends TestCase
         $this->assertArrayHasKey($expectedError, $messages);
     }
 
-    public function invalidPhoneNumberProvider(): array
+    public static function invalidPhoneNumberProvider(): array
     {
         return [
             'Too short'                         => ['1234', PhoneNumberValidator::INVALID_NUMBER],

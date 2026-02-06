@@ -27,9 +27,12 @@ use Ticket\Entity\Type;
 use User\Entity\User;
 use User\Service\UserManager;
 
-use function gmdate;
-use function htmlspecialchars;
+use function implode;
 use function sprintf;
+use function strlen;
+use function strtolower;
+use function substr;
+use function trim;
 
 class TicketService
 {
@@ -391,13 +394,12 @@ class TicketService
 
     public function sendNotificationEmail(Ticket $ticket, int $target, int $period = self::DUE_PERIOD_MINUTES): bool
     {
-        $now          = Carbon::now('UTC');
-        $due          = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate());
-        $lastNotified = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getLastNotified());
+        $now            = Carbon::now('UTC');
+        $due            = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate(), 'UTC');
+        $lastNotifiedAt = $ticket->getLastNotified() ?? $ticket->getCreatedAt();
+        $lastNotified   = Carbon::createFromFormat('Y-m-d H:i:s', $lastNotifiedAt, 'UTC');
 
-        $secondsDue = $due->diffInSeconds($now);
-
-        $notifyAt = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate());
+        $notifyAt = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate(), 'UTC');
         switch ($period) {
             case self::DUE_PERIOD_MINUTES:
                 $notifyAt->subMinutes($target);
@@ -426,19 +428,23 @@ class TicketService
         */
 
         if ($lastNotified < $notifyAt) {
-            $due     = gmdate('H:i:s', $secondsDue);
-            $subject = sprintf('Ticket %s due in %s', $ticket->getId(), $due);
+            $dueIn       = $this->formatDuration($now, $due);
+            $priorityTag = $this->getPriorityPrefix($ticket);
 
-            $ticketTitle = $ticket->getShortDescription();
-
-            $body = sprintf(
-                'Ticket %s (%s) raised by %s at %s is due in %s',
+            $subject = sprintf(
+                '%s Ticket #%s due in %s - %s',
+                $priorityTag,
                 $ticket->getId(),
-                $ticketTitle,
-                htmlspecialchars($ticket->getContact()->getFirstName()),
-                htmlspecialchars($ticket->getOrganisation()->getName()),
-                $due
+                $dueIn,
+                $ticket->getShortDescription()
             );
+
+            $body = $this->mailService->prepareBody('ticket_mail::ticket_notification', [
+                'ticket'   => $ticket,
+                'mode'     => 'due',
+                'timeText' => $dueIn,
+                'details'  => $this->getTicketNotificationContext($ticket),
+            ]);
 
             /** @var Agent $agent */
             foreach ($ticket->getQueue()->getMembers() as $agent) {
@@ -456,14 +462,23 @@ class TicketService
 
     public function sendOverdueNotificationEmail(Ticket $ticket): bool
     {
-        $subject = sprintf('Ticket #%s is now overdue', $ticket->getId());
-        $body    = sprintf(
-            'Ticket #%s (%s) raised by %s from %s is now overdue and requires attention',
+        $overdueTime = $this->calculateOverdueTime($ticket);
+        $priorityTag = $this->getPriorityPrefix($ticket);
+
+        $subject = sprintf(
+            '[OVERDUE] %s Ticket #%s - %s overdue - %s',
+            $priorityTag,
             $ticket->getId(),
-            $ticket->getShortDescription(),
-            htmlspecialchars($ticket->getContact()->getFirstName()),
-            htmlspecialchars($ticket->getOrganisation()->getName()),
+            $overdueTime,
+            $ticket->getShortDescription()
         );
+
+        $body = $this->mailService->prepareBody('ticket_mail::ticket_notification', [
+            'ticket'   => $ticket,
+            'mode'     => 'overdue',
+            'timeText' => $overdueTime,
+            'details'  => $this->getTicketNotificationContext($ticket),
+        ]);
 
         /** @var Agent $member */
         foreach ($ticket->getQueue()->getMembers() as $member) {
@@ -474,6 +489,108 @@ class TicketService
         $this->entityManager->flush();
 
         return true; // Email was sent
+    }
+
+    private function getTicketNotificationContext(Ticket $ticket): array
+    {
+        $description = trim($ticket->getLongDescription());
+        if ($description === '') {
+            $description = 'No description provided.';
+        }
+        if (strlen($description) > 500) {
+            $description = substr($description, 0, 500) . '...';
+        }
+
+        $contact      = $ticket->getContact();
+        $contactName  = $contact
+            ? trim($contact->getFirstName() . ' ' . $contact->getLastName())
+            : 'Unknown';
+        $contactEmail = $contact ? $contact->getWorkEmail() : 'Unknown';
+
+        $organisation     = $ticket->getOrganisation();
+        $organisationName = $organisation ? $organisation->getName() : 'Unknown';
+
+        $site     = $ticket->getSite();
+        $siteName = $site ? ($site->getName() ?? 'Not specified') : 'Not specified';
+
+        $queue     = $ticket->getQueue();
+        $queueName = $queue ? $queue->getName() : 'Unassigned';
+
+        $status     = $ticket->getStatus();
+        $statusName = $status ? $status->getDescription() : 'Unknown';
+
+        $assignedAgent = $ticket->getAssignedAgent();
+        $assignedTo    = $assignedAgent ? $assignedAgent->getFullName() : 'Unassigned';
+
+        return [
+            'summary'      => $ticket->getShortDescription(),
+            'description'  => $description,
+            'contactName'  => $contactName,
+            'contactEmail' => $contactEmail,
+            'organisation' => $organisationName,
+            'site'         => $siteName,
+            'priority'     => $ticket->getPriority()->getName(),
+            'impact'       => Ticket::getImpactUrgencyText($ticket->getImpact()),
+            'urgency'      => Ticket::getImpactUrgencyText($ticket->getUrgency()),
+            'queue'        => $queueName,
+            'status'       => $statusName,
+            'assignedTo'   => $assignedTo,
+            'dueDate'      => $ticket->getDueDate(),
+            'lastUpdated'  => $this->getLastUpdatedAt($ticket),
+        ];
+    }
+
+    private function getPriorityPrefix(Ticket $ticket): string
+    {
+        $priority = strtolower($ticket->getPriority()->getName());
+
+        return match ($priority) {
+            'critical', 'urgent' => '[URGENT]',
+            'high' => '[Priority: High]',
+            'medium' => '[Priority: Medium]',
+            'low' => '[Priority: Low]',
+            default => '',
+        };
+    }
+
+    private function calculateOverdueTime(Ticket $ticket): string
+    {
+        $now = Carbon::now('UTC');
+        $due = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate(), 'UTC');
+
+        return $this->formatDuration($due, $now);
+    }
+
+    private function formatDuration(Carbon $from, Carbon $to): string
+    {
+        $diff  = $from->diff($to);
+        $parts = [];
+
+        if ($diff->d > 0) {
+            $parts[] = $diff->d . ' day' . ($diff->d > 1 ? 's' : '');
+        }
+        if ($diff->h > 0) {
+            $parts[] = $diff->h . ' hour' . ($diff->h > 1 ? 's' : '');
+        }
+        if ($diff->i > 0) {
+            $parts[] = $diff->i . ' minute' . ($diff->i > 1 ? 's' : '');
+        }
+
+        if ($parts === []) {
+            $parts[] = '0 minutes';
+        }
+
+        return implode(' ', $parts);
+    }
+
+    private function getLastUpdatedAt(Ticket $ticket): string
+    {
+        $lastResponseDate = $ticket->getLastResponseDate();
+        if ($lastResponseDate !== null && $lastResponseDate !== '') {
+            return $lastResponseDate;
+        }
+
+        return $ticket->getCreatedAt();
     }
 
     /**

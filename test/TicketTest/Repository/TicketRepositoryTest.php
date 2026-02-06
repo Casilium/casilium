@@ -100,13 +100,23 @@ class TicketRepositoryTest extends TestCase
         $ticket->method('getOrganisation')->willReturn($organisation);
         $ticket->method('getSlaTarget')->willReturn($slaTarget);
 
+        $referenceCalls = [
+            [Organisation::class, 123, $orgReference],
+            [SlaTarget::class, 456, $slaReference],
+        ];
+        $referenceIndex = 0;
+
         $this->entityManager->expects($this->exactly(2))
             ->method('getReference')
-            ->withConsecutive(
-                [Organisation::class, 123],
-                [SlaTarget::class, 456]
-            )
-            ->willReturnOnConsecutiveCalls($orgReference, $slaReference);
+            ->willReturnCallback(function (string $class, int $id) use (&$referenceCalls, &$referenceIndex) {
+                $this->assertSame($referenceCalls[$referenceIndex][0], $class);
+                $this->assertSame($referenceCalls[$referenceIndex][1], $id);
+
+                $result = $referenceCalls[$referenceIndex][2];
+                $referenceIndex++;
+
+                return $result;
+            });
 
         $ticket->expects($this->once())
             ->method('setOrganisation')
@@ -594,10 +604,22 @@ class TicketRepositoryTest extends TestCase
         $agentRepo  = $this->createMock(EntityRepository::class);
         $statusRepo = $this->createMock(EntityRepository::class);
 
+        $repoCalls = [
+            [Agent::class, $agentRepo],
+            [Status::class, $statusRepo],
+        ];
+        $repoIndex = 0;
+
         $this->entityManager->expects($this->exactly(2))
             ->method('getRepository')
-            ->withConsecutive([Agent::class], [Status::class])
-            ->willReturnOnConsecutiveCalls($agentRepo, $statusRepo);
+            ->willReturnCallback(function (string $class) use (&$repoCalls, &$repoIndex) {
+                $this->assertSame($repoCalls[$repoIndex][0], $class);
+
+                $result = $repoCalls[$repoIndex][1];
+                $repoIndex++;
+
+                return $result;
+            });
 
         $agentRepo->expects($this->once())
             ->method('find')
@@ -674,8 +696,10 @@ class TicketRepositoryTest extends TestCase
 
         $mockRepo->expects($this->exactly(2))
             ->method('findAgentStats')
-            ->withConsecutive([1, null, null], [2, null, null])
-            ->willReturnOnConsecutiveCalls(['open' => 5], ['open' => 3]);
+            ->willReturnMap([
+                [1, null, null, ['open' => 5]],
+                [2, null, null, ['open' => 3]],
+            ]);
 
         $result = $mockRepo->findAllAgentStats();
 

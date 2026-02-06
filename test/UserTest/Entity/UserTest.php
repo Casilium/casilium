@@ -61,7 +61,7 @@ class UserTest extends TestCase
         $this->assertEquals($status, $this->user->getStatus());
     }
 
-    public function statusProvider(): array
+    public static function statusProvider(): array
     {
         return [
             'inactive' => [User::STATUS_INACTIVE],
@@ -90,7 +90,7 @@ class UserTest extends TestCase
         $this->assertEquals($expected, $this->user->getStatusAsString());
     }
 
-    public function statusStringProvider(): array
+    public static function statusStringProvider(): array
     {
         return [
             'inactive status' => [User::STATUS_INACTIVE, 'Inactive'],

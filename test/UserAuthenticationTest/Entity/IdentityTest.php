@@ -144,7 +144,7 @@ class IdentityTest extends TestCase
         $this->assertEquals($expected, $this->identity->hasRole($searchRole));
     }
 
-    public function roleDataProvider(): array
+    public static function roleDataProvider(): array
     {
         return [
             'single exact match'        => ['admin', 'admin', true],
