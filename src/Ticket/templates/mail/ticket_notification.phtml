@@ -1,0 +1,48 @@
+<?php
+    /** @var \Ticket\Entity\Ticket $ticket */
+    $ticket  = $this->ticket;
+    $mode    = $this->mode ?? 'due';
+    $timeText = $this->timeText ?? '';
+    $details = $this->details ?? [];
+
+    $title = $mode === 'overdue'
+        ? 'Ticket Alert: OVERDUE'
+        : 'Ticket Alert: Due Soon';
+
+    $headline = $mode === 'overdue'
+        ? sprintf('Ticket #%s is now %s overdue and requires immediate attention', $ticket->getId(), $timeText)
+        : sprintf('Ticket #%s is due in %s', $ticket->getId(), $timeText);
+?>
+<p><strong><?= $this->escapeHtml($title) ?></strong></p>
+<p><?= $this->escapeHtml($headline) ?></p>
+
+<p><strong>Summary:</strong> <?= $this->escapeHtml($details['summary'] ?? '') ?></p>
+
+<p><strong>Description:</strong><br>
+    <?= nl2br($this->escapeHtml($details['description'] ?? '')) ?>
+</p>
+
+<p>
+    <strong>Raised by:</strong> <?= $this->escapeHtml($details['contactName'] ?? '') ?>
+    (<?= $this->escapeHtml($details['contactEmail'] ?? '') ?>)<br>
+    <strong>Organisation:</strong> <?= $this->escapeHtml($details['organisation'] ?? '') ?><br>
+    <strong>Site:</strong> <?= $this->escapeHtml($details['site'] ?? '') ?><br>
+    <strong>Priority:</strong> <?= $this->escapeHtml($details['priority'] ?? '') ?>
+    (Impact: <?= $this->escapeHtml($details['impact'] ?? '') ?>, Urgency: <?= $this->escapeHtml($details['urgency'] ?? '') ?>)<br>
+    <strong>Queue:</strong> <?= $this->escapeHtml($details['queue'] ?? '') ?><br>
+    <strong>Status:</strong> <?= $this->escapeHtml($details['status'] ?? '') ?><br>
+    <strong>Assigned to:</strong> <?= $this->escapeHtml($details['assignedTo'] ?? '') ?>
+</p>
+
+<?php if ($mode === 'overdue'): ?>
+    <p>
+        <strong>Original Due Date:</strong> <?= $this->escapeHtml($details['dueDate'] ?? '') ?><br>
+        <strong>Overdue by:</strong> <?= $this->escapeHtml($timeText) ?><br>
+        <strong>Last Updated:</strong> <?= $this->escapeHtml($details['lastUpdated'] ?? '') ?>
+    </p>
+<?php else: ?>
+    <p>
+        <strong>Due Date:</strong> <?= $this->escapeHtml($details['dueDate'] ?? '') ?><br>
+        <strong>Last Updated:</strong> <?= $this->escapeHtml($details['lastUpdated'] ?? '') ?>
+    </p>
+<?php endif; ?>

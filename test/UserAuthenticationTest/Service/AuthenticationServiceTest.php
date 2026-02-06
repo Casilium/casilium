@@ -198,7 +198,7 @@ class AuthenticationServiceTest extends TestCase
         $this->assertNull($identity);
     }
 
-    public function credentialsProvider(): array
+    public static function credentialsProvider(): array
     {
         return [
             'valid email format'          => ['user@domain.com', 'password123', true],

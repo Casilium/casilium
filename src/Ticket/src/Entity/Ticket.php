@@ -71,7 +71,7 @@ class Ticket
 
     #[ORM\OneToOne(targetEntity: User::class)]
     #[ORM\JoinColumn(name: 'assigned_agent_id', referencedColumnName: 'id', nullable: true)]
-    private User $assignedAgent;
+    private ?User $assignedAgent = null;
 
     #[ORM\Column(name: 'created_at', type: 'string', length: 10)]
     private string $createdAt;
@@ -186,7 +186,7 @@ class Ticket
         return $this->assignedAgent;
     }
 
-    public function setAssignedAgent(User $assignedAgent): Ticket
+    public function setAssignedAgent(?User $assignedAgent): Ticket
     {
         $this->assignedAgent = $assignedAgent;
         return $this;

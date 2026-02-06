@@ -13,6 +13,7 @@ use Organisation\Entity\Organisation;
 use Organisation\Entity\OrganisationInterface;
 use Organisation\Exception\OrganisationNameException;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
 use ServiceLevel\Entity\Sla;
 
@@ -53,7 +54,7 @@ class OrganisationTest extends TestCase
 
     public function testSetAndGetUuid(): void
     {
-        $uuid   = $this->createMock(UuidInterface::class);
+        $uuid   = Uuid::uuid4();
         $result = $this->organisation->setUuid($uuid);
 
         $this->assertInstanceOf(Organisation::class, $result);
@@ -98,7 +99,7 @@ class OrganisationTest extends TestCase
         $this->assertEquals($state, $this->organisation->getIsActive());
     }
 
-    public function activeStateProvider(): array
+    public static function activeStateProvider(): array
     {
         return [
             'inactive' => [Organisation::STATE_INACTIVE],
@@ -156,7 +157,7 @@ class OrganisationTest extends TestCase
         $this->assertEquals($typeId, $this->organisation->getTypeId());
     }
 
-    public function typeProvider(): array
+    public static function typeProvider(): array
     {
         return [
             'client'   => [Organisation::TYPE_CLIENT],
@@ -257,7 +258,7 @@ class OrganisationTest extends TestCase
 
     public function testFluentInterfaceChaining(): void
     {
-        $uuid     = $this->createMock(UuidInterface::class);
+        $uuid     = Uuid::uuid4();
         $sla      = $this->createMock(Sla::class);
         $testDate = new DateTime('2023-01-01', new DateTimeZone('UTC'));
 
@@ -324,7 +325,7 @@ class OrganisationTest extends TestCase
         $this->organisation->setName($invalidName);
     }
 
-    public function invalidNameProvider(): array
+    public static function invalidNameProvider(): array
     {
         return [
             'empty string'       => [''],

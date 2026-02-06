@@ -362,6 +362,9 @@ class TicketServiceTest extends TestCase
         $organisation = $this->createMock(Organisation::class);
         $queue        = $this->createMock(Queue::class);
         $agent        = $this->createMock(Agent::class);
+        $status       = $this->createMock(Status::class);
+        $priority     = $this->createMock(Priority::class);
+        $assignedUser = $this->createMock(User::class);
 
         // Set up ticket data
         $now          = Carbon::now('UTC');
@@ -375,19 +378,37 @@ class TicketServiceTest extends TestCase
         $ticket->method('getContact')->willReturn($contact);
         $ticket->method('getOrganisation')->willReturn($organisation);
         $ticket->method('getQueue')->willReturn($queue);
+        $ticket->method('getLongDescription')->willReturn('Test description');
+        $ticket->method('getImpact')->willReturn(Ticket::IMPACT_HIGH);
+        $ticket->method('getUrgency')->willReturn(Ticket::URGENCY_HIGH);
+        $ticket->method('getPriority')->willReturn($priority);
+        $ticket->method('getStatus')->willReturn($status);
+        $ticket->method('getAssignedAgent')->willReturn($assignedUser);
+        $ticket->method('getSite')->willReturn(null);
+        $ticket->method('getLastResponseDate')->willReturn(null);
+        $ticket->method('getCreatedAt')->willReturn($now->copy()->subDay()->format('Y-m-d H:i:s'));
 
         $contact->method('getFirstName')->willReturn('John');
+        $contact->method('getLastName')->willReturn('Smith');
+        $contact->method('getWorkEmail')->willReturn('john@example.com');
         $organisation->method('getName')->willReturn('Test Org');
         $queue->method('getMembers')->willReturn(new ArrayCollection([$agent]));
         $agent->method('getEmail')->willReturn('agent@example.com');
+        $status->method('getDescription')->willReturn('Open');
+        $priority->method('getName')->willReturn('High');
+        $assignedUser->method('getFullName')->willReturn('Agent Smith');
 
         $ticket->expects($this->once())->method('setLastNotified')->with($this->isType('string'))->willReturn($ticket);
         $this->entityManager->flush()->shouldBeCalled();
 
+        $this->mailService->prepareBody(
+            'ticket_mail::ticket_notification',
+            Argument::type('array')
+        )->willReturn('<html>test</html>');
         $this->mailService->send(
             'agent@example.com',
-            Argument::containingString('Ticket 123 due in'),
-            Argument::containingString('Ticket 123 (Test ticket)')
+            Argument::containingString('Ticket #123 due in'),
+            '<html>test</html>'
         )->shouldBeCalled();
 
         $this->ticketService->sendNotificationEmail($ticket, 30, TicketService::DUE_PERIOD_MINUTES);
@@ -463,6 +484,9 @@ class TicketServiceTest extends TestCase
         $contact      = $this->createMock(Contact::class);
         $organisation = $this->createMock(Organisation::class);
         $queue        = $this->createMock(Queue::class);
+        $status       = $this->createMock(Status::class);
+        $priority     = $this->createMock(Priority::class);
+        $assignedUser = $this->createMock(User::class);
 
         $now          = Carbon::now('UTC');
         $dueDate      = $now->copy()->addDay(); // Due tomorrow
@@ -475,14 +499,32 @@ class TicketServiceTest extends TestCase
         $ticket->method('getContact')->willReturn($contact);
         $ticket->method('getOrganisation')->willReturn($organisation);
         $ticket->method('getQueue')->willReturn($queue);
+        $ticket->method('getLongDescription')->willReturn('Test description');
+        $ticket->method('getImpact')->willReturn(Ticket::IMPACT_HIGH);
+        $ticket->method('getUrgency')->willReturn(Ticket::URGENCY_HIGH);
+        $ticket->method('getPriority')->willReturn($priority);
+        $ticket->method('getStatus')->willReturn($status);
+        $ticket->method('getAssignedAgent')->willReturn($assignedUser);
+        $ticket->method('getSite')->willReturn(null);
+        $ticket->method('getLastResponseDate')->willReturn(null);
+        $ticket->method('getCreatedAt')->willReturn($now->copy()->subDay()->format('Y-m-d H:i:s'));
 
         $contact->method('getFirstName')->willReturn('Test');
+        $contact->method('getLastName')->willReturn('User');
+        $contact->method('getWorkEmail')->willReturn('test@example.com');
         $organisation->method('getName')->willReturn('Test Org');
         $queue->method('getMembers')->willReturn(new ArrayCollection([]));
+        $status->method('getDescription')->willReturn('Open');
+        $priority->method('getName')->willReturn('High');
+        $assignedUser->method('getFullName')->willReturn('Agent Smith');
 
         // Mock the ticket methods that might be called (conditional based on notification logic)
         $ticket->method('setLastNotified')->with($this->isType('string'))->willReturn($ticket);
         $this->entityManager->flush()->willReturn(null);
+        $this->mailService->prepareBody(
+            'ticket_mail::ticket_notification',
+            Argument::type('array')
+        )->willReturn('<html>test</html>');
 
         // Test that it processes different time periods without error
         $this->ticketService->sendNotificationEmail($ticket, 1, $period);
@@ -491,7 +533,7 @@ class TicketServiceTest extends TestCase
         $this->assertTrue(true);
     }
 
-    public function duePeriodProvider(): array
+    public static function duePeriodProvider(): array
     {
         return [
             'minutes' => [TicketService::DUE_PERIOD_MINUTES, 'subMinutes'],

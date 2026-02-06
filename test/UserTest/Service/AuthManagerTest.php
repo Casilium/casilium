@@ -209,7 +209,7 @@ class AuthManagerTest extends TestCase
         $this->assertEquals($expectedValue, $actualConstant);
     }
 
-    public function accessModeProvider(): array
+    public static function accessModeProvider(): array
     {
         return [
             'ACCESS_GRANTED' => [1, AuthManager::ACCESS_GRANTED],

@@ -310,7 +310,7 @@ class MfaServiceTest extends TestCase
         $this->assertEquals($expected, $mfaService->isMfaEnabled());
     }
 
-    public function booleanConfigProvider(): array
+    public static function booleanConfigProvider(): array
     {
         return [
             'true boolean'   => [true, true],

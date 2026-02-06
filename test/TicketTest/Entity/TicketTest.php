@@ -78,7 +78,7 @@ class TicketTest extends TestCase
         $this->assertEquals($impact, $this->ticket->getImpact());
     }
 
-    public function impactProvider(): array
+    public static function impactProvider(): array
     {
         return [
             'high impact'   => [Ticket::IMPACT_HIGH],
@@ -98,7 +98,7 @@ class TicketTest extends TestCase
         $this->assertEquals($urgency, $this->ticket->getUrgency());
     }
 
-    public function urgencyProvider(): array
+    public static function urgencyProvider(): array
     {
         return [
             'high urgency'   => [Ticket::URGENCY_HIGH],
@@ -118,7 +118,7 @@ class TicketTest extends TestCase
         $this->assertEquals($source, $this->ticket->getSource());
     }
 
-    public function sourceProvider(): array
+    public static function sourceProvider(): array
     {
         return [
             'email source' => [Ticket::SOURCE_EMAIL],
@@ -370,7 +370,7 @@ class TicketTest extends TestCase
         $this->assertEquals($expected, Ticket::getStatusTextFromCode($code));
     }
 
-    public function statusTextProvider(): array
+    public static function statusTextProvider(): array
     {
         return [
             'new status'  => [Ticket::STATUS_NEW, 'Open'],
@@ -389,7 +389,7 @@ class TicketTest extends TestCase
         $this->assertEquals($expected, Ticket::getImpactUrgencyText($code));
     }
 
-    public function impactUrgencyTextProvider(): array
+    public static function impactUrgencyTextProvider(): array
     {
         return [
             'high'   => [Ticket::IMPACT_HIGH, 'High'],
@@ -406,7 +406,7 @@ class TicketTest extends TestCase
         $this->assertEquals($expected, Ticket::getSourceTextFromCode($code));
     }
 
-    public function sourceTextProvider(): array
+    public static function sourceTextProvider(): array
     {
         return [
             'email' => [Ticket::SOURCE_EMAIL, 'E-Mail'],

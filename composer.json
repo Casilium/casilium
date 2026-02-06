@@ -83,7 +83,7 @@
         "mezzio/mezzio-tooling": "^2.9",
         "phpspec/prophecy": "^1.10.3",
         "phpspec/prophecy-phpunit": "^2.0",
-        "phpunit/phpunit": "^9.3.7",
+        "phpunit/phpunit": "^10",
         "roave/security-advisories": "dev-master"
     },
     "autoload": {

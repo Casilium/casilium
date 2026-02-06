@@ -1,0 +1,39 @@
+<?php
+    $queueName   = $this->queueName ?? 'Queue';
+    $tickets     = $this->tickets ?? [];
+    $generatedAt = $this->generatedAt ?? '';
+?>
+<p>
+    <strong>Overdue tickets digest</strong><br>
+    Queue: <?= $this->escapeHtml($queueName) ?><br>
+    Generated: <?= $this->escapeHtml($generatedAt) ?>
+</p>
+
+<table border="1" cellpadding="6" cellspacing="0">
+    <thead>
+        <tr>
+            <th align="left">ID</th>
+            <th align="left">Summary</th>
+            <th align="left">Organisation</th>
+            <th align="left">Contact</th>
+            <th align="left">Assigned</th>
+            <th align="left">Status</th>
+            <th align="left">Due Date</th>
+            <th align="left">Overdue By</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($tickets as $ticket): ?>
+            <tr>
+                <td><?= $this->escapeHtml((string) ($ticket['id'] ?? '')) ?></td>
+                <td><?= $this->escapeHtml($ticket['summary'] ?? '') ?></td>
+                <td><?= $this->escapeHtml($ticket['organisation'] ?? '') ?></td>
+                <td><?= $this->escapeHtml($ticket['contactName'] ?? '') ?></td>
+                <td><?= $this->escapeHtml($ticket['assignedTo'] ?? '') ?></td>
+                <td><?= $this->escapeHtml($ticket['status'] ?? '') ?></td>
+                <td><?= $this->escapeHtml($ticket['dueDate'] ?? '') ?></td>
+                <td><?= $this->escapeHtml($ticket['overdueBy'] ?? '') ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>

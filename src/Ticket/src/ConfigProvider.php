@@ -45,6 +45,7 @@ class ConfigProvider
             'factories'  => [
                 Command\CreateTicketsFromEmail::class    => Command\Factory\CreateTicketsFromEmailFactory::class,
                 Command\CloseResolvedTickets::class      => Command\Factory\CloseResolvedTicketsFactory::class,
+                Command\OverdueDigest::class             => Command\Factory\OverdueDigestFactory::class,
                 Command\Notifications::class             => Command\Factory\NotificationsFactory::class,
                 Command\UpdateWaitingTickets::class      => Command\Factory\UpdatingWaitingTicketsFactory::class,
                 EventListener\TicketEventListener::class => EventListener\TicketEventListener::class,
@@ -111,6 +112,7 @@ class ConfigProvider
             'commands' => [
                 Command\CreateTicketsFromEmail::class,
                 Command\CloseResolvedTickets::class,
+                Command\OverdueDigest::class,
                 Command\Notifications::class,
                 Command\UpdateWaitingTickets::class,
             ],

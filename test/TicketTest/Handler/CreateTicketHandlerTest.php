@@ -12,7 +12,7 @@ use Organisation\Entity\Organisation;
 use OrganisationContact\Entity\Contact;
 use OrganisationSite\Entity\SiteEntity;
 use PHPUnit\Framework\TestCase;
-use Ramsey\Uuid\UuidInterface;
+use Ramsey\Uuid\Uuid;
 use Ticket\Entity\Queue;
 use Ticket\Entity\Ticket;
 use Ticket\Entity\Type;
@@ -60,7 +60,7 @@ class CreateTicketHandlerTest extends TestCase
     public function testHandleGetRequestRendersCreateTicketForm(): void
     {
         $user         = $this->createMockUser(123);
-        $organisation = $this->createMockOrganisation(456, 'org-uuid-123');
+        $organisation = $this->createMockOrganisation(456, '11111111-1111-1111-1111-111111111111');
 
         $sites    = [$this->createMockSite(1, '123 Main St')];
         $contacts = [$this->createMockContact(1, 'John', 'Doe')];
@@ -69,11 +69,11 @@ class CreateTicketHandlerTest extends TestCase
         $request = new ServerRequest();
         $request = $request->withMethod('GET')
                           ->withAttribute(IdentityInterface::class, $user)
-                          ->withAttribute('org_id', 'org-uuid-123');
+                          ->withAttribute('org_id', '11111111-1111-1111-1111-111111111111');
 
         $this->ticketService->expects($this->once())
             ->method('getOrganisationByUuid')
-            ->with('org-uuid-123')
+            ->with('11111111-1111-1111-1111-111111111111')
             ->willReturn($organisation);
 
         $this->ticketService->expects($this->once())
@@ -110,7 +110,7 @@ class CreateTicketHandlerTest extends TestCase
     public function testHandlePostRequestCallsCorrectServiceMethods(): void
     {
         $user         = $this->createMockUser(123);
-        $organisation = $this->createMockOrganisation(456, 'org-uuid-123');
+        $organisation = $this->createMockOrganisation(456, '11111111-1111-1111-1111-111111111111');
 
         $postData = [
             'subject'     => 'Test ticket',
@@ -121,11 +121,11 @@ class CreateTicketHandlerTest extends TestCase
         $request = $request->withMethod('POST')
                           ->withParsedBody($postData)
                           ->withAttribute(IdentityInterface::class, $user)
-                          ->withAttribute('org_id', 'org-uuid-123');
+                          ->withAttribute('org_id', '11111111-1111-1111-1111-111111111111');
 
         $this->ticketService->expects($this->once())
             ->method('getOrganisationByUuid')
-            ->with('org-uuid-123')
+            ->with('11111111-1111-1111-1111-111111111111')
             ->willReturn($organisation);
 
         $this->ticketService->expects($this->once())
@@ -152,7 +152,7 @@ class CreateTicketHandlerTest extends TestCase
     public function testHandlePostRequestWithInvalidDataRendersFormWithErrors(): void
     {
         $user         = $this->createMockUser(123);
-        $organisation = $this->createMockOrganisation(456, 'org-uuid-123');
+        $organisation = $this->createMockOrganisation(456, '11111111-1111-1111-1111-111111111111');
 
         // Invalid data - empty required fields
         $postData = [
@@ -164,7 +164,7 @@ class CreateTicketHandlerTest extends TestCase
         $request = $request->withMethod('POST')
                           ->withParsedBody($postData)
                           ->withAttribute(IdentityInterface::class, $user)
-                          ->withAttribute('org_id', 'org-uuid-123');
+                          ->withAttribute('org_id', '11111111-1111-1111-1111-111111111111');
 
         $this->ticketService->method('getOrganisationByUuid')->willReturn($organisation);
         $this->ticketService->method('getSitesByOrganisationId')->willReturn([]);
@@ -189,7 +189,7 @@ class CreateTicketHandlerTest extends TestCase
     public function testHandleWithExistingTicketIdPrePopulatesForm(): void
     {
         $user           = $this->createMockUser(123);
-        $organisation   = $this->createMockOrganisation(456, 'org-uuid-123');
+        $organisation   = $this->createMockOrganisation(456, '11111111-1111-1111-1111-111111111111');
         $existingTicket = $this->createMockTicket(999);
         $contact        = $this->createMockContact(1, 'John', 'Doe');
         $type           = $this->createMockType(2);
@@ -206,7 +206,7 @@ class CreateTicketHandlerTest extends TestCase
         $request = $request->withMethod('GET')
                           ->withAttribute(IdentityInterface::class, $user)
                           ->withAttribute('ticket_id', 'existing-ticket-uuid')
-                          ->withAttribute('org_id', 'org-uuid-123');
+                          ->withAttribute('org_id', '11111111-1111-1111-1111-111111111111');
 
         $this->ticketService->expects($this->once())
             ->method('getTicketByUuid')
@@ -227,13 +227,13 @@ class CreateTicketHandlerTest extends TestCase
     public function testHandleSetsFormOptionsForSingleSite(): void
     {
         $user         = $this->createMockUser(123);
-        $organisation = $this->createMockOrganisation(456, 'org-uuid-123');
+        $organisation = $this->createMockOrganisation(456, '11111111-1111-1111-1111-111111111111');
         $site         = $this->createMockSite(1, '123 Main St');
 
         $request = new ServerRequest();
         $request = $request->withMethod('GET')
                           ->withAttribute(IdentityInterface::class, $user)
-                          ->withAttribute('org_id', 'org-uuid-123');
+                          ->withAttribute('org_id', '11111111-1111-1111-1111-111111111111');
 
         $this->ticketService->method('getOrganisationByUuid')->willReturn($organisation);
         $this->ticketService->method('getSitesByOrganisationId')->willReturn([$site]);
@@ -258,13 +258,13 @@ class CreateTicketHandlerTest extends TestCase
     public function testHandleSetsFormOptionsForSingleContact(): void
     {
         $user         = $this->createMockUser(123);
-        $organisation = $this->createMockOrganisation(456, 'org-uuid-123');
+        $organisation = $this->createMockOrganisation(456, '11111111-1111-1111-1111-111111111111');
         $contact      = $this->createMockContact(1, 'John', 'Doe');
 
         $request = new ServerRequest();
         $request = $request->withMethod('GET')
                           ->withAttribute(IdentityInterface::class, $user)
-                          ->withAttribute('org_id', 'org-uuid-123');
+                          ->withAttribute('org_id', '11111111-1111-1111-1111-111111111111');
 
         $this->ticketService->method('getOrganisationByUuid')->willReturn($organisation);
         $this->ticketService->method('getSitesByOrganisationId')->willReturn([]);
@@ -289,13 +289,13 @@ class CreateTicketHandlerTest extends TestCase
     public function testHandleSetsFormOptionsForSingleQueue(): void
     {
         $user         = $this->createMockUser(123);
-        $organisation = $this->createMockOrganisation(456, 'org-uuid-123');
+        $organisation = $this->createMockOrganisation(456, '11111111-1111-1111-1111-111111111111');
         $queue        = $this->createMockQueue(1, 'Support');
 
         $request = new ServerRequest();
         $request = $request->withMethod('GET')
                           ->withAttribute(IdentityInterface::class, $user)
-                          ->withAttribute('org_id', 'org-uuid-123');
+                          ->withAttribute('org_id', '11111111-1111-1111-1111-111111111111');
 
         $this->ticketService->method('getOrganisationByUuid')->willReturn($organisation);
         $this->ticketService->method('getSitesByOrganisationId')->willReturn([]);
@@ -320,12 +320,12 @@ class CreateTicketHandlerTest extends TestCase
     public function testHandleUsesCorrectTemplate(): void
     {
         $user         = $this->createMockUser(123);
-        $organisation = $this->createMockOrganisation(456, 'org-uuid-123');
+        $organisation = $this->createMockOrganisation(456, '11111111-1111-1111-1111-111111111111');
 
         $request = new ServerRequest();
         $request = $request->withMethod('GET')
                           ->withAttribute(IdentityInterface::class, $user)
-                          ->withAttribute('org_id', 'org-uuid-123');
+                          ->withAttribute('org_id', '11111111-1111-1111-1111-111111111111');
 
         $this->ticketService->method('getOrganisationByUuid')->willReturn($organisation);
         $this->ticketService->method('getSitesByOrganisationId')->willReturn([]);
@@ -344,12 +344,12 @@ class CreateTicketHandlerTest extends TestCase
     {
         $agentId      = 987;
         $user         = $this->createMockUser($agentId);
-        $organisation = $this->createMockOrganisation(456, 'org-uuid-123');
+        $organisation = $this->createMockOrganisation(456, '11111111-1111-1111-1111-111111111111');
 
         $request = new ServerRequest();
         $request = $request->withMethod('GET')
                           ->withAttribute(IdentityInterface::class, $user)
-                          ->withAttribute('org_id', 'org-uuid-123');
+                          ->withAttribute('org_id', '11111111-1111-1111-1111-111111111111');
 
         $this->ticketService->method('getOrganisationByUuid')->willReturn($organisation);
         $this->ticketService->method('getSitesByOrganisationId')->willReturn([]);
@@ -375,9 +375,8 @@ class CreateTicketHandlerTest extends TestCase
         $organisation = $this->createMock(Organisation::class);
         $organisation->method('getId')->willReturn($id);
 
-        $uuidInterface = $this->createMock(UuidInterface::class);
-        $uuidInterface->method('__toString')->willReturn($uuid);
-        $organisation->method('getUuid')->willReturn($uuidInterface);
+        $uuidObject = Uuid::fromString($uuid);
+        $organisation->method('getUuid')->willReturn($uuidObject);
 
         return $organisation;
     }
