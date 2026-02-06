@@ -16,7 +16,6 @@ $aggregator = new ConfigAggregator([
     \Mezzio\Tooling\ConfigProvider::class,
     \Laminas\Mail\ConfigProvider::class,
     \Laminas\Paginator\ConfigProvider::class,
-    \Laminas\Log\ConfigProvider::class,
     \Mezzio\Authorization\Rbac\ConfigProvider::class,
     \Mezzio\Authorization\ConfigProvider::class,
     \Laminas\Session\ConfigProvider::class,
