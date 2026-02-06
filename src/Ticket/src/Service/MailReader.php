@@ -10,6 +10,7 @@ use Laminas\Mail\Storage\Imap;
 use Ticket\Parser\EmailMessageParser;
 
 use function is_array;
+use function sprintf;
 
 class MailReader
 {
@@ -47,7 +48,12 @@ class MailReader
                     'ssl'      => $this->ssl,
                 ]);
             } catch (Exception $ex) {
-                throw new Exception('Unable to connect to server');
+                // Re-throw with more context and preserve original exception
+                throw new Exception(
+                    sprintf('Unable to connect to mail server %s: %s', $this->host, $ex->getMessage()),
+                    0,
+                    $ex
+                );
             }
         }
 
