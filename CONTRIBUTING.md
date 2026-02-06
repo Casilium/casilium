@@ -59,6 +59,46 @@ $ composer cs-fix
 If the above fixes any CS issues, please re-run the tests to ensure
 they pass, and make sure you add and commit the changes after verification.
 
+## Common Composer Scripts
+
+```console
+$ composer cs-check
+$ composer cs-fix
+$ composer test
+$ composer changelog
+$ composer changelog:write
+```
+
+## Changelog
+
+We maintain `CHANGELOG.md`. For automated generation, install `git-cliff` and use:
+
+```console
+$ composer changelog
+$ composer changelog:write
+```
+
+For now, add manual entries for significant changes when submitting PRs.
+
+## Admin User Setup
+
+To create a user from the console:
+
+```console
+$ php bin/console.php user:create --email "user@example.com" --name "User Name" --password "Secret123" --role "Administrator"
+```
+
+## Commit Message Format
+
+We use conventional prefixes so `git-cliff` can generate the changelog:
+
+- `feat:` new features
+- `fix:` bug fixes
+- `docs:` documentation changes
+- `chore:` maintenance or tooling
+- `refactor:` refactors
+- `test:` tests
+
 ## Recommended Workflow for Contributions
 
 Your first step is to establish a public repository from which we can

@@ -79,9 +79,11 @@ class EditTickerHandler implements RequestHandlerInterface
                 $ticket                  = $this->ticketService->save($data);
 
                 $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
-                $flashMessages->flash('info', sprintf('Ticket #%s successfully created', $ticket->getId()));
+                $flashMessages->flash('info', sprintf('Ticket #%s successfully updated', $ticket->getId()));
 
-                return new RedirectResponse($this->urlHelper->generate('organisation.list'));
+                return new RedirectResponse($this->urlHelper->generate('ticket.view', [
+                    'ticket_id' => $ticket->getUuid(),
+                ]));
             }
         }
 
@@ -95,7 +97,9 @@ class EditTickerHandler implements RequestHandlerInterface
         $this->setFormQueueOptions($form, $queues);
 
         return new HtmlResponse($this->renderer->render('ticket::create-ticket', [
-            'form' => $form,
+            'form'         => $form,
+            'org_id'       => $ticket->getOrganisation()->getUuid(),
+            'organisation' => $ticket->getOrganisation(),
         ]));
     }
 

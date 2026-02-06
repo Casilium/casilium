@@ -134,6 +134,8 @@
             "@cs-check",
             "@test"
         ],
+        "changelog": "git-cliff --latest",
+        "changelog:write": "git-cliff --latest -o CHANGELOG.md",
         "clear-config-cache": "php bin/clear-config-cache.php",
         "enable-codestandard": "Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run",
         "cs-check": "phpcs",

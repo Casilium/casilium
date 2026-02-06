@@ -151,12 +151,6 @@ final class Version20181119222947 extends AbstractMigration
             'date_created' => date('Y-m-d H:i:s'),
         ]);
 
-        // assign admin role to user 1
-        $this->connection->insert('user_role', [
-            'user_id' => 1,
-            'role_id' => 1,
-        ]);
-
         // assign permissions to admin role
         $this->connection->insert('role_permission', [
             'role_id'       => 1,

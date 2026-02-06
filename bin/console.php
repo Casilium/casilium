@@ -14,7 +14,18 @@ $application = new Application('Titan Console');
 
 $commands = $container->get('config')['console']['commands'];
 foreach ($commands as $command) {
-    $application->add($container->get($command));
+    try {
+        $application->add($container->get($command));
+    } catch (Throwable $e) {
+        fwrite(
+            STDERR,
+            sprintf(
+                "Skipped console command %s: %s (check config/autoload/mail.local.php if this is mail related)\n",
+                $command,
+                $e->getMessage()
+            )
+        );
+    }
 }
 
 $application->run();

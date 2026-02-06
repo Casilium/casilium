@@ -45,7 +45,6 @@ class TicketRepositoryTest extends TestCase
         // Set the protected _em property for methods that access it directly
         $reflection = new ReflectionClass($this->repository);
         $emProperty = $reflection->getProperty('_em');
-        $emProperty->setAccessible(true);
         $emProperty->setValue($this->repository, $this->entityManager);
     }
 

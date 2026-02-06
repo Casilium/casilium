@@ -7,6 +7,7 @@
 ?>
 <h1><i class="fas fa-ticket-alt"></i> Create New Ticket</h1>
 <?= $this->form()->openTag($form); ?>
+<?php $hasSla = $organisation->hasSla(); ?>
 <div class="widget">
     <div class="row">
         <div class="col-md-6">
@@ -105,6 +106,7 @@
 <?php
 $this->inlineScript()->captureStart();
 echo <<<JS
+var hasSla = " . ($hasSla ? 'true' : 'false') . ";
 function updatePriority()
 {
     var priority = [];
@@ -139,12 +141,17 @@ $(document).ready(function() {
     });
     
     function toggledueDate() {
+      if (!hasSla) {
+          $('#due_date').prop("readonly", false);
+          return;
+      }
+
       if ($('#type_id').val() === "2") {
           $('#due_date').prop("readonly", true);
       } else {
           $('#due_date').prop("readonly", false).val('');
       }
-      
+
       updateDue();
     }
     
@@ -164,6 +171,9 @@ $(document).ready(function() {
     
     function updateDue()
     {
+        if (!hasSla) {
+            return;
+        }
         var urgency = parseInt($('#urgency').val()) || 0;
         var impact = parseInt($('#impact').val()) || 0;
         
@@ -177,7 +187,7 @@ $(document).ready(function() {
                 $('#due_date').val(n);
             },
             error: function(n) {
-                $('#due_date').val('Error');
+                $('#due_date').val('');
             }
         });
 

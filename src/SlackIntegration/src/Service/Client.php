@@ -7,7 +7,6 @@ namespace SlackIntegration\Service;
 use Exception;
 use SlackIntegration\Entity\Message;
 
-use function curl_close;
 use function curl_exec;
 use function curl_init;
 use function curl_setopt;
@@ -207,10 +206,7 @@ class Client
         curl_setopt($ch, CURLOPT_POSTFIELDS, $encodedPayload);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
-        $result = curl_exec($ch);
-        curl_close($ch);
-
-        return $result;
+        return curl_exec($ch);
     }
 
     public function preparePayload(Message $message): array

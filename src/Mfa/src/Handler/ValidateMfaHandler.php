@@ -105,8 +105,7 @@ class ValidateMfaHandler implements MiddlewareInterface
                     ));
                 }
 
-                // get secret key and code from POST
-                $key = $data['secret_key'];
+                // use stored secret key from the user record
                 $pin = $data['pin'];
 
                 if ($this->mfaService->isValidCode($key, $pin)) {
@@ -126,12 +125,13 @@ class ValidateMfaHandler implements MiddlewareInterface
         }
 
         return new HtmlResponse($this->renderer->render('mfa::mfa-page', [
-            'layout'     => 'layout::clean',
-            'form'       => $form,
-            'qrcode_url' => $this->mfaService->getQrCodeUrl($user->getEmail(), $key),
-            'secret_key' => $key,
-            'token'      => $token,
-            'error'      => $error,
+            'layout'      => 'layout::clean',
+            'form'        => $form,
+            'qrcode_url'  => $this->mfaService->getQrCodeUrl($user->getEmail(), $key),
+            'secret_key'  => $key,
+            'token'       => $token,
+            'error'       => $error,
+            'show_secret' => false,
         ]));
     }
 }

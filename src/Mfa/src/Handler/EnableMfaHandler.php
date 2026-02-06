@@ -112,11 +112,12 @@ class EnableMfaHandler implements RequestHandlerInterface
         }
 
         return new HtmlResponse($this->renderer->render('mfa::mfa-page', [
-            'form'       => $form,
-            'qrcode_url' => $this->mfaService->getQrCodeUrl($user->getEmail(), $key),
-            'secret_key' => $key,
-            'token'      => $token,
-            'error'      => $error,
+            'form'        => $form,
+            'qrcode_url'  => $this->mfaService->getQrCodeUrl($user->getEmail(), $key),
+            'secret_key'  => $key,
+            'token'       => $token,
+            'error'       => $error,
+            'show_secret' => true,
         ]));
     }
 }
