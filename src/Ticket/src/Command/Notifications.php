@@ -75,26 +75,31 @@ class Notifications extends Command
             ]);
 
             $successCount = 0;
+            $skippedCount = 0;
             $failCount    = 0;
 
             // Process due tickets
             $dueCounts     = $this->processDueTickets($target, $targetType, $output);
             $successCount += $dueCounts['success'];
+            $skippedCount += $dueCounts['skipped'];
             $failCount    += $dueCounts['failed'];
 
             // Process overdue tickets
             $overdueCounts = $this->processOverdueTickets($output);
             $successCount += $overdueCounts['success'];
+            $skippedCount += $overdueCounts['skipped'];
             $failCount    += $overdueCounts['failed'];
 
             $output->writeln(sprintf(
-                '<info>Sent %d notifications (%d failed)</info>',
+                '<info>Sent %d notifications, %d skipped (already notified), %d failed</info>',
                 $successCount,
+                $skippedCount,
                 $failCount
             ));
 
             $this->logger->info('Notification process completed', [
                 'success' => $successCount,
+                'skipped' => $skippedCount,
                 'failed'  => $failCount,
             ]);
 
@@ -130,6 +135,7 @@ class Notifications extends Command
     private function processDueTickets(int $target, int $targetType, OutputInterface $output): array
     {
         $successCount = 0;
+        $skippedCount = 0;
         $failCount    = 0;
 
         try {
@@ -138,7 +144,7 @@ class Notifications extends Command
 
             if (empty($tickets)) {
                 $output->writeln('<comment>No tickets due within target period</comment>');
-                return ['success' => 0, 'failed' => 0];
+                return ['success' => 0, 'skipped' => 0, 'failed' => 0];
             }
 
             foreach ($tickets as $ticket) {
@@ -147,19 +153,31 @@ class Notifications extends Command
                     $due     = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate());
                     $seconds = $now->diffInSeconds($due);
 
-                    $output->writeln(sprintf(
-                        'Sending notification for ticket #%s (due in %s)',
-                        $ticket->getId(),
-                        gmdate('H:i:s', $seconds)
-                    ));
+                    $wasSent = $this->ticketService->sendNotificationEmail($ticket, $target, $targetType);
 
-                    $this->ticketService->sendNotificationEmail($ticket, $target, $targetType);
+                    if ($wasSent) {
+                        $output->writeln(sprintf(
+                            '<info>Sent notification for ticket #%s (due in %s)</info>',
+                            $ticket->getId(),
+                            gmdate('H:i:s', $seconds)
+                        ));
 
-                    $successCount++;
-                    $this->logger->info('Due ticket notification sent', [
-                        'ticket_id' => $ticket->getId(),
-                        'due_in'    => gmdate('H:i:s', $seconds),
-                    ]);
+                        $successCount++;
+                        $this->logger->info('Due ticket notification sent', [
+                            'ticket_id' => $ticket->getId(),
+                            'due_in'    => gmdate('H:i:s', $seconds),
+                        ]);
+                    } else {
+                        $output->writeln(sprintf(
+                            '<comment>Skipped ticket #%s (already notified)</comment>',
+                            $ticket->getId()
+                        ));
+
+                        $skippedCount++;
+                        $this->logger->info('Due ticket notification skipped (already notified)', [
+                            'ticket_id' => $ticket->getId(),
+                        ]);
+                    }
                 } catch (Throwable $e) {
                     $failCount++;
                     $output->writeln(sprintf(
@@ -181,7 +199,7 @@ class Notifications extends Command
             throw $e;
         }
 
-        return ['success' => $successCount, 'failed' => $failCount];
+        return ['success' => $successCount, 'skipped' => $skippedCount, 'failed' => $failCount];
     }
 
     /**
@@ -199,22 +217,24 @@ class Notifications extends Command
 
             if (empty($tickets)) {
                 $output->writeln('<comment>No overdue tickets</comment>');
-                return ['success' => 0, 'failed' => 0];
+                return ['success' => 0, 'skipped' => 0, 'failed' => 0];
             }
 
             foreach ($tickets as $ticket) {
                 try {
-                    $output->writeln(sprintf(
-                        'Sending overdue notification for ticket #%s',
-                        $ticket->getId()
-                    ));
+                    $wasSent = $this->ticketService->sendOverdueNotificationEmail($ticket);
 
-                    $this->ticketService->sendOverdueNotificationEmail($ticket);
+                    if ($wasSent) {
+                        $output->writeln(sprintf(
+                            '<info>Sent overdue notification for ticket #%s</info>',
+                            $ticket->getId()
+                        ));
 
-                    $successCount++;
-                    $this->logger->info('Overdue ticket notification sent', [
-                        'ticket_id' => $ticket->getId(),
-                    ]);
+                        $successCount++;
+                        $this->logger->info('Overdue ticket notification sent', [
+                            'ticket_id' => $ticket->getId(),
+                        ]);
+                    }
                 } catch (Throwable $e) {
                     $failCount++;
                     $output->writeln(sprintf(
@@ -236,6 +256,6 @@ class Notifications extends Command
             throw $e;
         }
 
-        return ['success' => $successCount, 'failed' => $failCount];
+        return ['success' => $successCount, 'skipped' => 0, 'failed' => $failCount];
     }
 }

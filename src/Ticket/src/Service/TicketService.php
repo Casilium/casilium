@@ -389,7 +389,7 @@ class TicketService
         return $response;
     }
 
-    public function sendNotificationEmail(Ticket $ticket, int $target, int $period = self::DUE_PERIOD_MINUTES)
+    public function sendNotificationEmail(Ticket $ticket, int $target, int $period = self::DUE_PERIOD_MINUTES): bool
     {
         $now          = Carbon::now('UTC');
         $due          = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate());
@@ -447,10 +447,14 @@ class TicketService
 
             $ticket->setLastNotified($now->format('Y-m-d H:i:s'));
             $this->entityManager->flush();
+
+            return true; // Email was sent
         }
+
+        return false; // Already notified, skipped
     }
 
-    public function sendOverdueNotificationEmail(Ticket $ticket): void
+    public function sendOverdueNotificationEmail(Ticket $ticket): bool
     {
         $subject = sprintf('Ticket #%s is now overdue', $ticket->getId());
         $body    = sprintf(
@@ -468,6 +472,8 @@ class TicketService
 
         $ticket->setLastNotified(Carbon::now('UTC')->format('Y-m-d H:i:s'));
         $this->entityManager->flush();
+
+        return true; // Email was sent
     }
 
     /**
