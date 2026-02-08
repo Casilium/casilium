@@ -40,7 +40,7 @@ final class Version20181119211033 extends AbstractMigration
         $table->addColumn('date_created', 'datetime', ['notnull' => true]);
         $table->addColumn('pwd_reset_token', 'string', ['length' => 128, 'notnull' => false]);
         $table->addColumn('pwd_reset_token_creation_date', 'datetime', ['notnull' => false]);
-        $table->addColumn('secret_key', 'string', ['notnull' => false]);
+        $table->addColumn('secret_key', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('mfa_enabled', 'smallint', ['notnull' => true, 'unsigned' => true, 'default' => 0]);
 
         $table->setPrimaryKey(['id']);

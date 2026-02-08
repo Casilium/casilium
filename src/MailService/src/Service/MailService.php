@@ -4,45 +4,40 @@ declare(strict_types=1);
 
 namespace MailService\Service;
 
-use Laminas\Mail;
-use Laminas\Mail\Transport\Smtp as SmtpTransport;
-use Laminas\Mime\Message as MimeMessage;
-use Laminas\Mime\Part as MimePart;
 use Mezzio\Template\TemplateRendererInterface;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\Mailer\Exception\TransportExceptionInterface;
+use Symfony\Component\Mailer\Mailer;
+use Symfony\Component\Mailer\MailerInterface;
+use Symfony\Component\Mailer\Transport;
+use Symfony\Component\Mime\Email;
 
 use function array_merge;
+use function error_log;
+use function http_build_query;
+use function sprintf;
+use function urlencode;
 
 class MailService
 {
-    /** @var array */
-    protected $options;
+    protected array $options;
+    protected TemplateRendererInterface $renderer;
+    protected ?LoggerInterface $logger = null;
+    protected ?MailerInterface $mailer = null;
+    protected string $mailFrom;
 
-    /** @var TemplateRendererInterface */
-    protected $renderer;
-
-    /** @var SmtpTransport */
-    protected $transport;
-
-    /** @var string */
-    protected $mailFrom;
-
-    /**
-     * @param TemplateRendererInterface $renderer Template renderer
-     * @param array $options config options
-     */
-    public function __construct(TemplateRendererInterface $renderer, array $options)
+    public function __construct(TemplateRendererInterface $renderer, array $options, ?LoggerInterface $logger = null)
     {
         $this->renderer = $renderer;
         $this->options  = $options;
         $this->mailFrom = $options['sender'];
+        $this->logger   = $logger;
     }
 
     /**
-     * @param string $template Mail template to render
-     * @param array $options
-     * @return string The rendered email template
+     * Render email template
      */
-    public function prepareBody(string $template, $options = []): string
+    public function prepareBody(string $template, array $options = []): string
     {
         $options = array_merge($options, [
             'layout' => 'layout::email',
@@ -55,35 +50,116 @@ class MailService
     }
 
     /**
-     * @param string $to email to send to
-     * @param string $subject email subject
-     * @param string $body email body
+     * Send email
      */
     public function send(string $to, string $subject, string $body): void
     {
-        $html       = new MimePart($body);
-        $html->type = 'text/html';
+        $email = (new Email())
+            ->from($this->mailFrom)
+            ->to($to)
+            ->subject($subject)
+            ->html($body);
 
-        $message = new MimeMessage();
-        $message->addPart($html);
-
-        $mail = new Mail\Message();
-        $mail->setEncoding('UTF-8');
-        $mail->setBody($message);
-        $mail->setFrom($this->mailFrom);
-        $mail->addTo($to);
-        $mail->setSubject($subject);
-
-        $this->getTransport()->send($mail);
+        $this->sendEmail($email);
     }
 
-    public function getTransport(): SmtpTransport
+    /**
+     * Send email with attachment
+     */
+    public function sendWithAttachment(
+        string $to,
+        string $subject,
+        string $body,
+        string $attachmentPath,
+        ?string $attachmentName = null
+    ): void {
+        $email = (new Email())
+            ->from($this->mailFrom)
+            ->to($to)
+            ->subject($subject)
+            ->html($body)
+            ->attachFromPath($attachmentPath, $attachmentName);
+
+        $this->sendEmail($email);
+    }
+
+    protected function sendEmail(Email $email): void
     {
-        if (null === $this->transport) {
-            $smtpOptions     = new Mail\Transport\SmtpOptions($this->options['smtp_options']);
-            $this->transport = new SmtpTransport($smtpOptions);
+        try {
+            $this->getMailer()->send($email);
+        } catch (TransportExceptionInterface $e) {
+            $this->logMailerError($e);
+            if (($this->options['fail_on_error'] ?? false) === true) {
+                throw $e;
+            }
+        }
+    }
+
+    protected function getMailer(): MailerInterface
+    {
+        if ($this->mailer === null) {
+            $dsn          = $this->buildDsn();
+            $transport    = Transport::fromDsn($dsn);
+            $this->mailer = new Mailer($transport);
         }
 
-        return $this->transport;
+        return $this->mailer;
+    }
+
+    protected function logMailerError(TransportExceptionInterface $e): void
+    {
+        $message = sprintf('Mail delivery failed: %s', $e->getMessage());
+        if ($this->logger !== null) {
+            $this->logger->error($message, ['exception' => $e]);
+        } else {
+            error_log($message);
+        }
+    }
+
+    /**
+     * Build Symfony Mailer DSN from legacy config format
+     */
+    protected function buildDsn(): string
+    {
+        $smtp   = $this->options['smtp_options'] ?? [];
+        $config = $smtp['connection_config'] ?? [];
+
+        $host = $smtp['host'] ?? 'localhost';
+        $port = $smtp['port'] ?? 25;
+        $user = $config['username'] ?? '';
+        $pass = $config['password'] ?? '';
+        $ssl  = $config['ssl'] ?? null;
+
+        // Determine scheme
+        $scheme = 'smtp';
+        if ($ssl === 'tls') {
+            $scheme = 'smtp';
+        } elseif ($ssl === 'ssl') {
+            $scheme = 'smtps';
+        }
+
+        $query = [];
+        if (($config['verify_peer'] ?? true) === false) {
+            $query['verify_peer'] = '0';
+        }
+        if (($config['verify_peer_name'] ?? true) === false) {
+            $query['verify_peer_name'] = '0';
+        }
+        if (($config['allow_self_signed'] ?? false) === true) {
+            $query['allow_self_signed'] = '1';
+        }
+
+        // Build DSN
+        if ($user && $pass) {
+            $dsn = sprintf('%s://%s:%s@%s:%d', $scheme, urlencode($user), urlencode($pass), $host, $port);
+        } else {
+            $dsn = sprintf('%s://%s:%d', $scheme, $host, $port);
+        }
+
+        if ($query !== []) {
+            $dsn .= '?' . http_build_query($query);
+        }
+
+        return $dsn;
     }
 }

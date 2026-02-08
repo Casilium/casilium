@@ -33,9 +33,9 @@ final class Version20191218104532 extends AbstractMigration
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement'=>true]);
         $table->addColumn('uuid', 'uuid');
         $table->addColumn('organisation_id', 'integer', ['notnull' => true, 'unsigned' => true]);
-        $table->addColumn('name', 'string', ['notnull' => false]);
-        $table->addColumn('street_address', 'string', ['notnull' => true]);
-        $table->addColumn('street_address2', 'string', ['notnull' => false]);
+        $table->addColumn('name', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('street_address', 'string', ['notnull' => true, 'length' => 255]);
+        $table->addColumn('street_address2', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('town', 'string', ['notnull' => false, 'length' => 64]);
         $table->addColumn('city', 'string', ['notnull' => true, 'length' => 64]);
         $table->addColumn('county', 'string', ['notnull' => false, 'length' => 64]);

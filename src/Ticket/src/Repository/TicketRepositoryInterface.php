@@ -34,11 +34,19 @@ interface TicketRepositoryInterface
     public function findRecentTicketsByContact(int $contactId, $limit = 5): array;
 
     /**
-     * Fetch all tickets from DB
+     * Fetch all tickets from DB (Doctrine default signature).
      *
      * @return array ticket list
      */
     public function findAll(): array;
+
+    /**
+     * Fetch all tickets with ability to include/exclude resolved tickets.
+     *
+     * @param bool $fetchResolved Include closed/resolved tickets
+     * @return array
+     */
+    public function findAllTickets(bool $fetchResolved = true): array;
 
     /**
      * Fetch tickets from database, paginated

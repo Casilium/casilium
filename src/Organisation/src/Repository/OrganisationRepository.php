@@ -27,7 +27,7 @@ class OrganisationRepository extends EntityRepository
         return null;
     }
 
-    public function findAll(array $options = []): ?array
+    public function findAll(): array
     {
         $qb = $this->createQueryBuilder('qb');
 

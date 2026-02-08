@@ -30,14 +30,16 @@
         }
     },
     "require": {
-        "php": "~8.2.0 || ~8.3.0 || ~8.4.0",
+        "php": "~8.4.0 || ~8.5.0",
         "ext-curl": "*",
+        "ext-imap": "*",
         "ext-json": "*",
         "ext-pdo": "*",
         "ext-sodium": "*",
         "composer/package-versions-deprecated": "^1.10.99",
+        "ddeboer/imap": "^1.23",
         "doctrine/doctrine-laminas-hydrator": "^3.4.0",
-        "doctrine/migrations": "^3.6.0",
+        "doctrine/migrations": "^3.9",
         "laminas/laminas-component-installer": "^3.4.0",
         "laminas/laminas-config-aggregator": "^1.14.0",
         "laminas/laminas-diactoros": "^3.0",
@@ -47,7 +49,6 @@
         "laminas/laminas-hydrator": "^4.3.0",
         "laminas/laminas-i18n": "^2.11",
         "laminas/laminas-inputfilter": "^2.10",
-        "laminas/laminas-mail": "^2.25",
         "laminas/laminas-paginator": "^2.9",
         "laminas/laminas-servicemanager": "^3.4",
         "laminas/laminas-session": "^2.10",
@@ -65,17 +66,17 @@
         "mezzio/mezzio-session-ext": "^1.10",
         "monolog/monolog": "^1.24",
         "nesbot/carbon": "^2.41.5",
-        "ramsey/uuid-doctrine": "^1.6",
-        "roave/psr-container-doctrine": "^4.1",
+        "ramsey/uuid-doctrine": "^2.1",
+        "roave/psr-container-doctrine": "^6.1",
         "sonata-project/google-authenticator": "^2.2",
         "symfony/cache": "^7.0",
-        "symfony/console": "^5.0"
+        "symfony/console": "^5.0",
+        "symfony/mailer": "^8.0"
     },
     "require-dev": {
         "filp/whoops": "^2.7.1",
         "laminas/laminas-coding-standard": "^2.5",
         "laminas/laminas-development-mode": "^3.2",
-        "mezzio/mezzio-tooling": "^2.9",
         "phpspec/prophecy": "^1.10.3",
         "phpspec/prophecy-phpunit": "^2.0",
         "phpunit/phpunit": "^10",
@@ -124,8 +125,7 @@
         "development-disable": "laminas-development-mode disable",
         "development-enable": "laminas-development-mode enable",
         "development-status": "laminas-development-mode status",
-        "mezzio": "mezzio --ansi",
-        "check": [
+                "check": [
             "@cs-check",
             "@test"
         ],

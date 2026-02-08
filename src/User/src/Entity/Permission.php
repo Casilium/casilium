@@ -27,9 +27,6 @@ class Permission
     private string $dateCreated;
 
     #[ORM\ManyToMany(targetEntity: Role::class, mappedBy: 'permissions')]
-    #[ORM\JoinTable(name: 'role_permission')]
-    #[ORM\JoinColumn(name: 'permission_id', referencedColumnName: 'id')]
-    #[ORM\InverseJoinColumn(name: 'role_id', referencedColumnName: 'id')]
     private Collection $roles;
 
     public function __construct()

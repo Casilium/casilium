@@ -474,7 +474,7 @@ class CreateTicketsFromEmail extends Command
      * @return int|null id of created ticket or null if no ticket created
      * @throws Exception
      */
-    private function createTicketFromMessage(array $message, Queue $queue): ?int
+    protected function createTicketFromMessage(array $message, Queue $queue): ?int
     {
         // see if we have an employee in the database matching the email address
         /** @var Contact $contact */
@@ -497,8 +497,11 @@ class CreateTicketsFromEmail extends Command
         // parse date from mail (want as UTC timezone)
         $date = Carbon::parse($message['date'], 'UTC');
 
-        $dueDate         = $date->addDays(2);
-        $responseDueDate = $dueDate->subHours(4);
+        $impact          = Ticket::IMPACT_LOW;
+        $urgency         = Ticket::URGENCY_LOW;
+        $priorityId      = $impact + $urgency;
+        $dueDate         = $date->copy()->addDays(2);
+        $responseDueDate = $dueDate->copy()->subHours(4);
 
         // if we have a sla then we can retrieve date response and resolution is due
         if ($contact->getOrganisation()->getSla() !== null) {
@@ -513,7 +516,7 @@ class CreateTicketsFromEmail extends Command
                 $dueDate,
                 $ticket->getOrganisation()
                     ->getSla()
-                    ->getSlaTarget($ticket->getPriority()->getId())->getResolveTime()
+                    ->getSlaTarget($priorityId)->getResolveTime()
             );
 
             // calculate expected response date
@@ -521,7 +524,7 @@ class CreateTicketsFromEmail extends Command
                 $responseDueDate,
                 $ticket->getOrganisation()
                     ->getSla()
-                    ->getSlaTarget($ticket->getPriority()->getId())->getResolveTime()
+                    ->getSlaTarget($priorityId)->getResolveTime()
             );
         }
 
@@ -532,8 +535,8 @@ class CreateTicketsFromEmail extends Command
             'organisation_id'   => $contact->getOrganisation()->getId(),
             'contact_id'        => $contact->getId(),
             'type_id'           => 1,
-            'impact'            => 3,
-            'urgency'           => 3,
+            'impact'            => $impact,
+            'urgency'           => $urgency,
             'site_id'           => null,
             'queue_id'          => $queue->getId(),
             'short_description' => $message['subject'],

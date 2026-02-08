@@ -3,10 +3,16 @@
  * Authentication database configuration
  * Edit this to your requirements
  */
+
+$dbHost = getenv('DB_HOST') ?: 'localhost';
+$dbName = getenv('DB_NAME') ?: 'YOUR_DBNAME';
+$dbUser = getenv('DB_USER') ?: 'YOUR_USERNAME';
+$dbPassword = getenv('DB_PASSWORD') ?: 'YOUR_PASSWORD';
+
 return [
     'authentication' => [
         'pdo' => [
-            'dsn'   => 'mysql:host=localhost; dbname=YOUR_DBNAME',
+            'dsn'   => sprintf('mysql:host=%s; dbname=%s', $dbHost, $dbName),
             'table' => 'user',
             'field' => [
                 'identity' => 'email',
@@ -14,8 +20,8 @@ return [
 
             ],
             'sql_get_details' => 'SELECT id,status,mfa_enabled FROM user WHERE user.email = :identity',
-            'username' => 'YOUR_USERNAME',
-            'password' => 'YOUR_PASSWORD'
+            'username' => $dbUser,
+            'password' => $dbPassword
         ],
     ],
 ];

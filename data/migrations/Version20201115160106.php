@@ -24,15 +24,15 @@ final class Version20201115160106 extends AbstractMigration
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement'=>true]);
         $table->addColumn('organisation_id', 'integer', ['notnull' => true, 'unsigned' => true]);
         $table->addColumn('site_id', 'integer', ['notnull' => false, 'unsigned' => true]);
-        $table->addColumn('first_name', 'string', ['notnull' => true]);
-        $table->addColumn('middle_name', 'string', ['notnull' => false]);
-        $table->addColumn('last_name', 'string', ['notnull' => true]);
-        $table->addColumn('work_telephone', 'string', ['notnull' => false]);
-        $table->addColumn('work_extension', 'string', ['notnull' => false]);
-        $table->addColumn('mobile_telephone', 'string', ['notnull' => false]);
-        $table->addColumn('home_telephone', 'string', ['notnull' => false]);
-        $table->addColumn('work_email', 'string', ['notnull' => true]);
-        $table->addColumn('other_email', 'string', ['notnull' => false]);
+        $table->addColumn('first_name', 'string', ['notnull' => true, 'length' => 128]);
+        $table->addColumn('middle_name', 'string', ['notnull' => false, 'length' => 128]);
+        $table->addColumn('last_name', 'string', ['notnull' => true, 'length' => 128]);
+        $table->addColumn('work_telephone', 'string', ['notnull' => false, 'length' => 32]);
+        $table->addColumn('work_extension', 'string', ['notnull' => false, 'length' => 16]);
+        $table->addColumn('mobile_telephone', 'string', ['notnull' => false, 'length' => 32]);
+        $table->addColumn('home_telephone', 'string', ['notnull' => false, 'length' => 32]);
+        $table->addColumn('work_email', 'string', ['notnull' => true, 'length' => 191]);
+        $table->addColumn('other_email', 'string', ['notnull' => false, 'length' => 191]);
         $table->addColumn('gender', 'string', ['notnull' => false, 'length' => 1]);
 
         $table->addForeignKeyConstraint('organisation',['organisation_id'], ['id'],

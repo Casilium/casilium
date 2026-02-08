@@ -1,4 +1,4 @@
-FROM php:8.2-apache
+FROM php:8.4-apache-bookworm
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
@@ -9,6 +9,9 @@ RUN apt-get update \
         libcurl4-openssl-dev \
         libxml2-dev \
         libzip-dev \
+        libc-client-dev \
+        libkrb5-dev \
+        libssl-dev \
     && docker-php-ext-install \
         curl \
         intl \
@@ -16,6 +19,8 @@ RUN apt-get update \
         pdo_mysql \
         xml \
         zip \
+    && pecl install imap \
+    && docker-php-ext-enable imap \
     && pecl install apcu \
     && docker-php-ext-enable apcu \
     && a2enmod rewrite \

@@ -84,11 +84,6 @@ class QueueForm extends Form implements InputFilterProviderInterface
                 'id'    => 'ssl',
             ])->setLabelAttributes([
                 'class' => 'form-check-label',
-            ])->setLabelAttributes([
-                'class' => 'form-check-label',
-            ])->setOptions([
-                'checked_value'   => '1',
-                'unchecked_value' => '0',
             ]);
         $this->add($element);
 
@@ -99,9 +94,6 @@ class QueueForm extends Form implements InputFilterProviderInterface
                 'id'    => 'fetch',
             ])->setLabelAttributes([
                 'class' => 'form-check-label',
-            ])->setOptions([
-                'checked_value'   => '1',
-                'unchecked_value' => '0',
             ]);
         $this->add($element);
 

@@ -27,7 +27,7 @@ return [
         'connection' => [
             'orm_default' => [
                 'params' => [
-                    'url' => 'mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}',
+                    'url' => 'pdo-mysql://${DB_USER}:${DB_PASSWORD}@${DB_HOST}/${DB_NAME}',
                 ],
             ],
         ],
@@ -71,10 +71,28 @@ PHP
         MAIL_SMTP_USERNAME="${MAIL_SMTP_USERNAME:-helpdesk@example.com}"
         MAIL_SMTP_PASSWORD="${MAIL_SMTP_PASSWORD:-change_me}"
         MAIL_SMTP_SSL="${MAIL_SMTP_SSL:-}"
+        MAIL_SMTP_VERIFY_PEER="${MAIL_SMTP_VERIFY_PEER:-true}"
+        MAIL_SMTP_VERIFY_PEER_NAME="${MAIL_SMTP_VERIFY_PEER_NAME:-true}"
+        MAIL_SMTP_ALLOW_SELF_SIGNED="${MAIL_SMTP_ALLOW_SELF_SIGNED:-false}"
 
         MAIL_SSL_LINE=""
         if [[ -n "${MAIL_SMTP_SSL}" ]]; then
             MAIL_SSL_LINE="                'ssl'       => '${MAIL_SMTP_SSL}',"
+        fi
+
+        MAIL_VERIFY_PEER_LINE=""
+        if [[ "${MAIL_SMTP_VERIFY_PEER}" == "false" ]]; then
+            MAIL_VERIFY_PEER_LINE="                'verify_peer' => false,"
+        fi
+
+        MAIL_VERIFY_PEER_NAME_LINE=""
+        if [[ "${MAIL_SMTP_VERIFY_PEER_NAME}" == "false" ]]; then
+            MAIL_VERIFY_PEER_NAME_LINE="                'verify_peer_name' => false,"
+        fi
+
+        MAIL_ALLOW_SELF_SIGNED_LINE=""
+        if [[ "${MAIL_SMTP_ALLOW_SELF_SIGNED}" == "true" ]]; then
+            MAIL_ALLOW_SELF_SIGNED_LINE="                'allow_self_signed' => true,"
         fi
 
         cat > config/autoload/mail.local.php <<PHP
@@ -92,6 +110,9 @@ return [
                 'username' => '${MAIL_SMTP_USERNAME}',
                 'password' => '${MAIL_SMTP_PASSWORD}',
 ${MAIL_SSL_LINE}
+${MAIL_VERIFY_PEER_LINE}
+${MAIL_VERIFY_PEER_NAME_LINE}
+${MAIL_ALLOW_SELF_SIGNED_LINE}
             ],
         ],
     ],
