@@ -181,6 +181,61 @@ $barWidths = [
             padding: 0;
             height: 16pt;
         }
+
+        .page-break {
+            page-break-before: always;
+        }
+
+        table.unresolved {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 12pt;
+            font-size: 10pt;
+        }
+
+        table.unresolved th {
+            background-color: #222;
+            color: #fff;
+            padding: 6pt 8pt;
+            text-align: left;
+        }
+
+        table.unresolved td {
+            padding: 6pt 8pt;
+            vertical-align: top;
+            border-bottom: 0;
+        }
+
+        .unresolved-meta {
+            color: #444;
+            font-size: 9pt;
+        }
+
+        .unresolved-desc td {
+            padding-bottom: 6pt;
+        }
+
+        .unresolved-sep td {
+            padding: 0;
+            height: 1px;
+            background-color: #999;
+            font-size: 0;
+            line-height: 0;
+        }
+
+        .footer {
+            position: fixed;
+            bottom: -28pt;
+            right: 0;
+            left: 0;
+            text-align: right;
+            font-size: 9pt;
+            color: #666;
+        }
+
+        .footer:before {
+            content: "Page " counter(page);
+        }
     </style>
 </head>
 <body>
@@ -360,5 +415,82 @@ $barWidths = [
             </tr>
         </tbody>
     </table>
+
+    <?php if (($this->reportConfig['include_unresolved'] ?? false) === true && ! empty($this->unresolved)): ?>
+    <?php
+    $unresolvedFields = $this->reportConfig['unresolved_fields'] ?? [];
+    $fieldCount       = count($unresolvedFields);
+    $groups           = [];
+    foreach ($this->unresolved as $row) {
+        $groupKey            = $row['type'] ?? 'Other';
+        $groups[$groupKey][] = $row;
+    }
+    ?>
+    <div class="page-break"></div>
+    <h2 style="font-size: 14pt; margin: 0 0 8pt 0;">Open Tickets (<?= count($this->unresolved) ?>)</h2>
+    <?php foreach ($groups as $groupLabel => $rows): ?>
+    <h3 style="font-size: 12pt; margin: 12pt 0 6pt 0;"><?= $this->escapeHtml($groupLabel) ?></h3>
+    <p class="unresolved-meta" style="margin: 0 0 6pt 0;">
+        Showing <?= count($this->unresolved) ?> of <?= (int) $stats['totalOutstanding'] ?> open tickets created in the period.
+    </p>
+    <table class="unresolved">
+        <thead>
+            <tr>
+                <?php if (in_array('id', $unresolvedFields, true)): ?>
+                <th>ID</th>
+                <?php endif; ?>
+                <?php if (in_array('created', $unresolvedFields, true)): ?>
+                <th>Created</th>
+                <?php endif; ?>
+                <?php if (in_array('due', $unresolvedFields, true)): ?>
+                <th>Due</th>
+                <?php endif; ?>
+                <?php if (in_array('updated', $unresolvedFields, true)): ?>
+                <th>Last Updated</th>
+                <?php endif; ?>
+                <?php if (in_array('type', $unresolvedFields, true)): ?>
+                <th>Type</th>
+                <?php endif; ?>
+                <?php if (in_array('contact', $unresolvedFields, true)): ?>
+                <th>Contact</th>
+                <?php endif; ?>
+            </tr>
+        </thead>
+        <tbody>
+            <?php foreach ($rows as $row): ?>
+            <tr class="unresolved-desc">
+                <td colspan="<?= $fieldCount ?>" class="unresolved-meta">
+                    <span class="bold"><?= $this->escapeHtml($row['description']) ?></span>
+                </td>
+            </tr>
+            <tr>
+                <?php if (in_array('id', $unresolvedFields, true)): ?>
+                <td class="unresolved-meta"><?= $this->escapeHtml($row['id']) ?></td>
+                <?php endif; ?>
+                <?php if (in_array('created', $unresolvedFields, true)): ?>
+                <td class="unresolved-meta"><?= $this->escapeHtml($row['created']) ?></td>
+                <?php endif; ?>
+                <?php if (in_array('due', $unresolvedFields, true)): ?>
+                <td class="unresolved-meta"><?= $this->escapeHtml($row['due']) ?></td>
+                <?php endif; ?>
+                <?php if (in_array('updated', $unresolvedFields, true)): ?>
+                <td class="unresolved-meta"><?= $this->escapeHtml($row['updated']) ?></td>
+                <?php endif; ?>
+                <?php if (in_array('type', $unresolvedFields, true)): ?>
+                <td class="unresolved-meta"><?= $this->escapeHtml($row['type']) ?></td>
+                <?php endif; ?>
+                <?php if (in_array('contact', $unresolvedFields, true)): ?>
+                <td class="unresolved-meta"><?= $this->escapeHtml($row['contact']) ?></td>
+                <?php endif; ?>
+            </tr>
+            <tr class="unresolved-sep">
+                <td colspan="<?= $fieldCount ?>">&nbsp;</td>
+            </tr>
+            <?php endforeach; ?>
+        </tbody>
+    </table>
+    <?php endforeach; ?>
+    <?php endif; ?>
+    <div class="footer"></div>
 </body>
 </html>

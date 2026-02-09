@@ -69,6 +69,22 @@ interface TicketRepositoryInterface
     public function findUnresolvedTicketCount(): int;
 
     /**
+     * Fetch unresolved tickets for an organisation within a period
+     *
+     * @param int $organisationId Organisation ID to filter
+     * @param CarbonInterface $periodStart Start of period
+     * @param CarbonInterface $periodEnd End of period
+     * @param int $limit Max results
+     * @return array
+     */
+    public function findUnresolvedTicketsByOrganisationAndPeriod(
+        int $organisationId,
+        CarbonInterface $periodStart,
+        CarbonInterface $periodEnd,
+        int $limit
+    ): array;
+
+    /**
      * Find average resolution time in hours
      *
      * @param CarbonInterface|null $periodStart Start of period

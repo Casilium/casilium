@@ -555,6 +555,31 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         return $stats;
     }
 
+    public function findUnresolvedTicketsByOrganisationAndPeriod(
+        int $organisationId,
+        CarbonInterface $periodStart,
+        CarbonInterface $periodEnd,
+        int $limit
+    ): array {
+        $qb = $this->createQueryBuilder('t')
+            ->where('t.organisation = :organisation')
+            ->andWhere('t.status IN (:statuses)')
+            ->andWhere('t.createdAt BETWEEN :start AND :end')
+            ->setParameter('organisation', $organisationId)
+            ->setParameter('statuses', [
+                Ticket::STATUS_NEW,
+                Ticket::STATUS_IN_PROGRESS,
+                Ticket::STATUS_ON_HOLD,
+            ])
+            ->setParameter('start', $periodStart->format('Y-m-d 00:00:00'))
+            ->setParameter('end', $periodEnd->format('Y-m-d 23:59:59'))
+            ->orderBy('t.dueDate', 'ASC');
+
+        return $qb->getQuery()
+            ->setMaxResults($limit)
+            ->getResult();
+    }
+
     private function createResolvedTicketQueryBuilder(
         ?CarbonInterface $periodStart,
         ?CarbonInterface $periodEnd,

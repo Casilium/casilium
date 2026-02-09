@@ -37,6 +37,8 @@ class PdfService
         Organisation $organisation,
         CarbonInterface $startDate,
         CarbonInterface $endDate,
+        array $reportConfig = [],
+        array $unresolvedTickets = [],
     ): string {
         $logoPath         = $this->options['logo_path'] ?? './public/img/casilium-black.svg';
         $resolvedLogoPath = realpath($logoPath);
@@ -51,6 +53,8 @@ class PdfService
             'startDate'    => $startDate,
             'endDate'      => $endDate,
             'logoPath'     => $logoPath,
+            'reportConfig' => $reportConfig,
+            'unresolved'   => $unresolvedTickets,
         ]);
 
         return $this->renderPdf($html);

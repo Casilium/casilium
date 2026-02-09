@@ -24,10 +24,17 @@ class ExecutiveReportHandler implements RequestHandlerInterface
 
     private ReportService $reportService;
 
-    public function __construct(ReportService $reportService, PdfService $pdfService)
+    /** @var array<string, mixed> */
+    private array $reportConfig;
+
+    /**
+     * @param array<string, mixed> $reportConfig
+     */
+    public function __construct(ReportService $reportService, PdfService $pdfService, array $reportConfig = [])
     {
         $this->reportService = $reportService;
         $this->pdfService    = $pdfService;
+        $this->reportConfig  = $reportConfig;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -76,12 +83,20 @@ class ExecutiveReportHandler implements RequestHandlerInterface
         $stats['totalOutstanding'] = $stats['new'] + $stats['progress'] + $stats['hold'];
         $stats['incidentSla']      = $this->reportService->getIncidentSlaComplianceStats();
 
+        $unresolvedTickets = [];
+        if (($this->reportConfig['include_unresolved'] ?? false) === true) {
+            $limit             = (int) ($this->reportConfig['unresolved_limit'] ?? 20);
+            $unresolvedTickets = $this->reportService->getUnresolvedTickets($limit);
+        }
+
         // generate PDF
         $pdfContent = $this->pdfService->generateExecutiveReport(
             $stats,
             $organisation,
             $this->reportService->getStartDate(),
             $this->reportService->getEndDate(),
+            $this->reportConfig,
+            $unresolvedTickets
         );
 
         // build filename

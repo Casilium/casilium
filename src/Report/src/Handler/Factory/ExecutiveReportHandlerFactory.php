@@ -15,6 +15,8 @@ class ExecutiveReportHandlerFactory
     {
         $reportService = $container->get(ReportService::class);
         $pdfService    = $container->get(PdfService::class);
-        return new ExecutiveReportHandler($reportService, $pdfService);
+        $config        = $container->get('config');
+        $reportConfig  = $config['tickets']['reports']['executive'] ?? [];
+        return new ExecutiveReportHandler($reportService, $pdfService, $reportConfig);
     }
 }

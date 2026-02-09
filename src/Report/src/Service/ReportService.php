@@ -14,6 +14,7 @@ use Ticket\Repository\TicketRepository;
 use Ticket\Repository\TicketRepositoryInterface;
 
 use function array_merge;
+use function trim;
 
 class ReportService
 {
@@ -145,6 +146,44 @@ class ReportService
     }
 
     /**
+     * Return unresolved tickets for the report period
+     *
+     * @param int $limit max results
+     * @return array<array<string, string>>
+     */
+    public function getUnresolvedTickets(int $limit): array
+    {
+        $organisationId = $this->getOrganisation()->getId();
+        $tickets        = $this->ticketRepository->findUnresolvedTicketsByOrganisationAndPeriod(
+            $organisationId,
+            $this->getStartDate(),
+            $this->getEndDate(),
+            $limit
+        );
+
+        $rows = [];
+        foreach ($tickets as $ticket) {
+            $contact     = $ticket->getContact();
+            $contactName = '';
+            if (null !== $contact) {
+                $contactName = trim($contact->getFirstName() . ' ' . $contact->getLastName());
+            }
+
+            $rows[] = [
+                'id'          => (string) $ticket->getId(),
+                'created'     => $this->formatReportDate($ticket->getCreatedAt()),
+                'due'         => $this->formatReportDate($ticket->getDueDate()),
+                'updated'     => $this->formatReportDate($ticket->getLastResponseDate()),
+                'type'        => (string) $ticket->getType(),
+                'contact'     => $contactName !== '' ? $contactName : '-',
+                'description' => $ticket->getShortDescription(),
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
      * Return incident SLA compliance stats for the report period
      *
      * @return array{total:int,within:int,rate:float}
@@ -167,6 +206,15 @@ class ReportService
             'within' => $stats['within'],
             'rate'   => $rate,
         ];
+    }
+
+    private function formatReportDate(?string $value): string
+    {
+        if (null === $value || '' === $value) {
+            return '-';
+        }
+
+        return Carbon::parse($value, 'UTC')->format('d M Y');
     }
 
     /**

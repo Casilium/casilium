@@ -16,6 +16,20 @@ return [
             'orientation'    => 'portrait',
             'logo_path'      => './public/img/casilium-black.svg',
         ],
+        'reports'         => [
+            'executive' => [
+                'include_unresolved' => true,
+                'unresolved_limit'   => 20,
+                'unresolved_fields'  => [
+                    'id',
+                    'created',
+                    'due',
+                    'updated',
+                    'type',
+                    'contact',
+                ],
+            ],
+        ],
         'csat'            => [
             'enabled'  => false,
             'base_url' => 'https://example.com/customer-satisfaction',
