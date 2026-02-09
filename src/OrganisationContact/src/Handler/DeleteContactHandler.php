@@ -49,6 +49,18 @@ class DeleteContactHandler implements RequestHandlerInterface
 
         $confirm = (bool) $request->getAttribute('confirm');
         if (true === $confirm) {
+            if (! $this->contactService->canDeleteContact($contact)) {
+                $this->contactService->deactivateContact($contact);
+                $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
+                $flashMessages->flash(
+                    'error',
+                    'Contact cannot be deleted because it is linked to tickets. It has been deactivated instead.'
+                );
+                return new RedirectResponse($this->urlHelper->generate('contact.list', [
+                    'id' => $contact->getOrganisation()->getUuid(),
+                ]));
+            }
+
             $this->contactService->deleteContact($contact);
             $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
             $flashMessages->flash('info', 'Contact has been deleted');
