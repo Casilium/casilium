@@ -20,14 +20,17 @@ trim = true
 [git]
 conventional_commits = true
 filter_unconventional = true
+commit_preprocessors = [
+  { pattern = "^\\s+", replace = "" },
+]
 commit_parsers = [
-  { message = "^feat", group = "Added" },
-  { message = "^fix", group = "Fixed" },
-  { message = "^docs", group = "Docs" },
-  { message = "^refactor", group = "Changed" },
-  { message = "^style", group = "Changed" },
-  { message = "^test", group = "Changed" },
-  { message = "^chore", group = "Changed" },
+  { message = "(?i)^\\s*feat", group = "Added" },
+  { message = "(?i)^\\s*fix", group = "Fixed" },
+  { message = "(?i)^\\s*docs", group = "Docs" },
+  { message = "(?i)^\\s*refactor", group = "Changed" },
+  { message = "(?i)^\\s*style", group = "Changed" },
+  { message = "(?i)^\\s*test", group = "Changed" },
+  { message = "(?i)^\\s*chore", group = "Changed" },
 ]
 tag_pattern = "v[0-9].*"
 sort_commits = "newest"
