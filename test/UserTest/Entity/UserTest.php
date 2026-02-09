@@ -7,6 +7,7 @@ namespace UserTest\Entity;
 use PHPUnit\Framework\TestCase;
 use User\Entity\Role;
 use User\Entity\User;
+use UserAuthentication\Entity\IdentityInterface;
 
 class UserTest extends TestCase
 {
@@ -177,5 +178,69 @@ class UserTest extends TestCase
         $this->user->addRole($role2);
 
         $this->assertEquals('Admin,User', $this->user->getRolesAsString());
+    }
+
+    public function testImplementsIdentityInterface(): void
+    {
+        $this->assertInstanceOf(IdentityInterface::class, $this->user);
+    }
+
+    public function testSetIdReturnsIdentityInterface(): void
+    {
+        $result = $this->user->setId(123);
+        $this->assertInstanceOf(IdentityInterface::class, $result);
+    }
+
+    public function testSetEmailReturnsIdentityInterface(): void
+    {
+        $result = $this->user->setEmail('test@example.com');
+        $this->assertInstanceOf(IdentityInterface::class, $result);
+    }
+
+    public function testGetNameReturnsFullName(): void
+    {
+        $this->user->setFullName('John Doe');
+        $this->assertEquals('John Doe', $this->user->getName());
+    }
+
+    public function testSetNameSetsFullName(): void
+    {
+        $result = $this->user->setName('Jane Doe');
+
+        $this->assertInstanceOf(IdentityInterface::class, $result);
+        $this->assertEquals('Jane Doe', $this->user->getFullName());
+        $this->assertEquals('Jane Doe', $this->user->getName());
+    }
+
+    public function testSetRolesReturnsIdentityInterface(): void
+    {
+        $result = $this->user->setRoles('admin,user');
+        $this->assertInstanceOf(IdentityInterface::class, $result);
+    }
+
+    public function testHasRoleReturnsTrueWhenRoleExists(): void
+    {
+        $role = $this->createMock(Role::class);
+        $role->method('getName')->willReturn('Administrator');
+
+        $this->user->addRole($role);
+
+        $this->assertTrue($this->user->hasRole('Administrator'));
+        $this->assertTrue($this->user->hasRole('administrator')); // case insensitive
+    }
+
+    public function testHasRoleReturnsFalseWhenRoleDoesNotExist(): void
+    {
+        $role = $this->createMock(Role::class);
+        $role->method('getName')->willReturn('User');
+
+        $this->user->addRole($role);
+
+        $this->assertFalse($this->user->hasRole('Administrator'));
+    }
+
+    public function testHasRoleReturnsFalseWhenNoRoles(): void
+    {
+        $this->assertFalse($this->user->hasRole('Administrator'));
     }
 }

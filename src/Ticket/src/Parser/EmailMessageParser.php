@@ -24,6 +24,7 @@ class EmailMessageParser
      */
     public static function sanitiseBody(string $body): string
     {
+        $body = self::stripStyles($body);
         $body = strip_tags($body);
         $body = self::stripImages($body);
         $body = self::sanitiseLineBreaks($body);
@@ -76,6 +77,23 @@ class EmailMessageParser
     {
         $body = preg_replace('/<img\b[^>]*\bsrc\s*=\s*[\'"]cid[^>]*>/im', '', $body) ?? $body;
         $body = preg_replace('/\[cid:.*]/im', '', $body) ?? $body;
+        return $body;
+    }
+
+    /**
+     * Remove <style> and <script> blocks entirely
+     */
+    private static function stripStyles(string $body): string
+    {
+        $patterns = [
+            '/<style\b[^>]*>.*?<\/style>/is',
+            '/<script\b[^>]*>.*?<\/script>/is',
+        ];
+
+        foreach ($patterns as $pattern) {
+            $body = preg_replace($pattern, '', $body) ?? $body;
+        }
+
         return $body;
     }
 }

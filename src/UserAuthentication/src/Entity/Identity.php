@@ -26,7 +26,7 @@ class Identity implements IdentityInterface
         return $this->id;
     }
 
-    public function setId(int $id): Identity
+    public function setId(int $id): IdentityInterface
     {
         $this->id = $id;
         return $this;
@@ -37,7 +37,7 @@ class Identity implements IdentityInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): Identity
+    public function setEmail(string $email): IdentityInterface
     {
         $this->email = $email;
         return $this;
@@ -48,13 +48,13 @@ class Identity implements IdentityInterface
         return $this->name;
     }
 
-    public function setName(string $name): Identity
+    public function setName(string $name): IdentityInterface
     {
         $this->name = $name;
         return $this;
     }
 
-    public function setRoles(string $roles): Identity
+    public function setRoles(string $roles): IdentityInterface
     {
         $this->roles = explode(',', $roles);
         return $this;

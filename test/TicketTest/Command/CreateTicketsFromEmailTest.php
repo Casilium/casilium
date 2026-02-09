@@ -12,7 +12,6 @@ use Monolog\Logger;
 use Organisation\Entity\Organisation;
 use OrganisationContact\Entity\Contact;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use ServiceLevel\Entity\BusinessHours;
 use ServiceLevel\Entity\Sla;
 use ServiceLevel\Entity\SlaTarget;
@@ -34,7 +33,12 @@ final class CreateTicketsFromEmailTest extends TestCase
             'mail'       => ['sender' => 'helpdesk@example.com'],
         ];
 
-        $command = new CreateTicketsFromEmail($entityManager, $ticketService, $logger, $config);
+        $command = new class ($entityManager, $ticketService, $logger, $config) extends CreateTicketsFromEmail {
+            public function callCreateTicketFromMessage(array $message, Queue $queue): ?int
+            {
+                return $this->createTicketFromMessage($message, $queue);
+            }
+        };
 
         $contactRepo = $this->getMockBuilder(EntityRepository::class)
             ->disableOriginalConstructor()
@@ -102,16 +106,8 @@ final class CreateTicketsFromEmailTest extends TestCase
             'body'    => 'Email body',
         ];
 
-        $result = $this->invokeCreateTicketFromMessage($command, $message, $queue);
+        $result = $command->callCreateTicketFromMessage($message, $queue);
 
         $this->assertSame(321, $result);
-    }
-
-    private function invokeCreateTicketFromMessage(CreateTicketsFromEmail $command, array $message, Queue $queue): ?int
-    {
-        $refMethod = (new ReflectionClass(CreateTicketsFromEmail::class))->getMethod('createTicketFromMessage');
-        $refMethod->setAccessible(true);
-
-        return $refMethod->invoke($command, $message, $queue);
     }
 }
