@@ -226,21 +226,21 @@ foreach ($agentStats as $agent) {
             </div>
         </div>
     </div>
+    </div>
 </div>
 <?php $this->inlineScript()->captureStart(); ?>
-<script>
     (function () {
         var labels = <?= json_encode($chartData['names']) ?>;
         if (!labels.length) {
             return;
         }
 
-        var ctx = document.getElementById('agentPerformanceChart');
-        if (!ctx) {
+        var canvas = document.getElementById('agentPerformanceChart');
+        if (!canvas) {
             return;
         }
 
-        new Chart(ctx.getContext('2d'), {
+        new Chart(canvas.getContext('2d'), {
             type: 'bar',
             data: {
                 labels: labels,
@@ -282,6 +282,5 @@ foreach ($agentStats as $agent) {
             }
         });
     })();
-</script>
 <?php
 $this->inlineScript()->captureEnd();
