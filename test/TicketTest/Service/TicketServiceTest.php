@@ -25,12 +25,15 @@ use Ticket\Entity\Priority;
 use Ticket\Entity\Queue;
 use Ticket\Entity\Status;
 use Ticket\Entity\Ticket;
+use Ticket\Entity\TicketResponse;
 use Ticket\Entity\Type;
 use Ticket\Repository\TicketRepository;
 use Ticket\Service\QueueManager;
 use Ticket\Service\TicketService;
 use User\Entity\User;
 use User\Service\UserManager;
+
+use function str_contains;
 
 class TicketServiceTest extends TestCase
 {
@@ -445,20 +448,63 @@ class TicketServiceTest extends TestCase
         $agent1->method('getEmail')->willReturn('agent1@example.com');
         $agent2->method('getEmail')->willReturn('agent2@example.com');
 
+        $this->mailService->prepareBody(
+            'ticket_mail::ticket_created_notification',
+            Argument::type('array')
+        )->willReturn('<html>created</html>');
+
         $this->mailService->send(
             'agent1@example.com',
-            'New ticket notification',
-            'A new ticket has been created, ticket #456'
-        )
-            ->shouldBeCalled();
+            Argument::that(fn (string $subject): bool => str_contains($subject, 'New ticket #456 created')),
+            '<html>created</html>'
+        )->shouldBeCalled();
         $this->mailService->send(
             'agent2@example.com',
-            'New ticket notification',
-            'A new ticket has been created, ticket #456'
-        )
-            ->shouldBeCalled();
+            Argument::that(fn (string $subject): bool => str_contains($subject, 'New ticket #456 created')),
+            '<html>created</html>'
+        )->shouldBeCalled();
 
         $this->ticketService->newTicketNotification($ticket);
+    }
+
+    public function testNewTicketReplyNotificationIncludesDetails(): void
+    {
+        $this->mailService->isEnabled()->willReturn(true);
+
+        $ticket   = $this->createMock(Ticket::class);
+        $queue    = $this->createMock(Queue::class);
+        $member   = $this->createMock(Agent::class);
+        $response = $this->createMock(TicketResponse::class);
+        $contact  = $this->createMock(Contact::class);
+
+        $ticket->method('getId')->willReturn(789);
+        $ticket->method('getShortDescription')->willReturn('Printer issue');
+        $ticket->method('getUuid')->willReturn('uuid-123');
+        $ticket->method('getQueue')->willReturn($queue);
+
+        $queue->method('getName')->willReturn('Support');
+        $queue->method('getMembers')->willReturn(new ArrayCollection([$member]));
+        $member->method('getEmail')->willReturn('agent@example.com');
+
+        $response->method('getAgent')->willReturn(null);
+        $response->method('getContact')->willReturn($contact);
+        $contact->method('getFirstName')->willReturn('Jane');
+        $contact->method('getLastName')->willReturn('Doe');
+        $contact->method('getWorkEmail')->willReturn('jane@example.com');
+        $response->method('getResponse')->willReturn('Hello there, here is an update.');
+
+        $this->mailService->prepareBody(
+            'ticket_mail::ticket_reply_notification',
+            Argument::type('array')
+        )->willReturn('<html>reply</html>');
+
+        $this->mailService->send(
+            'agent@example.com',
+            Argument::that(fn (string $subject): bool => str_contains($subject, 'Ticket #789 updated by Jane Doe')),
+            '<html>reply</html>'
+        )->shouldBeCalled();
+
+        $this->ticketService->newTicketReplyNotification($ticket, $response);
     }
 
     public function testNewTicketNotificationSkippedWhenMailDisabled(): void

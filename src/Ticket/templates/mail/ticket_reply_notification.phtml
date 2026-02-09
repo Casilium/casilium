@@ -1,0 +1,23 @@
+<?php
+/** @var \Ticket\Entity\Ticket $ticket */
+/** @var \Ticket\Entity\TicketResponse $response */
+/** @var \Ticket\Service\TicketService $this */
+/** @var string $author */
+?>
+<p>
+    Ticket #<?= $this->escapeHtml($ticket->getId()) ?>
+    (<?= $this->escapeHtml($ticket->getShortDescription() ?? 'No subject') ?>)
+    received a new reply from <?= $this->escapeHtml($author) ?>.
+</p>
+<p><strong>Latest reply:</strong></p>
+<p><?= nl2br($this->escapeHtml($response->getResponse() ?? '[No message]')) ?></p>
+<?php if ($ticket->getUuid() !== null): ?>
+<p>Tracking ID: <?= $this->escapeHtml($ticket->getUuid()) ?></p>
+<?php endif; ?>
+<?php if (($this->app_url ?? null) !== null): ?>
+<p>
+    <a href="<?= $this->escapeHtml($this->app_url) ?>/ticket/<?= $this->escapeHtml($ticket->getUuid() ?? $ticket->getId()) ?>">
+        View ticket
+    </a>
+</p>
+<?php endif; ?>
