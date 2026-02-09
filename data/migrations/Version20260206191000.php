@@ -16,6 +16,14 @@ final class Version20260206191000 extends AbstractMigration
 
     public function up(Schema $schema): void
     {
+        // Only seed defaults when both tables are empty (fresh install).
+        $hasBusinessHours = (bool) $this->connection->fetchOne('SELECT 1 FROM business_hours LIMIT 1');
+        $hasSla           = (bool) $this->connection->fetchOne('SELECT 1 FROM sla LIMIT 1');
+
+        if ($hasBusinessHours || $hasSla) {
+            return;
+        }
+
         // Default business hours: Mon-Fri 09:00-17:00, UTC
         $this->addSql(
             "INSERT INTO business_hours
