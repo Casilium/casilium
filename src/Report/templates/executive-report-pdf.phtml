@@ -26,6 +26,16 @@ $barWidths = [
     'requestCreated'   => round(($stats['totalRequest'] / $requestMax) * 100),
     'requestComplete'  => round(($stats['totalRequestComplete'] / $requestMax) * 100),
 ];
+
+$incidentCompleteRate = $stats['totalIncident'] > 0
+    ? ($stats['totalIncidentComplete'] / $stats['totalIncident']) * 100
+    : 0;
+$requestCompleteRate = $stats['totalRequest'] > 0
+    ? ($stats['totalRequestComplete'] / $stats['totalRequest']) * 100
+    : 0;
+
+$incidentCompleteRateDisplay = rtrim(rtrim(number_format($incidentCompleteRate, 1), '0'), '.');
+$requestCompleteRateDisplay  = rtrim(rtrim(number_format($requestCompleteRate, 1), '0'), '.');
 ?>
 <!DOCTYPE html>
 <html>
@@ -282,7 +292,7 @@ $barWidths = [
                 <p class="bold">Incident SLA Compliance:</p>
                 <?php if ($stats['incidentSla']['total'] > 0): ?>
                 <p>
-                    <?= number_format($stats['incidentSla']['rate'], 1) ?>%
+                    <?= rtrim(rtrim(number_format($stats['incidentSla']['rate'], 1), '0'), '.') ?>%
                     (<?= (int) $stats['incidentSla']['within'] ?> of <?= (int) $stats['incidentSla']['total'] ?>
                     incidents met SLA).
                 </p>
@@ -302,7 +312,9 @@ $barWidths = [
                     </tr>
                 </table>
 
-                <div class="chart-group-label">Incidents (<?= (int) $stats['totalIncident'] ?>)</div>
+                <div class="chart-group-label">
+                    Incidents (<?= (int) $stats['totalIncident'] ?>) - <?= $incidentCompleteRateDisplay ?>% complete
+                </div>
                 <table class="bars">
                     <tr>
                         <td class="bar-label">Created</td>
@@ -334,7 +346,9 @@ $barWidths = [
                     </tr>
                 </table>
 
-                <div class="chart-group-label">Requests (<?= (int) $stats['totalRequest'] ?>)</div>
+                <div class="chart-group-label">
+                    Requests (<?= (int) $stats['totalRequest'] ?>) - <?= $requestCompleteRateDisplay ?>% complete
+                </div>
                 <table class="bars">
                     <tr>
                         <td class="bar-label">Created</td>
