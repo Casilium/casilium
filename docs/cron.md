@@ -20,3 +20,8 @@ This project relies on scheduled console commands for background tasks. Configur
 ```
 
 Adjust timing, cadence, and paths for your environment.
+
+> **Note:** Commands that send or ingest email (`ticket:create-from-mail`,
+> `ticket:notifications`, `ticket:overdue-digest`) automatically skip execution
+> when the `mail.enabled` flag (or `MAIL_ENABLED` env var in Docker) is set to
+> `false`, which is useful for development environments without SMTP/IMAP.

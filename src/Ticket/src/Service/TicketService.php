@@ -397,6 +397,10 @@ class TicketService
 
     public function sendNotificationEmail(Ticket $ticket, int $target, int $period = self::DUE_PERIOD_MINUTES): bool
     {
+        if (! $this->mailService->isEnabled()) {
+            return false;
+        }
+
         $now            = Carbon::now('UTC');
         $due            = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate(), 'UTC');
         $lastNotifiedAt = $ticket->getLastNotified() ?? $ticket->getCreatedAt();
@@ -465,6 +469,10 @@ class TicketService
 
     public function sendOverdueNotificationEmail(Ticket $ticket): bool
     {
+        if (! $this->mailService->isEnabled()) {
+            return false;
+        }
+
         $overdueTime = $this->calculateOverdueTime($ticket);
         $priorityTag = $this->getPriorityPrefix($ticket);
 
@@ -629,6 +637,10 @@ class TicketService
 
     public function newTicketReplyNotification(Ticket $ticket): void
     {
+        if (! $this->mailService->isEnabled()) {
+            return;
+        }
+
         $agents = $ticket->getQueue()->getMembers();
 
         $body = sprintf('A new reply has been posted to ticket #%s', $ticket->getId());
@@ -641,6 +653,10 @@ class TicketService
 
     public function newTicketNotification(Ticket $ticket): void
     {
+        if (! $this->mailService->isEnabled()) {
+            return;
+        }
+
         $agents = $ticket->getQueue()->getMembers();
 
         $body = sprintf('A new ticket has been created, ticket #%s', $ticket->getId());

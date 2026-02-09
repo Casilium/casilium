@@ -108,4 +108,30 @@ final class MailServiceTest extends TestCase
 
         $this->assertTrue($logger->hasErrorRecords());
     }
+
+    public function testSendIsSkippedWhenMailDisabled(): void
+    {
+        $config = [
+            'sender'       => 'helpdesk@example.com',
+            'enabled'      => false,
+            'smtp_options' => [],
+        ];
+        $logger = new TestLogger();
+
+        $service = new class ($this->renderer, $config, $logger) extends MailService {
+            public function setMailer(MailerInterface $mailer): void
+            {
+                $this->mailer = $mailer;
+            }
+        };
+
+        $mailer = $this->createMock(MailerInterface::class);
+        $mailer->expects($this->never())->method('send');
+
+        $service->setMailer($mailer);
+
+        $service->send('user@example.com', 'Subject', 'Body');
+
+        $this->assertTrue($logger->hasInfoRecords());
+    }
 }

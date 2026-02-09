@@ -81,6 +81,8 @@ class CreateTicketsFromEmail extends Command
     /** @var resource */
     private $lockFile;
 
+    private bool $mailEnabled;
+
     public function __construct(
         EntityManagerInterface $entityManager,
         TicketService $ticketService,
@@ -91,6 +93,7 @@ class CreateTicketsFromEmail extends Command
         $this->ticketService = $ticketService;
         $this->logger        = $logger;
         $this->config        = $config;
+        $this->mailEnabled   = (bool) ($this->config['mail']['enabled'] ?? true);
 
         // we need the encryption key to decrypt the mailbox password
         if (! array_key_exists('encryption', $this->config) || ! isset($this->config['encryption']['key'])) {
@@ -187,6 +190,12 @@ class CreateTicketsFromEmail extends Command
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
+            if (! $this->mailEnabled) {
+                $output->writeln('<comment>Mail service disabled; skipping mailbox import</comment>');
+                $this->logger->info('Mail service disabled; skipping mailbox import');
+                return Command::SUCCESS;
+            }
+
             $this->lock();
 
             $output->writeln('<info>Importing messages from email</info>');

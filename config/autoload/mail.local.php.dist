@@ -5,7 +5,7 @@ declare(strict_types=1);
 return [
 // SMTP transport options for sending mail out
     'mail' => [
-        // is mail service enabled?
+        // is mail service enabled? (set to false to skip sending mail/cron imports)
         'enabled'      => true,
         // sender email address
         'sender'       => 'helpdesk@example.com',

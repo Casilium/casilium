@@ -357,6 +357,8 @@ class TicketServiceTest extends TestCase
 
     public function testSendNotificationEmailWithinThreshold(): void
     {
+        $this->mailService->isEnabled()->willReturn(true);
+
         $ticket       = $this->createMock(Ticket::class);
         $contact      = $this->createMock(Contact::class);
         $organisation = $this->createMock(Organisation::class);
@@ -414,8 +416,23 @@ class TicketServiceTest extends TestCase
         $this->ticketService->sendNotificationEmail($ticket, 30, TicketService::DUE_PERIOD_MINUTES);
     }
 
+    public function testSendNotificationEmailReturnsFalseWhenMailDisabled(): void
+    {
+        $ticket = $this->createMock(Ticket::class);
+
+        $this->mailService->isEnabled()->shouldBeCalled()->willReturn(false);
+        $this->mailService->prepareBody(Argument::cetera())->shouldNotBeCalled();
+        $this->mailService->send(Argument::cetera())->shouldNotBeCalled();
+
+        $result = $this->ticketService->sendNotificationEmail($ticket, 30, TicketService::DUE_PERIOD_MINUTES);
+
+        $this->assertFalse($result);
+    }
+
     public function testNewTicketNotificationSendsEmailToQueueMembers(): void
     {
+        $this->mailService->isEnabled()->willReturn(true);
+
         $ticket = $this->createMock(Ticket::class);
         $queue  = $this->createMock(Queue::class);
         $agent1 = $this->createMock(Agent::class);
@@ -440,6 +457,16 @@ class TicketServiceTest extends TestCase
             'A new ticket has been created, ticket #456'
         )
             ->shouldBeCalled();
+
+        $this->ticketService->newTicketNotification($ticket);
+    }
+
+    public function testNewTicketNotificationSkippedWhenMailDisabled(): void
+    {
+        $ticket = $this->createMock(Ticket::class);
+
+        $this->mailService->isEnabled()->shouldBeCalled()->willReturn(false);
+        $this->mailService->send(Argument::cetera())->shouldNotBeCalled();
 
         $this->ticketService->newTicketNotification($ticket);
     }
@@ -480,6 +507,8 @@ class TicketServiceTest extends TestCase
      */
     public function testSendNotificationEmailWithDifferentPeriods(int $period, string $method): void
     {
+        $this->mailService->isEnabled()->willReturn(true);
+
         $ticket       = $this->createMock(Ticket::class);
         $contact      = $this->createMock(Contact::class);
         $organisation = $this->createMock(Organisation::class);

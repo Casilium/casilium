@@ -25,6 +25,7 @@ class MailService
     protected ?LoggerInterface $logger = null;
     protected ?MailerInterface $mailer = null;
     protected string $mailFrom;
+    protected bool $enabled;
 
     public function __construct(TemplateRendererInterface $renderer, array $options, ?LoggerInterface $logger = null)
     {
@@ -32,6 +33,12 @@ class MailService
         $this->options  = $options;
         $this->mailFrom = $options['sender'];
         $this->logger   = $logger;
+        $this->enabled  = (bool) ($options['enabled'] ?? true);
+    }
+
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
     }
 
     /**
@@ -54,6 +61,11 @@ class MailService
      */
     public function send(string $to, string $subject, string $body): void
     {
+        if (! $this->enabled) {
+            $this->logMailDisabled($subject, $to);
+            return;
+        }
+
         $email = (new Email())
             ->from($this->mailFrom)
             ->to($to)
@@ -73,6 +85,11 @@ class MailService
         string $attachmentPath,
         ?string $attachmentName = null
     ): void {
+        if (! $this->enabled) {
+            $this->logMailDisabled($subject, $to);
+            return;
+        }
+
         $email = (new Email())
             ->from($this->mailFrom)
             ->to($to)
@@ -85,6 +102,10 @@ class MailService
 
     protected function sendEmail(Email $email): void
     {
+        if (! $this->enabled) {
+            return;
+        }
+
         try {
             $this->getMailer()->send($email);
         } catch (TransportExceptionInterface $e) {
@@ -93,6 +114,25 @@ class MailService
                 throw $e;
             }
         }
+    }
+
+    protected function logMailDisabled(string $subject, ?string $recipient = null): void
+    {
+        $message = sprintf(
+            'Mail delivery disabled; skipped "%s"%s',
+            $subject,
+            $recipient ? sprintf(' (recipient: %s)', $recipient) : ''
+        );
+
+        if ($this->logger !== null) {
+            $this->logger->info($message, [
+                'subject'   => $subject,
+                'recipient' => $recipient,
+            ]);
+            return;
+        }
+
+        error_log($message);
     }
 
     protected function getMailer(): MailerInterface

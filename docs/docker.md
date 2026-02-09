@@ -16,6 +16,11 @@ The Docker entrypoint creates `config/autoload/local.php` and
 `config/autoload/auth.local.php` automatically if they do not exist, using
 values from `docker-compose.yml`.
 
+Set `MAIL_ENABLED=false` in `docker-compose.yml` (or the environment) to disable
+all outbound/inbound mail handling. When disabled, the application will skip
+sending ticket notifications, cron-driven digests, and the mailbox import
+command so you can run containers without working SMTP/IMAP credentials.
+
 If `ADMIN_EMAIL` and `ADMIN_NAME` are set, the entrypoint creates an admin
 account only when the user table is empty. If `ADMIN_PASSWORD` is not provided,
 it is generated and printed once to container logs on first run.

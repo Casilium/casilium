@@ -38,6 +38,13 @@ matter (e.g. facilities, HR, operations, or managed service teams).
 - Usage: `docs/usage.md`
 - Cron jobs: `docs/cron.md`
 
+## Mail Settings
+
+All outbound and inbound email behavior is controlled by the `mail.enabled` flag
+(`MAIL_ENABLED` environment variable in Docker). When disabled, cron-based
+commands, ticket notifications, and mailbox imports safely no-op so you can run
+Casilium without connecting it to SMTP/IMAP during development.
+
 ## Quick Start (Docker)
 
 ```bash

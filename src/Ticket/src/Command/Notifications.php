@@ -59,6 +59,12 @@ class Notifications extends Command
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
+            if (! $this->mailService->isEnabled()) {
+                $output->writeln('<comment>Mail service disabled; skipping ticket notifications</comment>');
+                $this->logger->info('Mail service disabled; skipping ticket notifications');
+                return Command::SUCCESS;
+            }
+
             $target         = (int) $input->getArgument('target');
             $periodArgument = strtolower($input->getArgument('period'));
 
