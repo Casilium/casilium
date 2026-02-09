@@ -58,6 +58,9 @@ class Contact
     #[ORM\Column(name: 'gender', type: 'string', length: 1)]
     private ?string $gender = null;
 
+    #[ORM\Column(name: 'is_active', type: 'boolean', options: ['default' => true])]
+    private bool $isActive = true;
+
     public function getId(): int
     {
         return $this->id;
@@ -201,6 +204,17 @@ class Contact
         return $this;
     }
 
+    public function isActive(): bool
+    {
+        return $this->isActive;
+    }
+
+    public function setIsActive(bool $isActive): Contact
+    {
+        $this->isActive = $isActive;
+        return $this;
+    }
+
     /**
      * @return array
      */
@@ -227,6 +241,7 @@ class Contact
         $this->workEmail       = $data['work_email'] ?? '';
         $this->otherEmail      = $data['other_email'] ?? '';
         $this->gender          = $data['gender'] ?? null;
+        $this->isActive        = (bool) ($data['is_active'] ?? true);
         return $this;
     }
 }

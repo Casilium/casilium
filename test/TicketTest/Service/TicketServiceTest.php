@@ -129,7 +129,7 @@ class TicketServiceTest extends TestCase
         $id       = 101;
         $contacts = [$this->createMock(Contact::class)];
 
-        $this->contactService->fetchContactsByOrganisationId($id)
+        $this->contactService->fetchContactsByOrganisationId($id, true)
             ->willReturn($contacts);
 
         $result = $this->ticketService->getContactsByOrganisationId($id);

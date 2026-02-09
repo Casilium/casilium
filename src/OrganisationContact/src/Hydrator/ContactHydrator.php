@@ -39,6 +39,7 @@ class ContactHydrator implements HydratorInterface
             'work_email'       => $object->getWorkEmail(),
             'other_email'      => $object->getOtherEmail(),
             'gender'           => $object->getGender(),
+            'is_active'        => $object->isActive(),
         ];
     }
 
@@ -104,6 +105,10 @@ class ContactHydrator implements HydratorInterface
 
         if ($this->propertyExists('gender', $data)) {
             $object->setGender($data['gender']);
+        }
+
+        if (array_key_exists('is_active', $data)) {
+            $object->setIsActive((bool) $data['is_active']);
         }
 
         return $object;

@@ -201,6 +201,7 @@ class OrganisationManager
             ->select('o.id as value, o.name as text')
             ->from(Organisation::class, 'o')
             ->where('o.name LIKE :name')
+            ->andWhere('o.isActive = true')
             ->orderBy('o.name')
             ->setParameter('name', $name . '%')
             ->getQuery()

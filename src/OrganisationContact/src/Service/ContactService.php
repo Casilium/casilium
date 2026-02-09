@@ -50,10 +50,10 @@ class ContactService
     /**
      * Fetch contacts for an organisation
      */
-    public function fetchContactsByOrganisationId(int $id): ?array
+    public function fetchContactsByOrganisationId(int $id, bool $activeOnly = false): ?array
     {
         return $this->entityManager->getRepository(Contact::class)
-            ->findByCorporationId($id);
+            ->findByCorporationId($id, $activeOnly);
     }
 
     /**

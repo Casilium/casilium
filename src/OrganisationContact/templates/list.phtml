@@ -35,11 +35,12 @@
             </thead>
             <tbody>
             <?php foreach ($contacts as $contact): ?>
-                <tr>
+                <tr<?php if (! $contact->isActive()): ?> class="text-muted"<?php endif ?>>
                     <td>
                         <a href="<?= $this->url('contact.view', [
                             'id' => $organisation->getUuid(),
-                            'contact_id' => $contact->getId()]) ?>">
+                            'contact_id' => $contact->getId()]) ?>"
+                            <?php if (! $contact->isActive()): ?> class="text-muted"<?php endif ?>>
                             <?= $this->escapeHtml($contact->getFirstName()) ?>
                             <?= $this->escapeHtml($contact->getLastName()) ?>
                         </a>

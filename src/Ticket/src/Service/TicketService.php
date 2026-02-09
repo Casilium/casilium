@@ -117,7 +117,7 @@ class TicketService
      */
     public function getContactsByOrganisationId(int $id): array
     {
-        return $this->contactManager->fetchContactsByOrganisationId($id);
+        return $this->contactManager->fetchContactsByOrganisationId($id, true);
     }
 
     /**

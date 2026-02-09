@@ -178,6 +178,21 @@ class ContactForm extends Form implements InputFilterProviderInterface
             ],
         ]);
 
+        // is active
+        $this->add([
+            'type'       => 'checkbox',
+            'name'       => 'is_active',
+            'attributes' => [
+                'id' => 'isActive',
+            ],
+            'options'    => [
+                'label'              => 'Active',
+                'use_hidden_element' => true,
+                'checked_value'      => '1',
+                'unchecked_value'    => '0',
+            ],
+        ]);
+
         // submit
         $this->add([
             'name'       => 'submit',
@@ -352,6 +367,13 @@ class ContactForm extends Form implements InputFilterProviderInterface
                     [
                         'name' => Validator\EmailAddress::class,
                     ],
+                ],
+            ],
+            [
+                'name'     => 'is_active',
+                'required' => false,
+                'filters'  => [
+                    ['name' => Filter\ToInt::class],
                 ],
             ],
         ];
