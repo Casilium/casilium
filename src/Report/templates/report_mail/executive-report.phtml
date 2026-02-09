@@ -1,0 +1,24 @@
+<?php
+
+declare(strict_types=1);
+
+use Carbon\CarbonInterface;
+use Organisation\Entity\Organisation;
+
+/** @var Organisation $this->organisation */
+/** @var CarbonInterface $this->startDate */
+/** @var CarbonInterface $this->endDate */
+
+$period = $this->startDate->format('F Y');
+if ($this->startDate->format('m') !== $this->endDate->format('m')) {
+    $period = sprintf('%s to %s', $this->startDate->format('F Y'), $this->endDate->format('F Y'));
+}
+?>
+<p>Hello,</p>
+
+<p>
+    Please find attached the Executive Summary Report for
+    <?= $this->escapeHtml($this->organisation->getName()) ?> (<?= $this->escapeHtml($period) ?>).
+</p>
+
+<p>Regards,</p>

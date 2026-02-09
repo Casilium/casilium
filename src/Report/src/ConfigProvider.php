@@ -25,6 +25,7 @@ class ConfigProvider
             'dependencies'  => $this->getDependencies(),
             'templates'     => $this->getTemplates(),
             'access_filter' => $this->getAccessFilter(),
+            'console'       => $this->getConsoleCommands(),
         ];
     }
 
@@ -40,6 +41,7 @@ class ConfigProvider
                 ],
             ],
             'factories'  => [
+                Command\ExecutiveReportSend::class    => Command\Factory\ExecutiveReportSendFactory::class,
                 Handler\ExecutiveReportHandler::class => Handler\Factory\ExecutiveReportHandlerFactory::class,
                 Service\PdfService::class             => Service\Factory\PdfServiceFactory::class,
                 Service\ReportService::class          => Service\Factory\ReportServiceFactory::class,
@@ -54,7 +56,8 @@ class ConfigProvider
     {
         return [
             'paths' => [
-                'report' => [__DIR__ . '/../templates/'],
+                'report'      => [__DIR__ . '/../templates/'],
+                'report_mail' => [__DIR__ . '/../templates/report_mail/'],
             ],
         ];
     }
@@ -69,6 +72,15 @@ class ConfigProvider
                 'report' => [
                     ['allow' => '@'],
                 ],
+            ],
+        ];
+    }
+
+    public function getConsoleCommands(): array
+    {
+        return [
+            'commands' => [
+                Command\ExecutiveReportSend::class,
             ],
         ];
     }

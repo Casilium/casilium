@@ -146,6 +146,47 @@ class ReportService
     }
 
     /**
+     * Build executive report stats for the configured organisation and period
+     *
+     * @return array<string, int|float|array>
+     */
+    public function buildExecutiveStats(): array
+    {
+        $stats = [
+            'totalIncident'    => $this->getTotalTicketCount(['type' => Type::TYPE_INCIDENT]),
+            'totalRequest'     => $this->getTotalTicketCount(['type' => Type::TYPE_REQUEST]),
+            'resolvedIncident' => $this->getResolvedTicketCount(['type' => Type::TYPE_INCIDENT]),
+            'resolvedRequest'  => $this->getResolvedTicketCount(['type' => Type::TYPE_REQUEST]),
+            'closedIncident'   => $this->getClosedTicketCount(['type' => Type::TYPE_INCIDENT]),
+            'closedRequest'    => $this->getClosedTicketCount(['type' => Type::TYPE_REQUEST]),
+            'holdIncident'     => $this->getHoldTicketCount(['type' => Type::TYPE_INCIDENT]),
+            'holdRequest'      => $this->getHoldTicketCount(['type' => Type::TYPE_REQUEST]),
+            'progressIncident' => $this->getTicketInProgressCount(['type' => Type::TYPE_INCIDENT]),
+            'progressRequest'  => $this->getTicketInProgressCount(['type' => Type::TYPE_REQUEST]),
+            'newIncident'      => $this->getNewTicketCount(['type' => Type::TYPE_INCIDENT]),
+            'newRequest'       => $this->getNewTicketCount(['type' => Type::TYPE_REQUEST]),
+        ];
+
+        $stats += [
+            'total'                 => $stats['totalIncident'] + $stats['totalRequest'],
+            'resolved'              => $stats['resolvedIncident'] + $stats['resolvedRequest'],
+            'closed'                => $stats['closedIncident'] + $stats['closedRequest'],
+            'hold'                  => $stats['holdIncident'] + $stats['holdRequest'],
+            'progress'              => $stats['progressIncident'] + $stats['progressRequest'],
+            'new'                   => $stats['newIncident'] + $stats['newRequest'],
+            'totalIncidentComplete' => $stats['resolvedIncident'] + $stats['closedIncident'],
+            'totalRequestComplete'  => $stats['resolvedRequest'] + $stats['closedRequest'],
+            'totalComplete'         => $stats['resolvedIncident'] + $stats['closedIncident']
+                                     + $stats['resolvedRequest'] + $stats['closedRequest'],
+        ];
+
+        $stats['totalOutstanding'] = $stats['new'] + $stats['progress'] + $stats['hold'];
+        $stats['incidentSla']      = $this->getIncidentSlaComplianceStats();
+
+        return $stats;
+    }
+
+    /**
      * Return unresolved tickets for the report period
      *
      * @param int $limit max results

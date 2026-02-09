@@ -16,20 +16,15 @@ if ($this->startDate->format('m') === $this->endDate->format('m')) {
     $reportMonth = sprintf('%s to %s', $this->startDate->format('F Y'), $this->endDate->format('F Y'));
 }
 
-// Calculate bar widths as percentage of the largest value
-$barMax = max(
-    $stats['totalIncident'],
-    $stats['totalIncidentComplete'],
-    $stats['totalRequest'],
-    $stats['totalRequestComplete'],
-    1
-);
+// Calculate bar widths as percentage of the largest value per group
+$incidentMax = max($stats['totalIncident'], $stats['totalIncidentComplete'], 1);
+$requestMax  = max($stats['totalRequest'], $stats['totalRequestComplete'], 1);
 
 $barWidths = [
-    'incidentCreated'  => round(($stats['totalIncident'] / $barMax) * 100),
-    'incidentComplete' => round(($stats['totalIncidentComplete'] / $barMax) * 100),
-    'requestCreated'   => round(($stats['totalRequest'] / $barMax) * 100),
-    'requestComplete'  => round(($stats['totalRequestComplete'] / $barMax) * 100),
+    'incidentCreated'  => round(($stats['totalIncident'] / $incidentMax) * 100),
+    'incidentComplete' => round(($stats['totalIncidentComplete'] / $incidentMax) * 100),
+    'requestCreated'   => round(($stats['totalRequest'] / $requestMax) * 100),
+    'requestComplete'  => round(($stats['totalRequestComplete'] / $requestMax) * 100),
 ];
 ?>
 <!DOCTYPE html>
@@ -428,11 +423,11 @@ $barWidths = [
     ?>
     <div class="page-break"></div>
     <h2 style="font-size: 14pt; margin: 0 0 8pt 0;">Open Tickets (<?= count($this->unresolved) ?>)</h2>
-    <?php foreach ($groups as $groupLabel => $rows): ?>
-    <h3 style="font-size: 12pt; margin: 12pt 0 6pt 0;"><?= $this->escapeHtml($groupLabel) ?></h3>
     <p class="unresolved-meta" style="margin: 0 0 6pt 0;">
         Showing <?= count($this->unresolved) ?> of <?= (int) $stats['totalOutstanding'] ?> open tickets created in the period.
     </p>
+    <?php foreach ($groups as $groupLabel => $rows): ?>
+    <h3 style="font-size: 12pt; margin: 12pt 0 6pt 0;"><?= $this->escapeHtml($groupLabel) ?></h3>
     <table class="unresolved">
         <thead>
             <tr>

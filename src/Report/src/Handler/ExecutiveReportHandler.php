@@ -13,7 +13,6 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Report\Service\PdfService;
 use Report\Service\ReportService;
-use Ticket\Entity\Type;
 
 use function preg_replace;
 use function sprintf;
@@ -49,39 +48,7 @@ class ExecutiveReportHandler implements RequestHandlerInterface
         // set organisation for report
         $this->reportService->setOrganisation($organisation);
 
-        // build stats required pulling from database
-        $stats = [
-            'totalIncident'    => $this->reportService->getTotalTicketCount(['type' => Type::TYPE_INCIDENT]),
-            'totalRequest'     => $this->reportService->getTotalTicketCount(['type' => Type::TYPE_REQUEST]),
-            'resolvedIncident' => $this->reportService->getResolvedTicketCount(['type' => Type::TYPE_INCIDENT]),
-            'resolvedRequest'  => $this->reportService->getResolvedTicketCount(['type' => Type::TYPE_REQUEST]),
-            'closedIncident'   => $this->reportService->getClosedTicketCount(['type' => Type::TYPE_INCIDENT]),
-            'closedRequest'    => $this->reportService->getClosedTicketCount(['type' => Type::TYPE_REQUEST]),
-            'holdIncident'     => $this->reportService->getHoldTicketCount(['type' => Type::TYPE_INCIDENT]),
-            'holdRequest'      => $this->reportService->getHoldTicketCount(['type' => Type::TYPE_REQUEST]),
-            'progressIncident' => $this->reportService->getTicketInProgressCount(['type' => Type::TYPE_INCIDENT]),
-            'progressRequest'  => $this->reportService->getTicketInProgressCount(['type' => Type::TYPE_REQUEST]),
-            'newIncident'      => $this->reportService->getNewTicketCount(['type' => Type::TYPE_INCIDENT]),
-            'newRequest'       => $this->reportService->getNewTicketCount(['type' => Type::TYPE_REQUEST]),
-        ];
-
-        // add stats based on above, not requiring database pull
-        $stats += [
-            'total'                 => $stats['totalIncident'] + $stats['totalRequest'],
-            'resolved'              => $stats['resolvedIncident'] + $stats['resolvedRequest'],
-            'closed'                => $stats['closedIncident'] + $stats['closedRequest'],
-            'hold'                  => $stats['holdIncident'] + $stats['holdRequest'],
-            'progress'              => $stats['progressIncident'] + $stats['progressRequest'],
-            'new'                   => $stats['newIncident'] + $stats['newRequest'],
-            'totalIncidentComplete' => $stats['resolvedIncident'] + $stats['closedIncident'],
-            'totalRequestComplete'  => $stats['resolvedRequest'] + $stats['closedRequest'],
-            'totalComplete'         => $stats['resolvedIncident'] + $stats['closedIncident']
-                                     + $stats['resolvedRequest'] + $stats['closedRequest'],
-        ];
-
-        // stats based on above stats being present in stats array
-        $stats['totalOutstanding'] = $stats['new'] + $stats['progress'] + $stats['hold'];
-        $stats['incidentSla']      = $this->reportService->getIncidentSlaComplianceStats();
+        $stats = $this->reportService->buildExecutiveStats();
 
         $unresolvedTickets = [];
         if (($this->reportConfig['include_unresolved'] ?? false) === true) {
