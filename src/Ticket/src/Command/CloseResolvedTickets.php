@@ -16,11 +16,13 @@ use function sprintf;
 class CloseResolvedTickets extends Command
 {
     protected TicketService $ticketService;
+    private int $autoCloseDays;
 
-    public function __construct(TicketService $service)
+    public function __construct(TicketService $service, int $autoCloseDays = 2)
     {
         parent::__construct();
         $this->ticketService = $service;
+        $this->autoCloseDays = $autoCloseDays;
     }
 
     /**
@@ -41,7 +43,7 @@ class CloseResolvedTickets extends Command
     {
         try {
             $count = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-                ->closeResolvedTickets();
+                ->closeResolvedTickets($this->autoCloseDays);
 
             $output->writeln(sprintf('Closed %s tickets', $count));
         } catch (Exception $exception) {

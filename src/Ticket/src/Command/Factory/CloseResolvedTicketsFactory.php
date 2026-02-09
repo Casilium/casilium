@@ -13,6 +13,8 @@ class CloseResolvedTicketsFactory
     public function __invoke(ContainerInterface $container): CloseResolvedTickets
     {
         $ticketService = $container->get(TicketService::class);
-        return new CloseResolvedTickets($ticketService);
+        $config        = $container->get('config');
+        $autoCloseDays = (int) ($config['tickets']['auto_close_days'] ?? 2);
+        return new CloseResolvedTickets($ticketService, $autoCloseDays);
     }
 }
