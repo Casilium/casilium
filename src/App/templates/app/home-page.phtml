@@ -159,75 +159,123 @@ $this->inlineScript()->appendFile('https://cdnjs.cloudflare.com/ajax/libs/Chart.
 
     <hr style=" border-top: 1px dotted #999999;">
 
-    <div class="row">
-        <div class="col">
-            <canvas id="myChart" width="200" height="200"></canvas>
+<?php
+$agentStats = $this->stats['agent'] ?? [];
+usort($agentStats, function ($a, $b) {
+    return ($b['Resolved'] ?? 0) <=> ($a['Resolved'] ?? 0);
+});
+
+$topAgents = array_slice($agentStats, 0, 5);
+
+$chartData = [
+    'names'    => [],
+    'open'     => [],
+    'resolved' => [],
+];
+
+foreach ($agentStats as $agent) {
+    $chartData['names'][]    = $agent['name'];
+    $chartData['open'][]     = (int) ($agent['open'] ?? 0);
+    $chartData['resolved'][] = (int) ($agent['Resolved'] ?? 0);
+}
+?>
+
+    <div class="row gy-3">
+        <div class="col-12 col-lg-7">
+            <div class="card h-100">
+                <div class="card-header text-nowrap">
+                    Agent Performance
+                </div>
+                <div class="card-body">
+                    <?php if (empty($chartData['names'])): ?>
+                        <div class="text-center text-muted py-4">No agent activity recorded yet.</div>
+                    <?php else: ?>
+                        <div class="ratio ratio-16x9">
+                            <canvas id="agentPerformanceChart"></canvas>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-5">
+            <div class="card h-100">
+                <div class="card-header text-nowrap">
+                    Top Agents (This Month)
+                </div>
+                <div class="card-body p-0">
+                    <?php if (empty($topAgents)): ?>
+                        <div class="p-3 text-muted">No agent activity recorded yet.</div>
+                    <?php else: ?>
+                        <div class="list-group list-group-flush">
+                            <?php foreach ($topAgents as $agent): ?>
+                                <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div>
+                                        <div class="fw-semibold"><?= $this->escapeHtml($agent['name']) ?></div>
+                                        <div class="small text-muted">
+                                            Resolved: <?= (int) ($agent['Resolved'] ?? 0) ?> · Open: <?= (int) ($agent['open'] ?? 0) ?>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-success text-white">
+                                        <?= (int) ($agent['Resolved'] ?? 0) ?> closed
+                                    </span>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
         </div>
     </div>
 </div>
-<?php
-$chartData = [];
-
-$agentStats = $this->stats['agent'];
-usort($agentStats, function ($a, $b) {
-    return $b['Resolved'] - $a['Resolved'];
-});
-
-foreach ($agentStats as $agent) {
-    $chartData['names'][] = $agent['name'];
-    $chartData['open'][] = $agent['open'];
-    $chartData['resolved'][] = $agent['Resolved'];
-}
-$agentCount = count($this->stats['agent']);
-?>
 <?php $this->inlineScript()->captureStart(); ?>
-</script>
 <script>
-    var openData = {
-        label: 'Open',
-        data: [1,2,3],
-
-    }
-
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: <?= json_encode($chartData['names']) ?>,
-            datasets: [{
+    const agentChartLabels = <?= json_encode($chartData['names']) ?>;
+    const agentChartData = {
+        labels: agentChartLabels,
+        datasets: [
+            {
                 label: 'Open',
                 data: <?= json_encode($chartData['open']) ?>,
-                backgroundColor: [
-                    <?php for ($i=0; $i<=$agentCount; $i++): ?>
-                    'rgb(163,40,40)',
-                    <?php endfor ?>
-                ],
-            },{
+                backgroundColor: 'rgba(163,40,40,0.6)',
+                borderRadius: 4,
+            },
+            {
                 label: 'Resolved',
                 data: <?= json_encode($chartData['resolved']) ?>,
-                backgroundColor: [
-                    <?php for ($i=0; $i<=$agentCount; $i++): ?>
-                    'rgb(115,234,44)',
-                    <?php endfor ?>
-                ],
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            },
-            title: {
-                text: 'Agent Statistics for <?= \Carbon\Carbon::now()->format('F') ?>',
-                display: true,
-            },
-            maintainAspectRatio: false,
-            responsive: true,
-        }
-    });
+                backgroundColor: 'rgba(115,234,44,0.6)',
+                borderRadius: 4,
+            }
+        ]
+    };
 
+    const chartEl = document.getElementById('agentPerformanceChart');
+    if (chartEl && agentChartLabels.length) {
+        new Chart(chartEl.getContext('2d'), {
+            type: 'bar',
+            data: agentChartData,
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                    },
+                    title: {
+                        display: true,
+                        text: 'Agent Statistics for <?= \Carbon\Carbon::now()->format('F') ?>',
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            precision: 0,
+                        }
+                    }
+                }
+            }
+        });
+    }
+</script>
 <?php
 $this->inlineScript()->captureEnd();
