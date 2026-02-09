@@ -16,7 +16,7 @@ class ContactRepository extends EntityRepository
             $sql .= ' AND c.isActive = true';
         }
 
-        $sql  .= ' ORDER BY c.firstName';
+        $sql  .= ' ORDER BY c.firstName, c.lastName';
         $query = $this->getEntityManager()
             ->createQuery($sql)
             ->setParameter('org', $id);
