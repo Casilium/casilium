@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ "${AUTO_MIGRATE:-0}" == "1" ]]; then
-    DB_HOST="${DB_HOST:-db}"
-    DB_NAME="${DB_NAME:-casilium}"
-    DB_USER="${DB_USER:-casilium}"
-    DB_PASSWORD="${DB_PASSWORD:-casilium_password}"
+DB_HOST="${DB_HOST:-db}"
+DB_NAME="${DB_NAME:-casilium}"
+DB_USER="${DB_USER:-casilium}"
+DB_PASSWORD="${DB_PASSWORD:-casilium_password}"
+MFA_ISSUER="${MFA_ISSUER:-casilium.local}"
+APP_URL="${APP_URL:-http://localhost:8080}"
 
-    if [[ ! -f config/autoload/local.php ]]; then
-        if [[ -z "${ENCRYPTION_KEY:-}" ]]; then
-            ENCRYPTION_KEY="$(php -r 'echo sodium_bin2hex(random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES));')"
-        fi
-        MFA_ISSUER="${MFA_ISSUER:-casilium.local}"
-        APP_URL="${APP_URL:-http://localhost:8080}"
-        cat > config/autoload/local.php <<PHP
+if [[ ! -f config/autoload/local.php ]]; then
+    if [[ -z "${ENCRYPTION_KEY:-}" ]]; then
+        ENCRYPTION_KEY="$(php -r 'echo sodium_bin2hex(random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES));')"
+    fi
+    cat > config/autoload/local.php <<PHP
 <?php
 return [
     'encryption' => [
@@ -34,10 +33,10 @@ return [
     ],
 ];
 PHP
-    fi
+fi
 
-    if [[ ! -f config/autoload/auth.local.php ]]; then
-        cat > config/autoload/auth.local.php <<PHP
+if [[ ! -f config/autoload/auth.local.php ]]; then
+    cat > config/autoload/auth.local.php <<PHP
 <?php
 return [
     'authentication' => [
@@ -55,47 +54,43 @@ return [
     ],
 ];
 PHP
+fi
+
+if [[ ! -f config/autoload/mail.local.php ]]; then
+    MAIL_ENABLED="${MAIL_ENABLED:-false}"
+    MAIL_SENDER="${MAIL_SENDER:-helpdesk@example.com}"
+    MAIL_SMTP_NAME="${MAIL_SMTP_NAME:-localhost}"
+    MAIL_SMTP_HOST="${MAIL_SMTP_HOST:-127.0.0.1}"
+    MAIL_SMTP_PORT="${MAIL_SMTP_PORT:-25}"
+    MAIL_SMTP_CONNECTION_CLASS="${MAIL_SMTP_CONNECTION_CLASS:-plain}"
+    MAIL_SMTP_USERNAME="${MAIL_SMTP_USERNAME:-helpdesk@example.com}"
+    MAIL_SMTP_PASSWORD="${MAIL_SMTP_PASSWORD:-change_me}"
+    MAIL_SMTP_SSL="${MAIL_SMTP_SSL:-}"
+    MAIL_SMTP_VERIFY_PEER="${MAIL_SMTP_VERIFY_PEER:-true}"
+    MAIL_SMTP_VERIFY_PEER_NAME="${MAIL_SMTP_VERIFY_PEER_NAME:-true}"
+    MAIL_SMTP_ALLOW_SELF_SIGNED="${MAIL_SMTP_ALLOW_SELF_SIGNED:-false}"
+
+    MAIL_SSL_LINE=""
+    if [[ -n "${MAIL_SMTP_SSL}" ]]; then
+        MAIL_SSL_LINE="                'ssl'       => '${MAIL_SMTP_SSL}',"
     fi
 
-    if [[ "${DEV_MODE:-false}" == "true" ]]; then
-        composer development-enable || true
+    MAIL_VERIFY_PEER_LINE=""
+    if [[ "${MAIL_SMTP_VERIFY_PEER}" == "false" ]]; then
+        MAIL_VERIFY_PEER_LINE="                'verify_peer' => false,"
     fi
 
-    if [[ ! -f config/autoload/mail.local.php ]]; then
-        MAIL_ENABLED="${MAIL_ENABLED:-false}"
-        MAIL_SENDER="${MAIL_SENDER:-helpdesk@example.com}"
-        MAIL_SMTP_NAME="${MAIL_SMTP_NAME:-localhost}"
-        MAIL_SMTP_HOST="${MAIL_SMTP_HOST:-127.0.0.1}"
-        MAIL_SMTP_PORT="${MAIL_SMTP_PORT:-25}"
-        MAIL_SMTP_CONNECTION_CLASS="${MAIL_SMTP_CONNECTION_CLASS:-plain}"
-        MAIL_SMTP_USERNAME="${MAIL_SMTP_USERNAME:-helpdesk@example.com}"
-        MAIL_SMTP_PASSWORD="${MAIL_SMTP_PASSWORD:-change_me}"
-        MAIL_SMTP_SSL="${MAIL_SMTP_SSL:-}"
-        MAIL_SMTP_VERIFY_PEER="${MAIL_SMTP_VERIFY_PEER:-true}"
-        MAIL_SMTP_VERIFY_PEER_NAME="${MAIL_SMTP_VERIFY_PEER_NAME:-true}"
-        MAIL_SMTP_ALLOW_SELF_SIGNED="${MAIL_SMTP_ALLOW_SELF_SIGNED:-false}"
+    MAIL_VERIFY_PEER_NAME_LINE=""
+    if [[ "${MAIL_SMTP_VERIFY_PEER_NAME}" == "false" ]]; then
+        MAIL_VERIFY_PEER_NAME_LINE="                'verify_peer_name' => false,"
+    fi
 
-        MAIL_SSL_LINE=""
-        if [[ -n "${MAIL_SMTP_SSL}" ]]; then
-            MAIL_SSL_LINE="                'ssl'       => '${MAIL_SMTP_SSL}',"
-        fi
+    MAIL_ALLOW_SELF_SIGNED_LINE=""
+    if [[ "${MAIL_SMTP_ALLOW_SELF_SIGNED}" == "true" ]]; then
+        MAIL_ALLOW_SELF_SIGNED_LINE="                'allow_self_signed' => true,"
+    fi
 
-        MAIL_VERIFY_PEER_LINE=""
-        if [[ "${MAIL_SMTP_VERIFY_PEER}" == "false" ]]; then
-            MAIL_VERIFY_PEER_LINE="                'verify_peer' => false,"
-        fi
-
-        MAIL_VERIFY_PEER_NAME_LINE=""
-        if [[ "${MAIL_SMTP_VERIFY_PEER_NAME}" == "false" ]]; then
-            MAIL_VERIFY_PEER_NAME_LINE="                'verify_peer_name' => false,"
-        fi
-
-        MAIL_ALLOW_SELF_SIGNED_LINE=""
-        if [[ "${MAIL_SMTP_ALLOW_SELF_SIGNED}" == "true" ]]; then
-            MAIL_ALLOW_SELF_SIGNED_LINE="                'allow_self_signed' => true,"
-        fi
-
-        cat > config/autoload/mail.local.php <<PHP
+    cat > config/autoload/mail.local.php <<PHP
 <?php
 return [
     'mail' => [
@@ -118,6 +113,12 @@ ${MAIL_ALLOW_SELF_SIGNED_LINE}
     ],
 ];
 PHP
+fi
+
+if [[ "${AUTO_MIGRATE:-0}" == "1" ]]; then
+
+    if [[ "${DEV_MODE:-false}" == "true" ]]; then
+        composer development-enable || true
     fi
 
     echo "Waiting for database at ${DB_HOST}..."
@@ -172,6 +173,15 @@ PHP
             fi
         fi
     fi
+fi
+
+if [[ -f docker/cron.d/casilium ]]; then
+    CRON_SRC="/var/www/html/docker/cron.d/casilium"
+    CRON_DEST="/etc/cron.d/casilium"
+    cp "${CRON_SRC}" "${CRON_DEST}"
+    chmod 0644 "${CRON_DEST}"
+    crontab "${CRON_DEST}"
+    cron
 fi
 
 exec "$@"

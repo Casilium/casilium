@@ -25,3 +25,7 @@ Adjust timing, cadence, and paths for your environment.
 > `ticket:notifications`, `ticket:overdue-digest`) automatically skip execution
 > when the `mail.enabled` flag (or `MAIL_ENABLED` env var in Docker) is set to
 > `false`, which is useful for development environments without SMTP/IMAP.
+
+When running via Docker, the same schedule resides in `docker/cron.d/casilium`
+and is executed by the cron daemon that starts inside the `app` container. All
+job output goes to `docker compose logs -f app`.

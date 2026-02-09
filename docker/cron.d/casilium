@@ -1,0 +1,6 @@
+*/3 * * * * root cd /var/www/html && php /var/www/html/bin/console.php ticket:update-waiting > /dev/null 2>&1
+*/5 * * * * root cd /var/www/html && php /var/www/html/bin/console.php ticket:create-from-mail > /dev/null 2>&1
+0 2 * * * root cd /var/www/html && php /var/www/html/bin/console.php ticket:close-resolved > /dev/null 2>&1
+8 6-20 * * * root cd /var/www/html && php /var/www/html/bin/console.php ticket:notifications 2 hours > /dev/null 2>&1
+*/10 6-20 * * * root cd /var/www/html && php /var/www/html/bin/console.php ticket:notifications 1 hours > /dev/null 2>&1
+0 7 * * * root cd /var/www/html && php /var/www/html/bin/console.php ticket:overdue-digest > /dev/null 2>&1

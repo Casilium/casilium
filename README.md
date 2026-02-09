@@ -53,6 +53,13 @@ docker compose up --build
 
 See `docs/docker.md` for full Docker instructions and `docs/setup.md` for manual setup.
 
+## Background Jobs
+
+Cron now runs inside the main app container. When the container boots, it
+installs the schedule from `docker/cron.d/casilium` and starts the system cron
+daemon alongside Apache. Job output is forwarded to the container log stream, so
+you can monitor runs with `docker compose logs -f app`.
+
 License
 -------
 Casilium is released under the Apache 2.0 license. See the included LICENSE.txt
