@@ -190,7 +190,7 @@ foreach ($agentStats as $agent) {
                     <?php if (empty($chartData['names'])): ?>
                         <div class="text-center text-muted py-4">No agent activity recorded yet.</div>
                     <?php else: ?>
-                        <div class="ratio ratio-16x9">
+                        <div class="ratio ratio-16x9" style="min-height: 260px;">
                             <canvas id="agentPerformanceChart"></canvas>
                         </div>
                     <?php endif; ?>
@@ -229,53 +229,59 @@ foreach ($agentStats as $agent) {
 </div>
 <?php $this->inlineScript()->captureStart(); ?>
 <script>
-    const agentChartLabels = <?= json_encode($chartData['names']) ?>;
-    const agentChartData = {
-        labels: agentChartLabels,
-        datasets: [
-            {
-                label: 'Open',
-                data: <?= json_encode($chartData['open']) ?>,
-                backgroundColor: 'rgba(163,40,40,0.6)',
-                borderRadius: 4,
-            },
-            {
-                label: 'Resolved',
-                data: <?= json_encode($chartData['resolved']) ?>,
-                backgroundColor: 'rgba(115,234,44,0.6)',
-                borderRadius: 4,
-            }
-        ]
-    };
+    (function () {
+        var labels = <?= json_encode($chartData['names']) ?>;
+        if (!labels.length) {
+            return;
+        }
 
-    const chartEl = document.getElementById('agentPerformanceChart');
-    if (chartEl && agentChartLabels.length) {
-        new Chart(chartEl.getContext('2d'), {
+        var ctx = document.getElementById('agentPerformanceChart');
+        if (!ctx) {
+            return;
+        }
+
+        new Chart(ctx.getContext('2d'), {
             type: 'bar',
-            data: agentChartData,
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Open',
+                        data: <?= json_encode($chartData['open']) ?>,
+                        backgroundColor: 'rgba(163,40,40,0.6)',
+                        borderColor: 'rgba(163,40,40,0.9)',
+                        borderWidth: 1,
+                    },
+                    {
+                        label: 'Resolved',
+                        data: <?= json_encode($chartData['resolved']) ?>,
+                        backgroundColor: 'rgba(115,234,44,0.6)',
+                        borderColor: 'rgba(115,234,44,0.9)',
+                        borderWidth: 1,
+                    }
+                ]
+            },
             options: {
                 responsive: true,
                 maintainAspectRatio: false,
-                plugins: {
-                    legend: {
-                        position: 'bottom',
-                    },
-                    title: {
-                        display: true,
-                        text: 'Agent Statistics for <?= \Carbon\Carbon::now()->format('F') ?>',
-                    }
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Agent Statistics for <?= \Carbon\Carbon::now()->format('F') ?>',
                 },
                 scales: {
-                    y: {
-                        beginAtZero: true,
+                    yAxes: [{
                         ticks: {
+                            beginAtZero: true,
                             precision: 0,
                         }
-                    }
+                    }]
                 }
             }
         });
-    }
+    })();
 </script>
 <?php
 $this->inlineScript()->captureEnd();
