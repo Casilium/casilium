@@ -25,6 +25,7 @@ use Ticket\Service\TicketService;
 use function array_map;
 use function count;
 use function intval;
+use function is_numeric;
 
 class TicketRepository extends EntityRepository implements TicketRepositoryInterface
 {
@@ -758,5 +759,43 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         }
 
         return ($stats['within'] / $stats['total']) * 100;
+    }
+
+    /**
+     * Search tickets by ID or short description
+     *
+     * @param string $query Search query (ticket ID or description fragment)
+     * @param int $limit Maximum number of results
+     * @return array Array of ticket search results
+     */
+    public function searchTickets(string $query, int $limit = 10): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select(
+                't.id',
+                't.uuid',
+                't.shortDescription',
+                's.description AS statusDescription',
+                'o.name AS organisationName',
+                'CONCAT(c.firstName, \' \', c.lastName) AS contactName',
+                't.createdAt'
+            )
+            ->from(Ticket::class, 't')
+            ->leftJoin('t.status', 's')
+            ->leftJoin('t.organisation', 'o')
+            ->leftJoin('t.contact', 'c')
+            ->orderBy('t.id', 'DESC')
+            ->setMaxResults($limit);
+
+        if (is_numeric($query)) {
+            $qb->andWhere('t.id = :id OR t.shortDescription LIKE :query OR t.longDescription LIKE :query')
+                ->setParameter('id', (int) $query)
+                ->setParameter('query', '%' . $query . '%');
+        } else {
+            $qb->andWhere('t.shortDescription LIKE :query OR t.longDescription LIKE :query')
+                ->setParameter('query', '%' . $query . '%');
+        }
+
+        return $qb->getQuery()->getArrayResult();
     }
 }

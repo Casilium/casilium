@@ -702,6 +702,17 @@ class TicketService
         }
     }
 
+    /**
+     * Search tickets by ID or short description
+     *
+     * @param string $query Search query
+     * @return array Array of matching tickets
+     */
+    public function searchTickets(string $query): array
+    {
+        return $this->entityManager->getRepository(Ticket::class)->searchTickets($query);
+    }
+
     public function findWaitingTicketsToUpdate(): array
     {
         return $this->entityManager->getRepository(Ticket::class)->findWaitingTicketsToUpdateById();

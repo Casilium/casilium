@@ -46,13 +46,17 @@
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <form method="get" action="/ticket/go" class="mx-2 my-auto">
+                <form method="get" action="<?= $this->url('ticket.goto') ?>" class="mx-2 my-auto" id="ticket-search-form">
                     <div class="input-group">
-                        <input type="text" class="form-control" id="ticket_id" name="ticket_id" placeholder="ticket #"/>
+                        <input type="text" class="form-control" id="ticket-search" name="ticket_id"
+                               placeholder="search tickets..."
+                               autocomplete="off"
+                               data-url="/api/ticket-search" />
                         <div class="input-group-append">
                             <button class="btn btn-outline-secondary fas fa-search" type="submit"></button>
                         </div>
                     </div>
+                    <div id="ticket-search-results" class="dropdown-menu" style="display:none; position:absolute; z-index:1050; min-width:400px; max-width:500px;"></div>
                 </form>
                 <ul class="navbar-nav ml-auto mt-2 mt-lg-0">
                     <?php if ($this->identity() != null): ?>
@@ -93,6 +97,85 @@ $("#menu-toggle").click(function(e) {
     e.preventDefault();
     $('#wrapper').toggleClass("toggled");
 });
+
+(function() {
+    var searchInput = document.getElementById('ticket-search');
+    var resultsDiv = document.getElementById('ticket-search-results');
+    var searchForm = document.getElementById('ticket-search-form');
+    var debounceTimer = null;
+
+    if (!searchInput || !resultsDiv) return;
+
+    searchInput.addEventListener('input', function() {
+        clearTimeout(debounceTimer);
+        var query = this.value.trim();
+        if (query.length < 3) {
+            resultsDiv.style.display = 'none';
+            resultsDiv.innerHTML = '';
+            return;
+        }
+        debounceTimer = setTimeout(function() {
+            fetch(searchInput.getAttribute('data-url') + '?q=' + encodeURIComponent(query))
+                .then(function(response) {
+                    if (!response.ok) throw new Error(response.status);
+                    return response.json();
+                })
+                .then(function(data) {
+                    resultsDiv.innerHTML = '';
+                    if (data.length === 0) {
+                        var noResults = document.createElement('span');
+                        noResults.className = 'dropdown-item text-muted';
+                        noResults.textContent = 'No tickets found';
+                        resultsDiv.appendChild(noResults);
+                        resultsDiv.style.display = 'block';
+                        return;
+                    }
+                    data.forEach(function(ticket) {
+                        var item = document.createElement('a');
+                        item.className = 'dropdown-item py-1';
+                        item.href = '/ticket/' + ticket.uuid;
+                        var title = document.createElement('div');
+                        title.textContent = '#' + ticket.id + ' - ' + ticket.shortDescription;
+                        var meta = document.createElement('div');
+                        meta.className = 'small text-muted';
+                        var date = ticket.createdAt ? ticket.createdAt.substring(0, 10) : '';
+                        meta.textContent = ticket.organisationName + ' | ' + ticket.contactName + ' | ' + ticket.statusDescription + ' | ' + date;
+                        item.appendChild(title);
+                        item.appendChild(meta);
+                        resultsDiv.appendChild(item);
+                    });
+                    resultsDiv.style.display = 'block';
+                })
+                .catch(function() {
+                    resultsDiv.innerHTML = '';
+                    var errorItem = document.createElement('span');
+                    errorItem.className = 'dropdown-item text-danger';
+                    errorItem.textContent = 'Search unavailable';
+                    resultsDiv.appendChild(errorItem);
+                    resultsDiv.style.display = 'block';
+                });
+        }, 250);
+    });
+
+    searchForm.addEventListener('submit', function(e) {
+        var query = searchInput.value.trim();
+        if (!/^\d+$/.test(query)) {
+            e.preventDefault();
+        }
+    });
+
+    searchInput.addEventListener('keydown', function(e) {
+        if (e.key === 'Escape') {
+            resultsDiv.style.display = 'none';
+        }
+    });
+
+    document.addEventListener('click', function(e) {
+        if (!searchForm.contains(e.target)) {
+            resultsDiv.style.display = 'none';
+        }
+    });
+})();
 JS;
 $this->inlineScript()->captureEnd();
 ?>

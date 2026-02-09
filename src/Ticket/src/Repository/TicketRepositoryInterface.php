@@ -138,4 +138,13 @@ interface TicketRepositoryInterface
         ?int $organisationId = null,
         ?int $type = null
     ): float;
+
+    /**
+     * Search tickets by ID or short description
+     *
+     * @param string $query Search query (ticket ID or description fragment)
+     * @param int $limit Maximum number of results
+     * @return array Array of ticket search results
+     */
+    public function searchTickets(string $query, int $limit = 10): array;
 }

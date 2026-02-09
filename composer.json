@@ -98,7 +98,8 @@
             "MailService\\": "src/MailService/src",
             "Logger\\": "src/Logger/src",
             "SlackIntegration\\": "src/SlackIntegration/src",
-            "Report\\": "src/Report/src"
+            "Report\\": "src/Report/src",
+            "Api\\": "src/Api/src"
         }
     },
     "autoload-dev": {
