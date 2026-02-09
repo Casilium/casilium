@@ -566,9 +566,9 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         ?CarbonInterface $periodEnd = null
     ): float {
         $qb = $this->createQueryBuilder('t')
-            ->where('t.status = :status')
+            ->where('t.status IN (:statuses)')
             ->andWhere('t.resolveDate IS NOT NULL')
-            ->setParameter('status', Ticket::STATUS_RESOLVED);
+            ->setParameter('statuses', [Ticket::STATUS_RESOLVED, Ticket::STATUS_CLOSED]);
 
         if ($periodStart && $periodEnd) {
             $qb->andWhere('t.resolveDate BETWEEN :start AND :end')
