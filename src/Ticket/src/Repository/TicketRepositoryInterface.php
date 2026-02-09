@@ -92,14 +92,34 @@ interface TicketRepositoryInterface
     ): int;
 
     /**
+     * Find SLA compliance stats for resolved tickets
+     *
+     * @param CarbonInterface|null $periodStart Start of period
+     * @param CarbonInterface|null $periodEnd End of period
+     * @param int|null $organisationId Organisation ID to filter
+     * @param int|null $type Ticket type ID to filter
+     * @return array{total:int,within:int}
+     */
+    public function findSlaComplianceStats(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null,
+        ?int $organisationId = null,
+        ?int $type = null
+    ): array;
+
+    /**
      * Find SLA compliance rate as a percentage
      *
      * @param CarbonInterface|null $periodStart Start of period
      * @param CarbonInterface|null $periodEnd End of period
+     * @param int|null $organisationId Organisation ID to filter
+     * @param int|null $type Ticket type ID to filter
      * @return float SLA compliance rate (0-100)
      */
     public function findSlaComplianceRate(
         ?CarbonInterface $periodStart = null,
-        ?CarbonInterface $periodEnd = null
+        ?CarbonInterface $periodEnd = null,
+        ?int $organisationId = null,
+        ?int $type = null
     ): float;
 }

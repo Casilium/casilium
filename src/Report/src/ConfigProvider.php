@@ -41,6 +41,7 @@ class ConfigProvider
             ],
             'factories'  => [
                 Handler\ExecutiveReportHandler::class => Handler\Factory\ExecutiveReportHandlerFactory::class,
+                Service\PdfService::class             => Service\Factory\PdfServiceFactory::class,
                 Service\ReportService::class          => Service\Factory\ReportServiceFactory::class,
             ],
         ];

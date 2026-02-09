@@ -1,0 +1,364 @@
+<?php
+
+declare(strict_types=1);
+
+use Organisation\Entity\Organisation;
+
+/** @var array $this->stats */
+/** @var Organisation $this->organisation */
+
+$stats            = $this->stats;
+$organisationName = $this->organisation->getName();
+
+if ($this->startDate->format('m') === $this->endDate->format('m')) {
+    $reportMonth = $this->startDate->format('F Y');
+} else {
+    $reportMonth = sprintf('%s to %s', $this->startDate->format('F Y'), $this->endDate->format('F Y'));
+}
+
+// Calculate bar widths as percentage of the largest value
+$barMax = max(
+    $stats['totalIncident'],
+    $stats['totalIncidentComplete'],
+    $stats['totalRequest'],
+    $stats['totalRequestComplete'],
+    1
+);
+
+$barWidths = [
+    'incidentCreated'  => round(($stats['totalIncident'] / $barMax) * 100),
+    'incidentComplete' => round(($stats['totalIncidentComplete'] / $barMax) * 100),
+    'requestCreated'   => round(($stats['totalRequest'] / $barMax) * 100),
+    'requestComplete'  => round(($stats['totalRequestComplete'] / $barMax) * 100),
+];
+?>
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <style>
+        @page {
+            margin: 54pt;
+            size: A4 portrait;
+        }
+
+        body {
+            font-family: Helvetica, Arial, sans-serif;
+            font-size: 11pt;
+            line-height: 1.4;
+            color: #000;
+            margin: 0;
+            padding: 0;
+        }
+
+        .header {
+            border-bottom: 1px solid #000;
+            padding-bottom: 10pt;
+            margin-bottom: 16pt;
+        }
+
+        .header h1 {
+            font-size: 18pt;
+            margin: 0 0 4pt 0;
+        }
+
+        .header .subtitle {
+            font-size: 12pt;
+            margin: 0;
+        }
+
+        p {
+            margin: 0 0 10pt 0;
+        }
+
+        .bold {
+            font-weight: bold;
+        }
+
+        table.stats {
+            width: 100%;
+            border-collapse: collapse;
+            margin: 10pt 0 16pt 0;
+            font-size: 11pt;
+        }
+
+        table.stats th {
+            background-color: #4472c4;
+            color: #fff;
+            padding: 8pt 10pt;
+            text-align: left;
+            font-weight: bold;
+        }
+
+        table.stats td {
+            padding: 8pt 10pt;
+            text-align: left;
+            background-color: #e9edf4;
+        }
+
+        /* Two-column layout using table */
+        table.layout {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        table.layout td {
+            vertical-align: top;
+            padding: 0;
+        }
+
+        table.layout td.col-text {
+            width: 48%;
+            padding-right: 2%;
+        }
+
+        table.layout td.col-chart {
+            width: 50%;
+        }
+
+        /* Chart built with tables */
+        .chart-title {
+            font-size: 13pt;
+            font-weight: bold;
+            text-align: center;
+            margin-bottom: 6pt;
+        }
+
+        table.legend {
+            margin: 0 auto 10pt auto;
+            border-collapse: collapse;
+        }
+
+        table.legend td {
+            padding: 0 8pt;
+            font-size: 10pt;
+            vertical-align: middle;
+        }
+
+        .swatch {
+            width: 12pt;
+            height: 12pt;
+        }
+
+        .chart-group-label {
+            font-size: 11pt;
+            font-weight: bold;
+            margin: 8pt 0 4pt 0;
+        }
+
+        table.bars {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 6pt;
+        }
+
+        table.bars td {
+            padding: 3pt 0;
+            font-size: 10pt;
+            vertical-align: middle;
+        }
+
+        table.bars td.bar-label {
+            width: 60pt;
+        }
+
+        table.bars td.bar-cell {
+            padding: 3pt 4pt;
+        }
+
+        table.bars td.bar-value {
+            width: 30pt;
+            text-align: right;
+        }
+
+        .bar-track {
+            width: 100%;
+            height: 16pt;
+            background-color: #f0f0f0;
+        }
+
+        .bar-track td {
+            padding: 0;
+            height: 16pt;
+        }
+    </style>
+</head>
+<body>
+    <table style="width: 100%; border-bottom: 1px solid #000; margin-bottom: 16pt; border-collapse: collapse;">
+        <tr>
+            <td style="vertical-align: bottom; padding: 0 0 10pt 0;">
+                <h1 style="font-size: 18pt; margin: 0 0 4pt 0;">Executive Summary Report</h1>
+                <p style="font-size: 12pt; margin: 0;"><?= $this->escapeHtml($organisationName) ?>, <?= $this->escapeHtml($reportMonth) ?></p>
+            </td>
+            <td style="text-align: right; vertical-align: top; padding: 0 0 10pt 0;">
+                <img src="<?= $this->escapeHtmlAttr($this->logoPath) ?>" width="188">
+            </td>
+        </tr>
+    </table>
+
+    <p>
+        This Executive Summary Report has been compiled to provide you with a breakdown of support
+        tickets that have been received during the specified period.
+    </p>
+
+    <p>
+        In order to help you identify the types of support requests that have been received we have
+        broken them down into &ldquo;Incidents&rdquo; and &ldquo;Requests&rdquo;. We have defined these terms below for
+        your convenience and understanding.
+    </p>
+
+    <p class="bold">Incident:</p>
+    <p>An unplanned interruption to an IT service or reduction in the quality of an IT service.</p>
+
+    <p class="bold">Service Request:</p>
+    <p>
+        A request from a user for something to be provided &ndash; for example, a request for information
+        or advice; to reset a password; or to install a workstation for a new user.
+    </p>
+
+    <table class="layout">
+        <tr>
+            <td class="col-text">
+                <p class="bold">Results:</p>
+                <p>
+                    The report shows that over the period defined above, a total of
+                    <?= (int) $stats['total'] ?> tickets were received, of which <?= (int) $stats['totalComplete'] ?>
+                    have been resolved. <?= (int) $stats['totalIncident'] ?> were received due to incidents,
+                    and <?= (int) $stats['totalRequest'] ?> were due to general user requests.
+                </p>
+                <p>
+                    This information has been broken down further in the table below for clarity.
+                </p>
+                <p class="bold">Incident SLA Compliance:</p>
+                <?php if ($stats['incidentSla']['total'] > 0): ?>
+                <p>
+                    <?= number_format($stats['incidentSla']['rate'], 1) ?>%
+                    (<?= (int) $stats['incidentSla']['within'] ?> of <?= (int) $stats['incidentSla']['total'] ?>
+                    incidents met SLA).
+                </p>
+                <?php else: ?>
+                <p>Not available (no incident SLA tickets in period).</p>
+                <?php endif; ?>
+            </td>
+            <td class="col-chart">
+                <div class="chart-title">Ticket Statistics</div>
+
+                <table class="legend">
+                    <tr>
+                        <td><div class="swatch" style="background-color: #a32828;"></div></td>
+                        <td>Created (<?= (int) $stats['total'] ?>)</td>
+                        <td><div class="swatch" style="background-color: #73ea2c;"></div></td>
+                        <td>Complete (<?= (int) $stats['totalComplete'] ?>)</td>
+                    </tr>
+                </table>
+
+                <div class="chart-group-label">Incidents (<?= (int) $stats['totalIncident'] ?>)</div>
+                <table class="bars">
+                    <tr>
+                        <td class="bar-label">Created</td>
+                        <td class="bar-cell">
+                            <table class="bar-track" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <?php if ($barWidths['incidentCreated'] > 0): ?>
+                                    <td style="width: <?= $barWidths['incidentCreated'] ?>%; background-color: #a32828;"></td>
+                                    <?php endif; ?>
+                                    <td style="background-color: #f0f0f0;"></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="bar-value"><?= (int) $stats['totalIncident'] ?></td>
+                    </tr>
+                    <tr>
+                        <td class="bar-label">Complete</td>
+                        <td class="bar-cell">
+                            <table class="bar-track" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <?php if ($barWidths['incidentComplete'] > 0): ?>
+                                    <td style="width: <?= $barWidths['incidentComplete'] ?>%; background-color: #73ea2c;"></td>
+                                    <?php endif; ?>
+                                    <td style="background-color: #f0f0f0;"></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="bar-value"><?= (int) $stats['totalIncidentComplete'] ?></td>
+                    </tr>
+                </table>
+
+                <div class="chart-group-label">Requests (<?= (int) $stats['totalRequest'] ?>)</div>
+                <table class="bars">
+                    <tr>
+                        <td class="bar-label">Created</td>
+                        <td class="bar-cell">
+                            <table class="bar-track" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <?php if ($barWidths['requestCreated'] > 0): ?>
+                                    <td style="width: <?= $barWidths['requestCreated'] ?>%; background-color: #a32828;"></td>
+                                    <?php endif; ?>
+                                    <td style="background-color: #f0f0f0;"></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="bar-value"><?= (int) $stats['totalRequest'] ?></td>
+                    </tr>
+                    <tr>
+                        <td class="bar-label">Complete</td>
+                        <td class="bar-cell">
+                            <table class="bar-track" cellpadding="0" cellspacing="0">
+                                <tr>
+                                    <?php if ($barWidths['requestComplete'] > 0): ?>
+                                    <td style="width: <?= $barWidths['requestComplete'] ?>%; background-color: #73ea2c;"></td>
+                                    <?php endif; ?>
+                                    <td style="background-color: #f0f0f0;"></td>
+                                </tr>
+                            </table>
+                        </td>
+                        <td class="bar-value"><?= (int) $stats['totalRequestComplete'] ?></td>
+                    </tr>
+                </table>
+            </td>
+        </tr>
+    </table>
+
+    <table class="stats">
+        <thead>
+            <tr>
+                <th>Incidents</th>
+                <th>Incidents Resolved</th>
+                <th>Requests</th>
+                <th>Requests Completed</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><?= (int) $stats['totalIncident'] ?></td>
+                <td><?= (int) $stats['totalIncidentComplete'] ?></td>
+                <td><?= (int) $stats['totalRequest'] ?></td>
+                <td><?= (int) $stats['totalRequestComplete'] ?></td>
+            </tr>
+        </tbody>
+    </table>
+
+    <p>
+        Of all the requests received, <?= (int) $stats['totalOutstanding'] ?> remain outstanding which are
+        either currently being worked on, are on hold awaiting a user response, or are waiting to be
+        assigned to a technician.
+    </p>
+
+    <table class="stats">
+        <thead>
+            <tr>
+                <th>Unassigned</th>
+                <th>In-Progress</th>
+                <th>On Hold</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td><?= (int) $stats['new'] ?></td>
+                <td><?= (int) $stats['progress'] ?></td>
+                <td><?= (int) $stats['hold'] ?></td>
+            </tr>
+        </tbody>
+    </table>
+</body>
+</html>

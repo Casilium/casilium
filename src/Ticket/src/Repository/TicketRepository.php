@@ -647,16 +647,20 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
     }
 
     /**
-     * Find SLA compliance rate as a percentage
+     * Find SLA compliance stats for resolved tickets
      *
      * @param CarbonInterface|null $periodStart Start of period
      * @param CarbonInterface|null $periodEnd End of period
-     * @return float SLA compliance rate (0-100)
+     * @param int|null $organisationId Organisation ID to filter
+     * @param int|null $type Ticket type ID to filter
+     * @return array{total:int,within:int}
      */
-    public function findSlaComplianceRate(
+    public function findSlaComplianceStats(
         ?CarbonInterface $periodStart = null,
-        ?CarbonInterface $periodEnd = null
-    ): float {
+        ?CarbonInterface $periodEnd = null,
+        ?int $organisationId = null,
+        ?int $type = null
+    ): array {
         $qb = $this->createQueryBuilder('t')
             ->where('t.status IN (:statuses)')
             ->andWhere('t.dueDate IS NOT NULL')
@@ -670,11 +674,24 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
                 ->setParameter('end', $periodEnd->format('Y-m-d H:i:s'));
         }
 
+        if (null !== $organisationId) {
+            $qb->andWhere('t.organisation = :organisation')
+                ->setParameter('organisation', $organisationId);
+        }
+
+        if (null !== $type) {
+            $qb->andWhere('t.type = :type')
+                ->setParameter('type', $type);
+        }
+
         /** @var Ticket[] $tickets */
         $tickets = $qb->getQuery()->getResult();
 
         if (empty($tickets)) {
-            return 0.0;
+            return [
+                'total'  => 0,
+                'within' => 0,
+            ];
         }
 
         $withinSla = 0;
@@ -688,6 +705,33 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             }
         }
 
-        return ($withinSla / count($tickets)) * 100;
+        return [
+            'total'  => count($tickets),
+            'within' => $withinSla,
+        ];
+    }
+
+    /**
+     * Find SLA compliance rate as a percentage
+     *
+     * @param CarbonInterface|null $periodStart Start of period
+     * @param CarbonInterface|null $periodEnd End of period
+     * @param int|null $organisationId Organisation ID to filter
+     * @param int|null $type Ticket type ID to filter
+     * @return float SLA compliance rate (0-100)
+     */
+    public function findSlaComplianceRate(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null,
+        ?int $organisationId = null,
+        ?int $type = null
+    ): float {
+        $stats = $this->findSlaComplianceStats($periodStart, $periodEnd, $organisationId, $type);
+
+        if ($stats['total'] === 0) {
+            return 0.0;
+        }
+
+        return ($stats['within'] / $stats['total']) * 100;
     }
 }

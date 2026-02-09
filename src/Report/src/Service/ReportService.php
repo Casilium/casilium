@@ -9,6 +9,7 @@ use Carbon\CarbonInterface;
 use Organisation\Entity\Organisation;
 use Organisation\Service\OrganisationManager;
 use Ticket\Entity\Ticket;
+use Ticket\Entity\Type;
 use Ticket\Repository\TicketRepository;
 use Ticket\Repository\TicketRepositoryInterface;
 
@@ -141,6 +142,31 @@ class ReportService
     {
         $options = array_merge($options, $this->getDefaultOptions() + ['status' => Ticket::STATUS_NEW]);
         return $this->ticketRepository->findTicketCount($options);
+    }
+
+    /**
+     * Return incident SLA compliance stats for the report period
+     *
+     * @return array{total:int,within:int,rate:float}
+     */
+    public function getIncidentSlaComplianceStats(): array
+    {
+        $organisationId = $this->getOrganisation()->getId();
+        $stats          = $this->ticketRepository->findSlaComplianceStats(
+            $this->getStartDate(),
+            $this->getEndDate(),
+            $organisationId,
+            Type::TYPE_INCIDENT
+        );
+
+        $total = $stats['total'];
+        $rate  = $total > 0 ? ($stats['within'] / $total) * 100 : 0.0;
+
+        return [
+            'total'  => $total,
+            'within' => $stats['within'],
+            'rate'   => $rate,
+        ];
     }
 
     /**

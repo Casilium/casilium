@@ -4,31 +4,30 @@ declare(strict_types=1);
 
 namespace Report\Handler;
 
-use Laminas\Diactoros\Response\HtmlResponse;
-use Mezzio\Template\TemplateRendererInterface;
+use Laminas\Diactoros\Response;
+use Laminas\Diactoros\Stream;
 use Organisation\Entity\Organisation;
 use Organisation\Exception\OrganisationNotFoundException;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
+use Report\Service\PdfService;
 use Report\Service\ReportService;
 use Ticket\Entity\Type;
 
-/**
- * Handler to provide Executive Reports to be presented to clients.
- */
+use function preg_replace;
+use function sprintf;
+
 class ExecutiveReportHandler implements RequestHandlerInterface
 {
-    /** @var TemplateRendererInterface */
-    private $renderer;
+    private PdfService $pdfService;
 
-    /** @var ReportService */
-    private $reportService;
+    private ReportService $reportService;
 
-    public function __construct(ReportService $reportService, TemplateRendererInterface $renderer)
+    public function __construct(ReportService $reportService, PdfService $pdfService)
     {
-        $this->renderer      = $renderer;
         $this->reportService = $reportService;
+        $this->pdfService    = $pdfService;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -75,13 +74,29 @@ class ExecutiveReportHandler implements RequestHandlerInterface
 
         // stats based on above stats being present in stats array
         $stats['totalOutstanding'] = $stats['new'] + $stats['progress'] + $stats['hold'];
+        $stats['incidentSla']      = $this->reportService->getIncidentSlaComplianceStats();
 
-        // return the HTML response, passing stats and organisation to the view
-        return new HtmlResponse($this->renderer->render('report::executive-report', [
-            'stats'        => $stats,
-            'organisation' => $organisation,
-            'startDate'    => $this->reportService->getStartDate(),
-            'endDate'      => $this->reportService->getEndDate(),
-        ]));
+        // generate PDF
+        $pdfContent = $this->pdfService->generateExecutiveReport(
+            $stats,
+            $organisation,
+            $this->reportService->getStartDate(),
+            $this->reportService->getEndDate(),
+        );
+
+        // build filename
+        $orgName  = preg_replace('/[^A-Za-z0-9\-]/', '-', $organisation->getName());
+        $month    = $this->reportService->getStartDate()->format('Y-m');
+        $filename = sprintf('Executive-Report-%s-%s.pdf', $orgName, $month);
+
+        // return PDF response
+        $stream = new Stream('php://memory', 'w');
+        $stream->write($pdfContent);
+
+        $response = new Response();
+        return $response
+            ->withHeader('Content-Type', 'application/pdf')
+            ->withHeader('Content-Disposition', sprintf('inline; filename="%s"', $filename))
+            ->withBody($stream);
     }
 }
