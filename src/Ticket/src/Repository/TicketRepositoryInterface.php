@@ -80,6 +80,17 @@ interface TicketRepositoryInterface
         ?CarbonInterface $periodEnd = null
     ): float;
 
+    public function findAverageResolutionTimeWithoutSla(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null
+    ): float;
+
+    public function findResolvedTicketCountBySlaStatus(
+        bool $hasSla,
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null
+    ): int;
+
     /**
      * Find SLA compliance rate as a percentage
      *

@@ -44,7 +44,10 @@ class HomePageHandlerTest extends TestCase
         $ticketRepository->findClosedTicketCount()->willReturn(5);
         $ticketRepository->findAllAgentStats(Argument::any(), Argument::any())->willReturn([]);
         $ticketRepository->findAverageResolutionTime(Argument::any(), Argument::any())->willReturn(1.5);
+        $ticketRepository->findAverageResolutionTimeWithoutSla(Argument::any(), Argument::any())->willReturn(2.5);
         $ticketRepository->findSlaComplianceRate(Argument::any(), Argument::any())->willReturn(99.0);
+        $ticketRepository->findResolvedTicketCountBySlaStatus(true, Argument::any(), Argument::any())->willReturn(10);
+        $ticketRepository->findResolvedTicketCountBySlaStatus(false, Argument::any(), Argument::any())->willReturn(7);
 
         $homePage = new HomePageHandler($renderer->reveal(), $ticketRepository->reveal());
         $response = $homePage->handle($this->prophesize(ServerRequestInterface::class)->reveal());

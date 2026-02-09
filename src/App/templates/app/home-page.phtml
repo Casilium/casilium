@@ -49,25 +49,44 @@ $this->inlineScript()->appendFile('https://cdnjs.cloudflare.com/ajax/libs/Chart.
                 </div>
             </a>
         </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-3 mb-3">
         <div class="col">
-            <div class="card mb-1 border-primary">
-                <div class="card-header text-nowrap text-center bg-primary text-white">
-                    SLA Compliance
+            <div class="card h-100 border-primary">
+                <div class="card-header bg-primary text-white text-center">
+                    SLA Incidents
                 </div>
-                <div class="card-body text-center">
-                    <h3><?= number_format($this->stats['slaCompliance'], 1) ?>%</h3>
-                    <small class="text-muted">This Month</small>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="text-uppercase small text-muted">SLA Compliance</div>
+                        <div class="display-6 fw-semibold"><?= number_format($this->stats['sla']['compliance'], 1) ?>%</div>
+                        <small class="text-muted">This Month</small>
+                    </div>
+                    <dl class="row mb-0">
+                        <dt class="col-7 text-uppercase small text-muted">Avg Resolution</dt>
+                        <dd class="col-5 text-end fw-semibold"><?= $this->stats['sla']['avgResolutionDisplay'] ?></dd>
+                        <dt class="col-7 text-uppercase small text-muted">Tickets Resolved</dt>
+                        <dd class="col-5 text-end fw-semibold"><?= (int) $this->stats['sla']['resolved'] ?></dd>
+                    </dl>
                 </div>
             </div>
         </div>
         <div class="col">
-            <div class="card mb-1 border-info">
-                <div class="card-header text-nowrap text-center bg-info text-white">
-                    Avg Resolution Time
+            <div class="card h-100 border-info">
+                <div class="card-header bg-info text-white text-center">
+                    Service Requests (No SLA)
                 </div>
-                <div class="card-body text-center">
-                    <h3><?= number_format($this->stats['avgResolutionTime'], 1) ?>h</h3>
-                    <small class="text-muted">This Month</small>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="text-uppercase small text-muted">Avg Resolution</div>
+                        <div class="display-6 fw-semibold"><?= $this->stats['service']['avgResolutionDisplay'] ?></div>
+                        <small class="text-muted">This Month</small>
+                    </div>
+                    <dl class="row mb-0">
+                        <dt class="col-7 text-uppercase small text-muted">Tickets Resolved</dt>
+                        <dd class="col-5 text-end fw-semibold"><?= (int) $this->stats['service']['resolved'] ?></dd>
+                    </dl>
                 </div>
             </div>
         </div>

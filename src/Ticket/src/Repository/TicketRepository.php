@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Exception;
 use Organisation\Entity\Organisation;
 use ServiceLevel\Entity\SlaTarget;
@@ -554,6 +555,31 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         return $stats;
     }
 
+    private function createResolvedTicketQueryBuilder(
+        ?CarbonInterface $periodStart,
+        ?CarbonInterface $periodEnd,
+        ?bool $requiresSla
+    ): QueryBuilder {
+        $qb = $this->createQueryBuilder('t')
+            ->where('t.status IN (:statuses)')
+            ->andWhere('t.resolveDate IS NOT NULL')
+            ->setParameter('statuses', [Ticket::STATUS_RESOLVED, Ticket::STATUS_CLOSED]);
+
+        if ($periodStart && $periodEnd) {
+            $qb->andWhere('t.resolveDate BETWEEN :start AND :end')
+                ->setParameter('start', $periodStart->format('Y-m-d H:i:s'))
+                ->setParameter('end', $periodEnd->format('Y-m-d H:i:s'));
+        }
+
+        if ($requiresSla === true) {
+            $qb->andWhere('t.slaTarget IS NOT NULL');
+        } elseif ($requiresSla === false) {
+            $qb->andWhere('t.slaTarget IS NULL');
+        }
+
+        return $qb;
+    }
+
     /**
      * Find average resolution time in hours for resolved tickets
      *
@@ -565,17 +591,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         ?CarbonInterface $periodStart = null,
         ?CarbonInterface $periodEnd = null
     ): float {
-        $qb = $this->createQueryBuilder('t')
-            ->where('t.status IN (:statuses)')
-            ->andWhere('t.resolveDate IS NOT NULL')
-            ->andWhere('t.slaTarget IS NOT NULL')
-            ->setParameter('statuses', [Ticket::STATUS_RESOLVED, Ticket::STATUS_CLOSED]);
-
-        if ($periodStart && $periodEnd) {
-            $qb->andWhere('t.resolveDate BETWEEN :start AND :end')
-                ->setParameter('start', $periodStart->format('Y-m-d H:i:s'))
-                ->setParameter('end', $periodEnd->format('Y-m-d H:i:s'));
-        }
+        $qb = $this->createResolvedTicketQueryBuilder($periodStart, $periodEnd, true);
 
         /** @var Ticket[] $tickets */
         $tickets = $qb->getQuery()->getResult();
@@ -584,15 +600,50 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             return 0.0;
         }
 
-        $totalHours = 0;
+        $totalMinutes = 0;
 
         foreach ($tickets as $ticket) {
-            $createdAt   = Carbon::parse($ticket->getCreatedAt(), 'UTC');
-            $resolveDate = Carbon::parse($ticket->getResolveDate(), 'UTC');
-            $totalHours += $createdAt->diffInHours($resolveDate);
+            $createdAt     = Carbon::parse($ticket->getCreatedAt(), 'UTC');
+            $resolveDate   = Carbon::parse($ticket->getResolveDate(), 'UTC');
+            $totalMinutes += $createdAt->diffInMinutes($resolveDate);
         }
 
-        return $totalHours / count($tickets);
+        return ($totalMinutes / count($tickets)) / 60;
+    }
+
+    public function findAverageResolutionTimeWithoutSla(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null
+    ): float {
+        $qb = $this->createResolvedTicketQueryBuilder($periodStart, $periodEnd, false);
+
+        /** @var Ticket[] $tickets */
+        $tickets = $qb->getQuery()->getResult();
+
+        if (empty($tickets)) {
+            return 0.0;
+        }
+
+        $totalMinutes = 0;
+
+        foreach ($tickets as $ticket) {
+            $createdAt     = Carbon::parse($ticket->getCreatedAt(), 'UTC');
+            $resolveDate   = Carbon::parse($ticket->getResolveDate(), 'UTC');
+            $totalMinutes += $createdAt->diffInMinutes($resolveDate);
+        }
+
+        return ($totalMinutes / count($tickets)) / 60;
+    }
+
+    public function findResolvedTicketCountBySlaStatus(
+        bool $hasSla,
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null
+    ): int {
+        $qb = $this->createResolvedTicketQueryBuilder($periodStart, $periodEnd, $hasSla)
+            ->select('COUNT(t.id)');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
     }
 
     /**
