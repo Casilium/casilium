@@ -568,6 +568,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         $qb = $this->createQueryBuilder('t')
             ->where('t.status IN (:statuses)')
             ->andWhere('t.resolveDate IS NOT NULL')
+            ->andWhere('t.slaTarget IS NOT NULL')
             ->setParameter('statuses', [Ticket::STATUS_RESOLVED, Ticket::STATUS_CLOSED]);
 
         if ($periodStart && $periodEnd) {
@@ -609,6 +610,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->where('t.status IN (:statuses)')
             ->andWhere('t.dueDate IS NOT NULL')
             ->andWhere('t.resolveDate IS NOT NULL')
+            ->andWhere('t.slaTarget IS NOT NULL')
             ->setParameter('statuses', [Ticket::STATUS_RESOLVED, Ticket::STATUS_CLOSED]);
 
         if ($periodStart && $periodEnd) {
