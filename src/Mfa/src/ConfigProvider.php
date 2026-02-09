@@ -45,6 +45,7 @@ class ConfigProvider
                 Handler\ValidateMfaHandler::class => Handler\Factory\ValidateMfaHandlerFactory::class,
                 Middleware\MfaMiddleware::class   => Middleware\Factory\MfaMiddlewareFactory::class,
                 Service\MfaService::class         => Service\Factory\MfaServiceFactory::class,
+                Service\TotpService::class        => Service\Factory\TotpServiceFactory::class,
             ],
         ];
     }

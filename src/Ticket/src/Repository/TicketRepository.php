@@ -51,14 +51,14 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
     {
         // todo: organisation refuses to persist
         $organisationId = $ticket->getOrganisation()->getId();
-        $reference      = $this->_em->getReference(Organisation::class, $organisationId);
+        $reference      = $this->getEntityManager()->getReference(Organisation::class, $organisationId);
         $ticket->setOrganisation($reference);
 
         // todo sla refuses to persist
         $slaTarget = $ticket->getSlaTarget();
         if ($slaTarget !== null) {
             $slaTargetId  = $ticket->getSlaTarget()->getId();
-            $slaReference = $this->_em->getReference(SlaTarget::class, $slaTargetId);
+            $slaReference = $this->getEntityManager()->getReference(SlaTarget::class, $slaTargetId);
             $ticket->setSlaTarget($slaReference);
         }
 
@@ -85,12 +85,20 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
     }
 
     /**
-     * Fetch all tickets from DB
+     * Fetch all tickets from DB using Doctrine default signature.
+     */
+    public function findAll(): array
+    {
+        return $this->findAllTickets();
+    }
+
+    /**
+     * Fetch all tickets from DB with filtering options.
      *
-     * @param bool $fetchResolved Whether to fetch closed and resolved tickets
+     * @param bool $fetchResolved Whether to include closed/resolved tickets
      * @return array ticket list
      */
-    public function findAll(bool $fetchResolved = true): array
+    public function findAllTickets(bool $fetchResolved = true): array
     {
         $qb = $this->createQueryBuilder('q')
             ->select('t')

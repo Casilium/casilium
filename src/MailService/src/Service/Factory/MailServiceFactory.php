@@ -7,6 +7,7 @@ namespace MailService\Service\Factory;
 use MailService\Service\MailService;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Container\ContainerInterface;
+use Psr\Log\LoggerInterface;
 
 class MailServiceFactory
 {
@@ -14,7 +15,10 @@ class MailServiceFactory
     {
         $config   = $container->get('config')['mail'] ?? [];
         $renderer = $container->get(TemplateRendererInterface::class);
+        $logger   = $container->has(LoggerInterface::class)
+            ? $container->get(LoggerInterface::class)
+            : null;
 
-        return new MailService($renderer, $config);
+        return new MailService($renderer, $config, $logger);
     }
 }

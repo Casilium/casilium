@@ -10,7 +10,7 @@ jobs:
 
     strategy:
       matrix:
-        php: ['8.3']
+        php: ['8.4']
 
     steps:
       - uses: actions/checkout@v4
@@ -20,7 +20,7 @@ jobs:
         with:
           php-version: ${{ matrix.php }}
           tools: composer
-          extensions: intl, mbstring, pdo_mysql
+          extensions: imap, intl, mbstring, pdo_mysql
           ini-values: memory_limit=512M
 
       - name: Cache Composer

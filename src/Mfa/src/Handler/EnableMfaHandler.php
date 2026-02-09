@@ -65,6 +65,12 @@ class EnableMfaHandler implements RequestHandlerInterface
         // get user from session
         $user = $request->getAttribute(IdentityInterface::class);
         $key  = $this->mfaService->getSecretKey($user);
+        if ($key === null) {
+            /** @var FlashMessagesInterface $flashMessages */
+            $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
+            $flashMessages->flash('error', 'Unable to retrieve MFA secret key. Please try again.');
+            return new RedirectResponse($this->helper->generate('account'));
+        }
 
         if ($this->mfaService->hasMfa($user)) {
             return new RedirectResponse($this->helper->generate('account'));

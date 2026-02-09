@@ -12,11 +12,9 @@ use Doctrine\DBAL\Types\DateTimeType;
 
 class UtcDateTimeType extends DateTimeType
 {
-    /** @var DateTimeZone */
-    private static $utc;
+    private static ?DateTimeZone $utc = null;
 
-    /** @inheritDoc */
-    public function convertToDatabaseValue($value, AbstractPlatform $platform)
+    public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
     {
         if ($value instanceof DateTime) {
             $value->setTimezone(self::getUtc());
@@ -25,8 +23,7 @@ class UtcDateTimeType extends DateTimeType
         return parent::convertToDatabaseValue($value, $platform);
     }
 
-    /** @inheritDoc */
-    public function convertToPHPValue($value, AbstractPlatform $platform)
+    public function convertToPHPValue(mixed $value, AbstractPlatform $platform): ?DateTime
     {
         if (null === $value || $value instanceof DateTime) {
             return $value;
@@ -51,6 +48,6 @@ class UtcDateTimeType extends DateTimeType
 
     private static function getUtc(): DateTimeZone
     {
-        return self::$utc ?: self::$utc = new DateTimeZone('UTC');
+        return self::$utc ??= new DateTimeZone('UTC');
     }
 }

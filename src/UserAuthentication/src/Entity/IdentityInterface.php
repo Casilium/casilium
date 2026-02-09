@@ -8,17 +8,17 @@ interface IdentityInterface
 {
     public function getId(): ?int;
 
-    public function setId(int $id): Identity;
+    public function setId(int $id): IdentityInterface;
 
     public function getEmail(): ?string;
 
-    public function setEmail(string $email): Identity;
+    public function setEmail(string $email): IdentityInterface;
 
     public function getName(): ?string;
 
-    public function setName(string $name): Identity;
+    public function setName(string $name): IdentityInterface;
 
-    public function setRoles(string $roles): Identity;
+    public function setRoles(string $roles): IdentityInterface;
 
     public function hasRole(string $search): bool;
 }

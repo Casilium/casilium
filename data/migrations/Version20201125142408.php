@@ -21,7 +21,7 @@ final class Version20201125142408 extends AbstractMigration
     {
         $table = $schema->createTable('sla');
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
-        $table->addColumn('name', 'string', ['notnull' => true]);
+        $table->addColumn('name', 'string', ['notnull' => true, 'length' => 128]);
         $table->addColumn('business_hours_id', 'integer', ['notnull' => true, 'unsigned' => true]);
 
         $table->setPrimaryKey(['id']);
@@ -33,7 +33,7 @@ final class Version20201125142408 extends AbstractMigration
         $table = $schema->createTable('sla_target');
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
         $table->addColumn('sla_id', 'integer', ['notnull' => true, 'unsigned' => true]);
-        $table->addColumn('priority_id', 'string', ['notnull' => true, 'unsigned' => true]);
+        $table->addColumn('priority_id', 'string', ['notnull' => true, 'unsigned' => true, 'length' => 10]);
         $table->addColumn('response_time', 'string', ['notnull' => false, 'length' => 5]);
         $table->addColumn('resolve_time', 'string', ['notnull' => false, 'length' => 5]);
 
@@ -53,8 +53,8 @@ final class Version20201125142408 extends AbstractMigration
     {
         $table = $schema->createTable('business_hours');
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
-        $table->addColumn('name', 'string', ['notnull' => true]);
-        $table->addColumn('timezone', 'string', ['notnull' => true]);
+        $table->addColumn('name', 'string', ['notnull' => true, 'length' => 128]);
+        $table->addColumn('timezone', 'string', ['notnull' => true, 'length' => 64]);
         $table->addColumn('mon_start', 'string', ['notnull' => false, 'length' => 5]);
         $table->addColumn('mon_end', 'string', ['notnull' => false, 'length' => 5]);
         $table->addColumn('tue_start', 'string', ['notnull' => false, 'length' => 5]);

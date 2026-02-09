@@ -33,9 +33,6 @@ class Role
     private Collection $parentRoles;
 
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'parentRoles')]
-    #[ORM\JoinTable(name: 'role_hierarchy')]
-    #[ORM\JoinColumn(name: 'parent_role_id', referencedColumnName: 'id')]
-    #[ORM\InverseJoinColumn(name: 'child_role_id', referencedColumnName: 'id')]
     private Collection $childRoles;
 
     #[ORM\ManyToMany(targetEntity: Permission::class, inversedBy: 'roles')]

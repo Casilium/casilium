@@ -8,12 +8,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use User\Repository\UserRepository;
+use UserAuthentication\Entity\IdentityInterface;
 
 use function count;
+use function strcasecmp;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\Table(name: 'user')]
-class User
+class User implements IdentityInterface
 {
     public const STATUS_INACTIVE = 0; // Inactive user
     public const STATUS_ACTIVE   = 1; // Active user
@@ -68,9 +70,10 @@ class User
         return $this->id;
     }
 
-    public function setId(int $id): void
+    public function setId(int $id): IdentityInterface
     {
         $this->id = $id;
+        return $this;
     }
 
     public function getEmail(): string
@@ -78,9 +81,10 @@ class User
         return $this->email;
     }
 
-    public function setEmail(string $email): void
+    public function setEmail(string $email): IdentityInterface
     {
         $this->email = $email;
+        return $this;
     }
 
     public function getFullName(): string
@@ -91,6 +95,17 @@ class User
     public function setFullName(string $fullName): void
     {
         $this->fullName = $fullName;
+    }
+
+    public function getName(): ?string
+    {
+        return $this->fullName;
+    }
+
+    public function setName(string $name): IdentityInterface
+    {
+        $this->fullName = $name;
+        return $this;
     }
 
     public function getPassword(): string
@@ -174,7 +189,7 @@ class User
         return $this->secretKey;
     }
 
-    public function setSecretKey(string $secretKey): User
+    public function setSecretKey(?string $secretKey): User
     {
         $this->secretKey = $secretKey;
         return $this;
@@ -208,5 +223,21 @@ class User
     {
         $this->roles->add($role);
         return $this;
+    }
+
+    public function setRoles(string $roles): IdentityInterface
+    {
+        // IdentityInterface compatibility - roles are managed via addRole() in practice
+        return $this;
+    }
+
+    public function hasRole(string $search): bool
+    {
+        foreach ($this->roles as $role) {
+            if (strcasecmp($role->getName(), $search) === 0) {
+                return true;
+            }
+        }
+        return false;
     }
 }

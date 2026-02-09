@@ -4,87 +4,85 @@ declare(strict_types=1);
 
 namespace Mfa\Service;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Driver\Exception;
-use Sonata\GoogleAuthenticator\GoogleAuthenticator;
-use Sonata\GoogleAuthenticator\GoogleQrUrl;
+use App\Encryption\Sodium;
+use Doctrine\ORM\EntityManagerInterface;
+use RuntimeException;
+use User\Entity\User;
 use UserAuthentication\Entity\IdentityInterface;
+
+use function str_starts_with;
+use function strlen;
+use function substr;
 
 class MfaService
 {
-    protected GoogleAuthenticator $authenticator;
+    private const ENCRYPTED_PREFIX = 'enc:';
 
-    protected Connection $connection;
+    private EntityManagerInterface $entityManager;
+    private TotpService $totpService;
+    private array $config;
+    private string $encryptionKey;
 
-    /** @var array */
-    protected array $config;
-
-    public function __construct(Connection $connection, array $config)
-    {
-        $this->authenticator = new GoogleAuthenticator();
-        $this->connection    = $connection;
+    public function __construct(
+        EntityManagerInterface $entityManager,
+        array $config,
+        TotpService $totpService,
+        string $encryptionKey
+    ) {
+        $this->entityManager = $entityManager;
         $this->config        = $config;
+        $this->totpService   = $totpService;
+        $this->encryptionKey = $encryptionKey;
     }
 
     /**
      * Checks if user has MFA enabled
-     *
-     * @param IdentityInterface $user User to check if MFA is enabled
-     * @return false|mixed false if user not found, 0 if disable or 1 if enabled
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
      */
-    public function hasMfa(IdentityInterface $user): bool
+    public function hasMfa(IdentityInterface $identity): bool
     {
-        $sql  = 'SELECT mfa_enabled from `user` WHERE id = ? LIMIT 1';
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindValue(1, $user->getId());
-        $result = $stmt->executeQuery();
-
-        if ($result->rowCount()) {
-            return (bool) $result->fetchOne();
+        $user = $this->findUser($identity->getId());
+        if ($user === null) {
+            return false;
         }
 
-        return false;
+        return $user->isMfaEnabled();
     }
 
     /**
      * Enable MFA for user
-     *
-     * @param IdentityInterface $user User to check if MFA is enabled
-     * @return false|mixed true if successful or false
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
      */
-    public function enableMfa(IdentityInterface $user): bool
+    public function enableMfa(IdentityInterface $identity): bool
     {
-        $sql  = 'UPDATE `user` SET mfa_enabled = 1 WHERE id = ?';
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindValue(1, $user->getId());
-        return (bool) $stmt->executeStatement();
+        $user = $this->findUser($identity->getId());
+        if ($user === null) {
+            return false;
+        }
+
+        $user->setMfaEnabled(true);
+        $this->entityManager->flush();
+
+        return true;
     }
 
     /**
-     * Enable MFA for user
-     *
-     * @param IdentityInterface $user User to check if MFA is enabled
-     * @return false|mixed false if user not found, 0 if disable or 1 if enabled
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
+     * Disable MFA for user
      */
-    public function disableMfa(IdentityInterface $user)
+    public function disableMfa(IdentityInterface $identity): bool
     {
-        // prepare SQL statement and bind values
-        $sql  = 'UPDATE `user` SET mfa_enabled = 0, secret_key = null WHERE id = ?';
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindValue(1, $user->getId());
-        return (bool) $stmt->executeStatement();
+        $user = $this->findUser($identity->getId());
+        if ($user === null) {
+            return false;
+        }
+
+        $user->setMfaEnabled(false);
+        $user->setSecretKey(null);
+        $this->entityManager->flush();
+
+        return true;
     }
 
     /**
      * Checks if MFA is enabled within application
-     *
-     * @return bool true if enabled, or false
      */
     public function isMfaEnabled(): bool
     {
@@ -92,80 +90,60 @@ class MfaService
     }
 
     /**
-     * Retrieve user's mfa secret key
-     *
-     * @param IdentityInterface $user user object
-     * @return string|null secret key or null
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
+     * Retrieve user's mfa secret key (decrypted)
      */
-    public function getSecretKey(IdentityInterface $user): ?string
+    public function getSecretKey(IdentityInterface $identity): ?string
     {
-        // prepare sql statement
-        $sql  = 'SELECT secret_key from `user` WHERE id = ? LIMIT 1';
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindValue(1, $user->getId());
-        $result = $stmt->executeQuery();
-
-        if ($result->rowCount()) {
-            if (! $secretKey = $result->fetchOne()) {
-                // no secret key? Generate and save
-                $key = $this->generateSecretKey();
-                $this->saveSecretKey($user, $key);
-                return $key;
-            }
-
-            // return saved secret key
-            return $secretKey;
+        $user = $this->findUser($identity->getId());
+        if ($user === null) {
+            return null;
         }
 
-        return null;
+        $secretKey = $user->getSecretKey();
+        if ($secretKey === null || $secretKey === '') {
+            // No secret key? Generate and save
+            $key = $this->generateSecretKey();
+            $this->saveSecretKey($identity, $key);
+            return $key;
+        }
+
+        return $this->decryptSecret($secretKey);
     }
 
     /**
      * Generate secret key
-     *
-     * @return string secret key
      */
     public function generateSecretKey(): string
     {
-        return $this->authenticator->generateSecret();
+        return $this->totpService->generateSecret();
     }
 
     /**
-     * @param IdentityInterface $user user object
-     * @param string $key secret key
-     * @return bool true if saved or false
-     * @throws Exception
-     * @throws \Doctrine\DBAL\Exception
+     * Save secret key (encrypted)
      */
-    public function saveSecretKey(IdentityInterface $user, string $key): bool
+    public function saveSecretKey(IdentityInterface $identity, string $key): bool
     {
-        // prepare SQL statement and bind values
-        $sql  = 'UPDATE `user` SET secret_key = ? WHERE id = ?';
-        $stmt = $this->connection->prepare($sql);
-        $stmt->bindValue(1, $key);
-        $stmt->bindValue(2, $user->getId());
-        return (bool) $stmt->executeStatement();
+        $user = $this->findUser($identity->getId());
+        if ($user === null) {
+            return false;
+        }
+
+        $user->setSecretKey($this->encryptSecret($key));
+        $this->entityManager->flush();
+
+        return true;
     }
 
     /**
-     * Check if MFA entry is successful
-     *
-     * @param string $code secret key
-     * @param string $pin time coded pin
-     * @return bool true if valid, or false
+     * Check if MFA code is valid
      */
-    public function isValidCode(string $code, string $pin): bool
+    public function isValidCode(string $secret, string $pin): bool
     {
-        return $this->authenticator->checkCode($code, $pin);
+        return $this->totpService->verifyCode($secret, $pin);
     }
 
     /**
      * Return issuer
-     *
-     * @return string issuer
-     * @throws \Exception
      */
     public function getIssuer(): string
     {
@@ -173,18 +151,39 @@ class MfaService
             return $this->config['issuer'];
         }
 
-        throw new \Exception('Issuer not found!');
+        throw new RuntimeException('Issuer not found!');
     }
 
     /**
-     * Generate Google QR Code url
-     *
-     * @param string $email email of user
-     * @param string $key user's key
-     * @return string QR Code URL
+     * Generate QR Code URL
      */
     public function getQrCodeUrl(string $email, string $key): string
     {
-        return GoogleQrUrl::generate($email, $key, $this->getIssuer());
+        return $this->totpService->getQrCodeUrl($email, $key, $this->getIssuer());
+    }
+
+    private function findUser(int $userId): ?User
+    {
+        return $this->entityManager->getRepository(User::class)->find($userId);
+    }
+
+    private function encryptSecret(string $plain): string
+    {
+        return self::ENCRYPTED_PREFIX . Sodium::encrypt($plain, $this->encryptionKey);
+    }
+
+    private function decryptSecret(string $stored): string
+    {
+        if (! $this->isEncrypted($stored)) {
+            return $stored;
+        }
+
+        $cipher = substr($stored, strlen(self::ENCRYPTED_PREFIX));
+        return Sodium::decrypt($cipher, $this->encryptionKey);
+    }
+
+    private function isEncrypted(string $stored): bool
+    {
+        return str_starts_with($stored, self::ENCRYPTED_PREFIX);
     }
 }

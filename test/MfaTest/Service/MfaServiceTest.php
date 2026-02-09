@@ -4,57 +4,63 @@ declare(strict_types=1);
 
 namespace MfaTest\Service;
 
-use Doctrine\DBAL\Connection;
-use Doctrine\DBAL\Result;
-use Doctrine\DBAL\Statement;
-use Exception;
+use App\Encryption\Sodium;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
 use Mfa\Service\MfaService;
+use Mfa\Service\TotpService;
 use PHPUnit\Framework\TestCase;
-use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use RuntimeException;
+use User\Entity\User;
 use UserAuthentication\Entity\IdentityInterface;
-
-use function urlencode;
 
 class MfaServiceTest extends TestCase
 {
     use ProphecyTrait;
 
     private MfaService $mfaService;
-    private ObjectProphecy $connection;
-    private ObjectProphecy $statement;
-    private ObjectProphecy $result;
+    private ObjectProphecy $entityManager;
+    private ObjectProphecy $repository;
+    private ObjectProphecy $totpService;
     private ObjectProphecy $identity;
     private array $config;
+    private string $encryptionKey;
 
     protected function setUp(): void
     {
-        $this->connection = $this->prophesize(Connection::class);
-        $this->statement  = $this->prophesize(Statement::class);
-        $this->result     = $this->prophesize(Result::class);
-        $this->identity   = $this->prophesize(IdentityInterface::class);
+        $this->entityManager = $this->prophesize(EntityManagerInterface::class);
+        $this->repository    = $this->prophesize(EntityRepository::class);
+        $this->totpService   = $this->prophesize(TotpService::class);
+        $this->identity      = $this->prophesize(IdentityInterface::class);
+
+        $this->entityManager->getRepository(User::class)
+            ->willReturn($this->repository->reveal());
 
         $this->config = [
             'enabled' => true,
             'issuer'  => 'Test App',
         ];
 
-        $this->mfaService = new MfaService($this->connection->reveal(), $this->config);
+        $this->encryptionKey = Sodium::generateKey();
+
+        $this->mfaService = new MfaService(
+            $this->entityManager->reveal(),
+            $this->config,
+            $this->totpService->reveal(),
+            $this->encryptionKey
+        );
     }
 
     public function testHasMfaReturnsTrueWhenUserHasMfaEnabled(): void
     {
         $this->identity->getId()->willReturn(123);
 
-        $this->connection->prepare('SELECT mfa_enabled from `user` WHERE id = ? LIMIT 1')
-            ->willReturn($this->statement->reveal());
+        $user = new User();
+        $user->setMfaEnabled(true);
 
-        $this->statement->bindValue(1, 123)->shouldBeCalled();
-        $this->statement->executeQuery()->willReturn($this->result->reveal());
-
-        $this->result->rowCount()->willReturn(1);
-        $this->result->fetchOne()->willReturn(1);
+        $this->repository->find(123)->willReturn($user);
 
         $result = $this->mfaService->hasMfa($this->identity->reveal());
 
@@ -65,14 +71,10 @@ class MfaServiceTest extends TestCase
     {
         $this->identity->getId()->willReturn(123);
 
-        $this->connection->prepare(Argument::type('string'))
-            ->willReturn($this->statement->reveal());
+        $user = new User();
+        $user->setMfaEnabled(false);
 
-        $this->statement->bindValue(1, 123)->shouldBeCalled();
-        $this->statement->executeQuery()->willReturn($this->result->reveal());
-
-        $this->result->rowCount()->willReturn(1);
-        $this->result->fetchOne()->willReturn(0);
+        $this->repository->find(123)->willReturn($user);
 
         $result = $this->mfaService->hasMfa($this->identity->reveal());
 
@@ -82,14 +84,7 @@ class MfaServiceTest extends TestCase
     public function testHasMfaReturnsFalseWhenUserNotFound(): void
     {
         $this->identity->getId()->willReturn(999);
-
-        $this->connection->prepare(Argument::type('string'))
-            ->willReturn($this->statement->reveal());
-
-        $this->statement->bindValue(1, 999)->shouldBeCalled();
-        $this->statement->executeQuery()->willReturn($this->result->reveal());
-
-        $this->result->rowCount()->willReturn(0);
+        $this->repository->find(999)->willReturn(null);
 
         $result = $this->mfaService->hasMfa($this->identity->reveal());
 
@@ -100,26 +95,22 @@ class MfaServiceTest extends TestCase
     {
         $this->identity->getId()->willReturn(123);
 
-        $this->connection->prepare('UPDATE `user` SET mfa_enabled = 1 WHERE id = ?')
-            ->willReturn($this->statement->reveal());
+        $user = new User();
+        $user->setMfaEnabled(false);
 
-        $this->statement->bindValue(1, 123)->shouldBeCalled();
-        $this->statement->executeStatement()->willReturn(1);
+        $this->repository->find(123)->willReturn($user);
+        $this->entityManager->flush()->shouldBeCalled();
 
         $result = $this->mfaService->enableMfa($this->identity->reveal());
 
         $this->assertTrue($result);
+        $this->assertTrue($user->isMfaEnabled());
     }
 
-    public function testEnableMfaReturnsFalseOnFailure(): void
+    public function testEnableMfaReturnsFalseWhenUserNotFound(): void
     {
         $this->identity->getId()->willReturn(123);
-
-        $this->connection->prepare(Argument::type('string'))
-            ->willReturn($this->statement->reveal());
-
-        $this->statement->bindValue(1, 123)->shouldBeCalled();
-        $this->statement->executeStatement()->willReturn(0);
+        $this->repository->find(123)->willReturn(null);
 
         $result = $this->mfaService->enableMfa($this->identity->reveal());
 
@@ -130,15 +121,18 @@ class MfaServiceTest extends TestCase
     {
         $this->identity->getId()->willReturn(123);
 
-        $this->connection->prepare('UPDATE `user` SET mfa_enabled = 0, secret_key = null WHERE id = ?')
-            ->willReturn($this->statement->reveal());
+        $user = new User();
+        $user->setMfaEnabled(true);
+        $user->setSecretKey('some_key');
 
-        $this->statement->bindValue(1, 123)->shouldBeCalled();
-        $this->statement->executeStatement()->willReturn(1);
+        $this->repository->find(123)->willReturn($user);
+        $this->entityManager->flush()->shouldBeCalled();
 
         $result = $this->mfaService->disableMfa($this->identity->reveal());
 
         $this->assertTrue($result);
+        $this->assertFalse($user->isMfaEnabled());
+        $this->assertNull($user->getSecretKey());
     }
 
     public function testIsMfaEnabledReturnsTrueWhenConfigured(): void
@@ -150,7 +144,12 @@ class MfaServiceTest extends TestCase
     public function testIsMfaEnabledReturnsFalseWhenDisabledInConfig(): void
     {
         $config     = ['enabled' => false, 'issuer' => 'Test App'];
-        $mfaService = new MfaService($this->connection->reveal(), $config);
+        $mfaService = new MfaService(
+            $this->entityManager->reveal(),
+            $config,
+            $this->totpService->reveal(),
+            $this->encryptionKey
+        );
 
         $result = $mfaService->isMfaEnabled();
         $this->assertFalse($result);
@@ -159,113 +158,94 @@ class MfaServiceTest extends TestCase
     public function testIsMfaEnabledReturnsFalseWhenNotConfigured(): void
     {
         $config     = ['issuer' => 'Test App'];
-        $mfaService = new MfaService($this->connection->reveal(), $config);
+        $mfaService = new MfaService(
+            $this->entityManager->reveal(),
+            $config,
+            $this->totpService->reveal(),
+            $this->encryptionKey
+        );
 
         $result = $mfaService->isMfaEnabled();
         $this->assertFalse($result);
     }
 
-    public function testGetSecretKeyReturnsExistingKey(): void
+    public function testGetSecretKeyReturnsDecryptedExistingKey(): void
     {
         $this->identity->getId()->willReturn(123);
-        $existingKey = 'EXISTING_SECRET_KEY_123';
+        $plainKey = 'ABCDEFGHIJKLMNOP';
 
-        $this->connection->prepare('SELECT secret_key from `user` WHERE id = ? LIMIT 1')
-            ->willReturn($this->statement->reveal());
+        $user = new User();
+        $user->setSecretKey('enc:' . Sodium::encrypt($plainKey, $this->encryptionKey));
 
-        $this->statement->bindValue(1, 123)->shouldBeCalled();
-        $this->statement->executeQuery()->willReturn($this->result->reveal());
-
-        $this->result->rowCount()->willReturn(1);
-        $this->result->fetchOne()->willReturn($existingKey);
+        $this->repository->find(123)->willReturn($user);
 
         $result = $this->mfaService->getSecretKey($this->identity->reveal());
 
-        $this->assertEquals($existingKey, $result);
+        $this->assertEquals($plainKey, $result);
     }
 
     public function testGetSecretKeyGeneratesNewKeyWhenNoneExists(): void
     {
         $this->identity->getId()->willReturn(123);
+        $generatedKey = 'NEWGENERATEDKEY123';
 
-        // Setup for getting existing key (returns null)
-        $this->connection->prepare('SELECT secret_key from `user` WHERE id = ? LIMIT 1')
-            ->willReturn($this->statement->reveal());
+        $user = new User();
+        $user->setSecretKey(null);
 
-        $this->statement->bindValue(1, 123)->shouldBeCalled();
-        $this->statement->executeQuery()->willReturn($this->result->reveal());
-
-        $this->result->rowCount()->willReturn(1);
-        $this->result->fetchOne()->willReturn(null);
-
-        // Setup for saving new key
-        $saveStatement = $this->prophesize(Statement::class);
-        $this->connection->prepare('UPDATE `user` SET secret_key = ? WHERE id = ?')
-            ->willReturn($saveStatement->reveal());
-
-        $saveStatement->bindValue(1, Argument::type('string'))->shouldBeCalled();
-        $saveStatement->bindValue(2, 123)->shouldBeCalled();
-        $saveStatement->executeStatement()->willReturn(1);
+        $this->repository->find(123)->willReturn($user);
+        $this->totpService->generateSecret()->willReturn($generatedKey);
+        $this->entityManager->flush()->shouldBeCalled();
 
         $result = $this->mfaService->getSecretKey($this->identity->reveal());
 
-        $this->assertIsString($result);
-        $this->assertNotEmpty($result);
+        $this->assertEquals($generatedKey, $result);
     }
 
     public function testGetSecretKeyReturnsNullWhenUserNotFound(): void
     {
         $this->identity->getId()->willReturn(999);
-
-        $this->connection->prepare(Argument::type('string'))
-            ->willReturn($this->statement->reveal());
-
-        $this->statement->bindValue(1, 999)->shouldBeCalled();
-        $this->statement->executeQuery()->willReturn($this->result->reveal());
-
-        $this->result->rowCount()->willReturn(0);
+        $this->repository->find(999)->willReturn(null);
 
         $result = $this->mfaService->getSecretKey($this->identity->reveal());
 
         $this->assertNull($result);
     }
 
-    public function testGenerateSecretKeyReturnsString(): void
+    public function testGenerateSecretKeyDelegatesToTotpService(): void
     {
+        $expectedSecret = 'GENERATED_SECRET';
+        $this->totpService->generateSecret()->willReturn($expectedSecret);
+
         $result = $this->mfaService->generateSecretKey();
 
-        $this->assertIsString($result);
-        $this->assertNotEmpty($result);
+        $this->assertEquals($expectedSecret, $result);
     }
 
-    public function testSaveSecretKeyUpdatesDatabase(): void
+    public function testSaveSecretKeyEncryptsAndSaves(): void
     {
         $this->identity->getId()->willReturn(123);
-        $secretKey = 'NEW_SECRET_KEY_456';
+        $secretKey = 'PLAIN_SECRET_KEY';
 
-        $this->connection->prepare('UPDATE `user` SET secret_key = ? WHERE id = ?')
-            ->willReturn($this->statement->reveal());
-
-        $this->statement->bindValue(1, $secretKey)->shouldBeCalled();
-        $this->statement->bindValue(2, 123)->shouldBeCalled();
-        $this->statement->executeStatement()->willReturn(1);
+        $user = new User();
+        $this->repository->find(123)->willReturn($user);
+        $this->entityManager->flush()->shouldBeCalled();
 
         $result = $this->mfaService->saveSecretKey($this->identity->reveal(), $secretKey);
 
         $this->assertTrue($result);
+        $this->assertStringStartsWith('enc:', $user->getSecretKey());
     }
 
-    public function testIsValidCodeValidatesCorrectPin(): void
+    public function testIsValidCodeDelegatesToTotpService(): void
     {
-        // This test uses the actual GoogleAuthenticator functionality
-        // We'll test with known valid combinations
-        $secretKey = $this->mfaService->generateSecretKey();
+        $secret = 'SECRET';
+        $pin    = '123456';
 
-        // Since we can't predict the time-based code, we'll test the method exists
-        // and returns a boolean
-        $result = $this->mfaService->isValidCode($secretKey, '123456');
+        $this->totpService->verifyCode($secret, $pin)->willReturn(true);
 
-        $this->assertIsBool($result);
+        $result = $this->mfaService->isValidCode($secret, $pin);
+
+        $this->assertTrue($result);
     }
 
     public function testGetIssuerReturnsConfiguredIssuer(): void
@@ -277,26 +257,31 @@ class MfaServiceTest extends TestCase
     public function testGetIssuerThrowsExceptionWhenNotConfigured(): void
     {
         $config     = ['enabled' => true];
-        $mfaService = new MfaService($this->connection->reveal(), $config);
+        $mfaService = new MfaService(
+            $this->entityManager->reveal(),
+            $config,
+            $this->totpService->reveal(),
+            $this->encryptionKey
+        );
 
-        $this->expectException(Exception::class);
+        $this->expectException(RuntimeException::class);
         $this->expectExceptionMessage('Issuer not found!');
 
         $mfaService->getIssuer();
     }
 
-    public function testGetQrCodeUrlReturnsValidUrl(): void
+    public function testGetQrCodeUrlDelegatesToTotpService(): void
     {
-        $email = 'test@example.com';
-        $key   = 'SECRET_KEY_123';
+        $email       = 'test@example.com';
+        $key         = 'SECRET_KEY_123';
+        $expectedUrl = 'data:image/svg+xml;base64,abc123';
+
+        $this->totpService->getQrCodeUrl($email, $key, 'Test App')
+            ->willReturn($expectedUrl);
 
         $result = $this->mfaService->getQrCodeUrl($email, $key);
 
-        $this->assertIsString($result);
-        // The GoogleQrUrl generates a QR server URL that contains the encoded otpauth URL
-        $this->assertStringContainsString('qrserver.com', $result);
-        $this->assertStringContainsString(urlencode($email), $result);
-        $this->assertStringContainsString('Test%20App', $result);
+        $this->assertEquals($expectedUrl, $result);
     }
 
     /**
@@ -305,7 +290,12 @@ class MfaServiceTest extends TestCase
     public function testIsMfaEnabledWithVariousConfigurations(mixed $configValue, bool $expected): void
     {
         $config     = ['enabled' => $configValue, 'issuer' => 'Test'];
-        $mfaService = new MfaService($this->connection->reveal(), $config);
+        $mfaService = new MfaService(
+            $this->entityManager->reveal(),
+            $config,
+            $this->totpService->reveal(),
+            $this->encryptionKey
+        );
 
         $this->assertEquals($expected, $mfaService->isMfaEnabled());
     }

@@ -3,6 +3,19 @@
  * Local configuration excluded from vcs due to sensitive info
  * Edit to your needs
  */
+$dbHost = getenv('DB_HOST') ?: 'localhost';
+$dbName = getenv('DB_NAME') ?: 'DATABASE_NAME';
+$dbUser = getenv('DB_USER') ?: 'USERNAME';
+$dbPassword = getenv('DB_PASSWORD') ?: 'PASSWORD';
+
+$doctrineUrl = sprintf(
+    'pdo-mysql://%s:%s@%s/%s',
+    rawurlencode($dbUser),
+    rawurlencode($dbPassword),
+    $dbHost,
+    $dbName
+);
+
 return [
     'encryption' => [
         'key' => 'YOUR_HEX_KEY',
@@ -16,7 +29,7 @@ return [
         'connection' => [
             'orm_default' => [
                 'params' => [
-                    'url' => 'mysql://USERNAME:PASSWORD@localhost/DATABASE_NAME',
+                    'url' => $doctrineUrl,
                 ],
             ],
         ],

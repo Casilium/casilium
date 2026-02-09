@@ -34,10 +34,10 @@ class UserRepository extends EntityRepository
     public function save(User $user): void
     {
         if ($user->getId() === null) {
-            $this->_em->persist($user);
+            $this->getEntityManager()->persist($user);
         }
 
-        $this->_em->flush();
+        $this->getEntityManager()->flush();
     }
 
     public function findUserById(int $id, bool $fetchCredentials = false): ?User

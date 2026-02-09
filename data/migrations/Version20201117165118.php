@@ -35,7 +35,7 @@ final class Version20201117165118 extends AbstractMigration
     {
         $table = $schema->createTable('ticket_status');
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
-        $table->addColumn('description', 'string', ['notnull' => true]);
+        $table->addColumn('description', 'string', ['notnull' => true, 'length' => 128]);
         $table->addUniqueIndex(['description']);
         $table->setPrimaryKey(['id']);
     }
@@ -47,7 +47,7 @@ final class Version20201117165118 extends AbstractMigration
     {
         $table = $schema->createTable('ticket_priority');
         $table->addColumn('id', 'smallint', ['unsigned' => true]);
-        $table->addColumn('name', 'string', ['notnull' => true]);
+        $table->addColumn('name', 'string', ['notnull' => true, 'length' => 64]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name']);
     }
@@ -56,7 +56,7 @@ final class Version20201117165118 extends AbstractMigration
     {
         $table = $schema->createTable('ticket_type');
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
-        $table->addColumn('description', 'string', ['notnull' => true]);
+        $table->addColumn('description', 'string', ['notnull' => true, 'length' => 128]);
         $table->addUniqueIndex(['description']);
         $table->setPrimaryKey(['id']);
     }
@@ -65,7 +65,7 @@ final class Version20201117165118 extends AbstractMigration
     {
         $table = $schema->createTable('ticket_source');
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
-        $table->addColumn('description', 'string', ['notnull' => true]);
+        $table->addColumn('description', 'string', ['notnull' => true, 'length' => 128]);
         $table->addUniqueIndex(['description']);
         $table->setPrimaryKey(['id']);
     }
@@ -77,11 +77,11 @@ final class Version20201117165118 extends AbstractMigration
     {
         $table = $schema->createTable('queue');
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement' => true]);
-        $table->addColumn('name', 'string', ['notnull' => true]);
-        $table->addColumn('email', 'string', ['notnull' => false]);
-        $table->addColumn('host', 'string', ['notnull' => false]);
-        $table->addColumn('user', 'string', ['notnull' => false]);
-        $table->addColumn('password', 'string', ['notnull' => false]);
+        $table->addColumn('name', 'string', ['notnull' => true, 'length' => 128]);
+        $table->addColumn('email', 'string', ['notnull' => false, 'length' => 191]);
+        $table->addColumn('host', 'string', ['notnull' => false, 'length' => 255]);
+        $table->addColumn('user', 'string', ['notnull' => false, 'length' => 128]);
+        $table->addColumn('password', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('use_ssl', 'boolean', ['notnull' => false]);
         $table->addColumn('fetch_from_mail', 'boolean', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
@@ -130,7 +130,7 @@ final class Version20201117165118 extends AbstractMigration
         $table->addColumn('impact', 'smallint', ['unsigned' => true]);
         $table->addColumn('urgency', 'smallint', ['unsigned' => true]);
         $table->addColumn('priority_id', 'smallint', ['unsigned' => true]);
-        $table->addColumn('short_description', 'string', ['notnull' => true]);
+        $table->addColumn('short_description', 'string', ['notnull' => true, 'length' => 255]);
         $table->addColumn('long_description', 'text', ['notnull' => true]);
         $table->addColumn('status', 'integer', ['unsigned' => true]);
         $table->addColumn('queue_id', 'integer', ['unsigned' => true]);

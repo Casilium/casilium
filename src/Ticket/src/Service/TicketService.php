@@ -24,6 +24,7 @@ use Ticket\Entity\Status;
 use Ticket\Entity\Ticket;
 use Ticket\Entity\TicketResponse;
 use Ticket\Entity\Type;
+use Ticket\Repository\TicketRepositoryInterface;
 use User\Entity\User;
 use User\Service\UserManager;
 
@@ -177,7 +178,9 @@ class TicketService
      */
     public function fetchAllTickets(bool $fetchResolved = true): array
     {
-        return $this->entityManager->getRepository(Ticket::class)->findAll($fetchResolved);
+        /** @var TicketRepositoryInterface $repository */
+        $repository = $this->entityManager->getRepository(Ticket::class);
+        return $repository->findAllTickets($fetchResolved);
     }
 
     public function findTicketsByOrganisationUuid(string $uuid): array

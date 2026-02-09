@@ -9,7 +9,7 @@ use Doctrine\ORM\Query;
 
 class CountryRepository extends EntityRepository
 {
-    public function findAll(array $options = []): ?array
+    public function findAll(): array
     {
         $result = $this->createQueryBuilder('c')->getQuery();
         return $result->getResult(Query::HYDRATE_OBJECT);

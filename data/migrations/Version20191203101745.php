@@ -33,7 +33,7 @@ final class Version20191203101745 extends AbstractMigration
         $table = $schema->createTable('organisation_domain');
         $table->addColumn('id', 'integer', ['unsigned' => true, 'autoincrement'=>true]);
         $table->addColumn('organisation_id', 'integer', ['unsigned' => true]);
-        $table->addColumn('name', 'string', ['notnull' => true]);
+        $table->addColumn('name', 'string', ['notnull' => true, 'length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['name'], 'domain_index', []);
         $table->addOption('engine', 'InnoDB');

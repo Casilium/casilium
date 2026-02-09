@@ -9,6 +9,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Ticket\Repository\QueueRepository;
 
+use function array_key_exists;
 use function get_object_vars;
 
 #[ORM\Entity(repositoryClass: QueueRepository::class)]
@@ -178,14 +179,38 @@ class Queue
      */
     public function exchangeArray(array $data): self
     {
-        $this->id            = $data['id'] ?? null;
-        $this->name          = $data['name'] ?? null;
-        $this->email         = $data['email'] ?? null;
-        $this->password      = $data['password'] ?? null;
-        $this->host          = $data['host'] ?? null;
-        $this->user          = $data['user'] ?? null;
-        $this->useSsl        = $data['use_ssl'] ?? null;
-        $this->fetchFromMail = $data['fetch_from_mail'] ?? null;
+        if (array_key_exists('id', $data) && $data['id'] !== null && $data['id'] !== '') {
+            $this->id = (int) $data['id'];
+        }
+
+        if (array_key_exists('name', $data) && $data['name'] !== null) {
+            $this->name = (string) $data['name'];
+        }
+
+        if (array_key_exists('email', $data) && $data['email'] !== null) {
+            $this->email = (string) $data['email'];
+        }
+
+        if (array_key_exists('password', $data)) {
+            $this->password = $data['password'] !== null ? (string) $data['password'] : null;
+        }
+
+        if (array_key_exists('host', $data)) {
+            $this->host = $data['host'] !== null ? (string) $data['host'] : null;
+        }
+
+        if (array_key_exists('user', $data)) {
+            $this->user = $data['user'] !== null ? (string) $data['user'] : null;
+        }
+
+        if (array_key_exists('use_ssl', $data)) {
+            $this->useSsl = $data['use_ssl'] !== null ? (bool) $data['use_ssl'] : null;
+        }
+
+        if (array_key_exists('fetch_from_mail', $data)) {
+            $this->fetchFromMail = $data['fetch_from_mail'] !== null ? (bool) $data['fetch_from_mail'] : null;
+        }
+
         return $this;
     }
 }

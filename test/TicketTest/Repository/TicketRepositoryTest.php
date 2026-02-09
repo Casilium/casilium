@@ -12,7 +12,6 @@ use Doctrine\ORM\QueryBuilder;
 use Exception;
 use Organisation\Entity\Organisation;
 use PHPUnit\Framework\TestCase;
-use ReflectionClass;
 use ServiceLevel\Entity\SlaTarget;
 use Ticket\Entity\Agent;
 use Ticket\Entity\Status;
@@ -41,11 +40,6 @@ class TicketRepositoryTest extends TestCase
 
         $this->repository->method('getEntityManager')->willReturn($this->entityManager);
         $this->repository->method('createQueryBuilder')->willReturn($this->queryBuilder);
-
-        // Set the protected _em property for methods that access it directly
-        $reflection = new ReflectionClass($this->repository);
-        $emProperty = $reflection->getProperty('_em');
-        $emProperty->setValue($this->repository, $this->entityManager);
     }
 
     public function testFindTicketByUuid(): void

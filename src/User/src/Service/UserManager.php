@@ -6,7 +6,6 @@ namespace User\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
 use Exception;
-use Laminas\Crypt\Password\Bcrypt;
 use Mezzio\Template\TemplateRendererInterface;
 use User\Entity\Role;
 use User\Entity\User;
@@ -79,8 +78,7 @@ class UserManager
 
     public function getPasswordHash(string $password): string
     {
-        $bcrypt = new Bcrypt();
-        return $bcrypt->create($password);
+        return password_hash($password, PASSWORD_BCRYPT);
     }
 
     public function updateUser(User $user, array $data): bool

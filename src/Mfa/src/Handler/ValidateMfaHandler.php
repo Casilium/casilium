@@ -9,6 +9,8 @@ use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Mezzio\Csrf\CsrfMiddleware;
+use Mezzio\Flash\FlashMessageMiddleware;
+use Mezzio\Flash\FlashMessagesInterface;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Session\Session;
 use Mezzio\Session\SessionMiddleware;
@@ -86,8 +88,15 @@ class ValidateMfaHandler implements MiddlewareInterface
         $guard = $request->getAttribute(CsrfMiddleware::GUARD_ATTRIBUTE);
         $token = $this->getToken($session, $guard);
 
-        // get users secret key
-        $key = $user->getSecretKey();
+        // get users secret key (decrypted)
+        $key = $this->mfaService->getSecretKey($user);
+        if ($key === null) {
+            $session->unset('mfa:user:id');
+            /** @var FlashMessagesInterface $flashMessages */
+            $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
+            $flashMessages->flash('error', 'Unable to retrieve MFA secret key. Please try logging in again.');
+            return new RedirectResponse($this->helper->generate('login'));
+        }
 
         $form  = new GoogleMfaForm($guard);
         $error = null;

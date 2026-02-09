@@ -520,7 +520,6 @@ class TicketServiceTest extends TestCase
 
         // Mock the ticket methods that might be called (conditional based on notification logic)
         $ticket->method('setLastNotified')->with($this->isType('string'))->willReturn($ticket);
-        $this->entityManager->flush()->willReturn(null);
         $this->mailService->prepareBody(
             'ticket_mail::ticket_notification',
             Argument::type('array')
