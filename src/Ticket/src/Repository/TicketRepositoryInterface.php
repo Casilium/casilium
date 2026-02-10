@@ -59,6 +59,16 @@ interface TicketRepositoryInterface
     public function findTicketsByPagination(array $options = [], int $offset = 0, int $limit = 2): Query;
 
     /**
+     * Fetch lightweight rows for ticket list change detection.
+     *
+     * @param array $options list filters
+     * @param int $offset page offset
+     * @param int $limit number of rows
+     * @return array<int,array<string,mixed>>
+     */
+    public function findTicketListSignatureData(array $options = [], int $offset = 0, int $limit = 25): array;
+
+    /**
      * Fetch tickets belonging to organisation
      *
      * @param string $uuid UUID of organisation

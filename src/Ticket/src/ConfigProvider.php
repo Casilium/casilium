@@ -57,6 +57,7 @@ class ConfigProvider
                 Handler\CreateTicketHandler::class       => Handler\Factory\TicketCreateHandlerFactory::class,
                 Handler\EditTickerHandler::class         => Handler\Factory\TicketEditHandlerFactory::class,
                 Handler\ListTicketHandler::class         => Handler\Factory\ListTickerHandlerFactory::class,
+                Handler\TicketListChangesHandler::class  => Handler\Factory\TicketListChangesHandlerFactory::class,
                 Handler\ViewTicketHandler::class         => Handler\Factory\ViewTicketHandlerFactory::class,
                 Handler\GoToTicketHandler::class         => Handler\Factory\GoToTicketHandlerFactory::class,
                 Handler\SearchTicketHandler::class       => Handler\Factory\SearchTicketHandlerFactory::class,

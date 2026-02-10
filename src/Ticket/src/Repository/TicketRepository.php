@@ -129,9 +129,63 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
      */
     public function findTicketsByPagination(array $options = [], int $offset = 0, int $limit = 2): Query
     {
-        // get query builder
+        $qb = $this->buildTicketPaginationQueryBuilder($options);
+
+        return $qb->getQuery()
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+    }
+
+    public function findTicketListSignatureData(array $options = [], int $offset = 0, int $limit = 25): array
+    {
+        $qb = $this->buildTicketPaginationQueryBuilder($options);
+        $qb->select([
+            't.id AS id',
+            't.uuid AS uuid',
+            't.shortDescription AS short_description',
+            't.createdAt AS created_at',
+            't.dueDate AS due_date',
+            't.lastResponseDate AS last_response_date',
+            'IDENTITY(t.status) AS status_id',
+            'IDENTITY(t.priority) AS priority_id',
+            'IDENTITY(t.queue) AS queue_id',
+            'IDENTITY(t.organisation) AS organisation_id',
+            'IDENTITY(t.contact) AS contact_id',
+            'IDENTITY(t.site) AS site_id',
+        ]);
+
+        return $qb->getQuery()
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getArrayResult();
+    }
+
+    /**
+     * Fetch tickets belonging to organisation
+     *
+     * @param string $uuid UUID of organisation
+     * @return array of tickets by organisation
+     */
+    public function findByOrganisationUuid(string $uuid): array
+    {
+        $qb = $this->createQueryBuilder('q');
+
+        $qb->select('t')
+            ->from(Ticket::class, 't')
+            ->where('o.uuid = :uuid')
+            ->setParameter('uuid', $uuid)
+            ->leftJoin('t.organisation', 'o')
+            ->orderBy('t.status')
+            ->addOrderBy('t.priority')
+            ->addOrderBy('t.dueDate');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    private function buildTicketPaginationQueryBuilder(array $options): QueryBuilder
+    {
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->select(['t'])
+        $qb->select('t')
             ->from(Ticket::class, 't')
             ->orderBy('t.type', 'DESC')
             ->addOrderBy('t.status')
@@ -231,29 +285,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
                 ->setParameter('dateTo', $options['date_to'] . ' 23:59:59');
         }
 
-        return $qb->getQuery()->setMaxResults($limit)->setFirstResult($offset);
-    }
-
-    /**
-     * Fetch tickets belonging to organisation
-     *
-     * @param string $uuid UUID of organisation
-     * @return array of tickets by organisation
-     */
-    public function findByOrganisationUuid(string $uuid): array
-    {
-        $qb = $this->createQueryBuilder('q');
-
-        $qb->select('t')
-            ->from(Ticket::class, 't')
-            ->where('o.uuid = :uuid')
-            ->setParameter('uuid', $uuid)
-            ->leftJoin('t.organisation', 'o')
-            ->orderBy('t.status')
-            ->addOrderBy('t.priority')
-            ->addOrderBy('t.dueDate');
-
-        return $qb->getQuery()->getResult();
+        return $qb;
     }
 
     /**

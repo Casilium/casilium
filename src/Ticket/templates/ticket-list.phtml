@@ -1,173 +1,340 @@
 <?php
-// Refresh ticket list
-$this->headMeta()->appendHttpEquiv('Refresh', '120');
 // include libraries
 $this->inlineScript()->appendFile('/js/timeago.js');
 ?>
 <div class="container-fluid">
-    <?php if (count($this->tickets) === 0): ?>
-    <div class="row">
-        <div class="col">
-            <p class="text-info">No tickets have been created.</p>
+    <div id="ticket-list-update-banner" class="alert alert-info d-none mt-2" role="status">
+        New ticket updates are available.
+        <button type="button" class="btn btn-sm btn-primary ml-2" id="ticket-list-refresh-button">
+            Refresh list
+        </button>
+    </div>
+    <?php $itemsPerPage = (int) ($this->itemsPerPage ?? 25); ?>
+    <div class="row mb-3">
+        <div class="col-sm-4 col-md-3">
+            <label for="ticket-rows-per-page" class="mb-1 text-muted">Rows per page</label>
+            <select id="ticket-rows-per-page" class="form-control form-control-sm">
+                <?php foreach ([10, 25, 50, 100] as $rows): ?>
+                    <option value="<?= $rows ?>" <?= $itemsPerPage === $rows ? 'selected' : '' ?>>
+                        <?= $rows ?>
+                    </option>
+                <?php endforeach; ?>
+            </select>
         </div>
     </div>
-    <?php endif ?>
-    <?php
-    /** @var \Ticket\Entity\Ticket $ticket */
-    foreach ($this->tickets as $ticket): ?>
-        <div class="row ticket-list-item bg-dark">
-            <div class="col-sm-6 ">
-                <!-- ticket description -->
-                <a href="<?= $this->url('ticket.view', ['ticket_id' => $ticket->getUuid()]) ?>">
-                    <?= $this->escapeHtml($ticket->getShortDescription()) ?>
-                </a>
-                <!-- Ticket ID -->
-                <span class="text-muted">#<?= $this->escapehtml($ticket->getId()) ?><br></span>
-                <!-- Who raised the ticket? -->
-                <span class="text-muted">Raised by</span>
-                    <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>
-                    <?= $this->escapeHtml($ticket->getContact()->getLastName()) ?> /
-                    <!-- Name of organisation with link to tickets -->
-                    <a href="<?= $this->url('ticket.list',
-                        [ 'org_id' => $ticket->getOrganisation()->getUuid() ],
-                        [],
-                        null,
-                        [ 'reuse_result_params' => false] ) ?>">
-                        <?= $this->escapeHtml($ticket->getOrganisation()->getName()) ?>
-                    </a>
-                <?php if ($ticket->getSite() instanceof \OrganisationSite\Entity\SiteEntity && !empty ($ticket->getSite()->getName())): ?>
-                    <!-- Name of site -->
-                    / <?= $this->escapeHtml($ticket->getSite()->getName()) ?>
-                <?php endif ?>
-                <?php if ($ticket->hasSla()): ?>
-                    <!-- SLA Identifier -->
-                    <small><span class="badge badge-info">SLA</span></small>
-                <?php endif ?>
-                <br>
-                <span class="text-muted">
-                    <small>
-                    Due
-                    <time class="timeago" datetime="<?= $ticket->getDueDate() ?>">
-                    <?= $ticket->getDueDate() ?>
-                    </time>,
-                    created
-                    <time class="timeago" datetime="<?= $ticket->getCreatedAt() ?>">
-                        <?= $ticket->getCreatedAt() ?>
-                    </time>
-                        by
-                        <?php
-                            if (! empty($ticket->getAgent())) {
-                                echo $this->escapeHtml($ticket->getAgent()->getFullName());
-                            } elseif (empty($ticket->getAgent()) && !empty($ticket->getContact())) {
-                                echo sprintf('%s %s',
-                                $this->escapeHtml($ticket->getContact()->getFirstName()),
-                                $this->escapeHtml($ticket->getContact()->getLastName())
-                                );
-                            }
-                        ?>
-                    </small>
-                </span>
+    <div id="ticket-list-content">
+        <?php if (count($this->tickets) === 0): ?>
+        <div class="row">
+            <div class="col">
+                <p class="text-info">No tickets have been created.</p>
             </div>
-            <div class="col-sm-2">
-                <span class="text-muted">Last Response</span><br/>
-                <?php if (null !== $ticket->getLastResponseDate()): ?>
-                <small>
-                    <time class="timeago text-muted"
-                          datetime="<?= $this->localDate($ticket->getLastResponseDate(), 'Y-m-d H:i:s') ?>">
-                      <?= $this->localDate($ticket->getLastResponseDate()) ?>
-                    </time>
-                </small>
-                <?php else: ?>
+        </div>
+        <?php endif ?>
+        <?php
+        /** @var \Ticket\Entity\Ticket $ticket */
+        foreach ($this->tickets as $ticket): ?>
+            <div class="row ticket-list-item bg-dark">
+                <div class="col-sm-6 ">
+                    <!-- ticket description -->
+                    <a href="<?= $this->url('ticket.view', ['ticket_id' => $ticket->getUuid()]) ?>">
+                        <?= $this->escapeHtml($ticket->getShortDescription()) ?>
+                    </a>
+                    <!-- Ticket ID -->
+                    <span class="text-muted">#<?= $this->escapehtml($ticket->getId()) ?><br></span>
+                    <!-- Who raised the ticket? -->
+                    <span class="text-muted">Raised by</span>
+                        <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>
+                        <?= $this->escapeHtml($ticket->getContact()->getLastName()) ?> /
+                        <!-- Name of organisation with link to tickets -->
+                        <a href="<?= $this->url('ticket.list',
+                            [ 'org_id' => $ticket->getOrganisation()->getUuid() ],
+                            [],
+                            null,
+                            [ 'reuse_result_params' => false] ) ?>">
+                            <?= $this->escapeHtml($ticket->getOrganisation()->getName()) ?>
+                        </a>
+                    <?php if ($ticket->getSite() instanceof \OrganisationSite\Entity\SiteEntity && !empty ($ticket->getSite()->getName())): ?>
+                        <!-- Name of site -->
+                        / <?= $this->escapeHtml($ticket->getSite()->getName()) ?>
+                    <?php endif ?>
                     <?php if ($ticket->hasSla()): ?>
-                    <small class="text-warning">
-                        Response due <time class="timeago" datetime="<?= $ticket->getResponseDueDate() ?>">
-                            <?= $ticket->getResponseDueDate() ?>
+                        <!-- SLA Identifier -->
+                        <small><span class="badge badge-info">SLA</span></small>
+                    <?php endif
+                    ?>
+                    <br>
+                    <span class="text-muted">
+                        <small>
+                        Due
+                        <time class="timeago" datetime="<?= $ticket->getDueDate() ?>">
+                        <?= $ticket->getDueDate() ?>
+                        </time>,
+                        created
+                        <time class="timeago" datetime="<?= $ticket->getCreatedAt() ?>">
+                            <?= $ticket->getCreatedAt() ?>
+                        </time>
+                            by
+                            <?php
+                                if (! empty($ticket->getAgent())) {
+                                    echo $this->escapeHtml($ticket->getAgent()->getFullName());
+                                } elseif (empty($ticket->getAgent()) && !empty($ticket->getContact())) {
+                                    echo sprintf('%s %s',
+                                    $this->escapeHtml($ticket->getContact()->getFirstName()),
+                                    $this->escapeHtml($ticket->getContact()->getLastName())
+                                    );
+                                }
+                            ?>
+                        </small>
+                    </span>
+                </div>
+                <div class="col-sm-2">
+                    <span class="text-muted">Last Response</span><br/>
+                    <?php if (null !== $ticket->getLastResponseDate()): ?>
+                    <small>
+                        <time class="timeago text-muted"
+                              datetime="<?= $this->localDate($ticket->getLastResponseDate(), 'Y-m-d H:i:s') ?>">
+                          <?= $this->localDate($ticket->getLastResponseDate()) ?>
                         </time>
                     </small>
                     <?php else: ?>
-                        <small class="text-muted">No response</small><br>
+                        <?php if ($ticket->hasSla()): ?>
+                        <small class="text-warning">
+                            Response due <time class="timeago" datetime="<?= $ticket->getResponseDueDate() ?>">
+                                <?= $ticket->getResponseDueDate() ?>
+                            </time>
+                        </small>
+                        <?php else: ?>
+                            <small class="text-muted">No response</small><br>
+                        <?php endif ?>
                     <?php endif ?>
-                <?php endif ?>
-                <br>
-                <?php
-                    $dt = new \DateTime('now');
-                    $dtDue = new \DateTime($ticket->getDueDate());
+                    <br>
+                    <?php
+                        $dt = new \DateTime('now');
+                        $dtDue = new \DateTime($ticket->getDueDate());
 
-                    if ($dt->getTimestamp() >  $dtDue->getTimestamp()
-                        && $ticket->getStatus()->getId() <= $ticket::STATUS_ON_HOLD) : ?>
-                        <span class="badge badge-danger">Overdue</span>
-                    <?php endif
-                ?>
+                        if ($dt->getTimestamp() >  $dtDue->getTimestamp()
+                            && $ticket->getStatus()->getId() <= $ticket::STATUS_ON_HOLD) : ?>
+                            <span class="badge badge-danger">Overdue</span>
+                        <?php endif
+                    ?>
 
-            </div>
-            <div class="col-sm-1">
-                &nbsp;
-            </div>
-            <div class="col-sm-3">
-                <div class="row">
-                <div class="col-sm-12">
+                </div>
+                <div class="col-sm-1">
+                    &nbsp;
+                </div>
+                <div class="col-sm-3">
                     <div class="row">
-                        <div class="col-4">
-                            <small>
-                                <span class="text-muted">Assigned</span>
-                            </small>
-                        </div>
-                        <div class="col text-center">
-                            <small>
-                                <?= $ticket->getQueue()->getName() ?>
-                            </small>
-                        </div>
-                    </div>
-                </div>
-                <div class="col-sm-12">
-                    <div class="row status text-center">
-                        <div class="col-4 text-muted text-left">
-                            <small>Status</small>
-                        </div>
-                        <div class="col">
-                            <small>
-                            <span class="<?= strtolower($this->escapeHtml($ticket->getStatus()->getDescription())) ?>">
-                                <?= $this->escapeHtml($ticket->getStatus()->getDescription()) ?>
-                            </span>
-                            </small>
+                    <div class="col-sm-12">
+                        <div class="row">
+                            <div class="col-4">
+                                <small>
+                                    <span class="text-muted">Assigned</span>
+                                </small>
+                            </div>
+                            <div class="col text-center">
+                                <small>
+                                    <?= $ticket->getQueue()->getName() ?>
+                                </small>
+                            </div>
                         </div>
                     </div>
-                </div>
-                <?php if ($ticket->hasSla()) : ?>
-                <div class="col-sm-12">
-                    <div class="row priority text-center">
-                        <div class="col-4 text-muted text-left"><small>Priority</small></div>
-                        <div class="col <?= $this->escapeHtml(strtolower($ticket->getPriority()->getName())) ?>">
-                            <?= $this->escapeHtml($ticket->getPriority()->getName()) ?>
+                    <div class="col-sm-12">
+                        <div class="row status text-center">
+                            <div class="col-4 text-muted text-left">
+                                <small>Status</small>
+                            </div>
+                            <div class="col">
+                                <small>
+                                <span class="<?= strtolower($this->escapeHtml($ticket->getStatus()->getDescription())) ?>">
+                                    <?= $this->escapeHtml($ticket->getStatus()->getDescription()) ?>
+                                </span>
+                                </small>
+                            </div>
                         </div>
                     </div>
+                    <?php if ($ticket->hasSla()) : ?>
+                    <div class="col-sm-12">
+                        <div class="row priority text-center">
+                            <div class="col-4 text-muted text-left"><small>Priority</small></div>
+                            <div class="col <?= $this->escapeHtml(strtolower($ticket->getPriority()->getName())) ?>">
+                                <?= $this->escapeHtml($ticket->getPriority()->getName()) ?>
+                            </div>
+                        </div>
+                    </div>
+                    <?php endif ?>
                 </div>
-                <?php endif ?>
+                </div>
             </div>
-        </div>
-    </div>
-    <?php endforeach; ?>
-    <div class="row">
-        <div class="col mt-4">
-            <?php
-                if ($this->pageCount > 1) {
-                    echo $this->paginationControl($this->tickets,'Sliding','app::partial/paginator');
-                }
-            ?>
+        <?php endforeach; ?>
+        <div class="row">
+            <div class="col mt-4">
+                <?php
+                    if ($this->pageCount > 1) {
+                        echo $this->paginationControl($this->tickets,'Sliding','app::partial/paginator');
+                    }
+                ?>
+            </div>
         </div>
     </div>
 </div>
 <?php
 $this->inlineScript()->captureStart();
+$changesUrl       = (string) ($this->changesUrl ?? '/ticket/list/changes');
+$refreshInterval  = (int) ($this->refreshIntervalMs ?? 60000);
+$encodedChangesUrl = json_encode($changesUrl);
 echo <<<JS
-// <script>
-    $(document).ready(function() {
-        $(function() {
-            jQuery.timeago.settings.allowFuture = true;
-            $('.timeago').timeago();
+(function() {
+    var changesPath = {$encodedChangesUrl};
+    var pollIntervalMs = {$refreshInterval};
+    var listContainerId = 'ticket-list-content';
+    var banner = document.getElementById('ticket-list-update-banner');
+    var refreshButton = document.getElementById('ticket-list-refresh-button');
+    var rowsSelector = document.getElementById('ticket-rows-per-page');
+    var listContainer = document.getElementById(listContainerId);
+    var currentFingerprint = null;
+    var pendingFingerprint = null;
+    var pollingToken = 0;
+    var applyingUpdate = false;
+
+    function initTimeago(context) {
+        if (!window.jQuery || typeof jQuery.fn.timeago !== 'function') {
+            return;
+        }
+
+        jQuery.timeago.settings.allowFuture = true;
+        jQuery(context || document).find('.timeago').timeago();
+    }
+
+    function hideBanner() {
+        if (banner) {
+            banner.classList.add('d-none');
+        }
+    }
+
+    function showBanner() {
+        if (banner) {
+            banner.classList.remove('d-none');
+        }
+    }
+
+    function buildChangesUrl() {
+        var search = window.location.search || '';
+        return changesPath + search;
+    }
+
+    function checkForChanges() {
+        if (!listContainer || document.hidden || applyingUpdate) {
+            return;
+        }
+
+        var requestToken = ++pollingToken;
+        fetch(buildChangesUrl(), {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Cache-Control': 'no-cache'
+            }
+        })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error(String(response.status));
+                }
+
+                return response.json();
+            })
+            .then(function(payload) {
+                if (requestToken !== pollingToken || !payload || !payload.fingerprint) {
+                    return;
+                }
+
+                if (currentFingerprint === null) {
+                    currentFingerprint = payload.fingerprint;
+                    return;
+                }
+
+                if (payload.fingerprint !== currentFingerprint) {
+                    pendingFingerprint = payload.fingerprint;
+                    showBanner();
+                    return;
+                }
+
+                pendingFingerprint = null;
+                hideBanner();
+            })
+            .catch(function() {
+                // Keep current list state on polling failures.
+            });
+    }
+
+    function refreshList() {
+        if (!listContainer || applyingUpdate) {
+            return;
+        }
+
+        applyingUpdate = true;
+
+        fetch(window.location.href, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest',
+                'Cache-Control': 'no-cache'
+            }
+        })
+            .then(function(response) {
+                if (!response.ok) {
+                    throw new Error(String(response.status));
+                }
+
+                return response.text();
+            })
+            .then(function(html) {
+                var parser = new DOMParser();
+                var nextDocument = parser.parseFromString(html, 'text/html');
+                var nextListContainer = nextDocument.getElementById(listContainerId);
+
+                if (!nextListContainer) {
+                    throw new Error('Ticket list container not found');
+                }
+
+                listContainer.innerHTML = nextListContainer.innerHTML;
+                initTimeago(listContainer);
+                currentFingerprint = null;
+                pendingFingerprint = null;
+                hideBanner();
+                checkForChanges();
+            })
+            .catch(function() {
+                // Keep current list state on update failures.
+            })
+            .then(function() {
+                applyingUpdate = false;
+            });
+    }
+
+    initTimeago(document);
+
+    if (rowsSelector) {
+        rowsSelector.addEventListener('change', function() {
+            var url = new URL(window.location.href);
+            url.searchParams.set('rows', rowsSelector.value);
+            url.searchParams.delete('per_page');
+            url.searchParams.set('page', '1');
+            window.location.assign(url.toString());
         });
+    }
+
+    if (!listContainer || !refreshButton || !banner) {
+        return;
+    }
+
+    refreshButton.addEventListener('click', refreshList);
+    document.addEventListener('visibilitychange', function() {
+        if (!document.hidden) {
+            checkForChanges();
+        }
     });
-// </script>
+
+    checkForChanges();
+    window.setInterval(checkForChanges, pollIntervalMs);
+})();
 JS;
 $this->inlineScript()->captureEnd();
 ?>
