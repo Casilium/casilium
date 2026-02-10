@@ -4,20 +4,25 @@ set -euo pipefail
 # Ensure Doctrine proxy/cache directories are writable by www-data
 mkdir -p data/cache/DoctrineEntityProxy
 chown -R www-data:www-data data/cache
+git config --global --add safe.directory /var/www/html || true
 
-if [[ "${AUTO_MIGRATE:-0}" == "1" ]]; then
-    DB_HOST="${DB_HOST:-db}"
-    DB_NAME="${DB_NAME:-casilium}"
-    DB_USER="${DB_USER:-casilium}"
-    DB_PASSWORD="${DB_PASSWORD:-casilium_password}"
+DB_HOST="${DB_HOST:-db}"
+DB_NAME="${DB_NAME:-casilium}"
+DB_USER="${DB_USER:-casilium}"
+DB_PASSWORD="${DB_PASSWORD:-casilium_password}"
+MFA_ISSUER="${MFA_ISSUER:-casilium.local}"
+APP_URL="${APP_URL:-http://localhost:8080}"
 
-    if [[ ! -f config/autoload/local.php ]]; then
-        if [[ -z "${ENCRYPTION_KEY:-}" ]]; then
-            ENCRYPTION_KEY="$(php -r 'echo sodium_bin2hex(random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES));')"
-        fi
-        MFA_ISSUER="${MFA_ISSUER:-casilium.local}"
-        APP_URL="${APP_URL:-http://localhost:8080}"
-        cat > config/autoload/local.php <<PHP
+# Backward compatibility: older merges may have written mysql:// which DBAL no longer accepts.
+if [[ -f config/autoload/local.php ]]; then
+    sed -i "s|'url' => 'mysql://|'url' => 'pdo-mysql://|g" config/autoload/local.php
+fi
+
+if [[ ! -f config/autoload/local.php ]]; then
+    if [[ -z "${ENCRYPTION_KEY:-}" ]]; then
+        ENCRYPTION_KEY="$(php -r 'echo sodium_bin2hex(random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES));')"
+    fi
+    cat > config/autoload/local.php <<PHP
 <?php
 return [
     'encryption' => [

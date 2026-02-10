@@ -25,6 +25,8 @@ RUN apt-get update \
     && pecl install apcu \
     && docker-php-ext-enable apcu \
     && a2enmod rewrite \
+    && printf '%s\n' 'ServerName localhost' > /etc/apache2/conf-available/servername.conf \
+    && a2enconf servername \
     && rm -rf /var/lib/apt/lists/*
 
 ENV APACHE_DOCUMENT_ROOT=/var/www/html/public
