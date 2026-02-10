@@ -117,7 +117,7 @@ class TicketService
      */
     public function getContactsByOrganisationId(int $id): array
     {
-        return $this->contactManager->fetchContactsByOrganisationId($id);
+        return $this->contactManager->fetchContactsByOrganisationId($id, true);
     }
 
     /**
@@ -306,6 +306,26 @@ class TicketService
     }
 
     /**
+     * Return all ticket statuses
+     *
+     * @return array
+     */
+    public function getStatuses(): array
+    {
+        return $this->entityManager->getRepository(Status::class)->findAll();
+    }
+
+    /**
+     * Return all organisations
+     *
+     * @return array
+     */
+    public function getOrganisations(): array
+    {
+        return $this->organisationManager->fetchAll();
+    }
+
+    /**
      * Return list of queues
      *
      * @return array
@@ -397,6 +417,10 @@ class TicketService
 
     public function sendNotificationEmail(Ticket $ticket, int $target, int $period = self::DUE_PERIOD_MINUTES): bool
     {
+        if (! $this->mailService->isEnabled()) {
+            return false;
+        }
+
         $now            = Carbon::now('UTC');
         $due            = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate(), 'UTC');
         $lastNotifiedAt = $ticket->getLastNotified() ?? $ticket->getCreatedAt();
@@ -465,6 +489,10 @@ class TicketService
 
     public function sendOverdueNotificationEmail(Ticket $ticket): bool
     {
+        if (! $this->mailService->isEnabled()) {
+            return false;
+        }
+
         $overdueTime = $this->calculateOverdueTime($ticket);
         $priorityTag = $this->getPriorityPrefix($ticket);
 
@@ -627,28 +655,82 @@ class TicketService
             ->findTicketsDueWithin($target, $period);
     }
 
-    public function newTicketReplyNotification(Ticket $ticket): void
+    public function newTicketReplyNotification(Ticket $ticket, TicketResponse $response): void
     {
-        $agents = $ticket->getQueue()->getMembers();
+        if (! $this->mailService->isEnabled()) {
+            return;
+        }
 
-        $body = sprintf('A new reply has been posted to ticket #%s', $ticket->getId());
+        $author = $this->formatResponseAuthor($response);
+
+        $subject = sprintf('Ticket #%s updated by %s', $ticket->getId(), $author);
+
+        $body = $this->mailService->prepareBody('ticket_mail::ticket_reply_notification', [
+            'ticket'   => $ticket,
+            'response' => $response,
+            'author'   => $author,
+        ]);
+
+        $queue   = $ticket->getQueue();
+        $members = $queue ? $queue->getMembers() : [];
 
         /** @var Agent $agent */
-        foreach ($agents as $agent) {
-            $this->mailService->send($agent->getEmail(), 'New ticket reply', $body);
+        foreach ($members as $agent) {
+            $this->mailService->send($agent->getEmail(), $subject, $body);
         }
+    }
+
+    private function formatResponseAuthor(TicketResponse $response): string
+    {
+        if ($response->getAgent() !== null) {
+            return $response->getAgent()->getFullName() ?? 'Agent';
+        }
+
+        $contact = $response->getContact();
+        if ($contact !== null) {
+            $name = trim($contact->getFirstName() . ' ' . $contact->getLastName());
+            if ($name !== '') {
+                return $name;
+            }
+
+            return $contact->getWorkEmail() ?? 'Contact';
+        }
+
+        return 'Contact';
     }
 
     public function newTicketNotification(Ticket $ticket): void
     {
-        $agents = $ticket->getQueue()->getMembers();
+        if (! $this->mailService->isEnabled()) {
+            return;
+        }
 
-        $body = sprintf('A new ticket has been created, ticket #%s', $ticket->getId());
+        $queue   = $ticket->getQueue();
+        $members = $queue ? $queue->getMembers() : [];
+
+        $body = $this->mailService->prepareBody('ticket_mail::ticket_created_notification', [
+            'ticket' => $ticket,
+        ]);
 
         /** @var Agent $agent */
-        foreach ($agents as $agent) {
-            $this->mailService->send($agent->getEmail(), 'New ticket notification', $body);
+        foreach ($members as $agent) {
+            $this->mailService->send(
+                $agent->getEmail(),
+                sprintf('New ticket #%s created', $ticket->getId()),
+                $body
+            );
         }
+    }
+
+    /**
+     * Search tickets by ID or short description
+     *
+     * @param string $query Search query
+     * @return array Array of matching tickets
+     */
+    public function searchTickets(string $query): array
+    {
+        return $this->entityManager->getRepository(Ticket::class)->searchTickets($query);
     }
 
     public function findWaitingTicketsToUpdate(): array

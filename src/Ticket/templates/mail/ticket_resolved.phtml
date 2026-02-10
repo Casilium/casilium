@@ -2,12 +2,13 @@
     /** @var \Ticket\Entity\TicketResponse $response */
     $response = $this->response;
 
-    $useSatisfaction = false;
+    $useSatisfaction = (bool) ($useSatisfaction ?? false);
+    $csatBaseUrl     = $csatBaseUrl ?? 'https://example.com/customer-satisfaction';
 
     $ticketId = $response->getTicket()->getUuid();
 
-    $csatUrl = function(?int $option = null) use ($ticketId) {
-        $url = sprintf('https://example.com/customer-satisfaction/%s', $ticketId);
+    $csatUrl = function(?int $option = null) use ($ticketId, $csatBaseUrl) {
+        $url = sprintf('%s/%s', rtrim($csatBaseUrl, '/'), $ticketId);
         if ($option === null) {
             return $url;
         }
@@ -26,6 +27,11 @@
 <p>
     <?= $this->escapeHtml($response->getContact()->getFirstName()) ?>,
 </p>
+<?php if ((int) $response->getIsPublic() === 1 && $response->getResponse() !== null): ?>
+<p>
+    <?= nl2br($this->escapeHtml($response->getResponse())) ?>
+</p>
+<?php endif; ?>
 <p>
     Our team has indicated that your ticket has been <strong>resolved</strong>.
 </p>

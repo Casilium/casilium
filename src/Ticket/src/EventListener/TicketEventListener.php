@@ -35,9 +35,14 @@ class TicketEventListener
     /** @var bool  */
     protected $enabled = false;
 
+    /** @var array */
+    protected $ticketsConfig = [];
+
     public function __invoke(ContainerInterface $container): TicketEventListener
     {
-        $config        = $container->get('config')['mail'] ?? [];
+        $config        = $container->get('config');
+        $mailConfig    = $config['mail'] ?? [];
+        $ticketsConfig = $config['tickets'] ?? [];
         $entityManager = $container->get(EntityManager::class);
         $logService    = $container->get(LogService::class);
         $mailService   = $container->get(MailService::class);
@@ -47,8 +52,9 @@ class TicketEventListener
         $listener->setEntityManager($entityManager);
         $listener->setLogService($logService);
         $listener->setMailService($mailService);
-        $listener->setEnabled($config['enabled'] ?? false);
+        $listener->setEnabled($mailConfig['enabled'] ?? false);
         $listener->setSetSlackClient($slackClient);
+        $listener->setTicketsConfig($ticketsConfig);
 
         return $listener;
     }
@@ -139,8 +145,13 @@ class TicketEventListener
         }
 
         if ($this->enabled === true && $response->getIsPublic() === 1) {
+            $csatConfig = $this->ticketsConfig['csat'] ?? [];
             // prepare email body and send email
-            $body = $this->mailService->prepareBody($template, ['response' => $response]);
+            $body = $this->mailService->prepareBody($template, [
+                'response'        => $response,
+                'useSatisfaction' => $action === 'resolved' && ($csatConfig['enabled'] ?? false),
+                'csatBaseUrl'     => $csatConfig['base_url'] ?? null,
+            ]);
             $this->mailService->send(
                 $response->getContact()->getWorkEmail(),
                 'Your request has been updated',
@@ -170,6 +181,11 @@ class TicketEventListener
     public function setSetSlackClient(slackClient $client): void
     {
         $this->slackClient = $client;
+    }
+
+    public function setTicketsConfig(array $ticketsConfig): void
+    {
+        $this->ticketsConfig = $ticketsConfig;
     }
 
     /**

@@ -1,0 +1,306 @@
+<?php
+$this->inlineScript()->appendFile('/js/timeago.js');
+$filters = $this->filters ?? [];
+?>
+<div class="container-fluid">
+    <h4 class="mb-3">Search Tickets</h4>
+
+    <form method="get" action="<?= $this->url('ticket.search') ?>" class="mb-4">
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="search_text">Search</label>
+                    <input type="text" class="form-control" id="search_text" name="search_text"
+                           placeholder="Ticket ID or description..."
+                           value="<?= $this->escapeHtml($filters['search_text'] ?? '') ?>">
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <div>
+                        <?php
+                        $selectedStatuses = $filters['status_id'] ?? [];
+                        foreach ($this->statuses as $status): ?>
+                            <div class="form-check form-check-inline">
+                                <input class="form-check-input" type="checkbox"
+                                       name="status_id[]"
+                                       id="status_<?= $status->getId() ?>"
+                                       value="<?= $status->getId() ?>"
+                                    <?= in_array($status->getId(), $selectedStatuses, false) ? 'checked' : '' ?>>
+                                <label class="form-check-label" for="status_<?= $status->getId() ?>">
+                                    <?= $this->escapeHtml($status->getDescription()) ?>
+                                </label>
+                            </div>
+                        <?php endforeach ?>
+                    </div>
+                </div>
+                <div class="form-group">
+                    <label for="organisation_uuid">Organisation</label>
+                    <select class="form-control" id="organisation_uuid" name="organisation_uuid">
+                        <option value="">All Organisations</option>
+                        <?php foreach ($this->organisations as $organisation): ?>
+                            <option value="<?= $this->escapeHtml($organisation->getUuid()) ?>"
+                                <?= (isset($filters['organisation_uuid']) && $filters['organisation_uuid'] === (string) $organisation->getUuid()) ? 'selected' : '' ?>>
+                                <?= $this->escapeHtml($organisation->getName()) ?>
+                            </option>
+                        <?php endforeach ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="contact_id">Contact</label>
+                    <select class="form-control" id="contact_id" name="contact_id"
+                        <?= empty($filters['organisation_uuid']) ? 'disabled' : '' ?>>
+                        <option value="">All Contacts</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-6">
+                <div class="form-group">
+                    <label for="queue_id">Queue</label>
+                    <select class="form-control" id="queue_id" name="queue_id">
+                        <option value="">All Queues</option>
+                        <?php foreach ($this->queues as $queue): ?>
+                            <option value="<?= $queue->getId() ?>"
+                                <?= (isset($filters['queue_id']) && (int) $filters['queue_id'] === $queue->getId()) ? 'selected' : '' ?>>
+                                <?= $this->escapeHtml($queue->getName()) ?>
+                            </option>
+                        <?php endforeach ?>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="date_from">Date From</label>
+                    <input type="date" class="form-control" id="date_from" name="date_from"
+                           value="<?= $this->escapeHtml($filters['date_from'] ?? '') ?>">
+                </div>
+                <div class="form-group">
+                    <label for="date_to">Date To</label>
+                    <input type="date" class="form-control" id="date_to" name="date_to"
+                           value="<?= $this->escapeHtml($filters['date_to'] ?? '') ?>">
+                </div>
+            </div>
+        </div>
+        <div class="row">
+            <div class="col">
+                <button type="submit" class="btn btn-primary mr-2">
+                    <i class="fas fa-search"></i> Search
+                </button>
+                <a href="<?= $this->url('ticket.search') ?>" class="btn btn-secondary">
+                    <i class="fas fa-times"></i> Clear
+                </a>
+            </div>
+        </div>
+    </form>
+
+    <div class="row mb-2">
+        <div class="col">
+            <small class="text-muted"><?= $this->tickets->getTotalItemCount() ?> ticket<?= $this->tickets->getTotalItemCount() !== 1 ? 's' : '' ?> found</small>
+        </div>
+    </div>
+
+    <?php if (count($this->tickets) === 0): ?>
+    <div class="row">
+        <div class="col">
+            <p class="text-info">No tickets found matching your criteria.</p>
+        </div>
+    </div>
+    <?php endif ?>
+
+    <?php
+    /** @var \Ticket\Entity\Ticket $ticket */
+    foreach ($this->tickets as $ticket): ?>
+        <div class="row ticket-list-item bg-dark">
+            <div class="col-sm-6 ">
+                <a href="<?= $this->url('ticket.view', ['ticket_id' => $ticket->getUuid()]) ?>">
+                    <?= $this->escapeHtml($ticket->getShortDescription()) ?>
+                </a>
+                <span class="text-muted">#<?= $this->escapeHtml($ticket->getId()) ?><br></span>
+                <span class="text-muted">Raised by</span>
+                    <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>
+                    <?= $this->escapeHtml($ticket->getContact()->getLastName()) ?> /
+                    <a href="<?= $this->url('ticket.list',
+                        [ 'org_id' => $ticket->getOrganisation()->getUuid() ],
+                        [],
+                        null,
+                        [ 'reuse_result_params' => false] ) ?>">
+                        <?= $this->escapeHtml($ticket->getOrganisation()->getName()) ?>
+                    </a>
+                <?php if ($ticket->getSite() instanceof \OrganisationSite\Entity\SiteEntity && !empty ($ticket->getSite()->getName())): ?>
+                    / <?= $this->escapeHtml($ticket->getSite()->getName()) ?>
+                <?php endif ?>
+                <?php if ($ticket->hasSla()): ?>
+                    <small><span class="badge badge-info">SLA</span></small>
+                <?php endif ?>
+                <br>
+                <span class="text-muted">
+                    <small>
+                    Due
+                    <time class="timeago" datetime="<?= $ticket->getDueDate() ?>">
+                    <?= $ticket->getDueDate() ?>
+                    </time>,
+                    created
+                    <time class="timeago" datetime="<?= $ticket->getCreatedAt() ?>">
+                        <?= $ticket->getCreatedAt() ?>
+                    </time>
+                        by
+                        <?php
+                            if (! empty($ticket->getAgent())) {
+                                echo $this->escapeHtml($ticket->getAgent()->getFullName());
+                            } elseif (empty($ticket->getAgent()) && !empty($ticket->getContact())) {
+                                echo sprintf('%s %s',
+                                $this->escapeHtml($ticket->getContact()->getFirstName()),
+                                $this->escapeHtml($ticket->getContact()->getLastName())
+                                );
+                            }
+                        ?>
+                    </small>
+                </span>
+            </div>
+            <div class="col-sm-2">
+                <span class="text-muted">Last Response</span><br/>
+                <?php if (null !== $ticket->getLastResponseDate()): ?>
+                <small>
+                    <time class="timeago text-muted"
+                          datetime="<?= $this->localDate($ticket->getLastResponseDate(), 'Y-m-d H:i:s') ?>">
+                      <?= $this->localDate($ticket->getLastResponseDate()) ?>
+                    </time>
+                </small>
+                <?php else: ?>
+                    <?php if ($ticket->hasSla()): ?>
+                    <small class="text-warning">
+                        Response due <time class="timeago" datetime="<?= $ticket->getResponseDueDate() ?>">
+                            <?= $ticket->getResponseDueDate() ?>
+                        </time>
+                    </small>
+                    <?php else: ?>
+                        <small class="text-muted">No response</small><br>
+                    <?php endif ?>
+                <?php endif ?>
+                <br>
+                <?php
+                    $dt = new \DateTime('now');
+                    $dtDue = new \DateTime($ticket->getDueDate());
+
+                    if ($dt->getTimestamp() >  $dtDue->getTimestamp()
+                        && $ticket->getStatus()->getId() <= $ticket::STATUS_ON_HOLD) : ?>
+                        <span class="badge badge-danger">Overdue</span>
+                    <?php endif
+                ?>
+
+            </div>
+            <div class="col-sm-1">
+                &nbsp;
+            </div>
+            <div class="col-sm-3">
+                <div class="row">
+                <div class="col-sm-12">
+                    <div class="row">
+                        <div class="col-4">
+                            <small>
+                                <span class="text-muted">Assigned</span>
+                            </small>
+                        </div>
+                        <div class="col text-center">
+                            <small>
+                                <?= $ticket->getQueue()->getName() ?>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-12">
+                    <div class="row status text-center">
+                        <div class="col-4 text-muted text-left">
+                            <small>Status</small>
+                        </div>
+                        <div class="col">
+                            <small>
+                            <span class="<?= strtolower($this->escapeHtml($ticket->getStatus()->getDescription())) ?>">
+                                <?= $this->escapeHtml($ticket->getStatus()->getDescription()) ?>
+                            </span>
+                            </small>
+                        </div>
+                    </div>
+                </div>
+                <?php if ($ticket->hasSla()) : ?>
+                <div class="col-sm-12">
+                    <div class="row priority text-center">
+                        <div class="col-4 text-muted text-left"><small>Priority</small></div>
+                        <div class="col <?= $this->escapeHtml(strtolower($ticket->getPriority()->getName())) ?>">
+                            <?= $this->escapeHtml($ticket->getPriority()->getName()) ?>
+                        </div>
+                    </div>
+                </div>
+                <?php endif ?>
+            </div>
+        </div>
+    </div>
+    <?php endforeach; ?>
+
+    <div class="row">
+        <div class="col mt-4">
+            <?php
+                if ($this->pageCount > 1) {
+                    echo $this->paginationControl(
+                        $this->tickets,
+                        'Sliding',
+                        'app::partial/paginator',
+                        ['queryParams' => $filters]
+                    );
+                }
+            ?>
+        </div>
+    </div>
+</div>
+<?php
+$selectedContactId = $filters['contact_id'] ?? '';
+$this->inlineScript()->captureStart();
+echo <<<JS
+// <script>
+    $(document).ready(function() {
+        jQuery.timeago.settings.allowFuture = true;
+        $('.timeago').timeago();
+
+        var organisationSelect = document.getElementById('organisation_uuid');
+        var contactSelect = document.getElementById('contact_id');
+        var selectedContactId = '{$selectedContactId}';
+
+        function loadContacts(orgUuid, preselectId) {
+            contactSelect.innerHTML = '<option value="">All Contacts</option>';
+            contactSelect.disabled = true;
+
+            if (!orgUuid) {
+                return;
+            }
+
+            fetch('/api/organisation/' + encodeURIComponent(orgUuid) + '/contacts')
+                .then(function(response) {
+                    if (!response.ok) throw new Error(response.status);
+                    return response.json();
+                })
+                .then(function(contacts) {
+                    contacts.forEach(function(contact) {
+                        var option = document.createElement('option');
+                        option.value = contact.id;
+                        option.textContent = contact.name;
+                        if (preselectId && String(contact.id) === String(preselectId)) {
+                            option.selected = true;
+                        }
+                        contactSelect.appendChild(option);
+                    });
+                    contactSelect.disabled = false;
+                })
+                .catch(function() {
+                    contactSelect.disabled = true;
+                });
+        }
+
+        organisationSelect.addEventListener('change', function() {
+            loadContacts(this.value, '');
+        });
+
+        if (organisationSelect.value) {
+            loadContacts(organisationSelect.value, selectedContactId);
+        }
+    });
+// </script>
+JS;
+$this->inlineScript()->captureEnd();
+?>

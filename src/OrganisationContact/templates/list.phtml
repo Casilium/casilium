@@ -2,6 +2,17 @@
     /** @var \OrganisationContact\Entity\Contact[] $contacts */
     $contacts = $this->contacts;
     $organisation = $this->organisation;
+    $activeContacts = [];
+    $inactiveContacts = [];
+
+    foreach ($contacts as $contact) {
+        if ($contact->isActive()) {
+            $activeContacts[] = $contact;
+            continue;
+        }
+
+        $inactiveContacts[] = $contact;
+    }
 
     $this->headTitle('Contacts');
 
@@ -15,6 +26,8 @@
     ]);
 
     $contactCount = count($contacts);
+    $activeCount   = count($activeContacts);
+    $inactiveCount = count($inactiveContacts);
 ?>
 <div class="container-fluid">
     <h1>Contacts  <span class="badge badge-primary"><?= $contactCount ?></span></h1>
@@ -23,41 +36,102 @@
     <a href="<?= $this->url('contact.create', ['id' => $organisation->getUuid()]) ?>"
         class="btn btn-primary btn-sm mb-2">New Contact</a>
 
-    <?php if (! empty($contacts)): ?>
-    <div class="table-responsive">
-        <table class="table table-dark table-striped table-hover">
-            <thead class="thead-dark">
-                <tr>
-                    <th scope="col">Name</th>
-                    <th scope="col">Work</th>
-                    <th scope="col">Mobile</th>
-                </tr>
-            </thead>
-            <tbody>
-            <?php foreach ($contacts as $contact): ?>
-                <tr>
-                    <td>
-                        <a href="<?= $this->url('contact.view', [
-                            'id' => $organisation->getUuid(),
-                            'contact_id' => $contact->getId()]) ?>">
-                            <?= $this->escapeHtml($contact->getFirstName()) ?>
-                            <?= $this->escapeHtml($contact->getLastName()) ?>
-                        </a>
-                    </td>
-                    <td>
-                        <?= $this->escapeHtml($contact->getWorkTelephone()) ?>
-                    </td>
-                    <td>
-                        <?= $this->escapeHtml($contact->getMobileTelephone()) ?>
-                    </td>
-                </tr>
-            <?php endforeach ?>
-            </tbody>
-        </table>
-        <?php else: ?>
-            <p class="text-info">
-                No contacts are defined for <?= $this->escapeHtml($organisation->getName()) ?>
-            </p>
+    <ul class="nav nav-pills mb-3" id="contact-tabs" role="tablist">
+        <li class="nav-item">
+            <button class="btn btn-link nav-link active" id="active-contacts-tab" data-toggle="pill"
+                    data-target="#active-contacts" type="button" role="tab"
+                    aria-controls="active-contacts" aria-selected="true">
+                Active <span class="badge badge-secondary ml-1"><?= $activeCount ?></span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="btn btn-link nav-link" id="inactive-contacts-tab" data-toggle="pill"
+                    data-target="#inactive-contacts" type="button" role="tab"
+                    aria-controls="inactive-contacts" aria-selected="false">
+                Inactive <span class="badge badge-secondary ml-1"><?= $inactiveCount ?></span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="contact-tabs-content">
+        <div class="tab-pane fade show active" id="active-contacts" role="tabpanel" aria-labelledby="active-contacts-tab">
+            <?php if (! empty($activeContacts)): ?>
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Work</th>
+                                <th scope="col">Mobile</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($activeContacts as $contact): ?>
+                            <tr>
+                                <td>
+                                    <a href="<?= $this->url('contact.view', [
+                                        'id' => $organisation->getUuid(),
+                                        'contact_id' => $contact->getId()]) ?>">
+                                        <?= $this->escapeHtml($contact->getFirstName()) ?>
+                                        <?= $this->escapeHtml($contact->getLastName()) ?>
+                                    </a>
+                                </td>
+                                <td>
+                                    <?= $this->escapeHtml($contact->getWorkTelephone()) ?>
+                                </td>
+                                <td>
+                                    <?= $this->escapeHtml($contact->getMobileTelephone()) ?>
+                                </td>
+                            </tr>
+                        <?php endforeach ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php else: ?>
+                <p class="text-info">
+                    No active contacts are defined for <?= $this->escapeHtml($organisation->getName()) ?>
+                </p>
+            <?php endif ?>
         </div>
-    <?php endif ?>
+
+        <div class="tab-pane fade" id="inactive-contacts" role="tabpanel" aria-labelledby="inactive-contacts-tab">
+            <?php if (! empty($inactiveContacts)): ?>
+                <div class="table-responsive">
+                    <table class="table table-dark table-striped table-hover">
+                        <thead class="thead-dark">
+                            <tr>
+                                <th scope="col">Name</th>
+                                <th scope="col">Work</th>
+                                <th scope="col">Mobile</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                        <?php foreach ($inactiveContacts as $contact): ?>
+                            <tr class="text-muted">
+                                <td>
+                                    <a class="text-muted" href="<?= $this->url('contact.view', [
+                                        'id' => $organisation->getUuid(),
+                                        'contact_id' => $contact->getId()]) ?>">
+                                        <?= $this->escapeHtml($contact->getFirstName()) ?>
+                                        <?= $this->escapeHtml($contact->getLastName()) ?>
+                                    </a>
+                                </td>
+                                <td>
+                                    <?= $this->escapeHtml($contact->getWorkTelephone()) ?>
+                                </td>
+                                <td>
+                                    <?= $this->escapeHtml($contact->getMobileTelephone()) ?>
+                                </td>
+                            </tr>
+                        <?php endforeach ?>
+                        </tbody>
+                    </table>
+                </div>
+            <?php else: ?>
+                <p class="text-info">
+                    No inactive contacts are defined for <?= $this->escapeHtml($organisation->getName()) ?>
+                </p>
+            <?php endif ?>
+        </div>
+    </div>
 </div>

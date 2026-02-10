@@ -46,6 +46,8 @@ class OverdueDigestTest extends TestCase
         $this->output           = $this->createMock(OutputInterface::class);
         $this->input            = $this->createMock(InputInterface::class);
 
+        $this->mailService->method('isEnabled')->willReturn(true);
+
         $this->ticketService->method('getEntityManager')->willReturn($this->entityManager);
         $this->entityManager->method('getRepository')
             ->with(Ticket::class)

@@ -43,6 +43,12 @@ class OverdueDigest extends Command
     public function execute(InputInterface $input, OutputInterface $output): int
     {
         try {
+            if (! $this->mailService->isEnabled()) {
+                $output->writeln('<comment>Mail service disabled; skipping overdue digest</comment>');
+                $this->logger->info('Mail service disabled; skipping overdue digest');
+                return Command::SUCCESS;
+            }
+
             $repository = $this->ticketService->getEntityManager()->getRepository(Ticket::class);
             if (! $repository instanceof TicketRepository) {
                 $output->writeln('<error>Ticket repository not available</error>');

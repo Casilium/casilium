@@ -2,6 +2,7 @@ FROM php:8.4-apache-bookworm
 
 RUN apt-get update \
     && apt-get install -y --no-install-recommends \
+        cron \
         git \
         libicu-dev \
         mariadb-client \

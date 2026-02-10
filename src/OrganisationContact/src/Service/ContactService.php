@@ -8,6 +8,8 @@ use Doctrine\ORM\EntityManagerInterface;
 use Organisation\Entity\Organisation;
 use Organisation\Service\OrganisationManager;
 use OrganisationContact\Entity\Contact;
+use Ticket\Entity\Ticket;
+use Ticket\Entity\TicketResponse;
 
 class ContactService
 {
@@ -50,10 +52,10 @@ class ContactService
     /**
      * Fetch contacts for an organisation
      */
-    public function fetchContactsByOrganisationId(int $id): ?array
+    public function fetchContactsByOrganisationId(int $id, bool $activeOnly = false): ?array
     {
         return $this->entityManager->getRepository(Contact::class)
-            ->findByCorporationId($id);
+            ->findByCorporationId($id, $activeOnly);
     }
 
     /**
@@ -95,5 +97,36 @@ class ContactService
     {
         $this->entityManager->remove($contact);
         $this->entityManager->flush();
+    }
+
+    public function deactivateContact(Contact $contact): void
+    {
+        $contact->setIsActive(false);
+        $this->entityManager->flush();
+    }
+
+    public function canDeleteContact(Contact $contact): bool
+    {
+        $ticketCount = (int) $this->entityManager->createQueryBuilder()
+            ->select('COUNT(t.id)')
+            ->from(Ticket::class, 't')
+            ->where('t.contact = :contact')
+            ->setParameter('contact', $contact->getId())
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        if ($ticketCount > 0) {
+            return false;
+        }
+
+        $responseCount = (int) $this->entityManager->createQueryBuilder()
+            ->select('COUNT(r.id)')
+            ->from(TicketResponse::class, 'r')
+            ->where('r.contact = :contact')
+            ->setParameter('contact', $contact->getId())
+            ->getQuery()
+            ->getSingleScalarResult();
+
+        return $responseCount === 0;
     }
 }

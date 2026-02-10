@@ -13,6 +13,7 @@ use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Ticket\Entity\Ticket;
+use Ticket\Repository\TicketRepository;
 use Ticket\Service\TicketService;
 
 class ListTicketHandler implements RequestHandlerInterface
@@ -31,59 +32,25 @@ class ListTicketHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $queryParams   = $request->getQueryParams();
-        $page          = $queryParams['page'] ?? 1;
-        $hideCompleted = isset($queryParams['show']) ? false : true;
-        $filter        = $queryParams['filter'] ?? null;
-
-        if ($organisationUuid = $request->getAttribute('org_id')) {
-            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-                ->findTicketsByPagination([
-                    'organisation_uuid' => $organisationUuid,
-                    'hide_completed'    => $hideCompleted,
-                ]);
-        } elseif ($queueId = $request->getAttribute('queue_id')) {
-            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-                ->findTicketsByPagination([
-                    'queue_id'       => (int) $queueId,
-                    'hide_completed' => $hideCompleted,
-                ]);
-        } elseif ($statusId = $request->getAttribute('status_id')) {
-            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-                ->findTicketsByPagination([
-                    'status_id' => (int) $statusId,
-                ]);
-        } elseif ($filter === 'overdue') {
-            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-                ->findTicketsByPagination([
-                    'overdue' => true,
-                ]);
-        } elseif ($filter === 'duetoday') {
-            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-                ->findTicketsByPagination([
-                    'due_today' => true,
-                ]);
-        } elseif ($filter === 'unresolved') {
-            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-                ->findTicketsByPagination([
-                    'unresolved' => true,
-                ]);
-        } else {
-            $query = $this->ticketService->getEntityManager()->getRepository(Ticket::class)
-                ->findTicketsByPagination([
-                    'hide_completed' => $hideCompleted,
-                ]);
-        }
+        $page         = TicketListRequest::extractPage($request);
+        $options      = TicketListRequest::extractOptions($request);
+        $itemsPerPage = TicketListRequest::extractItemsPerPage($request);
+        /** @var TicketRepository $repository */
+        $repository = $this->ticketService->getEntityManager()->getRepository(Ticket::class);
+        $query      = $repository->findTicketsByPagination($options);
 
         $adapter   = new DoctrineAdapter(new ORMPaginator($query, false));
         $paginator = new Paginator($adapter);
 
-        $paginator->setItemCountPerPage(25);
+        $paginator->setItemCountPerPage($itemsPerPage);
         $paginator->setCurrentPageNumber($page);
 
         return new HtmlResponse($this->renderer->render('ticket::ticket-list', [
-            'tickets'   => $paginator,
-            'pageCount' => $paginator->count(),
+            'tickets'           => $paginator,
+            'pageCount'         => $paginator->count(),
+            'itemsPerPage'      => $itemsPerPage,
+            'changesUrl'        => TicketListRequest::extractChangesPath($request),
+            'refreshIntervalMs' => TicketListRequest::POLL_INTERVAL_MS,
         ]));
     }
 }

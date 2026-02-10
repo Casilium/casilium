@@ -109,7 +109,7 @@ class ContactServiceTest extends TestCase
 
         $this->entityManager->getRepository(Contact::class)
             ->willReturn($repository->reveal());
-        $repository->findByCorporationId($organisationId)->willReturn($contacts);
+        $repository->findByCorporationId($organisationId, false)->willReturn($contacts);
 
         $result = $this->contactService->fetchContactsByOrganisationId($organisationId);
 
@@ -124,11 +124,29 @@ class ContactServiceTest extends TestCase
 
         $this->entityManager->getRepository(Contact::class)
             ->willReturn($repository->reveal());
-        $repository->findByCorporationId($organisationId)->willReturn(null);
+        $repository->findByCorporationId($organisationId, false)->willReturn(null);
 
         $result = $this->contactService->fetchContactsByOrganisationId($organisationId);
 
         $this->assertNull($result);
+    }
+
+    public function testFetchContactsByOrganisationIdActiveOnly(): void
+    {
+        $organisationId = 789;
+        $contacts       = [
+            $this->createMock(Contact::class),
+        ];
+
+        $repository = $this->prophesize(ContactRepository::class);
+
+        $this->entityManager->getRepository(Contact::class)
+            ->willReturn($repository->reveal());
+        $repository->findByCorporationId($organisationId, true)->willReturn($contacts);
+
+        $result = $this->contactService->fetchContactsByOrganisationId($organisationId, true);
+
+        $this->assertSame($contacts, $result);
     }
 
     public function testFindContactById(): void

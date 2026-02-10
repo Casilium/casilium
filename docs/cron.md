@@ -20,3 +20,15 @@ This project relies on scheduled console commands for background tasks. Configur
 ```
 
 Adjust timing, cadence, and paths for your environment.
+
+The auto-close window for `ticket:close-resolved` is configurable via
+`config/autoload/tickets.global.php` (`tickets.auto_close_days`, default 2).
+
+> **Note:** Commands that send or ingest email (`ticket:create-from-mail`,
+> `ticket:notifications`, `ticket:overdue-digest`) automatically skip execution
+> when the `mail.enabled` flag (or `MAIL_ENABLED` env var in Docker) is set to
+> `false`, which is useful for development environments without SMTP/IMAP.
+
+When running via Docker, the same schedule resides in `docker/cron.d/casilium`
+and is executed by the cron daemon that starts inside the `app` container. All
+job output goes to `docker compose logs -f app`.

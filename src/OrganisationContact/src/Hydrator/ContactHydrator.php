@@ -7,6 +7,7 @@ namespace OrganisationContact\Hydrator;
 use Laminas\Hydrator\HydratorInterface;
 use OrganisationContact\Entity\Contact;
 use OrganisationContact\Service\ContactService;
+use ReflectionProperty;
 
 use function array_key_exists;
 
@@ -27,18 +28,19 @@ class ContactHydrator implements HydratorInterface
     {
         return [
             'id'               => $object->getId(),
-            'organisation'     => $object->getOrganisation()->getId(),
+            'organisation'     => $object->getOrganisation() === null ? null : $object->getOrganisation()->getId(),
             'site'             => $object->getSite() === null ? null : $object->getSite()->getId(),
-            'first_name'       => $object->getFirstName(),
-            'middle_name'      => $object->getMiddleName(),
-            'last_name'        => $object->getLastName(),
-            'work_telephone'   => $object->getWorkTelephone(),
-            'work_extension'   => $object->getWorkExtension(),
-            'mobile_telephone' => $object->getMobileTelephone(),
-            'home_telephone'   => $object->getMobileTelephone(),
-            'work_email'       => $object->getWorkEmail(),
-            'other_email'      => $object->getOtherEmail(),
+            'first_name'       => $this->getStringProperty($object, 'firstName'),
+            'middle_name'      => $this->getStringProperty($object, 'middleName'),
+            'last_name'        => $this->getStringProperty($object, 'lastName'),
+            'work_telephone'   => $this->getStringProperty($object, 'workTelephone'),
+            'work_extension'   => $this->getStringProperty($object, 'workExtension'),
+            'mobile_telephone' => $this->getStringProperty($object, 'mobileTelephone'),
+            'home_telephone'   => $this->getStringProperty($object, 'homeTelephone'),
+            'work_email'       => $this->getStringProperty($object, 'workEmail'),
+            'other_email'      => $this->getStringProperty($object, 'otherEmail'),
             'gender'           => $object->getGender(),
+            'is_active'        => $object->isActive(),
         ];
     }
 
@@ -106,6 +108,10 @@ class ContactHydrator implements HydratorInterface
             $object->setGender($data['gender']);
         }
 
+        if (array_key_exists('is_active', $data)) {
+            $object->setIsActive((bool) $data['is_active']);
+        }
+
         return $object;
     }
 
@@ -116,5 +122,15 @@ class ContactHydrator implements HydratorInterface
         }
 
         return false;
+    }
+
+    private function getStringProperty(Contact $contact, string $property): string
+    {
+        $reflection = new ReflectionProperty($contact, $property);
+        if (! $reflection->isInitialized($contact)) {
+            return '';
+        }
+
+        return (string) $reflection->getValue($contact);
     }
 }

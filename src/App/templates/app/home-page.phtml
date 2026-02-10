@@ -49,25 +49,44 @@ $this->inlineScript()->appendFile('https://cdnjs.cloudflare.com/ajax/libs/Chart.
                 </div>
             </a>
         </div>
+    </div>
+
+    <div class="row row-cols-1 row-cols-md-2 g-3 mb-3">
         <div class="col">
-            <div class="card mb-1 border-primary">
-                <div class="card-header text-nowrap text-center bg-primary text-white">
-                    SLA Compliance
+            <div class="card h-100 border-primary">
+                <div class="card-header bg-primary text-white text-center">
+                    SLA Incidents
                 </div>
-                <div class="card-body text-center">
-                    <h3><?= number_format($this->stats['slaCompliance'], 1) ?>%</h3>
-                    <small class="text-muted">This Month</small>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="text-uppercase small text-muted">SLA Compliance</div>
+                        <div class="display-6 fw-semibold"><?= number_format($this->stats['sla']['compliance'], 1) ?>%</div>
+                        <small class="text-muted">This Month</small>
+                    </div>
+                    <dl class="row mb-0">
+                        <dt class="col-7 text-uppercase small text-muted">Avg Resolution</dt>
+                        <dd class="col-5 text-end fw-semibold"><?= $this->stats['sla']['avgResolutionDisplay'] ?></dd>
+                        <dt class="col-7 text-uppercase small text-muted">Tickets Resolved</dt>
+                        <dd class="col-5 text-end fw-semibold"><?= (int) $this->stats['sla']['resolved'] ?></dd>
+                    </dl>
                 </div>
             </div>
         </div>
         <div class="col">
-            <div class="card mb-1 border-info">
-                <div class="card-header text-nowrap text-center bg-info text-white">
-                    Avg Resolution Time
+            <div class="card h-100 border-info">
+                <div class="card-header bg-info text-white text-center">
+                    Service Requests (No SLA)
                 </div>
-                <div class="card-body text-center">
-                    <h3><?= number_format($this->stats['avgResolutionTime'], 1) ?>h</h3>
-                    <small class="text-muted">This Month</small>
+                <div class="card-body">
+                    <div class="text-center mb-3">
+                        <div class="text-uppercase small text-muted">Avg Resolution</div>
+                        <div class="display-6 fw-semibold"><?= $this->stats['service']['avgResolutionDisplay'] ?></div>
+                        <small class="text-muted">This Month</small>
+                    </div>
+                    <dl class="row mb-0">
+                        <dt class="col-7 text-uppercase small text-muted">Tickets Resolved</dt>
+                        <dd class="col-5 text-end fw-semibold"><?= (int) $this->stats['service']['resolved'] ?></dd>
+                    </dl>
                 </div>
             </div>
         </div>
@@ -140,75 +159,128 @@ $this->inlineScript()->appendFile('https://cdnjs.cloudflare.com/ajax/libs/Chart.
 
     <hr style=" border-top: 1px dotted #999999;">
 
-    <div class="row">
-        <div class="col">
-            <canvas id="myChart" width="200" height="200"></canvas>
-        </div>
-    </div>
-</div>
 <?php
-$chartData = [];
-
-$agentStats = $this->stats['agent'];
+$agentStats = $this->stats['agent'] ?? [];
 usort($agentStats, function ($a, $b) {
-    return $b['Resolved'] - $a['Resolved'];
+    return ($b['Resolved'] ?? 0) <=> ($a['Resolved'] ?? 0);
 });
 
+$topAgents = array_slice($agentStats, 0, 5);
+
+$chartData = [
+    'names'    => [],
+    'open'     => [],
+    'resolved' => [],
+];
+
 foreach ($agentStats as $agent) {
-    $chartData['names'][] = $agent['name'];
-    $chartData['open'][] = $agent['open'];
-    $chartData['resolved'][] = $agent['Resolved'];
+    $chartData['names'][]    = $agent['name'];
+    $chartData['open'][]     = (int) ($agent['open'] ?? 0);
+    $chartData['resolved'][] = (int) ($agent['Resolved'] ?? 0);
 }
-$agentCount = count($this->stats['agent']);
 ?>
+
+    <div class="row gy-3">
+        <div class="col-12 col-lg-7">
+            <div class="card h-100">
+                <div class="card-header text-nowrap">
+                    Agent Performance
+                </div>
+                <div class="card-body">
+                    <?php if (empty($chartData['names'])): ?>
+                        <div class="text-center text-muted py-4">No agent activity recorded yet.</div>
+                    <?php else: ?>
+                        <div class="ratio ratio-16x9" style="min-height: 260px;">
+                            <canvas id="agentPerformanceChart"></canvas>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+        <div class="col-12 col-lg-5">
+            <div class="card h-100">
+                <div class="card-header text-nowrap">
+                    Top Agents (This Month)
+                </div>
+                <div class="card-body p-0">
+                    <?php if (empty($topAgents)): ?>
+                        <div class="p-3 text-muted">No agent activity recorded yet.</div>
+                    <?php else: ?>
+                        <div class="list-group list-group-flush">
+                            <?php foreach ($topAgents as $agent): ?>
+                                <div class="list-group-item d-flex justify-content-between align-items-center flex-wrap gap-2">
+                                    <div>
+                                        <div class="fw-semibold"><?= $this->escapeHtml($agent['name']) ?></div>
+                                        <div class="small text-muted">
+                                            Resolved: <?= (int) ($agent['Resolved'] ?? 0) ?> · Open: <?= (int) ($agent['open'] ?? 0) ?>
+                                        </div>
+                                    </div>
+                                    <span class="badge bg-success text-white">
+                                        <?= (int) ($agent['Resolved'] ?? 0) ?> closed
+                                    </span>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </div>
+    </div>
+    </div>
+</div>
 <?php $this->inlineScript()->captureStart(); ?>
-</script>
-<script>
-    var openData = {
-        label: 'Open',
-        data: [1,2,3],
-
-    }
-
-    var ctx = document.getElementById('myChart').getContext('2d');
-    var myChart = new Chart(ctx, {
-        type: 'bar',
-        data: {
-            labels: <?= json_encode($chartData['names']) ?>,
-            datasets: [{
-                label: 'Open',
-                data: <?= json_encode($chartData['open']) ?>,
-                backgroundColor: [
-                    <?php for ($i=0; $i<=$agentCount; $i++): ?>
-                    'rgb(163,40,40)',
-                    <?php endfor ?>
-                ],
-            },{
-                label: 'Resolved',
-                data: <?= json_encode($chartData['resolved']) ?>,
-                backgroundColor: [
-                    <?php for ($i=0; $i<=$agentCount; $i++): ?>
-                    'rgb(115,234,44)',
-                    <?php endfor ?>
-                ],
-            }]
-        },
-        options: {
-            scales: {
-                yAxes: [{
-                    ticks: {
-                        beginAtZero: true
-                    }
-                }]
-            },
-            title: {
-                text: 'Agent Statistics for <?= \Carbon\Carbon::now()->format('F') ?>',
-                display: true,
-            },
-            maintainAspectRatio: false,
-            responsive: true,
+    (function () {
+        var labels = <?= json_encode($chartData['names']) ?>;
+        if (!labels.length) {
+            return;
         }
-    });
 
+        var canvas = document.getElementById('agentPerformanceChart');
+        if (!canvas) {
+            return;
+        }
+
+        new Chart(canvas.getContext('2d'), {
+            type: 'bar',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Open',
+                        data: <?= json_encode($chartData['open']) ?>,
+                        backgroundColor: 'rgba(163,40,40,0.6)',
+                        borderColor: 'rgba(163,40,40,0.9)',
+                        borderWidth: 1,
+                    },
+                    {
+                        label: 'Resolved',
+                        data: <?= json_encode($chartData['resolved']) ?>,
+                        backgroundColor: 'rgba(115,234,44,0.6)',
+                        borderColor: 'rgba(115,234,44,0.9)',
+                        borderWidth: 1,
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                legend: {
+                    position: 'bottom',
+                },
+                title: {
+                    display: true,
+                    text: 'Agent Statistics for <?= \Carbon\Carbon::now()->format('F') ?>',
+                },
+                scales: {
+                    yAxes: [{
+                        ticks: {
+                            beginAtZero: true,
+                            precision: 0,
+                        }
+                    }]
+                }
+            }
+        });
+    })();
 <?php
 $this->inlineScript()->captureEnd();

@@ -631,7 +631,7 @@ class CreateTicketsFromEmail extends Command
         if ($response->getId() !== null) {
             // Try to send notification
             try {
-                $this->ticketService->newTicketReplyNotification($ticket);
+                $this->ticketService->newTicketReplyNotification($ticket, $response);
             } catch (Throwable $e) {
                 $this->logger->warning('Ticket reply notification failed', [
                     'ticket_id'   => $ticket->getId(),

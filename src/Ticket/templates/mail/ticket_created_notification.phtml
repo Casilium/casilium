@@ -1,0 +1,17 @@
+<?php
+/** @var \Ticket\Entity\Ticket $ticket */
+/** @var string|null $app_url */
+?>
+<p>
+    Ticket #<?= $this->escapeHtml($ticket->getId()) ?> has been created in
+    <strong><?= $this->escapeHtml($ticket->getQueue()->getName() ?? 'Unassigned') ?></strong>.
+</p>
+<p><strong>Summary:</strong> <?= $this->escapeHtml($ticket->getShortDescription() ?? 'N/A') ?></p>
+<p><strong>Created by:</strong> <?= $this->escapeHtml($ticket->getContact()->getWorkEmail() ?? 'Unknown') ?></p>
+<?php if (($this->app_url ?? null) !== null): ?>
+<p>
+    <a href="<?= $this->escapeHtml($this->app_url) ?>/ticket/<?= $this->escapeHtml($ticket->getUuid() ?? $ticket->getId()) ?>">
+        View ticket
+    </a>
+</p>
+<?php endif; ?>

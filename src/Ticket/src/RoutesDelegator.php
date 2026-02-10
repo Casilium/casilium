@@ -15,6 +15,8 @@ use Ticket\Handler\EditTickerHandler;
 use Ticket\Handler\GoToTicketHandler;
 use Ticket\Handler\ListQueueHandler;
 use Ticket\Handler\ListTicketHandler;
+use Ticket\Handler\SearchTicketHandler;
+use Ticket\Handler\TicketListChangesHandler;
 use Ticket\Handler\ViewTicketHandler;
 
 class RoutesDelegator
@@ -44,6 +46,12 @@ class RoutesDelegator
             'ticket.goto',
         );
 
+        $app->get(
+            '/ticket/search',
+            SearchTicketHandler::class,
+            'ticket.search',
+        );
+
         $app->route(
             '/ticket/{ticket_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}/edit',
             EditTickerHandler::class,
@@ -64,14 +72,29 @@ class RoutesDelegator
             'ticket.list'
         );
         $app->get(
+            '/ticket/list/changes[/organisation/{org_id:[0-9a-f]{8}-(?:[0-9a-f]{4}-){3}[0-9a-f]{12}}]',
+            TicketListChangesHandler::class,
+            'ticket.list_changes'
+        );
+        $app->get(
             '/ticket/list/queue/{queue_id:\d+}',
             ListTicketHandler::class,
             'ticket.list_queue'
         );
         $app->get(
+            '/ticket/list/changes/queue/{queue_id:\d+}',
+            TicketListChangesHandler::class,
+            'ticket.list_changes_queue'
+        );
+        $app->get(
             '/ticket/list/status/{status_id:\d+}',
             ListTicketHandler::class,
             'ticket.list_status'
+        );
+        $app->get(
+            '/ticket/list/changes/status/{status_id:\d+}',
+            TicketListChangesHandler::class,
+            'ticket.list_changes_status'
         );
 
         $app->route(

@@ -2,6 +2,7 @@
 if (!isset($this->routeOptions)) {
     $this->routeOptions = [];
 }
+$extraQueryParams = isset($this->queryParams) ? $this->queryParams : [];
 ?>
 <?php if ($this->pageCount): ?>
 <div class="container">
@@ -10,7 +11,7 @@ if (!isset($this->routeOptions)) {
 
             <li class="<?= isset($this->previous) ? 'page-item' : 'page-item disabled' ?>"
                 <?= isset($this->previous) ? '' : 'aria-hidden="true"' ?>>
-                <a class="page-link" href="<?= $this->url($this->route, $this->routeOptions, ['page'=>$this->previous]); ?>" aria-label="Previous page">
+                <a class="page-link" href="<?= $this->url($this->route, $this->routeOptions, array_merge($extraQueryParams, ['page'=>$this->previous])); ?>" aria-label="Previous page">
                     Previous
                 </a>
             </li>
@@ -19,7 +20,7 @@ if (!isset($this->routeOptions)) {
             <?php foreach ($this->pagesInRange as $page): ?>
                 <li class="page-item <?= $page === $this->current ? 'active' : ''?>">
                     <?php if ($page !== $this->current): ?>
-                        <a class="page-link" href="<?= $this->url($this->route, $this->routeOptions, ['page'=>$page]) ?>" aria-label="page <?= $page ?>">
+                        <a class="page-link" href="<?= $this->url($this->route, $this->routeOptions, array_merge($extraQueryParams, ['page'=>$page])) ?>" aria-label="page <?= $page ?>">
                             <?= $this->escapeHtml($page); ?>
                         </a>
                     <?php else: ?>
@@ -32,7 +33,7 @@ if (!isset($this->routeOptions)) {
             <!-- Next page link -->
             <li class="page-item <?= isset($this->next) ? '' : 'disabled' ?>"
                 <?= isset($this->previous) ? '' : 'aria-hidden="true"' ?>>
-                <a class="page-link" href="<?php echo $this->url($this->route, $this->routeOptions, ['page'=> $this->next]); ?>" aria-label="Next page">
+                <a class="page-link" href="<?php echo $this->url($this->route, $this->routeOptions, array_merge($extraQueryParams, ['page'=> $this->next])); ?>" aria-label="Next page">
                     Next
                 </a>
             </li>

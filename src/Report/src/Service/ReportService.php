@@ -9,10 +9,12 @@ use Carbon\CarbonInterface;
 use Organisation\Entity\Organisation;
 use Organisation\Service\OrganisationManager;
 use Ticket\Entity\Ticket;
+use Ticket\Entity\Type;
 use Ticket\Repository\TicketRepository;
 use Ticket\Repository\TicketRepositoryInterface;
 
 use function array_merge;
+use function trim;
 
 class ReportService
 {
@@ -141,6 +143,119 @@ class ReportService
     {
         $options = array_merge($options, $this->getDefaultOptions() + ['status' => Ticket::STATUS_NEW]);
         return $this->ticketRepository->findTicketCount($options);
+    }
+
+    /**
+     * Build executive report stats for the configured organisation and period
+     *
+     * @return array<string, int|float|array>
+     */
+    public function buildExecutiveStats(): array
+    {
+        $stats = [
+            'totalIncident'    => $this->getTotalTicketCount(['type' => Type::TYPE_INCIDENT]),
+            'totalRequest'     => $this->getTotalTicketCount(['type' => Type::TYPE_REQUEST]),
+            'resolvedIncident' => $this->getResolvedTicketCount(['type' => Type::TYPE_INCIDENT]),
+            'resolvedRequest'  => $this->getResolvedTicketCount(['type' => Type::TYPE_REQUEST]),
+            'closedIncident'   => $this->getClosedTicketCount(['type' => Type::TYPE_INCIDENT]),
+            'closedRequest'    => $this->getClosedTicketCount(['type' => Type::TYPE_REQUEST]),
+            'holdIncident'     => $this->getHoldTicketCount(['type' => Type::TYPE_INCIDENT]),
+            'holdRequest'      => $this->getHoldTicketCount(['type' => Type::TYPE_REQUEST]),
+            'progressIncident' => $this->getTicketInProgressCount(['type' => Type::TYPE_INCIDENT]),
+            'progressRequest'  => $this->getTicketInProgressCount(['type' => Type::TYPE_REQUEST]),
+            'newIncident'      => $this->getNewTicketCount(['type' => Type::TYPE_INCIDENT]),
+            'newRequest'       => $this->getNewTicketCount(['type' => Type::TYPE_REQUEST]),
+        ];
+
+        $stats += [
+            'total'                 => $stats['totalIncident'] + $stats['totalRequest'],
+            'resolved'              => $stats['resolvedIncident'] + $stats['resolvedRequest'],
+            'closed'                => $stats['closedIncident'] + $stats['closedRequest'],
+            'hold'                  => $stats['holdIncident'] + $stats['holdRequest'],
+            'progress'              => $stats['progressIncident'] + $stats['progressRequest'],
+            'new'                   => $stats['newIncident'] + $stats['newRequest'],
+            'totalIncidentComplete' => $stats['resolvedIncident'] + $stats['closedIncident'],
+            'totalRequestComplete'  => $stats['resolvedRequest'] + $stats['closedRequest'],
+            'totalComplete'         => $stats['resolvedIncident'] + $stats['closedIncident']
+                                     + $stats['resolvedRequest'] + $stats['closedRequest'],
+        ];
+
+        $stats['totalOutstanding'] = $stats['new'] + $stats['progress'] + $stats['hold'];
+        $stats['incidentSla']      = $this->getIncidentSlaComplianceStats();
+
+        return $stats;
+    }
+
+    /**
+     * Return unresolved tickets for the report period
+     *
+     * @param int $limit max results
+     * @return array<array<string, string>>
+     */
+    public function getUnresolvedTickets(int $limit): array
+    {
+        $organisationId = $this->getOrganisation()->getId();
+        $tickets        = $this->ticketRepository->findUnresolvedTicketsByOrganisationAndPeriod(
+            $organisationId,
+            $this->getStartDate(),
+            $this->getEndDate(),
+            $limit
+        );
+
+        $rows = [];
+        foreach ($tickets as $ticket) {
+            $contact     = $ticket->getContact();
+            $contactName = '';
+            if (null !== $contact) {
+                $contactName = trim($contact->getFirstName() . ' ' . $contact->getLastName());
+            }
+
+            $rows[] = [
+                'id'          => (string) $ticket->getId(),
+                'created'     => $this->formatReportDate($ticket->getCreatedAt()),
+                'due'         => $this->formatReportDate($ticket->getDueDate()),
+                'updated'     => $this->formatReportDate($ticket->getLastResponseDate()),
+                'type'        => (string) $ticket->getType(),
+                'contact'     => $contactName !== '' ? $contactName : '-',
+                'description' => $ticket->getShortDescription(),
+            ];
+        }
+
+        return $rows;
+    }
+
+    /**
+     * Return incident SLA compliance stats for the report period
+     *
+     * @return array{total:int,within:int,rate:float}
+     */
+    public function getIncidentSlaComplianceStats(): array
+    {
+        $organisationId = $this->getOrganisation()->getId();
+        $stats          = $this->ticketRepository->findSlaComplianceStats(
+            $this->getStartDate(),
+            $this->getEndDate(),
+            $organisationId,
+            Type::TYPE_INCIDENT
+        );
+
+        $total = $stats['total'];
+        $rate  = $total > 0 ? ($stats['within'] / $total) * 100 : 0.0;
+
+        return [
+            'total'  => $total,
+            'within' => $stats['within'],
+            'rate'   => $rate,
+        ];
+    }
+
+    private function formatReportDate(?string $value): string
+    {
+        if (null === $value || '' === $value) {
+            return '-';
+        }
+
+        return Carbon::parse($value, 'UTC')->format('d M Y');
     }
 
     /**

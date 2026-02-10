@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 use Exception;
 use Organisation\Entity\Organisation;
 use ServiceLevel\Entity\SlaTarget;
@@ -24,6 +25,8 @@ use Ticket\Service\TicketService;
 use function array_map;
 use function count;
 use function intval;
+use function is_array;
+use function is_numeric;
 
 class TicketRepository extends EntityRepository implements TicketRepositoryInterface
 {
@@ -126,37 +129,92 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
      */
     public function findTicketsByPagination(array $options = [], int $offset = 0, int $limit = 2): Query
     {
-        if (isset($options['hide_completed']) && $options['hide_completed'] === true) {
-            // hide completed (resolved/closed) tickets?
-            $status = Ticket::STATUS_ON_HOLD;
-        } else {
-            // by default show all tickets
-            $status = Ticket::STATUS_CLOSED;
-        }
+        $qb = $this->buildTicketPaginationQueryBuilder($options);
 
-        // get query builder
+        return $qb->getQuery()
+            ->setMaxResults($limit)
+            ->setFirstResult($offset);
+    }
+
+    public function findTicketListSignatureData(array $options = [], int $offset = 0, int $limit = 25): array
+    {
+        $qb = $this->buildTicketPaginationQueryBuilder($options);
+        $qb->select([
+            't.id AS id',
+            't.uuid AS uuid',
+            't.shortDescription AS short_description',
+            't.createdAt AS created_at',
+            't.dueDate AS due_date',
+            't.lastResponseDate AS last_response_date',
+            'IDENTITY(t.status) AS status_id',
+            'IDENTITY(t.priority) AS priority_id',
+            'IDENTITY(t.queue) AS queue_id',
+            'IDENTITY(t.organisation) AS organisation_id',
+            'IDENTITY(t.contact) AS contact_id',
+            'IDENTITY(t.site) AS site_id',
+        ]);
+
+        return $qb->getQuery()
+            ->setMaxResults($limit)
+            ->setFirstResult($offset)
+            ->getArrayResult();
+    }
+
+    /**
+     * Fetch tickets belonging to organisation
+     *
+     * @param string $uuid UUID of organisation
+     * @return array of tickets by organisation
+     */
+    public function findByOrganisationUuid(string $uuid): array
+    {
+        $qb = $this->createQueryBuilder('q');
+
+        $qb->select('t')
+            ->from(Ticket::class, 't')
+            ->where('o.uuid = :uuid')
+            ->setParameter('uuid', $uuid)
+            ->leftJoin('t.organisation', 'o')
+            ->orderBy('t.status')
+            ->addOrderBy('t.priority')
+            ->addOrderBy('t.dueDate');
+
+        return $qb->getQuery()->getResult();
+    }
+
+    private function buildTicketPaginationQueryBuilder(array $options): QueryBuilder
+    {
         $qb = $this->getEntityManager()->createQueryBuilder();
-        $qb->select(['t'])
+        $qb->select('t')
             ->from(Ticket::class, 't')
             ->orderBy('t.type', 'DESC')
             ->addOrderBy('t.status')
             ->addOrderBy('t.priority')
-            ->addOrderBy('t.dueDate')
-            ->where('t.status <= :status')
-            ->setParameter('status', $status);
+            ->addOrderBy('t.dueDate');
+
+        // apply status filter: explicit status_id takes priority, otherwise use default
+        if (isset($options['status_id'])) {
+            if (is_array($options['status_id'])) {
+                $statusIds = array_map('intval', $options['status_id']);
+                $qb->andWhere('t.status IN (:statuses)')
+                    ->setParameter('statuses', $statusIds);
+            } else {
+                $qb->andWhere('t.status = :status')
+                    ->setParameter('status', (int) $options['status_id']);
+            }
+        } elseif (isset($options['hide_completed']) && $options['hide_completed'] === true) {
+            $qb->andWhere('t.status <= :status')
+                ->setParameter('status', Ticket::STATUS_ON_HOLD);
+        } else {
+            $qb->andWhere('t.status <= :status')
+                ->setParameter('status', Ticket::STATUS_CLOSED);
+        }
 
         // if list queue show tickets for queue
         if (isset($options['queue_id'])) {
             $queueId = (int) $options['queue_id'];
             $qb->andWhere('t.queue = :queue')
                 ->setParameter('queue', $queueId);
-        }
-
-        // if requesting particular status, override status
-        if (isset($options['status_id'])) {
-            $statusId = (int) $options['status_id'];
-            $qb->where('t.status = :status')
-                ->setParameter('status', $statusId);
         }
 
         // if organisation uuid is defined, grab that organisation only
@@ -195,29 +253,39 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
                 ]);
         }
 
-        return $qb->getQuery()->setMaxResults($limit)->setFirstResult($offset);
-    }
+        // text search: match ticket ID (if numeric) or LIKE on descriptions
+        if (! empty($options['search_text'])) {
+            $searchText = $options['search_text'];
+            if (is_numeric($searchText)) {
+                $qb->andWhere(
+                    't.id = :searchId OR t.shortDescription LIKE :searchText'
+                    . ' OR t.longDescription LIKE :searchText'
+                )->setParameter('searchId', (int) $searchText)
+                    ->setParameter('searchText', '%' . $searchText . '%');
+            } else {
+                $qb->andWhere('t.shortDescription LIKE :searchText OR t.longDescription LIKE :searchText')
+                    ->setParameter('searchText', '%' . $searchText . '%');
+            }
+        }
 
-    /**
-     * Fetch tickets belonging to organisation
-     *
-     * @param string $uuid UUID of organisation
-     * @return array of tickets by organisation
-     */
-    public function findByOrganisationUuid(string $uuid): array
-    {
-        $qb = $this->createQueryBuilder('q');
+        // filter by contact
+        if (isset($options['contact_id'])) {
+            $qb->andWhere('t.contact = :contactId')
+                ->setParameter('contactId', (int) $options['contact_id']);
+        }
 
-        $qb->select('t')
-            ->from(Ticket::class, 't')
-            ->where('o.uuid = :uuid')
-            ->setParameter('uuid', $uuid)
-            ->leftJoin('t.organisation', 'o')
-            ->orderBy('t.status')
-            ->addOrderBy('t.priority')
-            ->addOrderBy('t.dueDate');
+        // filter by created date range
+        if (! empty($options['date_from'])) {
+            $qb->andWhere('t.createdAt >= :dateFrom')
+                ->setParameter('dateFrom', $options['date_from'] . ' 00:00:00');
+        }
 
-        return $qb->getQuery()->getResult();
+        if (! empty($options['date_to'])) {
+            $qb->andWhere('t.createdAt <= :dateTo')
+                ->setParameter('dateTo', $options['date_to'] . ' 23:59:59');
+        }
+
+        return $qb;
     }
 
     /**
@@ -554,6 +622,56 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         return $stats;
     }
 
+    public function findUnresolvedTicketsByOrganisationAndPeriod(
+        int $organisationId,
+        CarbonInterface $periodStart,
+        CarbonInterface $periodEnd,
+        int $limit
+    ): array {
+        $qb = $this->createQueryBuilder('t')
+            ->where('t.organisation = :organisation')
+            ->andWhere('t.status IN (:statuses)')
+            ->andWhere('t.createdAt BETWEEN :start AND :end')
+            ->setParameter('organisation', $organisationId)
+            ->setParameter('statuses', [
+                Ticket::STATUS_NEW,
+                Ticket::STATUS_IN_PROGRESS,
+                Ticket::STATUS_ON_HOLD,
+            ])
+            ->setParameter('start', $periodStart->format('Y-m-d 00:00:00'))
+            ->setParameter('end', $periodEnd->format('Y-m-d 23:59:59'))
+            ->orderBy('t.dueDate', 'ASC');
+
+        return $qb->getQuery()
+            ->setMaxResults($limit)
+            ->getResult();
+    }
+
+    private function createResolvedTicketQueryBuilder(
+        ?CarbonInterface $periodStart,
+        ?CarbonInterface $periodEnd,
+        ?bool $requiresSla
+    ): QueryBuilder {
+        $qb = $this->createQueryBuilder('t')
+            ->where('t.status IN (:statuses)')
+            ->andWhere('t.resolveDate IS NOT NULL')
+            ->setParameter('statuses', [Ticket::STATUS_RESOLVED, Ticket::STATUS_CLOSED]);
+
+        if ($periodStart && $periodEnd) {
+            $qb->andWhere('t.resolveDate BETWEEN :start AND :end')
+                ->setParameter('start', $periodStart->format('Y-m-d H:i:s'))
+                ->setParameter('end', $periodEnd->format('Y-m-d H:i:s'));
+        }
+
+        if ($requiresSla === true) {
+            $qb->andWhere('t.slaTarget IS NOT NULL');
+        } elseif ($requiresSla === false) {
+            $qb->andWhere('t.slaTarget IS NULL');
+        }
+
+        return $qb;
+    }
+
     /**
      * Find average resolution time in hours for resolved tickets
      *
@@ -565,16 +683,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         ?CarbonInterface $periodStart = null,
         ?CarbonInterface $periodEnd = null
     ): float {
-        $qb = $this->createQueryBuilder('t')
-            ->where('t.status = :status')
-            ->andWhere('t.resolveDate IS NOT NULL')
-            ->setParameter('status', Ticket::STATUS_RESOLVED);
-
-        if ($periodStart && $periodEnd) {
-            $qb->andWhere('t.resolveDate BETWEEN :start AND :end')
-                ->setParameter('start', $periodStart->format('Y-m-d H:i:s'))
-                ->setParameter('end', $periodEnd->format('Y-m-d H:i:s'));
-        }
+        $qb = $this->createResolvedTicketQueryBuilder($periodStart, $periodEnd, true);
 
         /** @var Ticket[] $tickets */
         $tickets = $qb->getQuery()->getResult();
@@ -583,32 +692,72 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             return 0.0;
         }
 
-        $totalHours = 0;
+        $totalMinutes = 0;
 
         foreach ($tickets as $ticket) {
-            $createdAt   = Carbon::parse($ticket->getCreatedAt(), 'UTC');
-            $resolveDate = Carbon::parse($ticket->getResolveDate(), 'UTC');
-            $totalHours += $createdAt->diffInHours($resolveDate);
+            $createdAt     = Carbon::parse($ticket->getCreatedAt(), 'UTC');
+            $resolveDate   = Carbon::parse($ticket->getResolveDate(), 'UTC');
+            $totalMinutes += $createdAt->diffInMinutes($resolveDate);
         }
 
-        return $totalHours / count($tickets);
+        return ($totalMinutes / count($tickets)) / 60;
     }
 
-    /**
-     * Find SLA compliance rate as a percentage
-     *
-     * @param CarbonInterface|null $periodStart Start of period
-     * @param CarbonInterface|null $periodEnd End of period
-     * @return float SLA compliance rate (0-100)
-     */
-    public function findSlaComplianceRate(
+    public function findAverageResolutionTimeWithoutSla(
         ?CarbonInterface $periodStart = null,
         ?CarbonInterface $periodEnd = null
     ): float {
+        $qb = $this->createResolvedTicketQueryBuilder($periodStart, $periodEnd, false);
+
+        /** @var Ticket[] $tickets */
+        $tickets = $qb->getQuery()->getResult();
+
+        if (empty($tickets)) {
+            return 0.0;
+        }
+
+        $totalMinutes = 0;
+
+        foreach ($tickets as $ticket) {
+            $createdAt     = Carbon::parse($ticket->getCreatedAt(), 'UTC');
+            $resolveDate   = Carbon::parse($ticket->getResolveDate(), 'UTC');
+            $totalMinutes += $createdAt->diffInMinutes($resolveDate);
+        }
+
+        return ($totalMinutes / count($tickets)) / 60;
+    }
+
+    public function findResolvedTicketCountBySlaStatus(
+        bool $hasSla,
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null
+    ): int {
+        $qb = $this->createResolvedTicketQueryBuilder($periodStart, $periodEnd, $hasSla)
+            ->select('COUNT(t.id)');
+
+        return (int) $qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * Find SLA compliance stats for resolved tickets
+     *
+     * @param CarbonInterface|null $periodStart Start of period
+     * @param CarbonInterface|null $periodEnd End of period
+     * @param int|null $organisationId Organisation ID to filter
+     * @param int|null $type Ticket type ID to filter
+     * @return array{total:int,within:int}
+     */
+    public function findSlaComplianceStats(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null,
+        ?int $organisationId = null,
+        ?int $type = null
+    ): array {
         $qb = $this->createQueryBuilder('t')
             ->where('t.status IN (:statuses)')
             ->andWhere('t.dueDate IS NOT NULL')
             ->andWhere('t.resolveDate IS NOT NULL')
+            ->andWhere('t.slaTarget IS NOT NULL')
             ->setParameter('statuses', [Ticket::STATUS_RESOLVED, Ticket::STATUS_CLOSED]);
 
         if ($periodStart && $periodEnd) {
@@ -617,11 +766,24 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
                 ->setParameter('end', $periodEnd->format('Y-m-d H:i:s'));
         }
 
+        if (null !== $organisationId) {
+            $qb->andWhere('t.organisation = :organisation')
+                ->setParameter('organisation', $organisationId);
+        }
+
+        if (null !== $type) {
+            $qb->andWhere('t.type = :type')
+                ->setParameter('type', $type);
+        }
+
         /** @var Ticket[] $tickets */
         $tickets = $qb->getQuery()->getResult();
 
         if (empty($tickets)) {
-            return 0.0;
+            return [
+                'total'  => 0,
+                'within' => 0,
+            ];
         }
 
         $withinSla = 0;
@@ -635,6 +797,71 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             }
         }
 
-        return ($withinSla / count($tickets)) * 100;
+        return [
+            'total'  => count($tickets),
+            'within' => $withinSla,
+        ];
+    }
+
+    /**
+     * Find SLA compliance rate as a percentage
+     *
+     * @param CarbonInterface|null $periodStart Start of period
+     * @param CarbonInterface|null $periodEnd End of period
+     * @param int|null $organisationId Organisation ID to filter
+     * @param int|null $type Ticket type ID to filter
+     * @return float SLA compliance rate (0-100)
+     */
+    public function findSlaComplianceRate(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null,
+        ?int $organisationId = null,
+        ?int $type = null
+    ): float {
+        $stats = $this->findSlaComplianceStats($periodStart, $periodEnd, $organisationId, $type);
+
+        if ($stats['total'] === 0) {
+            return 0.0;
+        }
+
+        return ($stats['within'] / $stats['total']) * 100;
+    }
+
+    /**
+     * Search tickets by ID or short description
+     *
+     * @param string $query Search query (ticket ID or description fragment)
+     * @param int $limit Maximum number of results
+     * @return array Array of ticket search results
+     */
+    public function searchTickets(string $query, int $limit = 10): array
+    {
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select(
+                't.id',
+                't.uuid',
+                't.shortDescription',
+                's.description AS statusDescription',
+                'o.name AS organisationName',
+                'CONCAT(c.firstName, \' \', c.lastName) AS contactName',
+                't.createdAt'
+            )
+            ->from(Ticket::class, 't')
+            ->leftJoin('t.status', 's')
+            ->leftJoin('t.organisation', 'o')
+            ->leftJoin('t.contact', 'c')
+            ->orderBy('t.id', 'DESC')
+            ->setMaxResults($limit);
+
+        if (is_numeric($query)) {
+            $qb->andWhere('t.id = :id OR t.shortDescription LIKE :query OR t.longDescription LIKE :query')
+                ->setParameter('id', (int) $query)
+                ->setParameter('query', '%' . $query . '%');
+        } else {
+            $qb->andWhere('t.shortDescription LIKE :query OR t.longDescription LIKE :query')
+                ->setParameter('query', '%' . $query . '%');
+        }
+
+        return $qb->getQuery()->getArrayResult();
     }
 }

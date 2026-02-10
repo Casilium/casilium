@@ -38,6 +38,13 @@ matter (e.g. facilities, HR, operations, or managed service teams).
 - Usage: `docs/usage.md`
 - Cron jobs: `docs/cron.md`
 
+## Mail Settings
+
+All outbound and inbound email behavior is controlled by the `mail.enabled` flag
+(`MAIL_ENABLED` environment variable in Docker). When disabled, cron-based
+commands, ticket notifications, and mailbox imports safely no-op so you can run
+Casilium without connecting it to SMTP/IMAP during development.
+
 ## Quick Start (Docker)
 
 ```bash
@@ -45,6 +52,13 @@ docker compose up --build
 ```
 
 See `docs/docker.md` for full Docker instructions and `docs/setup.md` for manual setup.
+
+## Background Jobs
+
+Cron now runs inside the main app container. When the container boots, it
+installs the schedule from `docker/cron.d/casilium` and starts the system cron
+daemon alongside Apache. Job output is forwarded to the container log stream, so
+you can monitor runs with `docker compose logs -f app`.
 
 License
 -------

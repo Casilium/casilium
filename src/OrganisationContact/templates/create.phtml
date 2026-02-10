@@ -103,6 +103,19 @@ $this->pageBreadcrumbs()->setItems([
                 </div>
             </div>
 
+            <div class="row">
+                <div class="col-sm-6">
+                    <div class="form-group">
+                        <div class="controls">
+                            <label>
+                                <?= $this->formCheckbox($form->get('is_active')); ?>
+                                <?= $this->formLabel($form->get('is_active')); ?>
+                            </label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
             <div class="form-group">
                 <div class="controls">
                     <?= $this->formHidden($form->get('id')); ?>

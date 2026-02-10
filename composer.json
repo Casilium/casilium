@@ -41,6 +41,7 @@
         "ddeboer/imap": "^1.23",
         "doctrine/doctrine-laminas-hydrator": "^3.4.0",
         "doctrine/migrations": "^3.9",
+        "dompdf/dompdf": "^3.1",
         "laminas/laminas-component-installer": "^3.4.0",
         "laminas/laminas-config-aggregator": "^1.14.0",
         "laminas/laminas-diactoros": "^3.0",
@@ -98,7 +99,8 @@
             "MailService\\": "src/MailService/src",
             "Logger\\": "src/Logger/src",
             "SlackIntegration\\": "src/SlackIntegration/src",
-            "Report\\": "src/Report/src"
+            "Report\\": "src/Report/src",
+            "Api\\": "src/Api/src"
         }
     },
     "autoload-dev": {
