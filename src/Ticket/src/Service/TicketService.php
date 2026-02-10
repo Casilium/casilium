@@ -306,6 +306,26 @@ class TicketService
     }
 
     /**
+     * Return all ticket statuses
+     *
+     * @return array
+     */
+    public function getStatuses(): array
+    {
+        return $this->entityManager->getRepository(Status::class)->findAll();
+    }
+
+    /**
+     * Return all organisations
+     *
+     * @return array
+     */
+    public function getOrganisations(): array
+    {
+        return $this->organisationManager->fetchAll();
+    }
+
+    /**
      * Return list of queues
      *
      * @return array

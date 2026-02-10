@@ -15,6 +15,7 @@ use Ticket\Handler\EditTickerHandler;
 use Ticket\Handler\GoToTicketHandler;
 use Ticket\Handler\ListQueueHandler;
 use Ticket\Handler\ListTicketHandler;
+use Ticket\Handler\SearchTicketHandler;
 use Ticket\Handler\ViewTicketHandler;
 
 class RoutesDelegator
@@ -42,6 +43,12 @@ class RoutesDelegator
             '/ticket/go',
             GoToTicketHandler::class,
             'ticket.goto',
+        );
+
+        $app->get(
+            '/ticket/search',
+            SearchTicketHandler::class,
+            'ticket.search',
         );
 
         $app->route(

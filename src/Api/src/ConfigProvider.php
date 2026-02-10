@@ -36,7 +36,8 @@ class ConfigProvider
                 ],
             ],
             'factories'  => [
-                Handler\TicketSearchHandler::class => Handler\Factory\TicketSearchHandlerFactory::class,
+                Handler\OrganisationContactsHandler::class => Handler\Factory\OrganisationContactsHandlerFactory::class,
+                Handler\TicketSearchHandler::class         => Handler\Factory\TicketSearchHandlerFactory::class,
             ],
         ];
     }

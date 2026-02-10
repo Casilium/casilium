@@ -25,6 +25,7 @@ use Ticket\Service\TicketService;
 use function array_map;
 use function count;
 use function intval;
+use function is_array;
 use function is_numeric;
 
 class TicketRepository extends EntityRepository implements TicketRepositoryInterface
@@ -128,14 +129,6 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
      */
     public function findTicketsByPagination(array $options = [], int $offset = 0, int $limit = 2): Query
     {
-        if (isset($options['hide_completed']) && $options['hide_completed'] === true) {
-            // hide completed (resolved/closed) tickets?
-            $status = Ticket::STATUS_ON_HOLD;
-        } else {
-            // by default show all tickets
-            $status = Ticket::STATUS_CLOSED;
-        }
-
         // get query builder
         $qb = $this->getEntityManager()->createQueryBuilder();
         $qb->select(['t'])
@@ -143,22 +136,31 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->orderBy('t.type', 'DESC')
             ->addOrderBy('t.status')
             ->addOrderBy('t.priority')
-            ->addOrderBy('t.dueDate')
-            ->where('t.status <= :status')
-            ->setParameter('status', $status);
+            ->addOrderBy('t.dueDate');
+
+        // apply status filter: explicit status_id takes priority, otherwise use default
+        if (isset($options['status_id'])) {
+            if (is_array($options['status_id'])) {
+                $statusIds = array_map('intval', $options['status_id']);
+                $qb->andWhere('t.status IN (:statuses)')
+                    ->setParameter('statuses', $statusIds);
+            } else {
+                $qb->andWhere('t.status = :status')
+                    ->setParameter('status', (int) $options['status_id']);
+            }
+        } elseif (isset($options['hide_completed']) && $options['hide_completed'] === true) {
+            $qb->andWhere('t.status <= :status')
+                ->setParameter('status', Ticket::STATUS_ON_HOLD);
+        } else {
+            $qb->andWhere('t.status <= :status')
+                ->setParameter('status', Ticket::STATUS_CLOSED);
+        }
 
         // if list queue show tickets for queue
         if (isset($options['queue_id'])) {
             $queueId = (int) $options['queue_id'];
             $qb->andWhere('t.queue = :queue')
                 ->setParameter('queue', $queueId);
-        }
-
-        // if requesting particular status, override status
-        if (isset($options['status_id'])) {
-            $statusId = (int) $options['status_id'];
-            $qb->where('t.status = :status')
-                ->setParameter('status', $statusId);
         }
 
         // if organisation uuid is defined, grab that organisation only
@@ -195,6 +197,38 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
                     Ticket::STATUS_NEW,
                     Ticket::STATUS_IN_PROGRESS,
                 ]);
+        }
+
+        // text search: match ticket ID (if numeric) or LIKE on descriptions
+        if (! empty($options['search_text'])) {
+            $searchText = $options['search_text'];
+            if (is_numeric($searchText)) {
+                $qb->andWhere(
+                    't.id = :searchId OR t.shortDescription LIKE :searchText'
+                    . ' OR t.longDescription LIKE :searchText'
+                )->setParameter('searchId', (int) $searchText)
+                    ->setParameter('searchText', '%' . $searchText . '%');
+            } else {
+                $qb->andWhere('t.shortDescription LIKE :searchText OR t.longDescription LIKE :searchText')
+                    ->setParameter('searchText', '%' . $searchText . '%');
+            }
+        }
+
+        // filter by contact
+        if (isset($options['contact_id'])) {
+            $qb->andWhere('t.contact = :contactId')
+                ->setParameter('contactId', (int) $options['contact_id']);
+        }
+
+        // filter by created date range
+        if (! empty($options['date_from'])) {
+            $qb->andWhere('t.createdAt >= :dateFrom')
+                ->setParameter('dateFrom', $options['date_from'] . ' 00:00:00');
+        }
+
+        if (! empty($options['date_to'])) {
+            $qb->andWhere('t.createdAt <= :dateTo')
+                ->setParameter('dateTo', $options['date_to'] . ' 23:59:59');
         }
 
         return $qb->getQuery()->setMaxResults($limit)->setFirstResult($offset);

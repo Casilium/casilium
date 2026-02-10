@@ -59,6 +59,7 @@ class ConfigProvider
                 Handler\ListTicketHandler::class         => Handler\Factory\ListTickerHandlerFactory::class,
                 Handler\ViewTicketHandler::class         => Handler\Factory\ViewTicketHandlerFactory::class,
                 Handler\GoToTicketHandler::class         => Handler\Factory\GoToTicketHandlerFactory::class,
+                Handler\SearchTicketHandler::class       => Handler\Factory\SearchTicketHandlerFactory::class,
                 Hydrator\TicketHydrator::class           => Hydrator\Factory\TicketHydratorFactory::class,
                 Service\TicketService::class             => Service\Factory\TicketServiceFactory::class,
                 Service\QueueManager::class              => Service\Factory\QueueManagerFactory::class,
