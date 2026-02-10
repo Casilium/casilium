@@ -103,18 +103,20 @@ $this->pageBreadcrumbs()->setItems([
                 </div>
             </div>
 
-            <div class="row">
-                <div class="col-sm-6">
-                    <div class="form-group">
-                        <div class="controls">
-                            <label>
-                                <?= $this->formCheckbox($form->get('is_active')); ?>
-                                <?= $this->formLabel($form->get('is_active')); ?>
-                            </label>
+            <?php if (isset($contact)): ?>
+                <div class="row">
+                    <div class="col-sm-6">
+                        <div class="form-group">
+                            <div class="controls">
+                                <label>
+                                    <?= $this->formCheckbox($form->get('is_active')); ?>
+                                    <?= $this->formLabel($form->get('is_active')); ?>
+                                </label>
+                            </div>
                         </div>
                     </div>
                 </div>
-            </div>
+            <?php endif; ?>
 
             <div class="form-group">
                 <div class="controls">

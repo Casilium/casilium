@@ -60,6 +60,7 @@ class CreateContactHandler implements RequestHandlerInterface
             if ($form->isValid()) {
                 $contact = new Contact();
                 $contact->exchangeArray($form->getInputFilter()->getValues());
+                $contact->setIsActive(true);
 
                 $contact->setOrganisation($organisation);
                 $result = $this->contactService->createContact($contact);
