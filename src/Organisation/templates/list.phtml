@@ -8,33 +8,89 @@ $this->pageBreadcrumbs()->setItems([
 ]);
 
 $organisations = $this->organisations;
+$activeOrganisations = [];
+$inactiveOrganisations = [];
+
+foreach ($organisations as $organisation) {
+    if ($organisation->getIsActive() === 1) {
+        $activeOrganisations[] = $organisation;
+        continue;
+    }
+
+    $inactiveOrganisations[] = $organisation;
+}
+
 $organisationCount = count($organisations);
+$activeCount       = count($activeOrganisations);
+$inactiveCount     = count($inactiveOrganisations);
 ?>
 <h1>Organisations <small><span class="badge badge-primary"><?= $organisationCount ?></span></small></h1>
 <div style="padding-bottom: 25px;">
     <a class="btn btn-sm btn-primary" href="<?= $this->url('organisation.create') ?>">New Organisation</a>
-    <?php if (! empty($organisations)) : ?>
-    <div class="organisation-list mt-3">
-        <?php foreach ($organisations as $organisation): ?>
-           <div class="row mt-1">
-               <div class="col">
-                   <ul class="list-group">
-                        <li class="list-group-item">
-                            <a href="<?= $this->url('organisation.view', ['id' => $organisation->getUuid()]) ?>">
-                                <?php if ($organisation->getIsActive() === 0): ?>
-                                    <span class="text-muted"><?= $this->escapeHtml($organisation->getName()) ?></span>
-                                <?php else: ?>
-                                    <?= $this->escapeHtml($organisation->getName()) ?>
-                                    <?php if ($organisation->getSla() !== null): ?>
-                                        <small><span class="badge badge-primary ml-1">SLA</span></small>
-                                    <?php endif ?>
-                                <?php endif ?>
-                           </a>
-                       </li>
-                   </ul>
-               </div>
-           </div>
-        <?php endforeach; ?>
+
+    <ul class="nav nav-pills mt-3 mb-3" id="organisation-tabs" role="tablist">
+        <li class="nav-item">
+            <button class="btn btn-link nav-link active" id="active-organisations-tab" data-toggle="pill"
+                    data-target="#active-organisations" type="button" role="tab"
+                    aria-controls="active-organisations" aria-selected="true">
+                Active <span class="badge badge-secondary ml-1"><?= $activeCount ?></span>
+            </button>
+        </li>
+        <li class="nav-item">
+            <button class="btn btn-link nav-link" id="inactive-organisations-tab" data-toggle="pill"
+                    data-target="#inactive-organisations" type="button" role="tab"
+                    aria-controls="inactive-organisations" aria-selected="false">
+                Inactive <span class="badge badge-secondary ml-1"><?= $inactiveCount ?></span>
+            </button>
+        </li>
+    </ul>
+
+    <div class="tab-content" id="organisation-tabs-content">
+        <div class="tab-pane fade show active" id="active-organisations" role="tabpanel" aria-labelledby="active-organisations-tab">
+            <?php if (! empty($activeOrganisations)) : ?>
+                <div class="organisation-list mt-2">
+                    <?php foreach ($activeOrganisations as $organisation): ?>
+                        <div class="row mt-1">
+                            <div class="col">
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        <a href="<?= $this->url('organisation.view', ['id' => $organisation->getUuid()]) ?>">
+                                            <?= $this->escapeHtml($organisation->getName()) ?>
+                                            <?php if ($organisation->getSla() !== null): ?>
+                                                <small><span class="badge badge-primary ml-1">SLA</span></small>
+                                            <?php endif ?>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <p class="text-info mt-2">No active organisations found.</p>
+            <?php endif ?>
+        </div>
+
+        <div class="tab-pane fade" id="inactive-organisations" role="tabpanel" aria-labelledby="inactive-organisations-tab">
+            <?php if (! empty($inactiveOrganisations)) : ?>
+                <div class="organisation-list mt-2">
+                    <?php foreach ($inactiveOrganisations as $organisation): ?>
+                        <div class="row mt-1">
+                            <div class="col">
+                                <ul class="list-group">
+                                    <li class="list-group-item">
+                                        <a class="text-muted" href="<?= $this->url('organisation.view', ['id' => $organisation->getUuid()]) ?>">
+                                            <?= $this->escapeHtml($organisation->getName()) ?>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
+            <?php else: ?>
+                <p class="text-info mt-2">No inactive organisations found.</p>
+            <?php endif ?>
+        </div>
     </div>
-    <?php endif ?>
 </div>

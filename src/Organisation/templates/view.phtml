@@ -6,6 +6,10 @@ use Organisation\Entity\OrganisationInterface;
 
 /** @var OrganisationInterface $organisation */
 $organisation = $this->organisation;
+$organisationUuid = $organisation->getUuid();
+$isActive         = $organisation->getIsActive() === 1;
+$statusText       = $isActive ? 'Active' : 'Inactive';
+$statusClass      = $isActive ? 'badge badge-success' : 'badge badge-secondary';
 
 $this->headTitle($this->escapeHtml($organisation->getName()));
 
@@ -15,59 +19,87 @@ $this->pageBreadcrumbs()->setItems([
     $organisation->getName() => $this->url('organisation.list'),
 ]);
 ?>
-<div class="container">
-    <h1><?= $this->escapeHtml($organisation->getName()) ?></h1>
-    <p>
-        Date created:
-        <span class="text-info">
-            <?= $this->escapeHtml($organisation->getCreated()->format('d/m/Y H:i')) ?>
-        </span>
-    </p>
-    <p>
-        Last modified:
-        <span class="text-info">
-            <?= $this->escapeHtml($organisation->getModified()->format('d/m/Y H:i')) ?>
-        </span>
-    </p>
-    <p>
-        Is active: <span class="text-info"><?= $organisation->getIsActive() === 1 ? 'true' : 'false' ?></span>
-    </p>
-    <p>
-        SLA:
-        <?php if ($organisation->getSla() === null): ?>
-            <span class="text-info">
-                No SLA assigned
-                <a href="<?= $this->url('sla.assign', ['org_id' => $organisation->getUuid()]) ?>">
-                    (assign SLA)
-                </a>
-            </span>
-        <?php else: ?>
-            <span class="text-info">
-                <a href="<?= $this->url('sla.view', ['id' => $organisation->getSla()->getId()]) ?>">
-                <?= $this->escapeHtml($organisation->getSla()->getName()) ?>
-                </a>
-            </span>
-        <?php endif ?>
-    </p>
-    <a class="btn btn-sm btn-primary" href="<?= $this->url('organisation.list') ?>">Organisation List</a>
-    <a class="btn btn-sm btn-info" href="<?= $this->url('organisation.edit', ['id' => $organisation->getUuid()]) ?>">
-        Edit Organisation
-    </a>
-    <a class="btn btn-sm btn-info" href="<?= $this->url('organisation_site.list',
-        ['id' => $organisation->getUuid()]) ?>">
-        Sites
-    </a>
-    <a class="btn btn-sm btn-info" href="<?= $this->url('contact.list', ['id' => $organisation->getUuid()]) ?>">
-        Contacts
-    </a>
-    <a class="btn btn-sm btn-info" href="<?= $this->url('ticket.list', ['org_id' => $organisation->getUuid()]) ?>">
-        List Ticket
-    </a>
-    <a class="btn btn-sm btn-info" href="<?= $this->url('ticket.create', ['org_id' => $organisation->getUuid()]) ?>">
-        New Ticket
-    </a>
-    <a class="btn btn-sm btn-success"
-       href="<?= $this->url('report.executive-report', ['org_id' => $organisation->getUuid()]) ?>">
-        Monthly Report
-    </a>
+<div class="container-fluid">
+    <div class="d-flex flex-wrap justify-content-between align-items-center mb-3">
+        <div>
+            <h1 class="mb-1"><?= $this->escapeHtml($organisation->getName()) ?></h1>
+            <span class="<?= $statusClass ?>"><?= $statusText ?></span>
+        </div>
+        <div class="mt-2 mt-md-0">
+            <a class="btn btn-sm btn-outline-light" href="<?= $this->url('organisation.list') ?>">
+                <i class="fas fa-arrow-left mr-1"></i> Organisation List
+            </a>
+            <a class="btn btn-sm btn-primary" href="<?= $this->url('organisation.edit', ['id' => $organisationUuid]) ?>">
+                <i class="fas fa-edit mr-1"></i> Edit Organisation
+            </a>
+        </div>
+    </div>
+
+    <div class="row">
+        <div class="col-lg-7 mb-3">
+            <div class="card h-100">
+                <div class="card-header">
+                    Organisation Details
+                </div>
+                <div class="card-body">
+                    <dl class="row mb-0">
+                        <dt class="col-sm-4 text-muted">Date created</dt>
+                        <dd class="col-sm-8"><?= $this->escapeHtml($organisation->getCreated()->format('d/m/Y H:i')) ?></dd>
+
+                        <dt class="col-sm-4 text-muted">Last modified</dt>
+                        <dd class="col-sm-8"><?= $this->escapeHtml($organisation->getModified()->format('d/m/Y H:i')) ?></dd>
+
+                        <dt class="col-sm-4 text-muted">SLA</dt>
+                        <dd class="col-sm-8 mb-0">
+                            <?php if ($organisation->getSla() === null): ?>
+                                <span class="text-muted">No SLA assigned</span>
+                                <a href="<?= $this->url('sla.assign', ['org_id' => $organisationUuid]) ?>" class="ml-2">
+                                    Assign SLA
+                                </a>
+                            <?php else: ?>
+                                <a href="<?= $this->url('sla.view', ['id' => $organisation->getSla()->getId()]) ?>">
+                                    <?= $this->escapeHtml($organisation->getSla()->getName()) ?>
+                                </a>
+                            <?php endif ?>
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-5 mb-3">
+            <div class="card">
+                <div class="card-header">
+                    Quick Actions
+                </div>
+                <div class="list-group list-group-flush">
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                       href="<?= $this->url('organisation_site.list', ['id' => $organisationUuid]) ?>">
+                        <span><i class="fas fa-map-marker-alt mr-2 text-muted"></i>Sites</span>
+                        <small class="text-muted">Manage</small>
+                    </a>
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                       href="<?= $this->url('contact.list', ['id' => $organisationUuid]) ?>">
+                        <span><i class="fas fa-address-book mr-2 text-muted"></i>Contacts</span>
+                        <small class="text-muted">Manage</small>
+                    </a>
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                       href="<?= $this->url('ticket.list', ['org_id' => $organisationUuid]) ?>">
+                        <span><i class="fas fa-ticket-alt mr-2 text-muted"></i>List Tickets</span>
+                        <small class="text-muted">View</small>
+                    </a>
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                       href="<?= $this->url('ticket.create', ['org_id' => $organisationUuid]) ?>">
+                        <span><i class="fas fa-plus-square mr-2 text-muted"></i>New Ticket</span>
+                        <small class="text-muted">Create</small>
+                    </a>
+                    <a class="list-group-item list-group-item-action d-flex justify-content-between align-items-center"
+                       href="<?= $this->url('report.executive-report', ['org_id' => $organisationUuid]) ?>">
+                        <span><i class="fas fa-chart-line mr-2 text-muted"></i>Monthly Report</span>
+                        <small class="text-muted">Open</small>
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
