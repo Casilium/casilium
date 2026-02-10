@@ -25,7 +25,7 @@ class TicketResponseForm extends Form implements InputFilterProviderInterface
         $this->add($element);
 
         $element = new Element\Textarea('response');
-        $element->setAttributes(['class' => 'form-control'])
+        $element->setAttributes(['class' => 'form-control', 'data-paste-cleanup' => 'true'])
             ->setLabel('Response');
         $this->add($element);
 
@@ -76,6 +76,13 @@ class TicketResponseForm extends Form implements InputFilterProviderInterface
                 'filters'    => [
                     ['name' => Filter\StringTrim::class],
                     ['name' => Filter\StripTags::class],
+                    [
+                        'name'    => Filter\PregReplace::class,
+                        'options' => [
+                            'pattern'     => '/(\r?\n\s*){3,}/',
+                            'replacement' => "\n\n",
+                        ],
+                    ],
                 ],
                 'validators' => [
                     [

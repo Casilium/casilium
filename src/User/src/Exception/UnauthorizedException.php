@@ -26,6 +26,6 @@ class UnauthorizedException extends Exception
             );
         }
 
-        return new static($message, $code, $previous);
+        return new self($message, $code, $previous);
     }
 }

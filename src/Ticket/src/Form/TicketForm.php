@@ -36,10 +36,11 @@ class TicketForm extends Form implements InputFilterProviderInterface
         $element = new Element\Textarea('long_description');
         $element->setLabel('Long Description')
             ->setAttributes([
-                'id'          => 'long_description',
-                'rows'        => 5,
-                'class'       => 'form-control',
-                'placeholder' => 'Enter a more comprehensive description of the problem',
+                'id'                 => 'long_description',
+                'rows'               => 5,
+                'class'              => 'form-control',
+                'placeholder'        => 'Enter a more comprehensive description of the problem',
+                'data-paste-cleanup' => 'true',
             ]);
         $this->add($element);
 
@@ -198,6 +199,13 @@ class TicketForm extends Form implements InputFilterProviderInterface
                 'filters'    => [
                     ['name' => Filter\StringTrim::class],
                     ['name' => Filter\StripTags::class],
+                    [
+                        'name'    => Filter\PregReplace::class,
+                        'options' => [
+                            'pattern'     => '/(\r?\n\s*){3,}/',
+                            'replacement' => "\n\n",
+                        ],
+                    ],
                 ],
                 'validators' => [
                     [

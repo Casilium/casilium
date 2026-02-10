@@ -1,6 +1,10 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
+# Ensure Doctrine proxy/cache directories are writable by www-data
+mkdir -p data/cache/DoctrineEntityProxy
+chown -R www-data:www-data data/cache
+
 if [[ "${AUTO_MIGRATE:-0}" == "1" ]]; then
     DB_HOST="${DB_HOST:-db}"
     DB_NAME="${DB_NAME:-casilium}"
