@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace Organisation\Service;
 
-use Doctrine\Dbal\Connection;
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Exception;
 use Doctrine\ORM\EntityManagerInterface;
 

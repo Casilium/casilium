@@ -1,18 +1,23 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-DB_HOST="${DB_HOST:-db}"
-DB_NAME="${DB_NAME:-casilium}"
-DB_USER="${DB_USER:-casilium}"
-DB_PASSWORD="${DB_PASSWORD:-casilium_password}"
-MFA_ISSUER="${MFA_ISSUER:-casilium.local}"
-APP_URL="${APP_URL:-http://localhost:8080}"
+# Ensure Doctrine proxy/cache directories are writable by www-data
+mkdir -p data/cache/DoctrineEntityProxy
+chown -R www-data:www-data data/cache
 
-if [[ ! -f config/autoload/local.php ]]; then
-    if [[ -z "${ENCRYPTION_KEY:-}" ]]; then
-        ENCRYPTION_KEY="$(php -r 'echo sodium_bin2hex(random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES));')"
-    fi
-    cat > config/autoload/local.php <<PHP
+if [[ "${AUTO_MIGRATE:-0}" == "1" ]]; then
+    DB_HOST="${DB_HOST:-db}"
+    DB_NAME="${DB_NAME:-casilium}"
+    DB_USER="${DB_USER:-casilium}"
+    DB_PASSWORD="${DB_PASSWORD:-casilium_password}"
+
+    if [[ ! -f config/autoload/local.php ]]; then
+        if [[ -z "${ENCRYPTION_KEY:-}" ]]; then
+            ENCRYPTION_KEY="$(php -r 'echo sodium_bin2hex(random_bytes(SODIUM_CRYPTO_SECRETBOX_KEYBYTES));')"
+        fi
+        MFA_ISSUER="${MFA_ISSUER:-casilium.local}"
+        APP_URL="${APP_URL:-http://localhost:8080}"
+        cat > config/autoload/local.php <<PHP
 <?php
 return [
     'encryption' => [

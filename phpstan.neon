@@ -1,0 +1,9 @@
+parameters:
+    paths:
+        - src
+    level: 0
+    parallel:
+        maximumNumberOfProcesses: 1
+    ignoreErrors:
+        - message: '#Class ServiceLevel\\Form\\Element\\Time extends @final class Laminas\\Form\\Element\\Time#'
+          path: src/ServiceLevel/src/Form/Element/Time.php

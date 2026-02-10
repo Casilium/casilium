@@ -80,6 +80,7 @@
         "laminas/laminas-development-mode": "^3.2",
         "phpspec/prophecy": "^1.10.3",
         "phpspec/prophecy-phpunit": "^2.0",
+        "phpstan/phpstan": "^2.1",
         "phpunit/phpunit": "^10",
         "roave/security-advisories": "dev-master"
     },
@@ -129,10 +130,12 @@
         "development-status": "laminas-development-mode status",
                 "check": [
             "@cs-check",
+            "@analyse",
             "@test"
         ],
-        "changelog": "git-cliff",
-        "changelog:write": "git-cliff -o CHANGELOG.md",
+        "analyse": "phpstan analyse --memory-limit=512M",
+        "changelog": "git-cliff --latest",
+        "changelog:write": "git-cliff --latest -o CHANGELOG.md",
         "clear-config-cache": "php bin/clear-config-cache.php",
         "enable-codestandard": "Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run",
         "cs-check": "phpcs",

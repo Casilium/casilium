@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 namespace OrganisationSite;
 
-use Doctrine\Common\Persistence\Mapping\Driver\MappingDriverChain;
 use Doctrine\ORM\Mapping\Driver\AttributeDriver;
+use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Mezzio\Application;
 use OrganisationSite\Service\Factory\SiteManagerFactory;
 use OrganisationSite\Service\SiteManager;
