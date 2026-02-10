@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Ticket\Handler;
 
+use DateTimeImmutable;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
 use Laminas\Form\FormInterface;
@@ -69,15 +70,18 @@ class CreateTicketHandler implements RequestHandlerInterface
 
             if ($form->isValid()) {
                 $data = $form->getData();
+                if (! $this->isDueDateInFutureOrNow($data['due_date'])) {
+                    $form->get('due_date')->setMessages(['Due date cannot be in the past.']);
+                } else {
+                    $data['agent_id']        = $agentId;
+                    $data['organisation_id'] = $organisation->getId();
+                    $ticket                  = $this->ticketService->save($data);
 
-                $data['agent_id']        = $agentId;
-                $data['organisation_id'] = $organisation->getId();
-                $ticket                  = $this->ticketService->save($data);
+                    $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
+                    $flashMessages->flash('info', sprintf('Ticket #%s successfully created', $ticket->getId()));
 
-                $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
-                $flashMessages->flash('info', sprintf('Ticket #%s successfully created', $ticket->getId()));
-
-                return new RedirectResponse($this->urlHelper->generate('ticket.list'));
+                    return new RedirectResponse($this->urlHelper->generate('ticket.list'));
+                }
             }
         }
 
@@ -149,5 +153,15 @@ class CreateTicketHandler implements RequestHandlerInterface
         if (count($queues) === 1) {
             $form->get('queue_id')->setValue($queues[0]->getId());
         }
+    }
+
+    private function isDueDateInFutureOrNow(string $dueDate): bool
+    {
+        $due = DateTimeImmutable::createFromFormat('Y-m-d H:i:s', $dueDate);
+        if ($due === false) {
+            return false;
+        }
+
+        return $due >= new DateTimeImmutable('now');
     }
 }

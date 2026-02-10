@@ -7,8 +7,8 @@ namespace App\Doctrine;
 use DateTime;
 use DateTimeZone;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
-use Doctrine\DBAL\Types\ConversionException;
 use Doctrine\DBAL\Types\DateTimeType;
+use Doctrine\DBAL\Types\Exception\InvalidFormat;
 
 class UtcDateTimeType extends DateTimeType
 {
@@ -36,9 +36,9 @@ class UtcDateTimeType extends DateTimeType
         );
 
         if (! $converted) {
-            throw ConversionException::conversionFailedFormat(
+            throw InvalidFormat::new(
                 $value,
-                $this->getName(),
+                static::class,
                 $platform->getDateTimeFormatString()
             );
         }
