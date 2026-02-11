@@ -134,8 +134,8 @@
             "@test"
         ],
         "analyse": "phpstan analyse --memory-limit=512M",
-        "changelog": "git-cliff --latest",
-        "changelog:write": "git-cliff --latest -o CHANGELOG.md",
+        "changelog": "git-cliff",
+        "changelog:write": "git-cliff -o CHANGELOG.md",
         "clear-config-cache": "php bin/clear-config-cache.php",
         "enable-codestandard": "Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run",
         "cs-check": "phpcs",
