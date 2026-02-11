@@ -110,6 +110,9 @@
                     Add Response
                 </div>
                 <div class="card-body">
+                    <?php if ($ticket->getStatus()->getId() === $ticket::STATUS_CLOSED): ?>
+                        <p class="text-muted mb-0">This ticket is closed. Responses are disabled.</p>
+                    <?php else: ?>
                     <?= $this->form()->openTag($responseForm) ?>
                     <div class="form-group">
                         <?= $this->formLabel($responseForm->get('response')); ?>
@@ -123,23 +126,36 @@
                                 'class' => 'help-block' ]); ?>
                     </div>
 
+                    <?php if ($ticket->getStatus()->getId() === $ticket::STATUS_RESOLVED): ?>
+                        <p class="text-warning">
+                            This ticket is resolved. Replying will reopen it.
+                        </p>
+                    <?php endif; ?>
+
                     <button type="submit" class="btn btn-primary mb-3" name="submit" value="save">
-                        <i class="fas fa-save fa-fw"></i> Save
+                        <i class="fas fa-save fa-fw"></i>
+                        <?php if ($ticket->getStatus()->getId() === $ticket::STATUS_RESOLVED): ?>
+                            Save + Reopen
+                        <?php else: ?>
+                            Save
+                        <?php endif; ?>
                     </button>
 
-                    <?php if ($ticket->getStatus()->getId() !== $ticket::STATUS_ON_HOLD): ?>
-                    <button type="submit" class="btn btn-warning mb-3" name="submit" value="save_hold">
-                        <i class="fas fa-hand-paper fa-fw"></i> Save + Hold
-                    </button>
-                    <?php elseif ($ticket->getStatus()->getId() === $ticket::STATUS_ON_HOLD): ?>
+                    <?php if ($ticket->getStatus()->getId() !== $ticket::STATUS_RESOLVED): ?>
+                        <?php if ($ticket->getStatus()->getId() !== $ticket::STATUS_ON_HOLD): ?>
                         <button type="submit" class="btn btn-warning mb-3" name="submit" value="save_hold">
-                            <i class="fas fa-hand-paper fa-fw"></i> Save (remove hold)
+                            <i class="fas fa-hand-paper fa-fw"></i> Save + Hold
                         </button>
-                    <?php endif ?>
+                        <?php elseif ($ticket->getStatus()->getId() === $ticket::STATUS_ON_HOLD): ?>
+                            <button type="submit" class="btn btn-warning mb-3" name="submit" value="save_hold">
+                                <i class="fas fa-hand-paper fa-fw"></i> Save (remove hold)
+                            </button>
+                        <?php endif ?>
 
-                    <button id="submit" type="submit" class="btn btn-success mb-3" name="submit" value="save_resolve">
-                        <i class="fas fa-check fa-fw"></i> Save + Resolve
-                    </button>
+                        <button id="submit" type="submit" class="btn btn-success mb-3" name="submit" value="save_resolve">
+                            <i class="fas fa-check fa-fw"></i> Save + Resolve
+                        </button>
+                    <?php endif; ?>
 
                     <?= $this->formElementErrors($responseForm->get('submit')) ?>
 
@@ -155,6 +171,7 @@
 
 
                     <?= $this->form()->closeTag() ?>
+                    <?php endif; ?>
 
                 </div>
             </div>
