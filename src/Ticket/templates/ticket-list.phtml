@@ -170,7 +170,7 @@ $this->inlineScript()->appendFile('/js/timeago.js');
             <div class="col mt-4">
                 <?php
                     if ($this->pageCount > 1) {
-                        echo $this->paginationControl($this->tickets,'Sliding','app::partial/paginator');
+                        echo $this->paginationControl($this->tickets,'Sliding','app::partial/paginator', ['queryParams' => $this->queryParams ?? []]);
                     }
                 ?>
             </div>

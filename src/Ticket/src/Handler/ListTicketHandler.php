@@ -45,10 +45,14 @@ class ListTicketHandler implements RequestHandlerInterface
         $paginator->setItemCountPerPage($itemsPerPage);
         $paginator->setCurrentPageNumber($page);
 
+        $queryParams = $request->getQueryParams();
+        unset($queryParams['page']);
+
         return new HtmlResponse($this->renderer->render('ticket::ticket-list', [
             'tickets'           => $paginator,
             'pageCount'         => $paginator->count(),
             'itemsPerPage'      => $itemsPerPage,
+            'queryParams'       => $queryParams,
             'changesUrl'        => TicketListRequest::extractChangesPath($request),
             'refreshIntervalMs' => TicketListRequest::POLL_INTERVAL_MS,
         ]));
