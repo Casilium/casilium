@@ -19,6 +19,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Throwable;
 use Ticket\Entity\Agent;
 use Ticket\Entity\Queue;
+use Ticket\Entity\Status;
 use Ticket\Entity\Ticket;
 use Ticket\Exception\MailConnectionException;
 use Ticket\Service\MailReader;
@@ -374,6 +375,11 @@ class CreateTicketsFromEmail extends Command
             return false;
         }
 
+        if ($this->shouldIgnoreFromBody($message['body'])) {
+            $output->writeln('<comment>Ignoring message due to body filter</comment>');
+            return false;
+        }
+
         // Check if this is a reply (has tracking UUID)
         $trackingId = $this->getUuid($message['body']);
 
@@ -607,6 +613,30 @@ class CreateTicketsFromEmail extends Command
             if ($agent === null) {
                 return null;
             }
+        }
+
+        if ((int) $ticket->getStatus()->getId() === Status::STATUS_CLOSED) {
+            if ($contact !== null) {
+                $this->ticketService->closedTicketReplyNotification($ticket, $contact);
+            }
+            $this->logger->info('Closed ticket reply ignored', [
+                'ticket_id'   => $ticket->getId(),
+                'tracking_id' => $uuid,
+                'from'        => $message['from'],
+            ]);
+            return null;
+        }
+
+        if ((int) $ticket->getStatus()->getId() === Status::STATUS_RESOLVED) {
+            $this->ticketService->updateStatus($ticket->getId(), Status::STATUS_IN_PROGRESS);
+            if ($contact !== null) {
+                $this->ticketService->resolvedTicketReplyNotification($ticket, $contact);
+            }
+            $this->logger->info('Resolved ticket reopened by reply', [
+                'ticket_id'   => $ticket->getId(),
+                'tracking_id' => $uuid,
+                'from'        => $message['from'],
+            ]);
         }
 
         // build reply, set to public
@@ -857,6 +887,36 @@ class CreateTicketsFromEmail extends Command
         }
 
         // otherwise allow message
+        return false;
+    }
+
+    /**
+     * Parses email body to determine if should be skipped,
+     * for example "reacted to your message"
+     *
+     * @param string|null $body email body
+     * @return bool true if should ignore or false
+     */
+    public function shouldIgnoreFromBody(?string $body): bool
+    {
+        if ($body === null) {
+            return false;
+        }
+
+        $patterns = $this->config['mail']['ignore_with_body'] ?? [];
+
+        if (empty($patterns)) {
+            return false;
+        }
+
+        $body = strip_tags(strtolower($body));
+
+        foreach ($patterns as $pattern) {
+            if (preg_match($pattern, $body)) {
+                return true;
+            }
+        }
+
         return false;
     }
 }

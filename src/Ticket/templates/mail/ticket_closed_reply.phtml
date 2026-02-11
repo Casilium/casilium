@@ -1,0 +1,22 @@
+<?php
+    /** @var \Ticket\Entity\Ticket $ticket */
+    $ticket = $this->ticket;
+
+    /** @var \OrganisationContact\Entity\Contact $contact */
+    $contact = $this->contact;
+?>
+<p>
+    Your case #<?= $ticket->getId() ?>
+    (<?= $this->escapeHtml($ticket->getShortDescription()) ?>)
+    is closed.
+</p>
+<p>
+    Hi <?= $this->escapeHtml($contact->getFirstName()) ?>,
+</p>
+<p>
+    We cannot add replies to closed cases. If you need further help, please send a new email to open a new
+    case.
+</p>
+<p>
+    Tracking ID: <?= $this->escapeHtml($ticket->getUuid()) ?>
+</p>

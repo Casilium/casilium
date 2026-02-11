@@ -377,9 +377,16 @@ class TicketService
                     $ticket->setResolveDate(Carbon::now('UTC')->format('Y-m-d H:i:s'));
                     break;
                 default:
-                    // update ticket status to IN PROGRESS if is currently OPEN
-                    if ($ticket->getStatus()->getId() === Status::STATUS_OPEN) {
+                    // update ticket status to IN PROGRESS if currently OPEN or RESOLVED
+                    $currentStatus = $ticket->getStatus()->getId();
+                    if (
+                        $currentStatus === Status::STATUS_OPEN
+                        || $currentStatus === Status::STATUS_RESOLVED
+                    ) {
                         $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_IN_PROGRESS);
+                        if ($currentStatus === Status::STATUS_RESOLVED) {
+                            $ticket->setResolveDate(null);
+                        }
                     }
                     break;
             }
@@ -669,6 +676,7 @@ class TicketService
             'ticket'   => $ticket,
             'response' => $response,
             'author'   => $author,
+            'status'   => $ticket->getStatus(),
         ]);
 
         $queue   = $ticket->getQueue();
@@ -678,6 +686,42 @@ class TicketService
         foreach ($members as $agent) {
             $this->mailService->send($agent->getEmail(), $subject, $body);
         }
+    }
+
+    public function closedTicketReplyNotification(Ticket $ticket, Contact $contact): void
+    {
+        if (! $this->mailService->isEnabled()) {
+            return;
+        }
+
+        $body = $this->mailService->prepareBody('ticket_mail::ticket_closed_reply', [
+            'ticket'  => $ticket,
+            'contact' => $contact,
+        ]);
+
+        $this->mailService->send(
+            $contact->getWorkEmail(),
+            sprintf('Ticket #%s is closed', $ticket->getId()),
+            $body
+        );
+    }
+
+    public function resolvedTicketReplyNotification(Ticket $ticket, Contact $contact): void
+    {
+        if (! $this->mailService->isEnabled()) {
+            return;
+        }
+
+        $body = $this->mailService->prepareBody('ticket_mail::ticket_resolved_reply', [
+            'ticket'  => $ticket,
+            'contact' => $contact,
+        ]);
+
+        $this->mailService->send(
+            $contact->getWorkEmail(),
+            sprintf('Ticket #%s reopened', $ticket->getId()),
+            $body
+        );
     }
 
     private function formatResponseAuthor(TicketResponse $response): string

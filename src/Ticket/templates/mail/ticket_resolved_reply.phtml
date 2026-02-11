@@ -1,0 +1,21 @@
+<?php
+    /** @var \Ticket\Entity\Ticket $ticket */
+    $ticket = $this->ticket;
+
+    /** @var \OrganisationContact\Entity\Contact $contact */
+    $contact = $this->contact;
+?>
+<p>
+    Your case #<?= $ticket->getId() ?>
+    (<?= $this->escapeHtml($ticket->getShortDescription()) ?>)
+    was marked as resolved.
+</p>
+<p>
+    Hi <?= $this->escapeHtml($contact->getFirstName()) ?>,
+</p>
+<p>
+    We received your reply and have re-opened the case. Our team will review your update and get back to you.
+</p>
+<p>
+    Tracking ID: <?= $this->escapeHtml($ticket->getUuid()) ?>
+</p>
