@@ -1,5 +1,25 @@
 # Changelog
 
+## v2.1.1 - 2026-02-24
+
+### Changed
+
+- cleanup tests (deprecations)
+
+- code cleanup for CountUser command
+
+- Updated PHPUnit and dependencies
+
+
+### Fixed
+
+- allow contacts being created with same email
+
+- TOTP Service not restoring error handler
+
+- EntityManagerInterface:class and EntityManager:class difference instances
+
+
 ## v2.1.0 - 2026-02-11
 
 ### Added
