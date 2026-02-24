@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Mfa\Service\MfaService;
 use Mfa\Service\TotpService;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -284,9 +285,7 @@ class MfaServiceTest extends TestCase
         $this->assertEquals($expectedUrl, $result);
     }
 
-    /**
-     * @dataProvider booleanConfigProvider
-     */
+    #[DataProvider('booleanConfigProvider')]
     public function testIsMfaEnabledWithVariousConfigurations(mixed $configValue, bool $expected): void
     {
         $config     = ['enabled' => $configValue, 'issuer' => 'Test'];

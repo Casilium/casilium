@@ -45,7 +45,7 @@ use const STR_PAD_RIGHT;
  */
 class TotpService
 {
-    private const BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
+    private const string BASE32_ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ234567';
 
     private int $digits;
     private int $period;
@@ -105,19 +105,15 @@ class TotpService
             new SvgImageBackEnd()
         );
 
-        $writer          = new Writer($renderer);
-        $previousHandler = set_error_handler(static function ($severity) {
+        $writer = new Writer($renderer);
+        set_error_handler(static function ($severity) {
             return $severity === E_DEPRECATED;
         });
 
         try {
             $svg = $writer->writeString($otpauth);
         } finally {
-            if ($previousHandler !== null) {
-                set_error_handler($previousHandler);
-            } else {
-                restore_error_handler();
-            }
+            restore_error_handler();
         }
 
         return 'data:image/svg+xml;base64,' . base64_encode($svg);
