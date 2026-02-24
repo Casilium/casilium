@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OrganisationContact\Service;
 
 use Doctrine\ORM\EntityManagerInterface;
+use InvalidArgumentException;
 use Organisation\Entity\Organisation;
 use Organisation\Service\OrganisationManager;
 use OrganisationContact\Entity\Contact;
@@ -38,9 +39,11 @@ class ContactService
             return $contact;
         }
 
-        $orgId     = $contact->getOrganisation()->getId();
-        $reference = $this->entityManager->getReference(Organisation::class, $orgId);
-        $contact->setOrganisation($reference);
+        $organisation = $contact->getOrganisation();
+        if ($organisation === null) {
+            throw new InvalidArgumentException('Contact must have an organisation set');
+        }
+        $contact->setOrganisation($organisation);
 
         // save entity
         $this->entityManager->persist($contact);
@@ -54,8 +57,12 @@ class ContactService
      */
     public function fetchContactsByOrganisationId(int $id, bool $activeOnly = false): ?array
     {
-        return $this->entityManager->getRepository(Contact::class)
-            ->findByCorporationId($id, $activeOnly);
+        $repo     = $this->entityManager->getRepository(Contact::class);
+        $criteria = ['organisation' => $id];
+        if ($activeOnly) {
+            $criteria['isActive'] = true;
+        }
+        return $repo->findBy($criteria, ['firstName' => 'ASC', 'lastName' => 'ASC']);
     }
 
     /**
@@ -90,9 +97,16 @@ class ContactService
         $this->entityManager->flush();
     }
 
-    /**
-     * Remove contact from database
-     */
+    public function findContactByWorkEmail(string $email): ?Contact
+    {
+        return $this->entityManager->getRepository(Contact::class)->findOneBy(['workEmail' => $email]);
+    }
+
+    public function findContactByOtherEmail(string $email): ?Contact
+    {
+        return $this->entityManager->getRepository(Contact::class)->findOneBy(['otherEmail' => $email]);
+    }
+
     public function deleteContact(Contact $contact): void
     {
         $this->entityManager->remove($contact);

@@ -6,6 +6,9 @@ namespace OrganisationContact\Repository;
 
 use Doctrine\ORM\EntityRepository;
 
+/**
+ * @extends EntityRepository<object>
+ */
 class ContactRepository extends EntityRepository
 {
     public function findByCorporationId(int $id, bool $activeOnly = false): ?array

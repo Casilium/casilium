@@ -10,6 +10,9 @@ use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator;
 use OrganisationContact\Validator\PhoneNumberValidator;
 
+/**
+ * @extends Form<mixed>
+ */
 class ContactForm extends Form implements InputFilterProviderInterface
 {
     public function __construct()

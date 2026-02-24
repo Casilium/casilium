@@ -18,7 +18,7 @@ class Contact
     #[ORM\Id]
     #[ORM\Column(name: 'id', type: 'integer')]
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
-    private int $id;
+    private int $id = 0;
 
     #[ORM\ManyToOne(targetEntity: Organisation::class)]
     #[ORM\JoinColumn(name: 'organisation_id', referencedColumnName: 'id')]
@@ -29,31 +29,31 @@ class Contact
     private ?SiteEntity $site = null;
 
     #[ORM\Column(name: 'first_name', type: 'string', length: 32)]
-    private string $firstName;
+    private string $firstName = '';
 
     #[ORM\Column(name: 'middle_name', type: 'string', length: 32)]
-    private string $middleName;
+    private string $middleName = '';
 
     #[ORM\Column(name: 'last_name', type: 'string', length: 32)]
-    private string $lastName;
+    private string $lastName = '';
 
     #[ORM\Column(name: 'work_telephone', type: 'string', length: 32)]
-    private string $workTelephone;
+    private string $workTelephone = '';
 
     #[ORM\Column(name: 'work_extension', type: 'string', length: 20)]
-    private string $workExtension;
+    private string $workExtension = '';
 
     #[ORM\Column(name: 'mobile_telephone', type: 'string', length: 20)]
-    private string $mobileTelephone;
+    private string $mobileTelephone = '';
 
     #[ORM\Column(name: 'home_telephone', type: 'string', length: 20)]
-    private string $homeTelephone;
+    private string $homeTelephone = '';
 
     #[ORM\Column(name: 'work_email', type: 'string', length: 20)]
-    private string $workEmail;
+    private string $workEmail = '';
 
     #[ORM\Column(name: 'other_email', type: 'string', length: 20)]
-    private string $otherEmail;
+    private string $otherEmail = '';
 
     #[ORM\Column(name: 'gender', type: 'string', length: 1)]
     private ?string $gender = null;
@@ -229,8 +229,6 @@ class Contact
     public function exchangeArray(array $data): Contact
     {
         $this->id              = isset($data['id']) ? (int) $data['id'] : 0;
-        $this->organisation    = $data['organisation'] ?? null;
-        $this->site            = $data['site'] ?? null;
         $this->firstName       = $data['first_name'] ?? '';
         $this->middleName      = $data['middle_name'] ?? '';
         $this->lastName        = $data['last_name'] ?? '';
