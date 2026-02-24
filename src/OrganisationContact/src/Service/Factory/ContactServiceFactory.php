@@ -4,7 +4,7 @@ declare(strict_types=1);
 
 namespace OrganisationContact\Service\Factory;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Organisation\Service\OrganisationManager;
 use OrganisationContact\Service\ContactService;
 use Psr\Container\ContainerInterface;
@@ -13,7 +13,7 @@ class ContactServiceFactory
 {
     public function __invoke(ContainerInterface $container): ContactService
     {
-        $entityManager       = $container->get(EntityManager::class);
+        $entityManager       = $container->get(EntityManagerInterface::class);
         $organisationService = $container->get(OrganisationManager::class);
 
         return new ContactService($entityManager, $organisationService);

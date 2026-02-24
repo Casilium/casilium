@@ -5,6 +5,7 @@ declare(strict_types=1);
 use App\Doctrine\UtcDateTimeType;
 use Doctrine\Migrations\Configuration\Migration\ConfigurationLoader;
 use Doctrine\Migrations\DependencyFactory;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\Persistence\Mapping\Driver\MappingDriverChain;
 use Ramsey\Uuid\Doctrine\UuidType;
@@ -16,7 +17,10 @@ use Symfony\Component\Cache\Adapter\ArrayAdapter;
 return [
     'dependencies' => [
         'aliases'   => [
+            // Both EntityManagerInterface and EntityManager must resolve to orm_default.
+            // Do not register EntityManager with its own factory.
             EntityManagerInterface::class => 'doctrine.entity_manager.orm_default',
+            EntityManager::class          => 'doctrine.entity_manager.orm_default',
         ],
         'factories' => [
             'doctrine.entity_manager.orm_default' => EntityManagerFactory::class,
