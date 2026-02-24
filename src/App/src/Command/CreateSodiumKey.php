@@ -17,20 +17,16 @@ class CreateSodiumKey extends Command
         parent::__construct($name);
     }
 
-    /**
-     * @return void
-     */
-    protected function configure()
+    protected function configure(): void
     {
         $this->setName('sodium:key')
             ->setDescription('Creates a sodium hex represented key');
     }
 
     /**
-     * @return int|null
      * @throws Exception
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function execute(InputInterface $input, OutputInterface $output): int
     {
         $output->writeln(Sodium::generateKey());
         return 0;

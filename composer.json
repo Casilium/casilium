@@ -1,147 +1,148 @@
 {
-    "name": "sheridans/calisium",
-    "description": "An open source ticket system using Mezzio",
-    "type": "project",
-    "license": "GPL-2.0 License",
-    "keywords": [
-        "casilium",
-        "ticket",
-        "helpdesk",
-        "servicedesk"
-    ],
-    "homepage": "https://casilium.com",
-    "config": {
-        "sort-packages": true,
-        "allow-plugins": {
-            "dealerdirect/phpcodesniffer-composer-installer": true,
-            "laminas/laminas-component-installer": true
-        }
-    },
-    "extra": {
-        "laminas": {
-            "component-whitelist": [
-                "mezzio/mezzio",
-                "mezzio/mezzio-helpers",
-                "mezzio/mezzio-router",
-                "laminas/laminas-httphandlerrunner",
-                "mezzio/mezzio-fastroute",
-                "mezzio/mezzio-laminasviewrenderer"
-            ]
-        }
-    },
-    "require": {
-        "php": "~8.4.0 || ~8.5.0",
-        "ext-curl": "*",
-        "ext-imap": "*",
-        "ext-json": "*",
-        "ext-pdo": "*",
-        "ext-sodium": "*",
-        "bacon/bacon-qr-code": "^2.0",
-        "composer/package-versions-deprecated": "^1.10.99",
-        "ddeboer/imap": "^1.23",
-        "doctrine/doctrine-laminas-hydrator": "^3.4.0",
-        "doctrine/migrations": "^3.9",
-        "dompdf/dompdf": "^3.1",
-        "laminas/laminas-component-installer": "^3.4.0",
-        "laminas/laminas-config-aggregator": "^1.14.0",
-        "laminas/laminas-diactoros": "^3.0",
-        "laminas/laminas-eventmanager": "^3.13.0",
-        "laminas/laminas-filter": "^2.9",
-        "laminas/laminas-form": "^3.0.2",
-        "laminas/laminas-hydrator": "^4.3.0",
-        "laminas/laminas-i18n": "^2.11",
-        "laminas/laminas-inputfilter": "^2.10",
-        "laminas/laminas-paginator": "^2.9",
-        "laminas/laminas-servicemanager": "^3.4",
-        "laminas/laminas-session": "^2.10",
-        "laminas/laminas-stdlib": "^3.3",
-        "mezzio/mezzio": "^3.2.1",
-        "mezzio/mezzio-authentication": "^1.2",
-        "mezzio/mezzio-authentication-session": "^1.0",
-        "mezzio/mezzio-authorization-rbac": "^1.0",
-        "mezzio/mezzio-csrf": "^1.0",
-        "mezzio/mezzio-fastroute": "^3.0.3",
-        "mezzio/mezzio-flash": "^1.0",
-        "mezzio/mezzio-helpers": "^5.3",
-        "mezzio/mezzio-laminasviewrenderer": "^2.2",
-        "mezzio/mezzio-session": "^1.4",
-        "mezzio/mezzio-session-ext": "^1.10",
-        "monolog/monolog": "^1.24",
-        "nesbot/carbon": "^2.41.5",
-        "ramsey/uuid-doctrine": "^2.1",
-        "roave/psr-container-doctrine": "^6.1",
-        "symfony/cache": "^7.0",
-        "symfony/console": "^5.0",
-        "symfony/mailer": "^8.0"
-    },
-    "require-dev": {
-        "filp/whoops": "^2.7.1",
-        "laminas/laminas-coding-standard": "^2.5",
-        "laminas/laminas-development-mode": "^3.2",
-        "phpspec/prophecy": "^1.10.3",
-        "phpspec/prophecy-phpunit": "^2.0",
-        "phpstan/phpstan": "^2.1",
-        "phpunit/phpunit": "^10",
-        "roave/security-advisories": "dev-master"
-    },
-    "autoload": {
-        "psr-4": {
-            "App\\": "src/App/src/",
-            "UserAuthentication\\": "src/UserAuthentication/src",
-            "User\\": "src/User/src/",
-            "Mfa\\": "src/Mfa/src/",
-            "Account\\": "src/Account/src",
-            "Organisation\\": "src/Organisation/src",
-            "OrganisationSite\\": "src/OrganisationSite/src",
-            "OrganisationContact\\": "src/OrganisationContact/src",
-            "ServiceLevel\\": "src/ServiceLevel/src",
-            "Ticket\\": "src/Ticket/src",
-            "MailService\\": "src/MailService/src",
-            "Logger\\": "src/Logger/src",
-            "SlackIntegration\\": "src/SlackIntegration/src",
-            "Report\\": "src/Report/src",
-            "Api\\": "src/Api/src"
-        }
-    },
-    "autoload-dev": {
-        "psr-4": {
-            "AppTest\\": "test/AppTest/",
-            "UserTest\\": "test/UserTest/",
-            "UserAuthenticationTest\\": "test/UserAuthenticationTest/",
-            "TicketTest\\": "test/TicketTest/",
-            "OrganisationTest\\": "test/OrganisationTest/",
-            "OrganisationContactTest\\": "test/OrganisationContactTest/",
-            "OrganisationSiteTest\\": "test/OrganisationSiteTest/",
-            "ServiceLevelTest\\": "test/ServiceLevelTest/",
-            "MfaTest\\": "test/MfaTest/",
-            "AccountTest\\": "test/AccountTest/",
-            "MailServiceTest\\": "test/MailServiceTest/",
-            "LoggerTest\\": "test/LoggerTest/",
-            "SlackIntegrationTest\\": "test/SlackIntegrationTest/",
-            "ReportTest\\": "test/ReportTest/"
-        }
-    },
-    "scripts": {
-        "post-create-project-cmd": [
-            "@development-enable"
-        ],
-        "development-disable": "laminas-development-mode disable",
-        "development-enable": "laminas-development-mode enable",
-        "development-status": "laminas-development-mode status",
-                "check": [
-            "@cs-check",
-            "@analyse",
-            "@test"
-        ],
-        "analyse": "phpstan analyse --memory-limit=512M",
-        "changelog": "git-cliff",
-        "changelog:write": "git-cliff -o CHANGELOG.md",
-        "clear-config-cache": "php bin/clear-config-cache.php",
-        "enable-codestandard": "Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run",
-        "cs-check": "phpcs",
-        "cs-fix": "phpcbf",
-        "serve": "php -S 0.0.0.0:8080 -t public/",
-        "test": "phpunit --colors=always",
-        "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
+  "name": "sheridans/calisium",
+  "description": "An open source ticket system using Mezzio",
+  "type": "project",
+  "license": "GPL-2.0 License",
+  "keywords": [
+    "casilium",
+    "ticket",
+    "helpdesk",
+    "servicedesk"
+  ],
+  "homepage": "https://casilium.com",
+  "config": {
+    "sort-packages": true,
+    "allow-plugins": {
+      "dealerdirect/phpcodesniffer-composer-installer": true,
+      "laminas/laminas-component-installer": true
     }
+  },
+  "extra": {
+    "laminas": {
+      "component-whitelist": [
+        "mezzio/mezzio",
+        "mezzio/mezzio-helpers",
+        "mezzio/mezzio-router",
+        "laminas/laminas-httphandlerrunner",
+        "mezzio/mezzio-fastroute",
+        "mezzio/mezzio-laminasviewrenderer"
+      ]
+    }
+  },
+  "require": {
+    "php": "~8.4.0 || ~8.5.0",
+    "ext-curl": "*",
+    "ext-imap": "*",
+    "ext-json": "*",
+    "ext-pdo": "*",
+    "ext-sodium": "*",
+    "bacon/bacon-qr-code": "^2.0",
+    "composer/package-versions-deprecated": "^1.10.99",
+    "ddeboer/imap": "^1.23",
+    "doctrine/doctrine-laminas-hydrator": "^3.4.0",
+    "doctrine/migrations": "^3.9",
+    "dompdf/dompdf": "^3.1",
+    "laminas/laminas-component-installer": "^3.4.0",
+    "laminas/laminas-config-aggregator": "^1.14.0",
+    "laminas/laminas-diactoros": "^3.0",
+    "laminas/laminas-eventmanager": "^3.13.0",
+    "laminas/laminas-filter": "^2.9",
+    "laminas/laminas-form": "^3.0.2",
+    "laminas/laminas-hydrator": "^4.3.0",
+    "laminas/laminas-i18n": "^2.11",
+    "laminas/laminas-inputfilter": "^2.10",
+    "laminas/laminas-paginator": "^2.9",
+    "laminas/laminas-servicemanager": "^3.4",
+    "laminas/laminas-session": "^2.10",
+    "laminas/laminas-stdlib": "^3.3",
+    "mezzio/mezzio": "^3.2.1",
+    "mezzio/mezzio-authentication": "^1.2",
+    "mezzio/mezzio-authentication-session": "^1.0",
+    "mezzio/mezzio-authorization-rbac": "^1.0",
+    "mezzio/mezzio-csrf": "^1.0",
+    "mezzio/mezzio-fastroute": "^3.0.3",
+    "mezzio/mezzio-flash": "^1.0",
+    "mezzio/mezzio-helpers": "^5.3",
+    "mezzio/mezzio-laminasviewrenderer": "^2.2",
+    "mezzio/mezzio-session": "^1.4",
+    "mezzio/mezzio-session-ext": "^1.10",
+    "monolog/monolog": "^1.24",
+    "nesbot/carbon": "^2.41.5",
+    "ramsey/uuid-doctrine": "^2.1",
+    "roave/psr-container-doctrine": "^6.1",
+    "symfony/cache": "^7.0",
+    "symfony/console": "^7.0",
+    "symfony/mailer": "^8.0"
+  },
+  "require-dev": {
+    "filp/whoops": "^2.7.1",
+    "laminas/laminas-coding-standard": "^2.5",
+    "laminas/laminas-development-mode": "^3.2",
+    "phpspec/prophecy": "^1.10.3",
+    "phpspec/prophecy-phpunit": "^2.0",
+    "phpstan/phpstan": "^2.1",
+    "phpunit/phpunit": "^11.5.42",
+    "psalm/plugin-phpunit": "^0.19.5",
+    "roave/security-advisories": "dev-master"
+  },
+  "autoload": {
+    "psr-4": {
+      "App\\": "src/App/src/",
+      "UserAuthentication\\": "src/UserAuthentication/src",
+      "User\\": "src/User/src/",
+      "Mfa\\": "src/Mfa/src/",
+      "Account\\": "src/Account/src",
+      "Organisation\\": "src/Organisation/src",
+      "OrganisationSite\\": "src/OrganisationSite/src",
+      "OrganisationContact\\": "src/OrganisationContact/src",
+      "ServiceLevel\\": "src/ServiceLevel/src",
+      "Ticket\\": "src/Ticket/src",
+      "MailService\\": "src/MailService/src",
+      "Logger\\": "src/Logger/src",
+      "SlackIntegration\\": "src/SlackIntegration/src",
+      "Report\\": "src/Report/src",
+      "Api\\": "src/Api/src"
+    }
+  },
+  "autoload-dev": {
+    "psr-4": {
+      "AppTest\\": "test/AppTest/",
+      "UserTest\\": "test/UserTest/",
+      "UserAuthenticationTest\\": "test/UserAuthenticationTest/",
+      "TicketTest\\": "test/TicketTest/",
+      "OrganisationTest\\": "test/OrganisationTest/",
+      "OrganisationContactTest\\": "test/OrganisationContactTest/",
+      "OrganisationSiteTest\\": "test/OrganisationSiteTest/",
+      "ServiceLevelTest\\": "test/ServiceLevelTest/",
+      "MfaTest\\": "test/MfaTest/",
+      "AccountTest\\": "test/AccountTest/",
+      "MailServiceTest\\": "test/MailServiceTest/",
+      "LoggerTest\\": "test/LoggerTest/",
+      "SlackIntegrationTest\\": "test/SlackIntegrationTest/",
+      "ReportTest\\": "test/ReportTest/"
+    }
+  },
+  "scripts": {
+    "post-create-project-cmd": [
+      "@development-enable"
+    ],
+    "development-disable": "laminas-development-mode disable",
+    "development-enable": "laminas-development-mode enable",
+    "development-status": "laminas-development-mode status",
+    "check": [
+      "@cs-check",
+      "@analyse",
+      "@test"
+    ],
+    "analyse": "phpstan analyse --memory-limit=512M",
+    "changelog": "git-cliff",
+    "changelog:write": "git-cliff -o CHANGELOG.md",
+    "clear-config-cache": "php bin/clear-config-cache.php",
+    "enable-codestandard": "Dealerdirect\\Composer\\Plugin\\Installers\\PHPCodeSniffer\\Plugin::run",
+    "cs-check": "phpcs",
+    "cs-fix": "phpcbf",
+    "serve": "php -S 0.0.0.0:8080 -t public/",
+    "test": "phpunit --colors=always",
+    "test-coverage": "phpunit --colors=always --coverage-clover clover.xml"
+  }
 }

@@ -4,10 +4,8 @@ declare(strict_types=1);
 
 namespace App;
 
-use Doctrine\ORM\EntityManager;
 use Laminas\ServiceManager\AbstractFactory\ReflectionBasedAbstractFactory;
 use Laminas\ServiceManager\Factory\InvokableFactory;
-use Roave\PsrContainerDoctrine\EntityManagerFactory;
 use Symfony\Component\Cache\Adapter\AdapterInterface as CacheAdapterInterface;
 
 /**
@@ -22,6 +20,8 @@ class ConfigProvider
      *
      * To add a bit of a structure, each section is defined in a separate
      * method which returns an array with its configuration.
+     *
+     * @return array<string,array>
      */
     public function __invoke(): array
     {
@@ -34,6 +34,8 @@ class ConfigProvider
 
     /**
      * Returns the container dependencies
+     *
+     * @return array<string,mixed>
      */
     public function getDependencies(): array
     {
@@ -44,7 +46,6 @@ class ConfigProvider
             ],
             'factories'  => [
                 CacheAdapterInterface::class                       => Cache\FileSystemCacheFactory::class,
-                EntityManager::class                               => EntityManagerFactory::class,
                 Handler\HomePageHandler::class                     => Handler\Factory\HomePageHandlerFactory::class,
                 Handler\AdminPageHandler::class                    => Handler\Factory\AdminPageHandlerFactory::class,
                 Middleware\PrgMiddleware::class                    => InvokableFactory::class,

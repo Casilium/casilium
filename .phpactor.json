@@ -2,5 +2,6 @@
     "$schema": "/phpactor.schema.json",
     "php_code_sniffer.enabled": true,
     "prophecy.enabled": true,
-    "language_server_phpstan.enabled": false
+    "language_server_phpstan.enabled": false,
+    "language_server_psalm.enabled": true
 }

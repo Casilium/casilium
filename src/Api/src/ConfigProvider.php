@@ -8,6 +8,9 @@ use Mezzio\Application;
 
 class ConfigProvider
 {
+    /**
+     * @return array<string,array>
+     */
     public function __invoke(): array
     {
         return [
@@ -16,6 +19,9 @@ class ConfigProvider
         ];
     }
 
+    /**
+     * @return array<string,array<string,array<int,array<string,string>>>>
+     */
     public function getAccessFilter(): array
     {
         return [
@@ -27,6 +33,9 @@ class ConfigProvider
         ];
     }
 
+    /**
+     * @return array<string,array>
+     */
     public function getDependencies(): array
     {
         return [
