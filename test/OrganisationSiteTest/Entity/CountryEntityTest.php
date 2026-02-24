@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OrganisationSiteTest\Entity;
 
 use OrganisationSite\Entity\CountryEntity;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class CountryEntityTest extends TestCase
@@ -44,9 +45,7 @@ class CountryEntityTest extends TestCase
         $this->assertEquals('United States', $this->country->getName());
     }
 
-    /**
-     * @dataProvider countryDataProvider
-     */
+    #[DataProvider('countryDataProvider')]
     public function testSetCountryData(int $id, string $name): void
     {
         $this->country->setId($id)->setName($name);

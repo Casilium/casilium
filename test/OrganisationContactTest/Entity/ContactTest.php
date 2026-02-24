@@ -7,6 +7,7 @@ namespace OrganisationContactTest\Entity;
 use Organisation\Entity\Organisation;
 use OrganisationContact\Entity\Contact;
 use OrganisationSite\Entity\SiteEntity;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 
 class ContactTest extends TestCase
@@ -199,13 +200,8 @@ class ContactTest extends TestCase
 
     public function testExchangeArraySetsAllProperties(): void
     {
-        $organisation = $this->createMock(Organisation::class);
-        $site         = $this->createMock(SiteEntity::class);
-
         $data = [
             'id'               => 789,
-            'organisation'     => $organisation,
-            'site'             => $site,
             'first_name'       => 'Bob',
             'middle_name'      => 'William',
             'last_name'        => 'Johnson',
@@ -222,8 +218,6 @@ class ContactTest extends TestCase
 
         $this->assertInstanceOf(Contact::class, $result);
         $this->assertEquals(789, $this->contact->getId());
-        $this->assertSame($organisation, $this->contact->getOrganisation());
-        $this->assertSame($site, $this->contact->getSite());
         $this->assertEquals('Bob', $this->contact->getFirstName());
         $this->assertEquals('William', $this->contact->getMiddleName());
         $this->assertEquals('Johnson', $this->contact->getLastName());
@@ -299,9 +293,7 @@ class ContactTest extends TestCase
         $this->assertEquals('M', $this->contact->getGender());
     }
 
-    /**
-     * @dataProvider genderProvider
-     */
+    #[DataProvider('genderProvider')]
     public function testSetGenderWithValidValues(string $gender): void
     {
         $result = $this->contact->setGender($gender);

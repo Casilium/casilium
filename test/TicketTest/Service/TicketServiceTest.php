@@ -16,6 +16,7 @@ use OrganisationContact\Entity\Contact;
 use OrganisationContact\Service\ContactService;
 use OrganisationSite\Entity\SiteEntity;
 use OrganisationSite\Service\SiteManager;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -548,9 +549,7 @@ class TicketServiceTest extends TestCase
         $this->assertSame($this->entityManager->reveal(), $result);
     }
 
-    /**
-     * @dataProvider duePeriodProvider
-     */
+    #[DataProvider('duePeriodProvider')]
     public function testSendNotificationEmailWithDifferentPeriods(int $period, string $method): void
     {
         $this->mailService->isEnabled()->willReturn(true);

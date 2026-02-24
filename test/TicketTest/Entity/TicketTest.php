@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Organisation\Entity\Organisation;
 use OrganisationContact\Entity\Contact;
 use OrganisationSite\Entity\SiteEntity;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ServiceLevel\Entity\SlaTarget;
 use Ticket\Entity\Agent;
@@ -67,9 +68,7 @@ class TicketTest extends TestCase
         $this->assertEquals($description, $this->ticket->getLongDescription());
     }
 
-    /**
-     * @dataProvider impactProvider
-     */
+    #[DataProvider('impactProvider')]
     public function testSetAndGetImpact(int $impact): void
     {
         $result = $this->ticket->setImpact($impact);
@@ -87,9 +86,7 @@ class TicketTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider urgencyProvider
-     */
+    #[DataProvider('urgencyProvider')]
     public function testSetAndGetUrgency(int $urgency): void
     {
         $result = $this->ticket->setUrgency($urgency);
@@ -107,9 +104,7 @@ class TicketTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider sourceProvider
-     */
+    #[DataProvider('sourceProvider')]
     public function testSetAndGetSource(int $source): void
     {
         $result = $this->ticket->setSource($source);
@@ -362,9 +357,7 @@ class TicketTest extends TestCase
         $this->assertEquals('Detailed description', $this->ticket->getLongDescription());
     }
 
-    /**
-     * @dataProvider statusTextProvider
-     */
+    #[DataProvider('statusTextProvider')]
     public function testGetStatusTextFromCode(int $code, string $expected): void
     {
         $this->assertEquals($expected, Ticket::getStatusTextFromCode($code));
@@ -381,9 +374,7 @@ class TicketTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider impactUrgencyTextProvider
-     */
+    #[DataProvider('impactUrgencyTextProvider')]
     public function testGetImpactUrgencyText(int $code, string $expected): void
     {
         $this->assertEquals($expected, Ticket::getImpactUrgencyText($code));
@@ -398,9 +389,7 @@ class TicketTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider sourceTextProvider
-     */
+    #[DataProvider('sourceTextProvider')]
     public function testGetSourceTextFromCode(int $code, string $expected): void
     {
         $this->assertEquals($expected, Ticket::getSourceTextFromCode($code));

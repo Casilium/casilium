@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace ServiceLevelTest\Entity;
 
 use Exception;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ServiceLevel\Entity\Sla;
 use ServiceLevel\Entity\SlaTarget;
@@ -63,9 +64,7 @@ class SlaTargetTest extends TestCase
         $this->assertEquals($resolveTime, $this->slaTarget->getResolveTime());
     }
 
-    /**
-     * @dataProvider validTimeFormatProvider
-     */
+    #[DataProvider('validTimeFormatProvider')]
     public function testGetTimeInSecondsWithValidFormats(string $timeString, int $expectedSeconds): void
     {
         $result = $this->slaTarget->getTimeInSeconds($timeString);
@@ -85,9 +84,7 @@ class SlaTargetTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidTimeFormatProvider
-     */
+    #[DataProvider('invalidTimeFormatProvider')]
     public function testGetTimeInSecondsThrowsExceptionForInvalidFormats(string $invalidTimeString): void
     {
         $this->expectException(Exception::class);

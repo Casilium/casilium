@@ -12,6 +12,7 @@ use Organisation\Entity\Domain;
 use Organisation\Entity\Organisation;
 use Organisation\Entity\OrganisationInterface;
 use Organisation\Exception\OrganisationNameException;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Ramsey\Uuid\Uuid;
 use Ramsey\Uuid\UuidInterface;
@@ -88,9 +89,7 @@ class OrganisationTest extends TestCase
         $this->assertEquals('2020-01-01 10:00:00', $this->organisation->getCreated()->format('Y-m-d H:i:s'));
     }
 
-    /**
-     * @dataProvider activeStateProvider
-     */
+    #[DataProvider('activeStateProvider')]
     public function testSetAndGetIsActive(int $state): void
     {
         $result = $this->organisation->setIsActive($state);
@@ -146,9 +145,7 @@ class OrganisationTest extends TestCase
         $this->organisation->setName('');
     }
 
-    /**
-     * @dataProvider typeProvider
-     */
+    #[DataProvider('typeProvider')]
     public function testSetAndGetTypeId(int $typeId): void
     {
         $result = $this->organisation->setTypeId($typeId);
@@ -315,9 +312,7 @@ class OrganisationTest extends TestCase
         $this->assertTrue($this->organisation->hasDomain($domain3));
     }
 
-    /**
-     * @dataProvider invalidNameProvider
-     */
+    #[DataProvider('invalidNameProvider')]
     public function testSetNameWithVariousInvalidInputs(string $invalidName): void
     {
         $this->expectException(OrganisationNameException::class);

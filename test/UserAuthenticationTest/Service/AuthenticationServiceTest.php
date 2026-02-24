@@ -7,6 +7,7 @@ namespace UserAuthenticationTest\Service;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Result;
 use Doctrine\DBAL\Statement;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
@@ -177,9 +178,7 @@ class AuthenticationServiceTest extends TestCase
         $this->assertNull($identity);
     }
 
-    /**
-     * @dataProvider credentialsProvider
-     */
+    #[DataProvider('credentialsProvider')]
     public function testAuthenticateWithVariousCredentials(string $username, string $password, bool $userExists): void
     {
         $this->connection->prepare(Argument::type('string'))

@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace UserAuthenticationTest\Entity;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use UserAuthentication\Entity\Identity;
 use UserAuthentication\Entity\IdentityInterface;
@@ -135,9 +136,7 @@ class IdentityTest extends TestCase
         $this->assertTrue($this->identity->hasRole('user'));
     }
 
-    /**
-     * @dataProvider roleDataProvider
-     */
+    #[DataProvider('roleDataProvider')]
     public function testHasRoleWithVariousInputs(string $roles, string $searchRole, bool $expected): void
     {
         $this->identity->setRoles($roles);

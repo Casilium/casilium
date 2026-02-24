@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace OrganisationContactTest\Validator;
 
 use OrganisationContact\Validator\PhoneNumberValidator;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use stdClass;
 
@@ -17,9 +18,7 @@ class PhoneNumberValidatorTest extends TestCase
         $this->validator = new PhoneNumberValidator();
     }
 
-    /**
-     * @dataProvider validPhoneNumberProvider
-     */
+    #[DataProvider('validPhoneNumberProvider')]
     public function testIsValidWithValidPhoneNumbers(string $phoneNumber): void
     {
         $result = $this->validator->isValid($phoneNumber);
@@ -41,9 +40,7 @@ class PhoneNumberValidatorTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider invalidPhoneNumberProvider
-     */
+    #[DataProvider('invalidPhoneNumberProvider')]
     public function testIsValidWithInvalidPhoneNumbers(string $phoneNumber, string $expectedError): void
     {
         $result = $this->validator->isValid($phoneNumber);
@@ -129,9 +126,6 @@ class PhoneNumberValidatorTest extends TestCase
         $this->assertFalse($validator->isValid('invalid'));
     }
 
-    /**
-     * Test the regex pattern behavior
-     */
     public function testRegexPatternBehavior(): void
     {
         // Test edge cases for the regex pattern: /^(\+\d{1,3}\.)?\d{5,15}$/
@@ -148,9 +142,6 @@ class PhoneNumberValidatorTest extends TestCase
         $this->assertFalse($this->validator->isValid('1234')); // Too few digits without country code
     }
 
-    /**
-     * Test that validator logic works correctly after fix
-     */
     public function testPregMatchLogicFixed(): void
     {
         // Valid number should return true
@@ -180,9 +171,6 @@ class PhoneNumberValidatorTest extends TestCase
         $this->assertEquals('Phone number entered is not valid', $messages[PhoneNumberValidator::INVALID_NUMBER]);
     }
 
-    /**
-     * Test real-world phone number formats
-     */
     public function testRealWorldPhoneNumbers(): void
     {
         // These should be valid according to the current pattern

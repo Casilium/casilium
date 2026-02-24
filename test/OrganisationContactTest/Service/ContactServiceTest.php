@@ -12,27 +12,40 @@ use OrganisationContact\Entity\Contact;
 use OrganisationContact\Repository\ContactRepository;
 use OrganisationContact\Service\ContactService;
 use OrganisationSite\Entity\SiteEntity;
+use Override;
 use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
 
-class ContactServiceTest extends TestCase
+final class ContactServiceTest extends TestCase
 {
     use ProphecyTrait;
 
-    private ContactService $contactService;
-    private ObjectProphecy $entityManager;
-    private ObjectProphecy $organisationService;
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private ?ContactService $contactService;
 
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private ?ObjectProphecy $entityManager;
+
+    /** @psalm-suppress PropertyNotSetInConstructor */
+    private ?ObjectProphecy $organisationService;
+
+    #[Override]
     protected function setUp(): void
     {
-        $this->entityManager       = $this->prophesize(EntityManagerInterface::class);
-        $this->organisationService = $this->prophesize(OrganisationManager::class);
+        /** @var ObjectProphecy $entityManager */
+        $entityManager = $this->prophesize(EntityManagerInterface::class);
+
+        /** @var ObjectProphecy $organisationService */
+        $organisationService = $this->prophesize(OrganisationManager::class);
+
+        $this->entityManager       = $entityManager;
+        $this->organisationService = $organisationService;
 
         $this->contactService = new ContactService(
             $this->entityManager->reveal(),
-            $this->organisationService->reveal()
+            $organisationService->reveal()
         );
     }
 
@@ -66,15 +79,11 @@ class ContactServiceTest extends TestCase
         $organisation = $this->createMock(Organisation::class);
         $organisation->method('getId')->willReturn(123);
 
-        $organisationReference = $this->createMock(Organisation::class);
-
         $contact = $this->createMock(Contact::class);
         $contact->method('getId')->willReturn(0); // New contact
         $contact->method('getOrganisation')->willReturn($organisation);
-        $contact->expects($this->once())->method('setOrganisation')->with($organisationReference)->willReturn($contact);
+        $contact->expects($this->once())->method('setOrganisation')->with($organisation);
 
-        $this->entityManager->getReference(Organisation::class, 123)
-            ->willReturn($organisationReference);
         $this->entityManager->persist($contact)->shouldBeCalled();
         $this->entityManager->flush()->shouldBeCalled();
 
@@ -109,7 +118,10 @@ class ContactServiceTest extends TestCase
 
         $this->entityManager->getRepository(Contact::class)
             ->willReturn($repository->reveal());
-        $repository->findByCorporationId($organisationId, false)->willReturn($contacts);
+        $repository->findBy(
+            ['organisation' => $organisationId],
+            ['firstName' => 'ASC', 'lastName' => 'ASC']
+        )->willReturn($contacts);
 
         $result = $this->contactService->fetchContactsByOrganisationId($organisationId);
 
@@ -119,16 +131,20 @@ class ContactServiceTest extends TestCase
     public function testFetchContactsByOrganisationIdReturnsNull(): void
     {
         $organisationId = 999;
+        $contacts       = [];
 
         $repository = $this->prophesize(ContactRepository::class);
 
         $this->entityManager->getRepository(Contact::class)
             ->willReturn($repository->reveal());
-        $repository->findByCorporationId($organisationId, false)->willReturn(null);
+        $repository->findBy(
+            ['organisation' => $organisationId],
+            ['firstName' => 'ASC', 'lastName' => 'ASC']
+        )->willReturn($contacts);
 
         $result = $this->contactService->fetchContactsByOrganisationId($organisationId);
 
-        $this->assertNull($result);
+        $this->assertSame($contacts, $result);
     }
 
     public function testFetchContactsByOrganisationIdActiveOnly(): void
@@ -142,7 +158,10 @@ class ContactServiceTest extends TestCase
 
         $this->entityManager->getRepository(Contact::class)
             ->willReturn($repository->reveal());
-        $repository->findByCorporationId($organisationId, true)->willReturn($contacts);
+        $repository->findBy(
+            ['organisation' => $organisationId, 'isActive' => true],
+            ['firstName' => 'ASC', 'lastName' => 'ASC']
+        )->willReturn($contacts);
 
         $result = $this->contactService->fetchContactsByOrganisationId($organisationId, true);
 

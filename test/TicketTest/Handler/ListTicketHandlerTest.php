@@ -60,12 +60,12 @@ class ListTicketHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback(function ($request) {
+            ->willReturnCallback(function ($request) {
                 // Simulate the handler behavior
                 $this->ticketService->getEntityManager()->getRepository(Ticket::class)
                     ->findTicketsByPagination(['hide_completed' => true]);
                 return new HtmlResponse('<html>test</html>');
-            }));
+            });
 
         $response = $handler->handle($request);
         $this->assertInstanceOf(HtmlResponse::class, $response);
@@ -88,11 +88,11 @@ class ListTicketHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback(function ($request) {
+            ->willReturnCallback(function ($request) {
                 $this->ticketService->getEntityManager()->getRepository(Ticket::class)
                     ->findTicketsByPagination(['hide_completed' => false]);
                 return new HtmlResponse('<html>test</html>');
-            }));
+            });
 
         $handler->handle($request);
     }
@@ -118,14 +118,14 @@ class ListTicketHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback(function ($request) use ($orgUuid) {
+            ->willReturnCallback(function ($request) use ($orgUuid) {
                 $this->ticketService->getEntityManager()->getRepository(Ticket::class)
                     ->findTicketsByPagination([
                         'organisation_uuid' => $orgUuid,
                         'hide_completed'    => true,
                     ]);
                 return new HtmlResponse('<html>test</html>');
-            }));
+            });
 
         $handler->handle($request);
     }
@@ -151,14 +151,14 @@ class ListTicketHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback(function ($request) {
+            ->willReturnCallback(function ($request) {
                 $this->ticketService->getEntityManager()->getRepository(Ticket::class)
                     ->findTicketsByPagination([
                         'queue_id'       => 456,
                         'hide_completed' => true,
                     ]);
                 return new HtmlResponse('<html>test</html>');
-            }));
+            });
 
         $handler->handle($request);
     }
@@ -183,13 +183,13 @@ class ListTicketHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback(function ($request) {
+            ->willReturnCallback(function ($request) {
                 $this->ticketService->getEntityManager()->getRepository(Ticket::class)
                     ->findTicketsByPagination([
                         'status_id' => 2,
                     ]);
                 return new HtmlResponse('<html>test</html>');
-            }));
+            });
 
         $handler->handle($request);
     }
@@ -218,14 +218,14 @@ class ListTicketHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback(function ($request) use ($orgUuid) {
+            ->willReturnCallback(function ($request) use ($orgUuid) {
                 $this->ticketService->getEntityManager()->getRepository(Ticket::class)
                     ->findTicketsByPagination([
                         'organisation_uuid' => $orgUuid,
                         'hide_completed'    => true,
                     ]);
                 return new HtmlResponse('<html>test</html>');
-            }));
+            });
 
         $handler->handle($request);
     }
@@ -254,14 +254,14 @@ class ListTicketHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback(function ($request) {
+            ->willReturnCallback(function ($request) {
                 $this->ticketService->getEntityManager()->getRepository(Ticket::class)
                     ->findTicketsByPagination([
                         'queue_id'       => 456,
                         'hide_completed' => true,
                     ]);
                 return new HtmlResponse('<html>test</html>');
-            }));
+            });
 
         $handler->handle($request);
     }
@@ -287,13 +287,13 @@ class ListTicketHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback(function ($request) {
+            ->willReturnCallback(function ($request) {
                 $this->ticketService->getEntityManager()->getRepository(Ticket::class)
                     ->findTicketsByPagination([
                         'status_id' => 2,
                     ]);
                 return new HtmlResponse('<html>test</html>');
-            }));
+            });
 
         $handler->handle($request);
     }
@@ -320,14 +320,14 @@ class ListTicketHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback(function ($request) use ($orgUuid) {
+            ->willReturnCallback(function ($request) use ($orgUuid) {
                 $this->ticketService->getEntityManager()->getRepository(Ticket::class)
                     ->findTicketsByPagination([
                         'organisation_uuid' => $orgUuid,
                         'hide_completed'    => false,
                     ]);
                 return new HtmlResponse('<html>test</html>');
-            }));
+            });
 
         $handler->handle($request);
     }
@@ -350,10 +350,10 @@ class ListTicketHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback(function ($request) {
+            ->willReturnCallback(function ($request) {
                 $this->ticketService->getEntityManager();
                 return new HtmlResponse('<html>test</html>');
-            }));
+            });
 
         $handler->handle($request);
     }
@@ -377,10 +377,10 @@ class ListTicketHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback(function ($request) {
+            ->willReturnCallback(function ($request) {
                 $this->ticketService->getEntityManager()->getRepository(Ticket::class);
                 return new HtmlResponse('<html>test</html>');
-            }));
+            });
 
         $handler->handle($request);
     }
@@ -404,9 +404,9 @@ class ListTicketHandlerTest extends TestCase
 
         $handler->expects($this->once())
             ->method('handle')
-            ->will($this->returnCallback(function ($request) {
+            ->willReturnCallback(function ($request) {
                 return new HtmlResponse($this->renderer->render('ticket::ticket-list', []));
-            }));
+            });
 
         $response = $handler->handle($request);
         $this->assertInstanceOf(HtmlResponse::class, $response);

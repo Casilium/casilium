@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ServiceLevelTest\Entity;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use ServiceLevel\Entity\BusinessHours;
 use TypeError;
@@ -74,9 +75,7 @@ class BusinessHoursTest extends TestCase
         $this->assertEquals($timezone, $this->businessHours->getTimezone());
     }
 
-    /**
-     * @dataProvider dayProvider
-     */
+    #[DataProvider('dayProvider')]
     public function testSetAndGetDayTimes(string $day): void
     {
         $startMethod    = "set{$day}Start";
@@ -109,9 +108,7 @@ class BusinessHoursTest extends TestCase
         ];
     }
 
-    /**
-     * @dataProvider dayActiveProvider
-     */
+    #[DataProvider('dayActiveProvider')]
     public function testSetAndGetDayActive(string $day): void
     {
         $activeMethod    = "set{$day}Active";

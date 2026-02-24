@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace UserTest\Service;
 
 use Exception;
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
@@ -201,9 +202,7 @@ class AuthManagerTest extends TestCase
         $this->assertEquals('Test User', $identity->getName());
     }
 
-    /**
-     * @dataProvider accessModeProvider
-     */
+    #[DataProvider('accessModeProvider')]
     public function testFilterAccessConstantsAreCorrect(int $expectedValue, int $actualConstant): void
     {
         $this->assertEquals($expectedValue, $actualConstant);

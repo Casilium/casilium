@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace UserTest\Entity;
 
+use PHPUnit\Framework\Attributes\DataProvider;
 use PHPUnit\Framework\TestCase;
 use User\Entity\Role;
 use User\Entity\User;
@@ -53,9 +54,7 @@ class UserTest extends TestCase
         $this->assertEquals($password, $this->user->getPassword());
     }
 
-    /**
-     * @dataProvider statusProvider
-     */
+    #[DataProvider('statusProvider')]
     public function testSetAndGetStatus(int $status): void
     {
         $this->user->setStatus($status);
@@ -82,9 +81,7 @@ class UserTest extends TestCase
         $this->assertEquals($expected, User::getStatusList());
     }
 
-    /**
-     * @dataProvider statusStringProvider
-     */
+    #[DataProvider('statusStringProvider')]
     public function testGetStatusAsString(int $status, string $expected): void
     {
         $this->user->setStatus($status);
