@@ -20,7 +20,8 @@ RUN apt-get update \
         pdo_mysql \
         xml \
         zip \
-    && pecl install imap \
+    && pecl channel-update pecl.php.net \
+    && pecl install imap-1.0.3 \
     && docker-php-ext-enable imap \
     && pecl install apcu \
     && docker-php-ext-enable apcu \
