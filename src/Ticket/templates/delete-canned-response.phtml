@@ -1,0 +1,29 @@
+<?php
+/** @var \Ticket\Entity\CannedResponse $cannedResponse */
+$cannedResponse = $this->cannedResponse;
+$form           = $this->form->prepare();
+$form->get('csrf')->setValue($this->token);
+
+$this->headTitle('Delete Canned Response');
+$this->pageBreadcrumbs()->setItems([
+    'Home'             => $this->url('home'),
+    'Administration'   => $this->url('admin'),
+    'Canned Responses' => $this->url('admin.canned_response.list'),
+    'Delete'           => '',
+]);
+?>
+<div class="row">
+    <div class="col-md-6 mx-auto">
+        <h1>Delete Canned Response</h1>
+        <p>
+            Delete <strong><?= $this->escapeHtml($cannedResponse->getTitle()) ?></strong>?
+            Existing ticket responses will not be affected.
+        </p>
+        <?= $this->form()->openTag($form) ?>
+        <?= $this->formHidden($form->get('csrf')) ?>
+        <?= $this->formElementErrors($form->get('csrf')) ?>
+        <?= $this->formElement($form->get('submit')) ?>
+        <a class="btn btn-secondary" href="<?= $this->url('admin.canned_response.list') ?>">Cancel</a>
+        <?= $this->form()->closeTag() ?>
+    </div>
+</div>

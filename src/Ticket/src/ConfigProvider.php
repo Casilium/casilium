@@ -16,7 +16,7 @@ class ConfigProvider
      * To add a bit of a structure, each section is defined in a separate
      * method which returns an array with its configuration.
      *
-     * @returns array
+     * @return array<string,array>
      */
     public function __invoke(): array
     {
@@ -51,19 +51,26 @@ class ConfigProvider
                 EventListener\TicketEventListener::class => EventListener\TicketEventListener::class,
                 Handler\AssignQueueMembersHandler::class => Handler\Factory\AssignQueueMembersHandlerFactory::class,
                 Handler\CreateQueueHandler::class        => Handler\Factory\CreateQueueHandlerFactory::class,
-                Handler\DeleteQueueHandler::class        => Handler\Factory\DeleteQueueHandlerFactory::class,
-                Handler\EditQueueHandler::class          => Handler\Factory\EditQueueHandlerFactory::class,
-                Handler\ListQueueHandler::class          => Handler\Factory\ListQueueHandlerFactory::class,
-                Handler\CreateTicketHandler::class       => Handler\Factory\TicketCreateHandlerFactory::class,
-                Handler\EditTickerHandler::class         => Handler\Factory\TicketEditHandlerFactory::class,
-                Handler\ListTicketHandler::class         => Handler\Factory\ListTickerHandlerFactory::class,
-                Handler\TicketListChangesHandler::class  => Handler\Factory\TicketListChangesHandlerFactory::class,
-                Handler\ViewTicketHandler::class         => Handler\Factory\ViewTicketHandlerFactory::class,
-                Handler\GoToTicketHandler::class         => Handler\Factory\GoToTicketHandlerFactory::class,
-                Handler\SearchTicketHandler::class       => Handler\Factory\SearchTicketHandlerFactory::class,
-                Hydrator\TicketHydrator::class           => Hydrator\Factory\TicketHydratorFactory::class,
-                Service\TicketService::class             => Service\Factory\TicketServiceFactory::class,
-                Service\QueueManager::class              => Service\Factory\QueueManagerFactory::class,
+                Handler\DeleteCannedResponseHandler::class
+                    => Handler\Factory\DeleteCannedResponseHandlerFactory::class,
+                Handler\DeleteQueueHandler::class => Handler\Factory\DeleteQueueHandlerFactory::class,
+                Handler\EditCannedResponseHandler::class
+                    => Handler\Factory\EditCannedResponseHandlerFactory::class,
+                Handler\EditQueueHandler::class => Handler\Factory\EditQueueHandlerFactory::class,
+                Handler\ListCannedResponseHandler::class
+                    => Handler\Factory\ListCannedResponseHandlerFactory::class,
+                Handler\ListQueueHandler::class         => Handler\Factory\ListQueueHandlerFactory::class,
+                Handler\CreateTicketHandler::class      => Handler\Factory\TicketCreateHandlerFactory::class,
+                Handler\EditTickerHandler::class        => Handler\Factory\TicketEditHandlerFactory::class,
+                Handler\ListTicketHandler::class        => Handler\Factory\ListTickerHandlerFactory::class,
+                Handler\TicketListChangesHandler::class => Handler\Factory\TicketListChangesHandlerFactory::class,
+                Handler\ViewTicketHandler::class        => Handler\Factory\ViewTicketHandlerFactory::class,
+                Handler\GoToTicketHandler::class        => Handler\Factory\GoToTicketHandlerFactory::class,
+                Handler\SearchTicketHandler::class      => Handler\Factory\SearchTicketHandlerFactory::class,
+                Hydrator\TicketHydrator::class          => Hydrator\Factory\TicketHydratorFactory::class,
+                Service\TicketService::class            => Service\Factory\TicketServiceFactory::class,
+                Service\CannedResponseManager::class    => Service\Factory\CannedResponseManagerFactory::class,
+                Service\QueueManager::class             => Service\Factory\QueueManagerFactory::class,
             ],
         ];
     }
@@ -101,13 +108,19 @@ class ConfigProvider
     {
         return [
             'routes' => [
-                'ticket' => [
+                'ticket'                => [
+                    ['allow' => '+ticket.manage'],
+                ],
+                'admin.canned_response' => [
                     ['allow' => '+ticket.manage'],
                 ],
             ],
         ];
     }
 
+    /**
+     * @return array<string,array<int,mixed>>
+     */
     public function getConsoleCommands(): array
     {
         return [
@@ -125,6 +138,7 @@ class ConfigProvider
      * Returns the templates configuration
      *
      * @returns array
+     * @return array<string,array<string,array<int,string>>>
      */
     public function getTemplates(): array
     {

@@ -10,35 +10,43 @@ use Laminas\Diactoros\ServerRequest;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use OrganisationContact\Entity\Contact;
+use Override;
+use PHPUnit\Framework\MockObject\MockObject;
 use PHPUnit\Framework\TestCase;
+use Ticket\Entity\CannedResponse;
 use Ticket\Entity\Ticket;
 use Ticket\Entity\TicketResponse;
 use Ticket\Form\TicketResponseForm;
 use Ticket\Handler\ViewTicketHandler;
 use Ticket\Hydrator\TicketHydrator;
+use Ticket\Service\CannedResponseManager;
 use Ticket\Service\TicketService;
 use UserAuthentication\Entity\IdentityInterface;
 
 class ViewTicketHandlerTest extends TestCase
 {
     private ViewTicketHandler $handler;
-    private TicketService $ticketService;
-    private TicketHydrator $hydrator;
-    private TemplateRendererInterface $renderer;
-    private UrlHelper $urlHelper;
+    private TicketService&MockObject $ticketService;
+    private TicketHydrator&MockObject $hydrator;
+    private TemplateRendererInterface&MockObject $renderer;
+    private UrlHelper&MockObject $urlHelper;
+    private CannedResponseManager&MockObject $cannedResponseManager;
 
+    #[Override]
     protected function setUp(): void
     {
-        $this->ticketService = $this->createMock(TicketService::class);
-        $this->hydrator      = $this->createMock(TicketHydrator::class);
-        $this->renderer      = $this->createMock(TemplateRendererInterface::class);
-        $this->urlHelper     = $this->createMock(UrlHelper::class);
+        $this->ticketService         = $this->createMock(TicketService::class);
+        $this->hydrator              = $this->createMock(TicketHydrator::class);
+        $this->renderer              = $this->createMock(TemplateRendererInterface::class);
+        $this->urlHelper             = $this->createMock(UrlHelper::class);
+        $this->cannedResponseManager = $this->createMock(CannedResponseManager::class);
 
         $this->handler = new ViewTicketHandler(
             $this->ticketService,
             $this->hydrator,
             $this->renderer,
-            $this->urlHelper
+            $this->urlHelper,
+            $this->cannedResponseManager
         );
     }
 
@@ -48,7 +56,8 @@ class ViewTicketHandlerTest extends TestCase
             $this->ticketService,
             $this->hydrator,
             $this->renderer,
-            $this->urlHelper
+            $this->urlHelper,
+            $this->cannedResponseManager
         );
 
         $this->assertInstanceOf(ViewTicketHandler::class, $handler);
@@ -91,10 +100,10 @@ class ViewTicketHandlerTest extends TestCase
             ->with(
                 'ticket::view-ticket',
                 $this->callback(function ($data) use ($ticket, $responses, $recentTickets) {
-                    return isset($data['ticket']) && $data['ticket'] === $ticket &&
-                           isset($data['responses']) && $data['responses'] === $responses &&
-                           isset($data['recentTickets']) && $data['recentTickets'] === $recentTickets &&
-                           isset($data['responseForm']) && $data['responseForm'] instanceof TicketResponseForm;
+                    return isset($data['ticket']) && $data['ticket'] === $ticket
+                           && isset($data['responses']) && $data['responses'] === $responses
+                           && isset($data['recentTickets']) && $data['recentTickets'] === $recentTickets
+                           && isset($data['responseForm']) && $data['responseForm'] instanceof TicketResponseForm;
                 })
             )
             ->willReturn('<html>Ticket view</html>');
@@ -183,7 +192,7 @@ class ViewTicketHandlerTest extends TestCase
 
         $this->renderer->expects($this->once())
             ->method('render')
-            ->with('ticket::view-ticket', $this->isType('array'))
+            ->with('ticket::view-ticket', $this->isArray())
             ->willReturn('<html>Ticket view with errors</html>');
 
         $response = $this->handler->handle($request);
@@ -308,11 +317,44 @@ class ViewTicketHandlerTest extends TestCase
             ->with(
                 'ticket::view-ticket',
                 $this->callback(function ($data) {
-                    return isset($data['responseForm']) &&
-                           $data['responseForm'] instanceof TicketResponseForm;
+                    return isset($data['responseForm'])
+                           && $data['responseForm'] instanceof TicketResponseForm;
                 })
             )
             ->willReturn('');
+
+        $this->handler->handle($request);
+    }
+
+    public function testHandlePassesCannedResponsesToTicketView(): void
+    {
+        $user    = $this->createMockUser(123);
+        $ticket  = $this->createMockTicket(456);
+        $contact = $this->createMock(Contact::class);
+        $contact->method('getId')->willReturn(789);
+        $ticket->method('getContact')->willReturn($contact);
+
+        $cannedResponses = [new CannedResponse()];
+        $this->cannedResponseManager->expects($this->once())
+            ->method('findAll')
+            ->willReturn($cannedResponses);
+        $this->ticketService->method('getTicketByUuid')->willReturn($ticket);
+        $this->ticketService->method('findTicketResponses')->willReturn([]);
+        $this->ticketService->method('findRecentTicketsByContact')->willReturn([]);
+        $this->renderer->expects($this->once())
+            ->method('render')
+            ->with(
+                'ticket::view-ticket',
+                $this->callback(static function (array $data) use ($cannedResponses): bool {
+                    return $data['cannedResponses'] === $cannedResponses;
+                })
+            )
+            ->willReturn('');
+
+        $request = new ServerRequest()
+            ->withMethod('GET')
+            ->withAttribute(IdentityInterface::class, $user)
+            ->withAttribute('ticket_id', 'ticket-uuid-123');
 
         $this->handler->handle($request);
     }
@@ -342,14 +384,14 @@ class ViewTicketHandlerTest extends TestCase
         $this->handler->handle($request);
     }
 
-    private function createMockUser(int $id): IdentityInterface
+    private function createMockUser(int $id): IdentityInterface&MockObject
     {
         $user = $this->createMock(IdentityInterface::class);
         $user->method('getId')->willReturn($id);
         return $user;
     }
 
-    private function createMockTicket(int $id): Ticket
+    private function createMockTicket(int $id): Ticket&MockObject
     {
         $ticket = $this->createMock(Ticket::class);
         $ticket->method('getId')->willReturn($id);

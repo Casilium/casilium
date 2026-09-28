@@ -1,4 +1,7 @@
 <?php
+
+/** @var Laminas\View\Renderer\PhpRenderer|App\View\HelperTrait $this */
+
 $this->headTitle('Administration');
 
 $this->pageBreadcrumbs()->setItems([
@@ -14,6 +17,7 @@ $this->pageBreadcrumbs()->setItems([
             <div class="list-group" id="list-tab" role="tablist">
                 <a class="list-group-item list-group-item-action active" id="list-business-hours-list" data-toggle="list" href="#list-business-hours" role="tab" aria-controls="home">Business Hours</a>
                 <a class="list-group-item list-group-item-action" id="list-account-list" data-toggle="list" href="#list-account" role="tab" aria-controls="home">Queues</a>
+                <a class="list-group-item list-group-item-action" id="list-canned-responses-list" data-toggle="list" href="#list-canned-responses" role="tab" aria-controls="profile">Canned Responses</a>
                 <a class="list-group-item list-group-item-action" id="list-sla-list" data-toggle="list" href="#list-sla" role="tab" aria-controls="profile">Service Level Agreements</a>
                 <a class="list-group-item list-group-item-action" id="list-user-list" data-toggle="list" href="#list-user" role="tab" aria-controls="profile">Users</a>
                 <a class="list-group-item list-group-item-action" id="list-export-list" data-toggle="list" href="#list-export" role="tab" aria-controls="profile">Export</a>
@@ -35,6 +39,17 @@ $this->pageBreadcrumbs()->setItems([
                         </li>
                         <li class="list-group-item">
                             <a href="<?= $this->url('admin.queue_list') ?>">List Queues</a>
+                        </li>
+                    </ul>
+                </div>
+
+                <div class="tab-pane fade" id="list-canned-responses" role="tabpanel" aria-labelledby="list-canned-responses-list">
+                    <ul class="list-group">
+                        <li class="list-group-item">
+                            <a href="<?= $this->url('admin.canned_response.create') ?>">Create Canned Response</a>
+                        </li>
+                        <li class="list-group-item">
+                            <a href="<?= $this->url('admin.canned_response.list') ?>">List Canned Responses</a>
                         </li>
                     </ul>
                 </div>
@@ -63,4 +78,3 @@ $this->pageBreadcrumbs()->setItems([
         </div>
     </div>
 </div>
-

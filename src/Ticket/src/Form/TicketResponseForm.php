@@ -9,7 +9,16 @@ use Laminas\Form\Element;
 use Laminas\Form\Form;
 use Laminas\InputFilter\InputFilterProviderInterface;
 use Laminas\Validator;
+use Override;
 
+/**
+ * @extends Form<array{
+ *     id?: string,
+ *     response: string,
+ *     is_public?: int,
+ *     submit: string
+ * }>
+ */
 class TicketResponseForm extends Form implements InputFilterProviderInterface
 {
     public function __construct()
@@ -25,25 +34,28 @@ class TicketResponseForm extends Form implements InputFilterProviderInterface
         $this->add($element);
 
         $element = new Element\Textarea('response');
-        $element->setAttributes(['class' => 'form-control', 'data-paste-cleanup' => 'true'])
+        $element->setAttributes([
+            'class'              => 'form-control',
+            'data-paste-cleanup' => 'true',
+            'id'                 => 'response',
+        ])
             ->setLabel('Response');
         $this->add($element);
 
         $element = new Element\Checkbox('is_public');
-        $element
-            ->setLabel('Public')
-            ->setAttributes([
-                'id'    => 'is_public',
-                'class' => 'custom-control-input',
-            ])
-            ->setLabelAttributes([
-                'class' => 'custom-control-label',
-            ])
-            ->setOptions([
-                'check_value'     => '1',
-                'unchecked_value' => '0',
-            ])
-            ->setValue(1);
+        $element->setLabel('Public');
+        $element->setAttributes([
+            'id'    => 'is_public',
+            'class' => 'custom-control-input',
+        ]);
+        $element->setLabelAttributes([
+            'class' => 'custom-control-label',
+        ]);
+        $element->setOptions([
+            'check_value'     => '1',
+            'unchecked_value' => '0',
+        ]);
+        $element->setValue(1);
         $this->add($element);
 
         $element = new Element\Submit('submit');
@@ -54,6 +66,7 @@ class TicketResponseForm extends Form implements InputFilterProviderInterface
         $this->add($element);
     }
 
+    #[Override]
     public function getInputFilterSpecification(): array
     {
         return [
@@ -105,11 +118,10 @@ class TicketResponseForm extends Form implements InputFilterProviderInterface
                 ],
                 'validators' => [
                     [
-                        'name'    => Validator\Between::class,
+                        'name'    => Validator\InArray::class,
                         'options' => [
-                            'min'       => 0,
-                            'max'       => 1,
-                            'inclusive' => true,
+                            'haystack' => [0, 1],
+                            'strict'   => Validator\InArray::COMPARE_STRICT,
                         ],
                     ],
                 ],

@@ -9,10 +9,13 @@ use Psr\Container\ContainerInterface;
 use Ticket\Handler\AssignQueueMembersHandler;
 use Ticket\Handler\CreateQueueHandler;
 use Ticket\Handler\CreateTicketHandler;
+use Ticket\Handler\DeleteCannedResponseHandler;
 use Ticket\Handler\DeleteQueueHandler;
+use Ticket\Handler\EditCannedResponseHandler;
 use Ticket\Handler\EditQueueHandler;
 use Ticket\Handler\EditTickerHandler;
 use Ticket\Handler\GoToTicketHandler;
+use Ticket\Handler\ListCannedResponseHandler;
 use Ticket\Handler\ListQueueHandler;
 use Ticket\Handler\ListTicketHandler;
 use Ticket\Handler\SearchTicketHandler;
@@ -21,6 +24,9 @@ use Ticket\Handler\ViewTicketHandler;
 
 class RoutesDelegator
 {
+    /**
+     * @param callable(): mixed $callback
+     */
     public function __invoke(ContainerInterface $container, string $serviceName, callable $callback): Application
     {
         /** @var Application $app */
@@ -128,6 +134,30 @@ class RoutesDelegator
         );
 
         $app->get('/admin/ticket/queue/list', ListQueueHandler::class, 'admin.queue_list');
+
+        $app->route(
+            '/admin/ticket/canned-response/create',
+            EditCannedResponseHandler::class,
+            ['GET', 'POST'],
+            'admin.canned_response.create'
+        );
+        $app->route(
+            '/admin/ticket/canned-response/edit/{id:\d+}',
+            EditCannedResponseHandler::class,
+            ['GET', 'POST'],
+            'admin.canned_response.edit'
+        );
+        $app->route(
+            '/admin/ticket/canned-response/delete/{id:\d+}',
+            DeleteCannedResponseHandler::class,
+            ['GET', 'POST'],
+            'admin.canned_response.delete'
+        );
+        $app->get(
+            '/admin/ticket/canned-response',
+            ListCannedResponseHandler::class,
+            'admin.canned_response.list'
+        );
         return $app;
     }
 }

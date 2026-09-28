@@ -1,0 +1,37 @@
+<?php
+/** @var \Ticket\Entity\CannedResponse|null $cannedResponse */
+$cannedResponse = $this->cannedResponse;
+$form           = $this->form->prepare();
+$form->get('csrf')->setValue($this->token);
+$isEditing = $cannedResponse !== null;
+
+$this->headTitle($isEditing ? 'Edit Canned Response' : 'Create Canned Response');
+$this->pageBreadcrumbs()->setItems([
+    'Home'             => $this->url('home'),
+    'Administration'   => $this->url('admin'),
+    'Canned Responses' => $this->url('admin.canned_response.list'),
+    $isEditing ? 'Edit' : 'Create' => '',
+]);
+?>
+<div class="row">
+    <div class="col-md-8 mx-auto">
+        <h1><?= $isEditing ? 'Edit' : 'Create' ?> Canned Response</h1>
+        <?= $this->form()->openTag($form) ?>
+        <div class="form-group">
+            <?= $this->formLabel($form->get('title')) ?>
+            <?= $this->formElement($form->get('title')) ?>
+            <?= $this->formElementErrors($form->get('title')) ?>
+        </div>
+        <div class="form-group">
+            <?= $this->formLabel($form->get('response')) ?>
+            <?= $this->formElement($form->get('response')) ?>
+            <?= $this->formElementErrors($form->get('response')) ?>
+        </div>
+        <?= $this->formHidden($form->get('id')) ?>
+        <?= $this->formHidden($form->get('csrf')) ?>
+        <?= $this->formElementErrors($form->get('csrf')) ?>
+        <?= $this->formElement($form->get('submit')) ?>
+        <a class="btn btn-secondary" href="<?= $this->url('admin.canned_response.list') ?>">Cancel</a>
+        <?= $this->form()->closeTag() ?>
+    </div>
+</div>

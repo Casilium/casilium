@@ -1,0 +1,46 @@
+<?php
+/** @var \Ticket\Entity\CannedResponse[] $cannedResponses */
+$cannedResponses = $this->cannedResponses;
+
+$this->headTitle('Canned Responses');
+$this->pageBreadcrumbs()->setItems([
+    'Home'             => $this->url('home'),
+    'Administration'   => $this->url('admin'),
+    'Canned Responses' => $this->url('admin.canned_response.list'),
+]);
+?>
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1>Canned Responses</h1>
+        <a class="btn btn-primary" href="<?= $this->url('admin.canned_response.create') ?>">
+            Create Canned Response
+        </a>
+    </div>
+
+    <?php if ($cannedResponses === []): ?>
+        <p class="text-muted">No canned responses have been created.</p>
+    <?php else: ?>
+        <div class="list-group">
+            <?php foreach ($cannedResponses as $cannedResponse): ?>
+                <div class="list-group-item">
+                    <div class="d-flex justify-content-between align-items-start">
+                        <div>
+                            <h2 class="h5 mb-2"><?= $this->escapeHtml($cannedResponse->getTitle()) ?></h2>
+                            <p class="mb-0"><?= nl2br($this->escapeHtml($cannedResponse->getResponse())) ?></p>
+                        </div>
+                        <div class="btn-group ml-3">
+                            <a class="btn btn-secondary btn-sm" href="<?= $this->url(
+                                'admin.canned_response.edit',
+                                ['id' => $cannedResponse->getId()]
+                            ) ?>">Edit</a>
+                            <a class="btn btn-danger btn-sm" href="<?= $this->url(
+                                'admin.canned_response.delete',
+                                ['id' => $cannedResponse->getId()]
+                            ) ?>">Delete</a>
+                        </div>
+                    </div>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+</div>
