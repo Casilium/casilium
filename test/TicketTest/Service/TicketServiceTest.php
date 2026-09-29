@@ -266,6 +266,64 @@ class TicketServiceTest extends TestCase
         $this->assertSame($ticket, $result);
     }
 
+    public function testEditingATicketDoesNotFireTheCreatedEvent(): void
+    {
+        $data = [
+            'short_description' => 'Existing ticket',
+            'long_description'  => 'Edited, not created',
+            'impact'            => Ticket::IMPACT_HIGH,
+            'urgency'           => Ticket::URGENCY_HIGH,
+            'source'            => Ticket::SOURCE_PHONE,
+            'queue_id'          => 1,
+            'organisation_id'   => 2,
+            'contact_id'        => 3,
+            'type_id'           => Type::TYPE_INCIDENT,
+            'id'                => 77,
+        ];
+
+        $priority = $this->createMock(Priority::class);
+        $priority->method('getId')->willReturn(2);
+
+        $type = $this->createMock(Type::class);
+        $type->method('getId')->willReturn(Type::TYPE_INCIDENT);
+
+        $organisation = $this->createMock(Organisation::class);
+        $organisation->method('hasSla')->willReturn(false);
+
+        $ticket = $this->createMock(Ticket::class);
+        $ticket->method('getId')->willReturn(77);
+        $ticket->method('getType')->willReturn($type);
+        $ticket->method('getPriority')->willReturn($priority);
+        $ticket->method('getImpact')->willReturn(Ticket::IMPACT_HIGH);
+        $ticket->method('getUrgency')->willReturn(Ticket::URGENCY_HIGH);
+        $ticket->method('getStatus')->willReturn($this->createMock(Status::class));
+
+        $priorityRepo = $this->prophesize(EntityRepository::class);
+        $statusRepo   = $this->prophesize(EntityRepository::class);
+        $typeRepo     = $this->prophesize(EntityRepository::class);
+        $ticketRepo   = $this->prophesize(TicketRepository::class);
+
+        $this->entityManager->getRepository(Priority::class)->willReturn($priorityRepo->reveal());
+        $this->entityManager->getRepository(Status::class)->willReturn($statusRepo->reveal());
+        $this->entityManager->getRepository(Type::class)->willReturn($typeRepo->reveal());
+        $this->entityManager->getRepository(Ticket::class)->willReturn($ticketRepo->reveal());
+
+        $priorityRepo->find(2)->willReturn($priority);
+        $statusRepo->find(1)->willReturn($this->createMock(Status::class));
+        $typeRepo->find(Type::TYPE_INCIDENT)->willReturn($type);
+        $ticketRepo->find(77)->willReturn($ticket);
+        $ticketRepo->save(Argument::type(Ticket::class))->willReturn($ticket);
+
+        $this->queueManager->findQueueById(1)->willReturn($this->createMock(Queue::class));
+        $this->organisationManager->findOrganisationById(2)->willReturn($organisation);
+        $this->contactService->findContactById(3)->willReturn($this->createMock(Contact::class));
+
+        // the contact would otherwise be told their ticket was opened, again
+        $this->eventManager->trigger('ticket.created', Argument::cetera())->shouldNotBeCalled();
+
+        $this->ticketService->save($data);
+    }
+
     public function testRetypingAwayFromIncidentClearsTheSlaTarget(): void
     {
         $data = [

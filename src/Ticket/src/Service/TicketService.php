@@ -306,7 +306,11 @@ class TicketService
         }
 
         $ticket = $this->entityManager->getRepository(Ticket::class)->save($ticket);
-        $this->eventManager->trigger('ticket.created', $this, ['id' => $ticket->getId()]);
+
+        // editing comes through here too, and only a new ticket was created
+        if ($id === 0) {
+            $this->eventManager->trigger('ticket.created', $this, ['id' => $ticket->getId()]);
+        }
 
         return $ticket;
     }
