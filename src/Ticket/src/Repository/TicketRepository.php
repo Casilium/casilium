@@ -6,8 +6,6 @@ namespace Ticket\Repository;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
-use DateTime;
-use DateTimeZone;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
@@ -243,20 +241,20 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         // if filtering by overdue tickets
         if (isset($options['overdue']) && $options['overdue'] === true) {
-            $now = new DateTime('now', new DateTimeZone('UTC'));
+            $now = Carbon::now('UTC');
             $qb->andWhere('t.dueDate < :now')
                 ->andWhere('t.status < :resolvedStatus')
-                ->setParameter('now', $now->format(Ticket::DATE_FORMAT))
+                ->setParameter('now', $now->toDateTime(), Types::DATETIME_MUTABLE)
                 ->setParameter('resolvedStatus', Ticket::STATUS_RESOLVED);
         }
 
         // if filtering by due today tickets
         if (isset($options['due_today']) && $options['due_today'] === true) {
-            $today = new DateTime('now', new DateTimeZone('UTC'));
+            $today = Carbon::now('UTC');
             $qb->andWhere('t.dueDate BETWEEN :dateMin AND :dateMax')
                 ->andWhere('t.status < :resolvedStatus')
-                ->setParameter('dateMin', $today->format('Y-m-d 00:00:00'))
-                ->setParameter('dateMax', $today->format('Y-m-d 23:59:59'))
+                ->setParameter('dateMin', $today->copy()->startOfDay()->toDateTime(), Types::DATETIME_MUTABLE)
+                ->setParameter('dateMax', $today->copy()->endOfDay()->toDateTime(), Types::DATETIME_MUTABLE)
                 ->setParameter('resolvedStatus', Ticket::STATUS_RESOLVED);
         }
 
@@ -327,13 +325,13 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
     public function findDueTodayTicketCount(): int
     {
-        $today = new DateTime('now', new DateTimeZone('UTC'));
+        $today = Carbon::now('UTC');
 
         return (int) $this->createQueryBuilder('t')
             ->select('COUNT(t.id)')
             ->where('t.dueDate BETWEEN :dateMin AND :dateMax')
-            ->setParameter('dateMin', $today->format('Y-m-d 00:00:00'))
-            ->setParameter('dateMax', $today->format('Y-m-d 23:59:59'))
+            ->setParameter('dateMin', $today->copy()->startOfDay()->toDateTime(), Types::DATETIME_MUTABLE)
+            ->setParameter('dateMax', $today->copy()->endOfDay()->toDateTime(), Types::DATETIME_MUTABLE)
             ->andWhere('t.status < :status')
             ->setParameter('status', Ticket::STATUS_RESOLVED)
             ->getQuery()
@@ -343,12 +341,12 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
     public function findOverdueTicketCount(): int
     {
-        $today = new DateTime('now', new DateTimeZone('UTC'));
+        $today = Carbon::now('UTC');
 
         return (int) $this->createQueryBuilder('t')
             ->select('COUNT(t.id)')
             ->where('t.dueDate < :date')
-            ->setParameter('date', $today->format(Ticket::DATE_FORMAT))
+            ->setParameter('date', $today->toDateTime(), Types::DATETIME_MUTABLE)
             ->andWhere('t.status < :status')
             ->setParameter('status', Ticket::STATUS_RESOLVED)
             ->getQuery()
@@ -398,8 +396,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         if ($start !== null && $end !== null) {
             $qb->andWhere('t.createdAt BETWEEN :dateMin AND :dateMax')
-                ->setParameter('dateMin', $start->format('Y-m-d 00:00:00'))
-                ->setParameter('dateMax', $end->format('Y-m-d 23:59:59'));
+                ->setParameter('dateMin', $start->copy()->startOfDay()->toDateTime(), Types::DATETIME_MUTABLE)
+                ->setParameter('dateMax', $end->copy()->endOfDay()->toDateTime(), Types::DATETIME_MUTABLE);
         }
 
         if (null !== $organisation) {
@@ -424,8 +422,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         if ($start !== null && $end !== null) {
             $qb->andWhere('t.createdAt BETWEEN :dateMin AND :dateMax')
-                ->setParameter('dateMin', $start->format('Y-m-d 00:00:00'))
-                ->setParameter('dateMax', $end->format('Y-m-d 23:59:59'));
+                ->setParameter('dateMin', $start->copy()->startOfDay()->toDateTime(), Types::DATETIME_MUTABLE)
+                ->setParameter('dateMax', $end->copy()->endOfDay()->toDateTime(), Types::DATETIME_MUTABLE);
         }
 
         if (null !== $organisation) {
@@ -479,7 +477,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         $sql .= 'SET t.status = 5,t.closeDate = :closed WHERE t.status = 4 AND t.resolveDate < :dateMin';
         return $this->getEntityManager()
             ->createQuery($sql)
-            ->setParameter('closed', Carbon::now('UTC')->format(Ticket::DATE_FORMAT))
+            ->setParameter('closed', Carbon::now('UTC')->toDateTime(), Types::DATETIME_MUTABLE)
             ->setParameter('dateMin', $today)
             ->execute();
     }
@@ -511,8 +509,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->select('t')
             ->from(Ticket::class, 't')
             ->andWhere('t.dueDate BETWEEN :dateMin AND :dateMax')
-            ->setParameter('dateMin', $date->format(Ticket::DATE_FORMAT))
-            ->setParameter('dateMax', $inFuture->format(Ticket::DATE_FORMAT))
+            ->setParameter('dateMin', $date->toDateTime(), Types::DATETIME_MUTABLE)
+            ->setParameter('dateMax', $inFuture->toDateTime(), Types::DATETIME_MUTABLE)
             ->andWhere('t.status <= 2');
 
         return $qb->getQuery()->getResult();
@@ -527,7 +525,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->from(Ticket::class, 't')
             ->andWhere('t.dueDate < :today')
             ->andWhere('t.lastNotified < t.dueDate')
-            ->setParameter('today', $now->format(Ticket::DATE_FORMAT))
+            ->setParameter('today', $now->toDateTime(), Types::DATETIME_MUTABLE)
             ->andWhere('t.status <= 3')
             ->getQuery()
             ->getResult();
@@ -541,7 +539,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->select('t')
             ->from(Ticket::class, 't')
             ->andWhere('t.dueDate < :today')
-            ->setParameter('today', $now->format(Ticket::DATE_FORMAT))
+            ->setParameter('today', $now->toDateTime(), Types::DATETIME_MUTABLE)
             ->andWhere('t.status <= 3')
             ->getQuery()
             ->getResult();
@@ -556,7 +554,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->from(Ticket::class, 't')
             ->where('t.status = :t_status')
             ->andWhere('t.waitingResetDate < :date_now OR t.waitingResetDate is null')
-            ->setParameter('date_now', $now->format(Ticket::DATE_FORMAT))
+            ->setParameter('date_now', $now->toDateTime(), Types::DATETIME_MUTABLE)
             ->andWhere('t.status = :t_status')
             ->setParameter('t_status', Status::STATUS_ON_HOLD)
             ->getQuery()
@@ -586,8 +584,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         if ($periodStart && $periodEnd !== null) {
             $qb->andWhere('t.createdAt BETWEEN :dateMin AND :dateMax')
-                ->setParameter('dateMin', $periodStart->format(Ticket::DATE_FORMAT))
-                ->setParameter('dateMax', $periodEnd->format(Ticket::DATE_FORMAT));
+                ->setParameter('dateMin', $periodStart->toDateTime(), Types::DATETIME_MUTABLE)
+                ->setParameter('dateMax', $periodEnd->toDateTime(), Types::DATETIME_MUTABLE);
         }
 
         $stats['raised'] = (int) $qb->getQuery()->getSingleScalarResult();
@@ -610,8 +608,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
             if ($periodStart && $periodEnd !== null) {
                 $qb->andWhere('t.responseDate BETWEEN :dateMin AND :dateMax')
-                    ->setParameter('dateMin', $periodStart->format(Ticket::DATE_FORMAT))
-                    ->setParameter('dateMax', $periodEnd->format(Ticket::DATE_FORMAT));
+                    ->setParameter('dateMin', $periodStart->toDateTime(), Types::DATETIME_MUTABLE)
+                    ->setParameter('dateMax', $periodEnd->toDateTime(), Types::DATETIME_MUTABLE);
             }
 
             $stats[Status::getStatusTextFromId($statusType->getId())] = $qb->getQuery()->getSingleScalarResult();
@@ -654,8 +652,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
                 Ticket::STATUS_IN_PROGRESS,
                 Ticket::STATUS_ON_HOLD,
             ])
-            ->setParameter('start', $periodStart->format('Y-m-d 00:00:00'))
-            ->setParameter('end', $periodEnd->format('Y-m-d 23:59:59'))
+            ->setParameter('start', $periodStart->copy()->startOfDay()->toDateTime(), Types::DATETIME_MUTABLE)
+            ->setParameter('end', $periodEnd->copy()->endOfDay()->toDateTime(), Types::DATETIME_MUTABLE)
             ->orderBy('t.dueDate', 'ASC');
 
         return $qb->getQuery()
@@ -675,8 +673,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         if ($periodStart && $periodEnd) {
             $qb->andWhere('t.resolveDate BETWEEN :start AND :end')
-                ->setParameter('start', $periodStart->format(Ticket::DATE_FORMAT))
-                ->setParameter('end', $periodEnd->format(Ticket::DATE_FORMAT));
+                ->setParameter('start', $periodStart->toDateTime(), Types::DATETIME_MUTABLE)
+                ->setParameter('end', $periodEnd->toDateTime(), Types::DATETIME_MUTABLE);
         }
 
         if ($requiresSla === true) {
@@ -949,8 +947,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         if ($periodStart && $periodEnd) {
             $qb->andWhere('t.resolveDate BETWEEN :start AND :end')
-                ->setParameter('start', $periodStart->format(Ticket::DATE_FORMAT))
-                ->setParameter('end', $periodEnd->format(Ticket::DATE_FORMAT));
+                ->setParameter('start', $periodStart->toDateTime(), Types::DATETIME_MUTABLE)
+                ->setParameter('end', $periodEnd->toDateTime(), Types::DATETIME_MUTABLE);
         }
 
         if (null !== $organisationId) {
