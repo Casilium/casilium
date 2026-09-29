@@ -859,6 +859,7 @@ class TicketService
                 }
 
                 $dueDate = $businessHoursCalc->addMinutesTo($dueDate, $elapsedMinutes);
+                $ticket->addHeldMinutes($elapsedMinutes);
             } else {
                 // no SLA means the clock runs around the clock
                 $elapsedMinutes = (int) $heldSince->diffInMinutes($now);
@@ -868,6 +869,7 @@ class TicketService
                 }
 
                 $dueDate = $dueDate->addMinutes($elapsedMinutes);
+                $ticket->addHeldMinutes($elapsedMinutes);
             }
 
             // update due date and set the last reset date to now

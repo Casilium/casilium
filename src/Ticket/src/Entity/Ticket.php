@@ -177,6 +177,14 @@ class Ticket
     #[ORM\Column(name: 'waiting_reset_date', type: 'utcdatetime', nullable: true)]
     private ?DateTimeInterface $waitingResetDate = null;
 
+    /**
+     * Running total of the time this ticket has spent on hold, in the same
+     * units its due date is extended by: working minutes where the
+     * organisation has an SLA, elapsed minutes where it has not.
+     */
+    #[ORM\Column(name: 'held_minutes', type: 'integer', options: ['unsigned' => true, 'default' => 0])]
+    private int $heldMinutes = 0;
+
     #[ORM\OneToOne(targetEntity: SlaTarget::class)]
     #[ORM\JoinColumn(name: 'sla_target_id', referencedColumnName: 'id')]
     private ?SlaTarget $slaTarget = null;
@@ -530,6 +538,18 @@ class Ticket
         $date = DateTime::createFromFormat(self::DATE_FORMAT, $value, new DateTimeZone('UTC'));
 
         return $date === false ? null : $date;
+    }
+
+    public function getHeldMinutes(): int
+    {
+        return $this->heldMinutes;
+    }
+
+    public function addHeldMinutes(int $minutes): Ticket
+    {
+        $this->heldMinutes += $minutes;
+
+        return $this;
     }
 
     public function getArrayCopy(): array

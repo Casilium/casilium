@@ -30,6 +30,7 @@ use function intdiv;
 use function intval;
 use function is_array;
 use function is_numeric;
+use function max;
 use function sort;
 
 class TicketRepository extends EntityRepository implements TicketRepositoryInterface
@@ -770,7 +771,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
                 ? $createdAt->diffInMinutes($resolved)
                 : $calculator->diffInBusinessMinutes($createdAt, $resolved);
 
-            $hours[] = $minutes / 60;
+            // time on hold is time the desk did not have the ticket
+            $hours[] = max(0, $minutes - $ticket->getHeldMinutes()) / 60;
         }
 
         return $hours;

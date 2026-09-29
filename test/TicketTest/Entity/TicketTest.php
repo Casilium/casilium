@@ -409,6 +409,16 @@ class TicketTest extends TestCase
         ];
     }
 
+    public function testHeldMinutesAccumulate(): void
+    {
+        $this->assertSame(0, $this->ticket->getHeldMinutes());
+
+        $this->ticket->addHeldMinutes(45);
+        $this->ticket->addHeldMinutes(75);
+
+        $this->assertSame(120, $this->ticket->getHeldMinutes());
+    }
+
     public function testIsOverdueReturnsTrueWhenPastDue(): void
     {
         // Set due date in the past
