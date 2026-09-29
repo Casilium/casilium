@@ -12,6 +12,8 @@ use ServiceLevel\Entity\Sla;
 use ServiceLevel\Entity\SlaTarget;
 use Ticket\Entity\Priority;
 
+use function sprintf;
+
 class SlaService
 {
     /** Form field prefix carrying each priority's response and resolve times */
@@ -62,6 +64,8 @@ class SlaService
 
     /**
      * Delete business hours entry
+     *
+     * @throws Exception When the record is missing, or still used by an SLA.
      */
     public function deleteBusinessHours(int $id): void
     {
@@ -69,8 +73,35 @@ class SlaService
         if ($businessHours === null) {
             throw new Exception('Business Hours not found');
         }
+
+        // sla.business_hours_id has no foreign key, so a delete here would leave
+        // every SLA on these hours pointing at a row that is not there, and
+        // every due date calculation for them would fail
+        $inUse = $this->countSlasUsingBusinessHours($id);
+        if ($inUse > 0) {
+            throw new Exception(sprintf(
+                'These business hours are used by %d SLA %s and cannot be deleted',
+                $inUse,
+                $inUse === 1 ? 'policy' : 'policies'
+            ));
+        }
+
         $this->entityManager->remove($businessHours);
         $this->entityManager->flush();
+    }
+
+    /**
+     * Count the SLA policies using a given business hours record
+     */
+    public function countSlasUsingBusinessHours(int $businessHoursId): int
+    {
+        return (int) $this->entityManager->createQueryBuilder()
+            ->select('COUNT(s.id)')
+            ->from(Sla::class, 's')
+            ->where('s.businessHours = :businessHours')
+            ->setParameter('businessHours', $businessHoursId)
+            ->getQuery()
+            ->getSingleScalarResult();
     }
 
     /**

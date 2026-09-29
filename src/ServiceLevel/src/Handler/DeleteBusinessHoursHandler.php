@@ -4,8 +4,10 @@ declare(strict_types=1);
 
 namespace ServiceLevel\Handler;
 
+use Exception;
 use Laminas\Diactoros\Response\HtmlResponse;
 use Laminas\Diactoros\Response\RedirectResponse;
+use Mezzio\Flash\FlashMessageMiddleware;
 use Mezzio\Helper\UrlHelper;
 use Mezzio\Template\TemplateRendererInterface;
 use Psr\Http\Message\ResponseInterface;
@@ -38,7 +40,13 @@ class DeleteBusinessHoursHandler implements RequestHandlerInterface
         $confirm       = (bool) $request->getAttribute('confirm');
 
         if (true === $confirm) {
-            $this->slaService->deleteBusinessHours($id);
+            try {
+                $this->slaService->deleteBusinessHours($id);
+            } catch (Exception $e) {
+                $flashMessages = $request->getAttribute(FlashMessageMiddleware::FLASH_ATTRIBUTE);
+                $flashMessages?->flash('error', $e->getMessage());
+            }
+
             return new RedirectResponse($this->urlHelper->generate('sla.list_business_hours'));
         }
 

@@ -65,10 +65,49 @@ class SlaServiceTest extends TestCase
         $this->entityManager->getRepository(BusinessHours::class)->willReturn($repository->reveal());
         $repository->find($id)->willReturn($businessHours);
 
+        $this->mockSlaCountFor($id, 0);
+
         $this->entityManager->remove($businessHours)->shouldBeCalled();
         $this->entityManager->flush()->shouldBeCalled();
 
         $this->slaService->deleteBusinessHours($id);
+    }
+
+    /**
+     * sla.business_hours_id has no foreign key, so deleting a record an SLA
+     * still points at leaves it referencing a row that is not there.
+     */
+    public function testDeleteBusinessHoursRefusesWhenAnSlaStillUsesThem(): void
+    {
+        $id            = 456;
+        $businessHours = $this->createMock(BusinessHours::class);
+        $repository    = $this->prophesize(EntityRepository::class);
+
+        $this->entityManager->getRepository(BusinessHours::class)->willReturn($repository->reveal());
+        $repository->find($id)->willReturn($businessHours);
+
+        $this->mockSlaCountFor($id, 2);
+
+        $this->entityManager->remove(Argument::any())->shouldNotBeCalled();
+
+        $this->expectException(Exception::class);
+        $this->expectExceptionMessage('used by 2 SLA policies');
+
+        $this->slaService->deleteBusinessHours($id);
+    }
+
+    private function mockSlaCountFor(int $businessHoursId, int $count): void
+    {
+        $queryBuilder = $this->prophesize(QueryBuilder::class);
+        $query        = $this->prophesize(Query::class);
+
+        $this->entityManager->createQueryBuilder()->willReturn($queryBuilder->reveal());
+        $queryBuilder->select('COUNT(s.id)')->willReturn($queryBuilder->reveal());
+        $queryBuilder->from(Sla::class, 's')->willReturn($queryBuilder->reveal());
+        $queryBuilder->where('s.businessHours = :businessHours')->willReturn($queryBuilder->reveal());
+        $queryBuilder->setParameter('businessHours', $businessHoursId)->willReturn($queryBuilder->reveal());
+        $queryBuilder->getQuery()->willReturn($query->reveal());
+        $query->getSingleScalarResult()->willReturn($count);
     }
 
     public function testFindBusinessHoursById(): void
