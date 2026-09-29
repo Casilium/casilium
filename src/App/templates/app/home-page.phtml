@@ -29,10 +29,11 @@ $this->inlineScript()->appendFile('https://cdnjs.cloudflare.com/ajax/libs/Chart.
             <a href="<?= $this->url('ticket.list_status', ['status_id' => 4]) ?>" class="text-decoration-none">
                 <div class="card mb-1 hover-shadow" style="cursor: pointer;">
                     <div class="card-header text-nowrap text-center text-body">
-                        Resolved Tickets
+                        Awaiting Close
                     </div>
                     <div class="card-body text-center text-body">
                         <h3><?= $this->stats['resolved'] ?></h3>
+                        <small class="text-muted"><?= $this->escapeHtml($this->stats['autoClose']) ?></small>
                     </div>
                 </div>
             </a>

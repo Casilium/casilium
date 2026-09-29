@@ -18,6 +18,10 @@ class HomePageHandlerFactory
         $renderer         = $container->get(TemplateRendererInterface::class);
         $ticketRepository = $container->get(EntityManagerInterface::class)
             ->getRepository(Ticket::class);
-        return new HomePageHandler($renderer, $ticketRepository);
+
+        $config        = $container->get('config');
+        $autoCloseDays = (int) ($config['tickets']['auto_close_days'] ?? 2);
+
+        return new HomePageHandler($renderer, $ticketRepository, $autoCloseDays);
     }
 }

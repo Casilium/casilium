@@ -30,9 +30,28 @@ class HomePageHandlerFactoryTest extends TestCase
         $container = $this->prophesize(ContainerInterface::class);
         $container->get(EntityManagerInterface::class)->wilLReturn($entityManager->reveal());
         $container->get(TemplateRendererInterface::class)->willReturn($templateRenderInterface->reveal());
+        $container->get('config')->willReturn(['tickets' => ['auto_close_days' => 2]]);
 
         $factory  = new HomePageHandlerFactory();
         $homePage = $factory($container->reveal());
         $this->assertInstanceOf(HomePageHandler::class, $homePage);
+    }
+
+    public function testFallsBackWhenTheAutoCloseSettingIsMissing(): void
+    {
+        $templateRenderInterface = $this->prophesize(TemplateRendererInterface::class);
+        $ticketRepository        = $this->prophesize(TicketRepository::class);
+
+        $entityManager = $this->prophesize(EntityManager::class);
+        $entityManager->getRepository(Ticket::class)->willReturn($ticketRepository->reveal());
+
+        $container = $this->prophesize(ContainerInterface::class);
+        $container->get(EntityManagerInterface::class)->willReturn($entityManager->reveal());
+        $container->get(TemplateRendererInterface::class)->willReturn($templateRenderInterface->reveal());
+        $container->get('config')->willReturn([]);
+
+        $factory = new HomePageHandlerFactory();
+
+        $this->assertInstanceOf(HomePageHandler::class, $factory($container->reveal()));
     }
 }

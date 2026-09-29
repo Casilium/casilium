@@ -25,13 +25,16 @@ class HomePageHandler implements RequestHandlerInterface
 
     private TemplateRendererInterface $renderer;
     private TicketRepositoryInterface $ticketRepo;
+    private int $autoCloseDays;
 
     public function __construct(
         TemplateRendererInterface $renderer,
-        TicketRepositoryInterface $ticketRepository
+        TicketRepositoryInterface $ticketRepository,
+        int $autoCloseDays = 2
     ) {
-        $this->renderer   = $renderer;
-        $this->ticketRepo = $ticketRepository;
+        $this->renderer      = $renderer;
+        $this->ticketRepo    = $ticketRepository;
+        $this->autoCloseDays = $autoCloseDays;
     }
 
     public function handle(ServerRequestInterface $request): ResponseInterface
@@ -49,6 +52,11 @@ class HomePageHandler implements RequestHandlerInterface
             'created'     => $this->ticketRepo->findTotalTicketCount(),
             'resolved'    => $this->ticketRepo->findResolvedTicketCount(),
             'closed'      => $this->ticketRepo->findClosedTicketCount(),
+            'autoClose'   => sprintf(
+                'auto-closes after %d day%s',
+                $this->autoCloseDays,
+                $this->autoCloseDays === 1 ? '' : 's'
+            ),
         ];
 
         $slaResolution     = $this->ticketRepo->findResolutionStats($periodStart, $periodEnd, true);
