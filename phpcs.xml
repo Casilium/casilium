@@ -17,8 +17,7 @@
     <file>test</file>
     <exclude-pattern>config/config.php</exclude-pattern>
     <exclude-pattern>config/routes.php</exclude-pattern>
-    <exclude-pattern>config/app/doctrine.local.php</exclude-pattern>
-    <exclude-pattern>config/app/auth.local.php</exclude-pattern>
+    <exclude-pattern>config/autoload/*local.php</exclude-pattern>
 
     <!-- Include all rules from the Laminsas Coding Standard -->
     <rule ref="LaminasCodingStandard">
