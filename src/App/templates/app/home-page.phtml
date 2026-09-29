@@ -61,11 +61,13 @@ $this->inlineScript()->appendFile('https://cdnjs.cloudflare.com/ajax/libs/Chart.
                     <div class="text-center mb-3">
                         <div class="text-uppercase small text-muted">SLA Compliance</div>
                         <div class="display-6 fw-semibold"><?= number_format($this->stats['sla']['compliance'], 1) ?>%</div>
-                        <small class="text-muted">This Month</small>
+                        <small class="text-muted"><?= $this->escapeHtml($this->stats['periodLabel']) ?></small>
                     </div>
                     <dl class="row mb-0">
-                        <dt class="col-7 text-uppercase small text-muted">Avg Resolution</dt>
-                        <dd class="col-5 text-end fw-semibold"><?= $this->stats['sla']['avgResolutionDisplay'] ?></dd>
+                        <dt class="col-7 text-uppercase small text-muted">Typical Resolution</dt>
+                        <dd class="col-5 text-end fw-semibold"><?= $this->stats['sla']['median'] ?></dd>
+                        <dt class="col-7 small text-muted">Mean</dt>
+                        <dd class="col-5 text-end small text-muted"><?= $this->stats['sla']['mean'] ?></dd>
                         <dt class="col-7 text-uppercase small text-muted">Tickets Resolved</dt>
                         <dd class="col-5 text-end fw-semibold"><?= (int) $this->stats['sla']['resolved'] ?></dd>
                     </dl>
@@ -79,11 +81,13 @@ $this->inlineScript()->appendFile('https://cdnjs.cloudflare.com/ajax/libs/Chart.
                 </div>
                 <div class="card-body">
                     <div class="text-center mb-3">
-                        <div class="text-uppercase small text-muted">Avg Resolution</div>
-                        <div class="display-6 fw-semibold"><?= $this->stats['service']['avgResolutionDisplay'] ?></div>
-                        <small class="text-muted">This Month</small>
+                        <div class="text-uppercase small text-muted">Typical Resolution</div>
+                        <div class="display-6 fw-semibold"><?= $this->stats['service']['median'] ?></div>
+                        <small class="text-muted"><?= $this->escapeHtml($this->stats['periodLabel']) ?></small>
                     </div>
                     <dl class="row mb-0">
+                        <dt class="col-7 small text-muted">Mean</dt>
+                        <dd class="col-5 text-end small text-muted"><?= $this->stats['service']['mean'] ?></dd>
                         <dt class="col-7 text-uppercase small text-muted">Tickets Resolved</dt>
                         <dd class="col-5 text-end fw-semibold"><?= (int) $this->stats['service']['resolved'] ?></dd>
                     </dl>
@@ -200,7 +204,7 @@ foreach ($agentStats as $agent) {
         <div class="col-12 col-lg-5">
             <div class="card h-100">
                 <div class="card-header text-nowrap">
-                    Top Agents (This Month)
+                    Top Agents (<?= $this->escapeHtml($this->stats['periodLabel']) ?>)
                 </div>
                 <div class="card-body p-0">
                     <?php if (empty($topAgents)): ?>

@@ -16,6 +16,7 @@ use Doctrine\ORM\QueryBuilder;
 use Exception;
 use Organisation\Entity\Organisation;
 use ServiceLevel\Entity\SlaTarget;
+use ServiceLevel\Service\CalculateBusinessHours;
 use Ticket\Entity\Agent;
 use Ticket\Entity\Status;
 use Ticket\Entity\Ticket;
@@ -23,12 +24,19 @@ use Ticket\Entity\TicketResponse;
 use Ticket\Service\TicketService;
 
 use function array_map;
+use function array_sum;
+use function count;
+use function intdiv;
 use function intval;
 use function is_array;
 use function is_numeric;
+use function sort;
 
 class TicketRepository extends EntityRepository implements TicketRepositoryInterface
 {
+    /** @var array<int, CalculateBusinessHours> */
+    private array $businessHoursCalculators = [];
+
     /**
      * Find ticket by UUID
      *
@@ -688,14 +696,14 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         ?CarbonInterface $periodStart = null,
         ?CarbonInterface $periodEnd = null
     ): float {
-        return $this->averageResolutionHours($periodStart, $periodEnd, true);
+        return self::mean($this->resolutionHours($periodStart, $periodEnd, true));
     }
 
     public function findAverageResolutionTimeWithoutSla(
         ?CarbonInterface $periodStart = null,
         ?CarbonInterface $periodEnd = null
     ): float {
-        return $this->averageResolutionHours($periodStart, $periodEnd, false);
+        return self::mean($this->resolutionHours($periodStart, $periodEnd, false));
     }
 
     /**
@@ -703,18 +711,50 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
      *
      * @param bool $requiresSla true counts tickets carrying an SLA target, false those without
      */
-    private function averageResolutionHours(
+    /**
+     * Mean and median working hours taken to resolve tickets in the period.
+     *
+     * The mean on its own is misleading here: one ticket left open for months
+     * and cleared out drags a month of same-day work into the hundreds, so the
+     * median is reported beside it.
+     *
+     * @param bool $requiresSla true counts tickets carrying an SLA target, false those without
+     * @return array{mean: float, median: float, count: int}
+     */
+    public function findResolutionStats(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null,
+        bool $requiresSla = true
+    ): array {
+        $hours = $this->resolutionHours($periodStart, $periodEnd, $requiresSla);
+
+        return [
+            'mean'   => self::mean($hours),
+            'median' => self::median($hours),
+            'count'  => count($hours),
+        ];
+    }
+
+    /**
+     * Working hours between raising and resolving each ticket in the period.
+     *
+     * Measured against the organisation's business hours, because that is what
+     * every SLA target on the same screen is measured against. Organisations
+     * with no SLA have no working window, so those fall back to elapsed time.
+     *
+     * @return list<float>
+     */
+    private function resolutionHours(
         ?CarbonInterface $periodStart,
         ?CarbonInterface $periodEnd,
         bool $requiresSla
-    ): float {
+    ): array {
         /** @var Ticket[] $tickets */
         $tickets = $this->createResolvedTicketQueryBuilder($periodStart, $periodEnd, $requiresSla)
             ->getQuery()
             ->getResult();
 
-        $totalMinutes = 0;
-        $measured     = 0;
+        $hours = [];
 
         foreach ($tickets as $ticket) {
             $resolveDate = $ticket->getResolveDate();
@@ -722,16 +762,63 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
                 continue;
             }
 
-            $totalMinutes += Carbon::instance($ticket->getCreatedAt())
-                ->diffInMinutes(Carbon::instance($resolveDate));
-            $measured++;
+            $createdAt = Carbon::instance($ticket->getCreatedAt());
+            $resolved  = Carbon::instance($resolveDate);
+
+            $calculator = $this->businessHoursFor($ticket);
+            $minutes    = $calculator === null
+                ? $createdAt->diffInMinutes($resolved)
+                : $calculator->diffInBusinessMinutes($createdAt, $resolved);
+
+            $hours[] = $minutes / 60;
         }
 
-        if ($measured === 0) {
+        return $hours;
+    }
+
+    /**
+     * Business hours for a ticket's organisation, or null when it has no SLA
+     * and so no defined working window.
+     *
+     * Calculators are kept because one dashboard load walks every ticket
+     * resolved in the period, and most share a handful of business hours.
+     */
+    private function businessHoursFor(Ticket $ticket): ?CalculateBusinessHours
+    {
+        $sla = $ticket->getOrganisation()->getSla();
+        if ($sla === null) {
+            return null;
+        }
+
+        $businessHours = $sla->getBusinessHours();
+
+        return $this->businessHoursCalculators[$businessHours->getId() ?? 0]
+            ??= new CalculateBusinessHours($businessHours);
+    }
+
+    /** @param list<float> $values */
+    private static function mean(array $values): float
+    {
+        if ($values === []) {
             return 0.0;
         }
 
-        return ($totalMinutes / $measured) / 60;
+        return array_sum($values) / count($values);
+    }
+
+    /** @param list<float> $values */
+    private static function median(array $values): float
+    {
+        if ($values === []) {
+            return 0.0;
+        }
+
+        sort($values);
+        $middle = intdiv(count($values), 2);
+
+        return count($values) % 2 === 1
+            ? $values[$middle]
+            : ($values[$middle - 1] + $values[$middle]) / 2;
     }
 
     public function findResolvedTicketCountBySlaStatus(

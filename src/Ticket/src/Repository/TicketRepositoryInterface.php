@@ -106,6 +106,20 @@ interface TicketRepositoryInterface
         ?CarbonInterface $periodEnd = null
     ): float;
 
+    /**
+     * Mean and median working hours taken to resolve tickets in the period
+     *
+     * @param CarbonInterface|null $periodStart Start of period
+     * @param CarbonInterface|null $periodEnd End of period
+     * @param bool $requiresSla True counts tickets with an SLA target, false those without
+     * @return array{mean: float, median: float, count: int}
+     */
+    public function findResolutionStats(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null,
+        bool $requiresSla = true
+    ): array;
+
     public function findAverageResolutionTimeWithoutSla(
         ?CarbonInterface $periodStart = null,
         ?CarbonInterface $periodEnd = null

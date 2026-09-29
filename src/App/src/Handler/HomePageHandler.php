@@ -13,12 +13,16 @@ use Psr\Http\Server\RequestHandlerInterface;
 use Ticket\Repository\TicketRepositoryInterface;
 
 use function number_format;
+use function sprintf;
 
 /**
  * Display home page
  */
 class HomePageHandler implements RequestHandlerInterface
 {
+    /** Rolling window the dashboard reports over, in days */
+    private const REPORTING_DAYS = 30;
+
     private TemplateRendererInterface $renderer;
     private TicketRepositoryInterface $ticketRepo;
 
@@ -32,36 +36,38 @@ class HomePageHandler implements RequestHandlerInterface
 
     public function handle(ServerRequestInterface $request): ResponseInterface
     {
-        $endOfMonth   = Carbon::now('UTC')->endOfMonth();
-        $startOfMonth = Carbon::now('UTC')->startOfMonth();
+        $periodEnd   = Carbon::now('UTC');
+        $periodStart = $periodEnd->copy()->subDays(self::REPORTING_DAYS);
 
         $stats = [
-            'unresolved' => $this->ticketRepo->findUnresolvedTicketCount(),
-            'overdue'    => $this->ticketRepo->findOverdueTicketCount(),
-            'dueToday'   => $this->ticketRepo->findDueTodayTicketCount(),
-            'open'       => $this->ticketRepo->findOpenTicketCount(),
-            'hold'       => $this->ticketRepo->findOnHoldTicketCount(),
-            'created'    => $this->ticketRepo->findTotalTicketCount(),
-            'resolved'   => $this->ticketRepo->findResolvedTicketCount(),
-            'closed'     => $this->ticketRepo->findClosedTicketCount(),
+            'periodLabel' => sprintf('Last %d days', self::REPORTING_DAYS),
+            'unresolved'  => $this->ticketRepo->findUnresolvedTicketCount(),
+            'overdue'     => $this->ticketRepo->findOverdueTicketCount(),
+            'dueToday'    => $this->ticketRepo->findDueTodayTicketCount(),
+            'open'        => $this->ticketRepo->findOpenTicketCount(),
+            'hold'        => $this->ticketRepo->findOnHoldTicketCount(),
+            'created'     => $this->ticketRepo->findTotalTicketCount(),
+            'resolved'    => $this->ticketRepo->findResolvedTicketCount(),
+            'closed'      => $this->ticketRepo->findClosedTicketCount(),
         ];
 
-        // New metrics
-        $stats['sla']                         = [
-            'compliance'    => $this->ticketRepo->findSlaComplianceRate($startOfMonth, $endOfMonth),
-            'avgResolution' => $this->ticketRepo->findAverageResolutionTime($startOfMonth, $endOfMonth),
-            'resolved'      => $this->ticketRepo->findResolvedTicketCountBySlaStatus(true, $startOfMonth, $endOfMonth),
-        ];
-        $stats['sla']['avgResolutionDisplay'] = $this->formatResolutionDuration($stats['sla']['avgResolution']);
+        $slaResolution     = $this->ticketRepo->findResolutionStats($periodStart, $periodEnd, true);
+        $serviceResolution = $this->ticketRepo->findResolutionStats($periodStart, $periodEnd, false);
 
-        $stats['service']                         = [
-            'avgResolution' => $this->ticketRepo->findAverageResolutionTimeWithoutSla($startOfMonth, $endOfMonth),
-            'resolved'      => $this->ticketRepo->findResolvedTicketCountBySlaStatus(false, $startOfMonth, $endOfMonth),
+        $stats['sla'] = [
+            'compliance' => $this->ticketRepo->findSlaComplianceRate($periodStart, $periodEnd),
+            'resolved'   => $slaResolution['count'],
+            'median'     => $this->formatResolutionDuration($slaResolution['median']),
+            'mean'       => $this->formatResolutionDuration($slaResolution['mean']),
         ];
-        $stats['service']['avgResolutionDisplay'] = $this->formatResolutionDuration($stats['service']['avgResolution']);
 
-        $agentStats     = $this->ticketRepo->findAllAgentStats($startOfMonth, $endOfMonth);
-        $stats['agent'] = $agentStats;
+        $stats['service'] = [
+            'resolved' => $serviceResolution['count'],
+            'median'   => $this->formatResolutionDuration($serviceResolution['median']),
+            'mean'     => $this->formatResolutionDuration($serviceResolution['mean']),
+        ];
+
+        $stats['agent'] = $this->ticketRepo->findAllAgentStats($periodStart, $periodEnd);
 
         return new HtmlResponse($this->renderer->render('app::home-page', [
             'stats' => $stats,
