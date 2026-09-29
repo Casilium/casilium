@@ -255,7 +255,7 @@ class TicketService
         $type = $this->findTypeById($data['type_id']);
         $ticket->setType($type);
 
-        // assign sla target if organisation has sla
+        // save() is the edit path too, so retyping away from incident clears it
         if (
             ($ticket->getType()->getId() === $ticket->getType()::TYPE_INCIDENT
                 || $ticket->getType()->getId() === $ticket->getType()::TYPE_PROBLEM
@@ -263,6 +263,8 @@ class TicketService
             && $organisation->hasSla()
         ) {
             $ticket->setSlaTarget($organisation->getSla()->getSlaTarget($ticket->getPriority()->getId()));
+        } else {
+            $ticket->setSlaTarget(null);
         }
 
         $dueDate = $data['due_date'] ?? null;
