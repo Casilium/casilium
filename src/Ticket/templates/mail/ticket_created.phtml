@@ -4,7 +4,7 @@ $ticket = $this->ticket;
 $created = (clone $ticket->getCreatedAt())->setTimezone(new \DateTimeZone('Europe/London'));
 ?>
 <p>
-    <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>,
+    Hi <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>,
 </p>
 <p>
     Thank you for contacting us a support case has been opened for you. We will review the

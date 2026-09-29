@@ -25,7 +25,7 @@
     <strong>Comments:</strong>
 </p>
 <p>
-    <?= $this->escapeHtml($response->getContact()->getFirstName()) ?>,
+    Hi <?= $this->escapeHtml($response->getContact()->getFirstName()) ?>,
 </p>
 <?php if ((int) $response->getIsPublic() === 1 && $response->getResponse() !== null): ?>
 <p>
