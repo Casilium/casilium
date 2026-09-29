@@ -75,8 +75,12 @@ class OverdueDigest extends Command
                     ];
                 }
 
-                $due       = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate(), 'UTC');
-                $overdueBy = $this->formatDuration($due, Carbon::now('UTC'));
+                $dueDate = $ticket->getDueDate();
+                if (null === $dueDate) {
+                    continue;
+                }
+
+                $overdueBy = $this->formatDuration(Carbon::instance($dueDate), Carbon::now('UTC'));
 
                 $assignedAgent = $ticket->getAssignedAgent();
                 $assignedTo    = $assignedAgent ? $assignedAgent->getFullName() : 'Unassigned';
@@ -95,7 +99,7 @@ class OverdueDigest extends Command
                 $queues[$queueId]['tickets'][] = [
                     'id'           => $ticket->getId(),
                     'summary'      => $ticket->getShortDescription(),
-                    'dueDate'      => $ticket->getDueDate(),
+                    'dueDate'      => $dueDate->format(Ticket::DATE_FORMAT),
                     'overdueBy'    => $overdueBy,
                     'status'       => $statusName,
                     'assignedTo'   => $assignedTo,
@@ -130,7 +134,7 @@ class OverdueDigest extends Command
                 $body = $this->mailService->prepareBody('ticket_mail::ticket_overdue_digest', [
                     'queueName'   => $group['name'],
                     'tickets'     => $group['tickets'],
-                    'generatedAt' => Carbon::now('UTC')->format('Y-m-d H:i:s'),
+                    'generatedAt' => Carbon::now('UTC')->format(Ticket::DATE_FORMAT),
                 ]);
 
                 foreach ($members as $member) {

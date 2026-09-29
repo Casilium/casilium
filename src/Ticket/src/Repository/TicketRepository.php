@@ -23,7 +23,6 @@ use Ticket\Entity\TicketResponse;
 use Ticket\Service\TicketService;
 
 use function array_map;
-use function count;
 use function intval;
 use function is_array;
 use function is_numeric;
@@ -236,7 +235,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             $now = new DateTime('now', new DateTimeZone('UTC'));
             $qb->andWhere('t.dueDate < :now')
                 ->andWhere('t.status < :resolvedStatus')
-                ->setParameter('now', $now->format('Y-m-d H:i:s'))
+                ->setParameter('now', $now->format(Ticket::DATE_FORMAT))
                 ->setParameter('resolvedStatus', Ticket::STATUS_RESOLVED);
         }
 
@@ -338,7 +337,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         return (int) $this->createQueryBuilder('t')
             ->select('COUNT(t.id)')
             ->where('t.dueDate < :date')
-            ->setParameter('date', $today->format('Y-m-d H:i:s'))
+            ->setParameter('date', $today->format(Ticket::DATE_FORMAT))
             ->andWhere('t.status < :status')
             ->setParameter('status', Ticket::STATUS_RESOLVED)
             ->getQuery()
@@ -469,7 +468,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         $sql .= 'SET t.status = 5,t.closeDate = :closed WHERE t.status = 4 AND t.resolveDate < :dateMin';
         return $this->getEntityManager()
             ->createQuery($sql)
-            ->setParameter('closed', Carbon::now('UTC')->format('Y-m-d H:i:s'))
+            ->setParameter('closed', Carbon::now('UTC')->format(Ticket::DATE_FORMAT))
             ->setParameter('dateMin', $today)
             ->execute();
     }
@@ -501,8 +500,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->select('t')
             ->from(Ticket::class, 't')
             ->andWhere('t.dueDate BETWEEN :dateMin AND :dateMax')
-            ->setParameter('dateMin', $date->format('Y-m-d H:i:s'))
-            ->setParameter('dateMax', $inFuture->format('Y-m-d H:i:s'))
+            ->setParameter('dateMin', $date->format(Ticket::DATE_FORMAT))
+            ->setParameter('dateMax', $inFuture->format(Ticket::DATE_FORMAT))
             ->andWhere('t.status <= 2');
 
         return $qb->getQuery()->getResult();
@@ -517,7 +516,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->from(Ticket::class, 't')
             ->andWhere('t.dueDate < :today')
             ->andWhere('t.lastNotified < t.dueDate')
-            ->setParameter('today', $now->format('Y-m-d H:i:s'))
+            ->setParameter('today', $now->format(Ticket::DATE_FORMAT))
             ->andWhere('t.status <= 3')
             ->getQuery()
             ->getResult();
@@ -531,7 +530,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->select('t')
             ->from(Ticket::class, 't')
             ->andWhere('t.dueDate < :today')
-            ->setParameter('today', $now->format('Y-m-d H:i:s'))
+            ->setParameter('today', $now->format(Ticket::DATE_FORMAT))
             ->andWhere('t.status <= 3')
             ->getQuery()
             ->getResult();
@@ -546,7 +545,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             ->from(Ticket::class, 't')
             ->where('t.status = :t_status')
             ->andWhere('t.waitingResetDate < :date_now OR t.waitingResetDate is null')
-            ->setParameter('date_now', $now->format('Y-m-d H:i:s'))
+            ->setParameter('date_now', $now->format(Ticket::DATE_FORMAT))
             ->andWhere('t.status = :t_status')
             ->setParameter('t_status', Status::STATUS_ON_HOLD)
             ->getQuery()
@@ -576,8 +575,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         if ($periodStart && $periodEnd !== null) {
             $qb->andWhere('t.createdAt BETWEEN :dateMin AND :dateMax')
-                ->setParameter('dateMin', $periodStart->format('Y-m-d H:i:s'))
-                ->setParameter('dateMax', $periodEnd->format('Y-m-d H:i:s'));
+                ->setParameter('dateMin', $periodStart->format(Ticket::DATE_FORMAT))
+                ->setParameter('dateMax', $periodEnd->format(Ticket::DATE_FORMAT));
         }
 
         $stats['open'] = $qb->getQuery()->getSingleScalarResult();
@@ -600,8 +599,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
             if ($periodStart && $periodEnd !== null) {
                 $qb->andWhere('t.responseDate BETWEEN :dateMin AND :dateMax')
-                    ->setParameter('dateMin', $periodStart->format('Y-m-d H:i:s'))
-                    ->setParameter('dateMax', $periodEnd->format('Y-m-d H:i:s'));
+                    ->setParameter('dateMin', $periodStart->format(Ticket::DATE_FORMAT))
+                    ->setParameter('dateMax', $periodEnd->format(Ticket::DATE_FORMAT));
             }
 
             $stats[Status::getStatusTextFromId($statusType->getId())] = $qb->getQuery()->getSingleScalarResult();
@@ -665,8 +664,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         if ($periodStart && $periodEnd) {
             $qb->andWhere('t.resolveDate BETWEEN :start AND :end')
-                ->setParameter('start', $periodStart->format('Y-m-d H:i:s'))
-                ->setParameter('end', $periodEnd->format('Y-m-d H:i:s'));
+                ->setParameter('start', $periodStart->format(Ticket::DATE_FORMAT))
+                ->setParameter('end', $periodEnd->format(Ticket::DATE_FORMAT));
         }
 
         if ($requiresSla === true) {
@@ -689,48 +688,50 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         ?CarbonInterface $periodStart = null,
         ?CarbonInterface $periodEnd = null
     ): float {
-        $qb = $this->createResolvedTicketQueryBuilder($periodStart, $periodEnd, true);
-
-        /** @var Ticket[] $tickets */
-        $tickets = $qb->getQuery()->getResult();
-
-        if (empty($tickets)) {
-            return 0.0;
-        }
-
-        $totalMinutes = 0;
-
-        foreach ($tickets as $ticket) {
-            $createdAt     = Carbon::parse($ticket->getCreatedAt(), 'UTC');
-            $resolveDate   = Carbon::parse($ticket->getResolveDate(), 'UTC');
-            $totalMinutes += $createdAt->diffInMinutes($resolveDate);
-        }
-
-        return ($totalMinutes / count($tickets)) / 60;
+        return $this->averageResolutionHours($periodStart, $periodEnd, true);
     }
 
     public function findAverageResolutionTimeWithoutSla(
         ?CarbonInterface $periodStart = null,
         ?CarbonInterface $periodEnd = null
     ): float {
-        $qb = $this->createResolvedTicketQueryBuilder($periodStart, $periodEnd, false);
+        return $this->averageResolutionHours($periodStart, $periodEnd, false);
+    }
 
+    /**
+     * Mean hours between a ticket being raised and resolved.
+     *
+     * @param bool $requiresSla true counts tickets carrying an SLA target, false those without
+     */
+    private function averageResolutionHours(
+        ?CarbonInterface $periodStart,
+        ?CarbonInterface $periodEnd,
+        bool $requiresSla
+    ): float {
         /** @var Ticket[] $tickets */
-        $tickets = $qb->getQuery()->getResult();
+        $tickets = $this->createResolvedTicketQueryBuilder($periodStart, $periodEnd, $requiresSla)
+            ->getQuery()
+            ->getResult();
 
-        if (empty($tickets)) {
+        $totalMinutes = 0;
+        $measured     = 0;
+
+        foreach ($tickets as $ticket) {
+            $resolveDate = $ticket->getResolveDate();
+            if (null === $resolveDate) {
+                continue;
+            }
+
+            $totalMinutes += Carbon::instance($ticket->getCreatedAt())
+                ->diffInMinutes(Carbon::instance($resolveDate));
+            $measured++;
+        }
+
+        if ($measured === 0) {
             return 0.0;
         }
 
-        $totalMinutes = 0;
-
-        foreach ($tickets as $ticket) {
-            $createdAt     = Carbon::parse($ticket->getCreatedAt(), 'UTC');
-            $resolveDate   = Carbon::parse($ticket->getResolveDate(), 'UTC');
-            $totalMinutes += $createdAt->diffInMinutes($resolveDate);
-        }
-
-        return ($totalMinutes / count($tickets)) / 60;
+        return ($totalMinutes / $measured) / 60;
     }
 
     public function findResolvedTicketCountBySlaStatus(
@@ -768,8 +769,8 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
 
         if ($periodStart && $periodEnd) {
             $qb->andWhere('t.resolveDate BETWEEN :start AND :end')
-                ->setParameter('start', $periodStart->format('Y-m-d H:i:s'))
-                ->setParameter('end', $periodEnd->format('Y-m-d H:i:s'));
+                ->setParameter('start', $periodStart->format(Ticket::DATE_FORMAT))
+                ->setParameter('end', $periodEnd->format(Ticket::DATE_FORMAT));
         }
 
         if (null !== $organisationId) {
@@ -785,26 +786,26 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
         /** @var Ticket[] $tickets */
         $tickets = $qb->getQuery()->getResult();
 
-        if (empty($tickets)) {
-            return [
-                'total'  => 0,
-                'within' => 0,
-            ];
-        }
-
+        $measured  = 0;
         $withinSla = 0;
 
         foreach ($tickets as $ticket) {
-            $resolveDate = Carbon::parse($ticket->getResolveDate(), 'UTC');
-            $dueDate     = Carbon::parse($ticket->getDueDate(), 'UTC');
+            $resolveDate = $ticket->getResolveDate();
+            $dueDate     = $ticket->getDueDate();
 
-            if ($resolveDate->lte($dueDate)) {
+            if (null === $resolveDate || null === $dueDate) {
+                continue;
+            }
+
+            $measured++;
+
+            if ($resolveDate <= $dueDate) {
                 $withinSla++;
             }
         }
 
         return [
-            'total'  => count($tickets),
+            'total'  => $measured,
             'within' => $withinSla,
         ];
     }

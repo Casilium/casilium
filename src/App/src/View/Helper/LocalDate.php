@@ -5,7 +5,7 @@ declare(strict_types=1);
 namespace App\View\Helper;
 
 use Carbon\Carbon;
-use Carbon\CarbonInterface;
+use DateTimeInterface;
 use Laminas\View\Helper\AbstractHelper;
 
 class LocalDate extends AbstractHelper
@@ -23,23 +23,20 @@ class LocalDate extends AbstractHelper
     }
 
     /**
-     * @param mixed $date date to parse
-     * @param string|null $format date format
-     * @return CarbonInterface carbon instance of date
+     * Render a date in the display timezone.
+     *
+     * Only accepts a DateTimeInterface. A string carries no timezone, so
+     * accepting one would mean guessing which zone it was written in.
+     *
+     * @param DateTimeInterface|null $date date to render, or null for now
+     * @param string|null $format date format, defaults to the configured one
      */
-    public function __invoke($date = null, $format = null): string
+    public function __invoke(?DateTimeInterface $date = null, ?string $format = null): string
     {
-        if ($date === null) {
-            $date = Carbon::now($this->timezone);
-        } else {
-            $date = Carbon::createFromFormat('Y-m-d H:i:s', $date);
-            $date->setTimezone($this->timezone);
-        }
+        $date = $date === null
+            ? Carbon::now($this->timezone)
+            : Carbon::instance($date)->setTimezone($this->timezone);
 
-        if ($format === null) {
-            return $date->format($this->format);
-        }
-
-        return $date->format($format);
+        return $date->format($format ?? $this->format);
     }
 }

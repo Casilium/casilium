@@ -133,12 +133,12 @@ $filters = $this->filters ?? [];
                 <span class="text-muted">
                     <small>
                     Due
-                    <time class="timeago" datetime="<?= $ticket->getDueDate() ?>">
-                    <?= $ticket->getDueDate() ?>
+                    <time class="timeago" datetime="<?= $ticket->getDueDate()?->format('c') ?>">
+                    <?= $this->localDate($ticket->getDueDate()) ?>
                     </time>,
                     created
-                    <time class="timeago" datetime="<?= $ticket->getCreatedAt() ?>">
-                        <?= $ticket->getCreatedAt() ?>
+                    <time class="timeago" datetime="<?= $ticket->getCreatedAt()->format('c') ?>">
+                        <?= $this->localDate($ticket->getCreatedAt()) ?>
                     </time>
                         by
                         <?php
@@ -159,14 +159,14 @@ $filters = $this->filters ?? [];
                 <?php if (null !== $ticket->getLastResponseDate()): ?>
                 <small>
                     <time class="timeago text-muted"
-                          datetime="<?= $this->localDate($ticket->getLastResponseDate(), 'Y-m-d H:i:s') ?>">
+                          datetime="<?= $ticket->getLastResponseDate()?->format('c') ?>">
                       <?= $this->localDate($ticket->getLastResponseDate()) ?>
                     </time>
                 </small>
                 <?php else: ?>
                     <?php if ($ticket->hasSla()): ?>
                     <small class="text-warning">
-                        Response due <time class="timeago" datetime="<?= $ticket->getResponseDueDate() ?>">
+                        Response due <time class="timeago" datetime="<?= $ticket->getResponseDueDate()->format('c') ?>">
                             <?= $ticket->getResponseDueDate() ?>
                         </time>
                     </small>
@@ -175,15 +175,10 @@ $filters = $this->filters ?? [];
                     <?php endif ?>
                 <?php endif ?>
                 <br>
-                <?php
-                    $dt = new \DateTime('now');
-                    $dtDue = new \DateTime($ticket->getDueDate());
-
-                    if ($dt->getTimestamp() >  $dtDue->getTimestamp()
+                <?php if ($ticket->isOverdue()
                         && $ticket->getStatus()->getId() <= $ticket::STATUS_ON_HOLD) : ?>
                         <span class="badge badge-danger">Overdue</span>
-                    <?php endif
-                ?>
+                <?php endif ?>
 
             </div>
             <div class="col-sm-1">

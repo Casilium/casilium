@@ -1,7 +1,7 @@
 <?php
 /** @var \Ticket\Entity\Ticket $ticket */
 $ticket = $this->ticket;
-$created = new \DateTime($ticket->getCreatedAt(), new \DateTimeZone('Europe/London'));
+$created = (clone $ticket->getCreatedAt())->setTimezone(new \DateTimeZone('Europe/London'));
 ?>
 <p>
     <?= $this->escapeHtml($ticket->getContact()->getFirstName()) ?>,

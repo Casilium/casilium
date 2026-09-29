@@ -4,14 +4,15 @@ declare(strict_types=1);
 
 namespace Ticket\Entity;
 
+use DateTime;
+use DateTimeInterface;
+use DateTimeZone;
 use Doctrine\ORM\Mapping as ORM;
 use OrganisationContact\Entity\Contact;
 use Ticket\Entity\Ticket;
 use Ticket\Repository\TicketResponseRepository;
 
-use function date;
 use function get_object_vars;
-use function time;
 
 #[ORM\Entity(repositoryClass: TicketResponseRepository::class)]
 #[ORM\Table(name: 'ticket_response')]
@@ -33,8 +34,8 @@ class TicketResponse
     #[ORM\Column(name: 'response', type: 'string')]
     private string $response;
 
-    #[ORM\Column(name: 'response_date', type: 'string')]
-    private string $responseDate;
+    #[ORM\Column(name: 'response_date', type: 'utcdatetime')]
+    private DateTimeInterface $responseDate;
 
     #[ORM\ManyToOne(targetEntity: Ticket::class, inversedBy: 'response')]
     #[ORM\JoinColumn(name: 'ticket_id', referencedColumnName: 'id')]
@@ -49,7 +50,7 @@ class TicketResponse
 
     public function __construct()
     {
-        $this->responseDate = date('Y-m-d H:i:s', time());
+        $this->responseDate = new DateTime('now', new DateTimeZone('UTC'));
         $this->isPublic     = 1;
     }
 
@@ -97,12 +98,12 @@ class TicketResponse
         return $this;
     }
 
-    public function getResponseDate(): string
+    public function getResponseDate(): DateTimeInterface
     {
         return $this->responseDate;
     }
 
-    public function setResponseDate(string $responseDate): TicketResponse
+    public function setResponseDate(DateTimeInterface $responseDate): TicketResponse
     {
         $this->responseDate = $responseDate;
         return $this;

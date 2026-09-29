@@ -6,6 +6,7 @@ namespace Report\Service;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
+use DateTimeInterface;
 use Organisation\Entity\Organisation;
 use Organisation\Service\OrganisationManager;
 use Ticket\Entity\Ticket;
@@ -249,13 +250,13 @@ class ReportService
         ];
     }
 
-    private function formatReportDate(?string $value): string
+    private function formatReportDate(?DateTimeInterface $value): string
     {
-        if (null === $value || '' === $value) {
+        if (null === $value) {
             return '-';
         }
 
-        return Carbon::parse($value, 'UTC')->format('d M Y');
+        return $value->format('d M Y');
     }
 
     /**

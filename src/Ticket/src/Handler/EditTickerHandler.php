@@ -16,6 +16,7 @@ use Psr\Http\Message\ServerRequestInterface;
 use Psr\Http\Server\RequestHandlerInterface;
 use Ticket\Entity\Agent;
 use Ticket\Entity\Queue;
+use Ticket\Entity\Ticket;
 use Ticket\Form\TicketForm;
 use Ticket\Hydrator\TicketHydrator;
 use Ticket\Service\TicketService;
@@ -65,7 +66,7 @@ class EditTickerHandler implements RequestHandlerInterface
         $form->get('urgency')->setValue($ticket->getUrgency());
         //$form->get('priority_id')->setValue($ticket->getPriority()->getId());
         $form->get('type_id')->setValue($ticket->getType()->getId());
-        $form->get('due_date')->setValue($ticket->getDueDate());
+        $form->get('due_date')->setValue($ticket->getDueDate()?->format(Ticket::DATE_FORMAT));
 
         if ($request->getMethod() === 'POST') {
             $form->setData($request->getParsedBody());

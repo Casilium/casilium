@@ -198,7 +198,7 @@ class OverdueDigestTest extends TestCase
         $ticket->method('getId')->willReturn($id);
         $ticket->method('getShortDescription')->willReturn(sprintf('Ticket %d', $id));
         $ticket->method('getDueDate')->willReturn(
-            Carbon::now('UTC')->subHour()->format('Y-m-d H:i:s')
+            Carbon::now('UTC')->subHour()->toDateTime()
         );
         $ticket->method('getQueue')->willReturn($queue);
         $ticket->method('getAssignedAgent')->willReturn($agent);

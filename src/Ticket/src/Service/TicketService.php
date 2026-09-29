@@ -6,6 +6,7 @@ namespace Ticket\Service;
 
 use Carbon\Carbon;
 use DateTime;
+use DateTimeZone;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Laminas\EventManager\EventManagerInterface;
@@ -59,6 +60,8 @@ class TicketService
 
     protected MailService $mailService;
 
+    private string $displayTimezone;
+
     public function __construct(
         EventManagerInterface $eventManager,
         EntityManager $entityManager,
@@ -67,7 +70,8 @@ class TicketService
         ContactService $contactService,
         QueueManager $queueManager,
         UserManager $userManager,
-        MailService $mailService
+        MailService $mailService,
+        string $displayTimezone = 'Europe/London'
     ) {
         $this->eventManager        = $eventManager;
         $this->entityManager       = $entityManager;
@@ -77,6 +81,7 @@ class TicketService
         $this->queueManager        = $queueManager;
         $this->userManager         = $userManager;
         $this->mailService         = $mailService;
+        $this->displayTimezone     = $displayTimezone;
     }
 
     public function getOrganisationByUuid(string $uuid): Organisation
@@ -193,6 +198,19 @@ class TicketService
      *
      * @param array $data
      */
+    /**
+     * Read a date submitted on a form.
+     *
+     * Form fields show local time, so a submitted value is wall-clock in the
+     * display timezone rather than UTC.
+     */
+    private function parseSubmittedDate(string $value): DateTime
+    {
+        return Carbon::createFromFormat(Ticket::DATE_FORMAT, $value, $this->displayTimezone)
+            ->utc()
+            ->toDateTime();
+    }
+
     public function save(array $data): Ticket
     {
         $id = $data['id'] ?? 0;
@@ -249,7 +267,7 @@ class TicketService
 
         $dueDate = $data['due_date'] ?? null;
         if (! empty($dueDate)) {
-            $ticket->setDueDate($dueDate);
+            $ticket->setDueDate($this->parseSubmittedDate($dueDate));
         } else {
             $date = Carbon::now('UTC');
 
@@ -260,13 +278,13 @@ class TicketService
                     $date,
                     $organisation->getSla()->getSlaTarget($priority->getId())->getResolveTime()
                 );
-                $ticket->setDueDate($result->format('Y-m-d H:i:s'));
+                $ticket->setDueDate($result->utc()->toDateTime());
             }
         }
 
         $firstResponseDue = $data['first_response_due'] ?? null;
         if (! empty($firstResponseDue)) {
-            $ticket->setFirstResponseDue($firstResponseDue);
+            $ticket->setFirstResponseDue($this->parseSubmittedDate($firstResponseDue));
         } else {
             $date = Carbon::now('UTC');
 
@@ -276,7 +294,7 @@ class TicketService
                     $date,
                     $organisation->getSla()->getSlaTarget($priority->getId())->getResponseTime()
                 );
-                $ticket->setFirstResponseDue($result->format('Y-m-d H:i:s'));
+                $ticket->setFirstResponseDue($result->utc()->toDateTime());
             }
         }
 
@@ -297,8 +315,7 @@ class TicketService
         $ticket = $this->findTicketById($id);
         $ticket->setStatus($status);
 
-        $dt = new DateTime('now');
-        $ticket->setLastResponseDate($dt->format('Y-m-d H:i:s'));
+        $ticket->setLastResponseDate(new DateTime('now', new DateTimeZone('UTC')));
 
         $this->entityManager->flush();
 
@@ -362,7 +379,7 @@ class TicketService
                         $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_ON_HOLD);
 
                         // set hold date
-                        $ticket->setWaitingDate(Carbon::now('UTC')->format('Y-m-d H:i:s'));
+                        $ticket->setWaitingDate(Carbon::now('UTC')->toDateTime());
                     } else {
                         // if on hold, place in progress.
                         $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_IN_PROGRESS);
@@ -374,7 +391,7 @@ class TicketService
                     break;
                 case 'save_resolve':
                     $ticketStatus = $this->updateStatus($ticket->getId(), Status::STATUS_RESOLVED);
-                    $ticket->setResolveDate(Carbon::now('UTC')->format('Y-m-d H:i:s'));
+                    $ticket->setResolveDate(Carbon::now('UTC')->toDateTime());
                     break;
                 default:
                     // update ticket status to IN PROGRESS if currently OPEN or RESOLVED
@@ -394,10 +411,10 @@ class TicketService
         /** @var TicketResponse[] $responses */
         $responses = $this->findTicketResponses($ticket->getId());
         if (empty($responses)) {
-            $ticket->setFirstResponseDate(Carbon::now()->format('Y-m-d H:i:s'));
+            $ticket->setFirstResponseDate(Carbon::now('UTC')->toDateTime());
         }
 
-        $ticket->setLastResponseDate(Carbon::now()->format('Y-m-d H:i:s'));
+        $ticket->setLastResponseDate(Carbon::now('UTC')->toDateTime());
 
         $response = new TicketResponse();
         $ticket->setStatus($ticketStatus);
@@ -428,12 +445,16 @@ class TicketService
             return false;
         }
 
-        $now            = Carbon::now('UTC');
-        $due            = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate(), 'UTC');
-        $lastNotifiedAt = $ticket->getLastNotified() ?? $ticket->getCreatedAt();
-        $lastNotified   = Carbon::createFromFormat('Y-m-d H:i:s', $lastNotifiedAt, 'UTC');
+        $dueDate = $ticket->getDueDate();
+        if (null === $dueDate) {
+            return false;
+        }
 
-        $notifyAt = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate(), 'UTC');
+        $now          = Carbon::now('UTC');
+        $due          = Carbon::instance($dueDate);
+        $lastNotified = Carbon::instance($ticket->getLastNotified() ?? $ticket->getCreatedAt());
+
+        $notifyAt = Carbon::instance($dueDate);
         switch ($period) {
             case self::DUE_PERIOD_MINUTES:
                 $notifyAt->subMinutes($target);
@@ -455,9 +476,9 @@ class TicketService
         /*
         echo sprintf(
             "-- Due: %s, Notify at: %s, Last notified: %s\n",
-            $due->format('Y-m-d H:i:s'),
-            $notifyAt->format('Y-m-d H:i:s'),
-            $lastNotified->format('Y-m-d H:i:s')
+            $due->format(Ticket::DATE_FORMAT),
+            $notifyAt->format(Ticket::DATE_FORMAT),
+            $lastNotified->format(Ticket::DATE_FORMAT)
         );
         */
 
@@ -485,7 +506,7 @@ class TicketService
                 $this->mailService->send($agent->getEmail(), $subject, $body);
             }
 
-            $ticket->setLastNotified($now->format('Y-m-d H:i:s'));
+            $ticket->setLastNotified($now->toDateTime());
             $this->entityManager->flush();
 
             return true; // Email was sent
@@ -523,7 +544,7 @@ class TicketService
             $this->mailService->send($member->getEmail(), $subject, $body);
         }
 
-        $ticket->setLastNotified(Carbon::now('UTC')->format('Y-m-d H:i:s'));
+        $ticket->setLastNotified(Carbon::now('UTC')->toDateTime());
         $this->entityManager->flush();
 
         return true; // Email was sent
@@ -573,7 +594,7 @@ class TicketService
             'queue'        => $queueName,
             'status'       => $statusName,
             'assignedTo'   => $assignedTo,
-            'dueDate'      => $ticket->getDueDate(),
+            'dueDate'      => $ticket->getDueDate()?->format(Ticket::DATE_FORMAT),
             'lastUpdated'  => $this->getLastUpdatedAt($ticket),
         ];
     }
@@ -593,10 +614,12 @@ class TicketService
 
     private function calculateOverdueTime(Ticket $ticket): string
     {
-        $now = Carbon::now('UTC');
-        $due = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate(), 'UTC');
+        $dueDate = $ticket->getDueDate();
+        if (null === $dueDate) {
+            return '0 minutes';
+        }
 
-        return $this->formatDuration($due, $now);
+        return $this->formatDuration(Carbon::instance($dueDate), Carbon::now('UTC'));
     }
 
     private function formatDuration(Carbon $from, Carbon $to): string
@@ -623,12 +646,9 @@ class TicketService
 
     private function getLastUpdatedAt(Ticket $ticket): string
     {
-        $lastResponseDate = $ticket->getLastResponseDate();
-        if ($lastResponseDate !== null && $lastResponseDate !== '') {
-            return $lastResponseDate;
-        }
+        $lastUpdated = $ticket->getLastResponseDate() ?? $ticket->getCreatedAt();
 
-        return $ticket->getCreatedAt();
+        return $lastUpdated->format(Ticket::DATE_FORMAT);
     }
 
     /**
@@ -810,15 +830,15 @@ class TicketService
             }
 
             // get due date as carbon object
-            $dueDate = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate(), 'UTC');
+            $dueDate = Carbon::instance($ticket->getDueDate());
             $wasDue  = $dueDate->clone();
 
             // get waiting date as carbon object
-            $waitingDate = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getWaitingDate(), 'UTC');
+            $waitingDate = Carbon::instance($ticket->getWaitingDate());
 
             // get last reset date (if set) as carbon object
-            $waitingResetDate = $ticket->getWaitingResetDate()
-                ? Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getWaitingResetDate())
+            $waitingResetDate = $ticket->getWaitingResetDate() !== null
+                ? Carbon::instance($ticket->getWaitingResetDate())
                 : null;
 
             // update the due date
@@ -862,12 +882,12 @@ class TicketService
             }
 
             // update due date and set the last reset date to now
-            $ticket->setDueDate($dueDate->format('Y-m-d H:i:s'));
-            $ticket->setWaitingResetDate($now->format('Y-m-d H:i:s'));
+            $ticket->setDueDate($dueDate->copy()->utc()->toDateTime());
+            $ticket->setWaitingResetDate($now->toDateTime());
 
             $updateStatus[$ticket->getId()] = [
-                'was_due' => $wasDue->format('Y-m-d H:i:s'),
-                'now_due' => $dueDate->format('Y-m-d H:i:s'),
+                'was_due' => $wasDue->format(Ticket::DATE_FORMAT),
+                'now_due' => $dueDate->format(Ticket::DATE_FORMAT),
             ];
 
             // write ticket changes

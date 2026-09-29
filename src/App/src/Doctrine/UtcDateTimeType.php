@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace App\Doctrine;
 
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\Types\DateTimeType;
@@ -16,8 +17,10 @@ class UtcDateTimeType extends DateTimeType
 
     public function convertToDatabaseValue(mixed $value, AbstractPlatform $platform): ?string
     {
-        if ($value instanceof DateTime) {
-            $value->setTimezone(self::getUtc());
+        if ($value instanceof DateTimeInterface) {
+            // Parent only takes DateTime. createFromInterface copies, so the
+            // caller's instance keeps its own timezone.
+            $value = DateTime::createFromInterface($value)->setTimezone(self::getUtc());
         }
 
         return parent::convertToDatabaseValue($value, $platform);

@@ -88,8 +88,8 @@
                     <?php foreach ($responses as $response): ?>
                     <p class="text-muted">
                         <small>
-                            <time class="timeago " datetime="<?= $this->escapeHtml($response->getResponseDate()) ?>">
-                                <?= $this->escapeHtml($response->getResponseDate()) ?>
+                            <time class="timeago " datetime="<?= $this->escapeHtml($response->getResponseDate()->format('c')) ?>">
+                                <?= $this->escapeHtml($this->localDate($response->getResponseDate())) ?>
                             </time>
                             by
                             <?php if (null !== $response->getAgent()) {
@@ -241,7 +241,7 @@
                     <p>
                         <small class="text-light">Response Due</small><br>
                         <time class="timeago"
-                              datetime="<?= $this->localDate($ticket->getResponseDueDate(), 'Y-m-d H:i:s') ?>">
+                              datetime="<?= $ticket->getResponseDueDate()->format('c') ?>">
                             <?= $this->localDate($ticket->getResponseDueDate()) ?>
                         </time>
                     </p>
@@ -249,7 +249,7 @@
                     <p>
                         <small class="text-light">Due Date</small><br>
                         <?php if ($ticket->getDueDate() !== null): ?>
-                        <time class="timeago" datetime="<?= $this->localDate($ticket->getDueDate(), 'Y-m-d H:i:s') ?>">
+                        <time class="timeago" datetime="<?= $ticket->getDueDate()?->format('c') ?>">
                             <?= $this->localDate($ticket->getDueDate()) ?>
                         <?php else: ?>
                             ???
@@ -323,8 +323,8 @@
                     ?>
                         <p>
                             <small class="text-muted">
-                                <time class="timeago" datetime="<?= $recentTicket->getCreatedAt() ?>">
-                                    <?= $recentTicket->getCreatedAt() ?>
+                                <time class="timeago" datetime="<?= $recentTicket->getCreatedAt()->format('c') ?>">
+                                    <?= $this->localDate($recentTicket->getCreatedAt()) ?>
                                 </time>
                             </small><br/>
                             <a href="<?= $this->url('ticket.view', ['ticket_id' => $recentTicket->getUuid()]) ?>">

@@ -155,9 +155,13 @@ class Notifications extends Command
 
             foreach ($tickets as $ticket) {
                 try {
+                    $dueDate = $ticket->getDueDate();
+                    if (null === $dueDate) {
+                        continue;
+                    }
+
                     $now     = Carbon::now('UTC');
-                    $due     = Carbon::createFromFormat('Y-m-d H:i:s', $ticket->getDueDate());
-                    $seconds = $now->diffInSeconds($due);
+                    $seconds = $now->diffInSeconds(Carbon::instance($dueDate));
 
                     $wasSent = $this->ticketService->sendNotificationEmail($ticket, $target, $targetType);
 

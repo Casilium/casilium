@@ -5,6 +5,7 @@ declare(strict_types=1);
 namespace TicketTest\Service;
 
 use Carbon\Carbon;
+use DateTimeInterface;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -21,6 +22,7 @@ use PHPUnit\Framework\TestCase;
 use Prophecy\Argument;
 use Prophecy\PhpUnit\ProphecyTrait;
 use Prophecy\Prophecy\ObjectProphecy;
+use ReflectionMethod;
 use Ticket\Entity\Agent;
 use Ticket\Entity\Priority;
 use Ticket\Entity\Queue;
@@ -326,6 +328,61 @@ class TicketServiceTest extends TestCase
         $this->assertSame($savedTicket, $result);
     }
 
+    /**
+     * A due date typed into the form is local time, so it has to be read in
+     * the display timezone. Reading it as UTC shifts the stored instant by
+     * whatever offset is in force.
+     */
+    public function testSubmittedDueDateIsReadInTheDisplayTimezone(): void
+    {
+        $service = $this->serviceWithTimezone('Europe/London');
+
+        $stored = $this->parseSubmitted($service, '2026-10-05 17:00:00');
+
+        $this->assertSame('2026-10-05 16:00:00', $stored->format('Y-m-d H:i:s'));
+        $this->assertSame('UTC', $stored->getTimezone()->getName());
+    }
+
+    public function testSubmittedDueDateOutsideSummerTimeIsUnshifted(): void
+    {
+        $service = $this->serviceWithTimezone('Europe/London');
+
+        $stored = $this->parseSubmitted($service, '2026-01-05 17:00:00');
+
+        $this->assertSame('2026-01-05 17:00:00', $stored->format('Y-m-d H:i:s'));
+    }
+
+    public function testSubmittedDueDateHonoursANonBritishTimezone(): void
+    {
+        $service = $this->serviceWithTimezone('America/New_York');
+
+        $stored = $this->parseSubmitted($service, '2026-10-05 17:00:00');
+
+        $this->assertSame('2026-10-05 21:00:00', $stored->format('Y-m-d H:i:s'));
+    }
+
+    private function serviceWithTimezone(string $timezone): TicketService
+    {
+        return new TicketService(
+            $this->eventManager->reveal(),
+            $this->entityManager->reveal(),
+            $this->organisationManager->reveal(),
+            $this->siteManager->reveal(),
+            $this->contactService->reveal(),
+            $this->queueManager->reveal(),
+            $this->userManager->reveal(),
+            $this->mailService->reveal(),
+            $timezone
+        );
+    }
+
+    private function parseSubmitted(TicketService $service, string $value): DateTimeInterface
+    {
+        $method = new ReflectionMethod($service, 'parseSubmittedDate');
+
+        return $method->invoke($service, $value);
+    }
+
     public function testUpdateStatusChangesTicketStatus(): void
     {
         $ticketId = 123;
@@ -349,7 +406,7 @@ class TicketServiceTest extends TestCase
         $ticket->expects($this->once())->method('setStatus')->with($status)->willReturn($ticket);
         $ticket->expects($this->once())
             ->method('setLastResponseDate')
-            ->with($this->isType('string'))
+            ->with($this->isInstanceOf(DateTimeInterface::class))
             ->willReturn($ticket);
 
         $this->entityManager->flush()->shouldBeCalled();
@@ -378,8 +435,8 @@ class TicketServiceTest extends TestCase
         $lastNotified = $now->copy()->subHours(2); // Last notified 2 hours ago
 
         $ticket->method('getId')->willReturn(123);
-        $ticket->method('getDueDate')->willReturn($dueDate->format('Y-m-d H:i:s'));
-        $ticket->method('getLastNotified')->willReturn($lastNotified->format('Y-m-d H:i:s'));
+        $ticket->method('getDueDate')->willReturn($dueDate->toDateTime());
+        $ticket->method('getLastNotified')->willReturn($lastNotified->toDateTime());
         $ticket->method('getShortDescription')->willReturn('Test ticket');
         $ticket->method('getContact')->willReturn($contact);
         $ticket->method('getOrganisation')->willReturn($organisation);
@@ -392,7 +449,7 @@ class TicketServiceTest extends TestCase
         $ticket->method('getAssignedAgent')->willReturn($assignedUser);
         $ticket->method('getSite')->willReturn(null);
         $ticket->method('getLastResponseDate')->willReturn(null);
-        $ticket->method('getCreatedAt')->willReturn($now->copy()->subDay()->format('Y-m-d H:i:s'));
+        $ticket->method('getCreatedAt')->willReturn($now->copy()->subDay()->toDateTime());
 
         $contact->method('getFirstName')->willReturn('John');
         $contact->method('getLastName')->willReturn('Smith');
@@ -404,7 +461,10 @@ class TicketServiceTest extends TestCase
         $priority->method('getName')->willReturn('High');
         $assignedUser->method('getFullName')->willReturn('Agent Smith');
 
-        $ticket->expects($this->once())->method('setLastNotified')->with($this->isType('string'))->willReturn($ticket);
+        $ticket->expects($this->once())
+            ->method('setLastNotified')
+            ->with($this->isInstanceOf(DateTimeInterface::class))
+            ->willReturn($ticket);
         $this->entityManager->flush()->shouldBeCalled();
 
         $this->mailService->prepareBody(
@@ -567,8 +627,8 @@ class TicketServiceTest extends TestCase
         $lastNotified = $now->copy()->subDays(2); // Last notified 2 days ago
 
         $ticket->method('getId')->willReturn(123);
-        $ticket->method('getDueDate')->willReturn($dueDate->format('Y-m-d H:i:s'));
-        $ticket->method('getLastNotified')->willReturn($lastNotified->format('Y-m-d H:i:s'));
+        $ticket->method('getDueDate')->willReturn($dueDate->toDateTime());
+        $ticket->method('getLastNotified')->willReturn($lastNotified->toDateTime());
         $ticket->method('getShortDescription')->willReturn('Test');
         $ticket->method('getContact')->willReturn($contact);
         $ticket->method('getOrganisation')->willReturn($organisation);
@@ -581,7 +641,7 @@ class TicketServiceTest extends TestCase
         $ticket->method('getAssignedAgent')->willReturn($assignedUser);
         $ticket->method('getSite')->willReturn(null);
         $ticket->method('getLastResponseDate')->willReturn(null);
-        $ticket->method('getCreatedAt')->willReturn($now->copy()->subDay()->format('Y-m-d H:i:s'));
+        $ticket->method('getCreatedAt')->willReturn($now->copy()->subDay()->toDateTime());
 
         $contact->method('getFirstName')->willReturn('Test');
         $contact->method('getLastName')->willReturn('User');
@@ -593,7 +653,7 @@ class TicketServiceTest extends TestCase
         $assignedUser->method('getFullName')->willReturn('Agent Smith');
 
         // Mock the ticket methods that might be called (conditional based on notification logic)
-        $ticket->method('setLastNotified')->with($this->isType('string'))->willReturn($ticket);
+        $ticket->method('setLastNotified')->with($this->isInstanceOf(DateTimeInterface::class))->willReturn($ticket);
         $this->mailService->prepareBody(
             'ticket_mail::ticket_notification',
             Argument::type('array')

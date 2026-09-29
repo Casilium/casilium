@@ -5,6 +5,8 @@ declare(strict_types=1);
 namespace TicketTest\Entity;
 
 use Carbon\Carbon;
+use DateTimeImmutable;
+use DateTimeZone;
 use Organisation\Entity\Organisation;
 use OrganisationContact\Entity\Contact;
 use OrganisationSite\Entity\SiteEntity;
@@ -214,47 +216,47 @@ class TicketTest extends TestCase
 
     public function testSetAndGetCreatedAt(): void
     {
-        $createdAt = '2023-01-01 12:00:00';
+        $createdAt = new DateTimeImmutable('2023-01-01 12:00:00', new DateTimeZone('UTC'));
         $result    = $this->ticket->setCreatedAt($createdAt);
 
         $this->assertInstanceOf(Ticket::class, $result);
-        $this->assertEquals($createdAt, $this->ticket->getCreatedAt());
+        $this->assertSame($createdAt, $this->ticket->getCreatedAt());
     }
 
     public function testSetAndGetDueDate(): void
     {
-        $dueDate = '2023-01-02 12:00:00';
+        $dueDate = new DateTimeImmutable('2023-01-02 12:00:00', new DateTimeZone('UTC'));
         $result  = $this->ticket->setDueDate($dueDate);
 
         $this->assertInstanceOf(Ticket::class, $result);
-        $this->assertEquals($dueDate, $this->ticket->getDueDate());
+        $this->assertSame($dueDate, $this->ticket->getDueDate());
     }
 
     public function testSetAndGetLastResponseDate(): void
     {
-        $date   = '2023-01-01 15:30:00';
+        $date   = new DateTimeImmutable('2023-01-01 15:30:00', new DateTimeZone('UTC'));
         $result = $this->ticket->setLastResponseDate($date);
 
         $this->assertInstanceOf(Ticket::class, $result);
-        $this->assertEquals($date, $this->ticket->getLastResponseDate());
+        $this->assertSame($date, $this->ticket->getLastResponseDate());
     }
 
     public function testSetAndGetFirstResponseDate(): void
     {
-        $date   = '2023-01-01 13:00:00';
+        $date   = new DateTimeImmutable('2023-01-01 13:00:00', new DateTimeZone('UTC'));
         $result = $this->ticket->setFirstResponseDate($date);
 
         $this->assertInstanceOf(Ticket::class, $result);
-        $this->assertEquals($date, $this->ticket->getFirstResponseDate());
+        $this->assertSame($date, $this->ticket->getFirstResponseDate());
     }
 
     public function testSetAndGetResolveDate(): void
     {
-        $date   = '2023-01-03 10:00:00';
+        $date   = new DateTimeImmutable('2023-01-03 10:00:00', new DateTimeZone('UTC'));
         $result = $this->ticket->setResolveDate($date);
 
         $this->assertInstanceOf(Ticket::class, $result);
-        $this->assertEquals($date, $this->ticket->getResolveDate());
+        $this->assertSame($date, $this->ticket->getResolveDate());
     }
 
     public function testSetAndGetSlaTarget(): void
@@ -280,38 +282,38 @@ class TicketTest extends TestCase
 
     public function testSetAndGetLastNotified(): void
     {
-        $date   = '2023-01-01 16:00:00';
+        $date   = new DateTimeImmutable('2023-01-01 16:00:00', new DateTimeZone('UTC'));
         $result = $this->ticket->setLastNotified($date);
 
         $this->assertInstanceOf(Ticket::class, $result);
-        $this->assertEquals($date, $this->ticket->getLastNotified());
+        $this->assertSame($date, $this->ticket->getLastNotified());
     }
 
     public function testSetAndGetCloseDate(): void
     {
-        $date   = '2023-01-05 09:00:00';
+        $date   = new DateTimeImmutable('2023-01-05 09:00:00', new DateTimeZone('UTC'));
         $result = $this->ticket->setCloseDate($date);
 
         $this->assertInstanceOf(Ticket::class, $result);
-        $this->assertEquals($date, $this->ticket->getCloseDate());
+        $this->assertSame($date, $this->ticket->getCloseDate());
     }
 
     public function testSetAndGetWaitingDate(): void
     {
-        $date   = '2023-01-02 14:00:00';
+        $date   = new DateTimeImmutable('2023-01-02 14:00:00', new DateTimeZone('UTC'));
         $result = $this->ticket->setWaitingDate($date);
 
         $this->assertInstanceOf(Ticket::class, $result);
-        $this->assertEquals($date, $this->ticket->getWaitingDate());
+        $this->assertSame($date, $this->ticket->getWaitingDate());
     }
 
     public function testSetAndGetFirstResponseDue(): void
     {
-        $date   = '2023-01-01 17:00:00';
+        $date   = new DateTimeImmutable('2023-01-01 17:00:00', new DateTimeZone('UTC'));
         $result = $this->ticket->setFirstResponseDue($date);
 
         $this->assertInstanceOf(Ticket::class, $result);
-        $this->assertEquals($date, $this->ticket->getFirstResponseDue());
+        $this->assertSame($date, $this->ticket->getFirstResponseDue());
     }
 
     public function testGetArrayCopyReturnsObjectVars(): void
@@ -350,7 +352,10 @@ class TicketTest extends TestCase
 
         $this->assertInstanceOf(Ticket::class, $result);
         $this->assertEquals(456, $this->ticket->getId());
-        $this->assertEquals('2023-01-01 12:00:00', $this->ticket->getCreatedAt());
+        $this->assertEquals(
+            '2023-01-01 12:00:00',
+            $this->ticket->getCreatedAt()->format(Ticket::DATE_FORMAT)
+        );
         $this->assertEquals(Ticket::IMPACT_HIGH, $this->ticket->getImpact());
         $this->assertEquals(Ticket::URGENCY_HIGH, $this->ticket->getUrgency());
         $this->assertEquals('Test Description', $this->ticket->getShortDescription());
@@ -407,7 +412,7 @@ class TicketTest extends TestCase
     public function testIsOverdueReturnsTrueWhenPastDue(): void
     {
         // Set due date in the past
-        $pastDate = Carbon::now('UTC')->subHour()->format('Y-m-d H:i:s');
+        $pastDate = Carbon::now('UTC')->subHour()->toDateTime();
         $this->ticket->setDueDate($pastDate);
 
         $this->assertTrue($this->ticket->isOverdue());
@@ -416,10 +421,38 @@ class TicketTest extends TestCase
     public function testIsOverdueReturnsFalseWhenNotDue(): void
     {
         // Set due date in the future
-        $futureDate = Carbon::now('UTC')->addHour()->format('Y-m-d H:i:s');
+        $futureDate = Carbon::now('UTC')->addHour()->toDateTime();
         $this->ticket->setDueDate($futureDate);
 
         $this->assertFalse($this->ticket->isOverdue());
+    }
+
+    public function testIsOverdueComparesInstantsNotWallClock(): void
+    {
+        // same instant as an hour ago, but labelled in another timezone
+        $due = Carbon::now('UTC')->subHour()->setTimezone('Europe/London')->toDateTime();
+        $this->ticket->setDueDate($due);
+
+        $this->assertTrue($this->ticket->isOverdue());
+    }
+
+    public function testIsOverdueReturnsFalseWithoutDueDate(): void
+    {
+        $this->ticket->setDueDate(null);
+
+        $this->assertFalse($this->ticket->isOverdue());
+    }
+
+    public function testGetArrayCopyRendersDatesAsStringsForForms(): void
+    {
+        $this->ticket->setDueDate(new DateTimeImmutable('2026-07-01 14:00:00', new DateTimeZone('UTC')));
+        $this->ticket->setResolveDate(null);
+
+        $values = $this->ticket->getArrayCopy();
+
+        $this->assertSame('2026-07-01 14:00:00', $values['dueDate']);
+        $this->assertNull($values['resolveDate']);
+        $this->assertIsString($values['createdAt']);
     }
 
     public function testFluentInterfaceChaining(): void

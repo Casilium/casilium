@@ -7,6 +7,7 @@ namespace Ticket\Entity;
 use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTime;
+use DateTimeInterface;
 use DateTimeZone;
 use Doctrine\ORM\Mapping as ORM;
 use Organisation\Entity\Organisation;
@@ -18,7 +19,6 @@ use ServiceLevel\Service\CalculateBusinessHours;
 use Ticket\Repository\TicketRepository;
 use User\Entity\User;
 
-use function date;
 use function get_object_vars;
 use function is_string;
 use function strlen;
@@ -27,6 +27,22 @@ use function strlen;
 #[ORM\Table(name: 'ticket')]
 class Ticket
 {
+    public const DATE_FORMAT = 'Y-m-d H:i:s';
+
+    /** Date properties that getArrayCopy() renders as strings for form binding */
+    private const DATE_PROPERTIES = [
+        'createdAt',
+        'dueDate',
+        'closeDate',
+        'resolveDate',
+        'waitingDate',
+        'waitingResetDate',
+        'lastResponseDate',
+        'firstResponseDate',
+        'firstResponseDue',
+        'lastNotified',
+    ];
+
     public const IMPACT_HIGH    = 1;
     public const IMPACT_MEDIUM  = 2;
     public const IMPACT_LOW     = 3;
@@ -73,8 +89,8 @@ class Ticket
     #[ORM\JoinColumn(name: 'assigned_agent_id', referencedColumnName: 'id', nullable: true)]
     private ?User $assignedAgent = null;
 
-    #[ORM\Column(name: 'created_at', type: 'string', length: 10)]
-    private string $createdAt;
+    #[ORM\Column(name: 'created_at', type: 'utcdatetime')]
+    private DateTimeInterface $createdAt;
 
     #[ORM\OneToOne(targetEntity: Agent::class, cascade: ['all'])]
     #[ORM\JoinColumn(name: 'agent_id', referencedColumnName: 'id', nullable: true)]
@@ -117,8 +133,8 @@ class Ticket
     #[ORM\Column(name: 'source_id', type: 'integer')]
     private int $source;
 
-    #[ORM\Column(name: 'due_date', type: 'string')]
-    private string $dueDate;
+    #[ORM\Column(name: 'due_date', type: 'utcdatetime', nullable: true)]
+    private ?DateTimeInterface $dueDate = null;
 
     #[ORM\OneToOne(targetEntity: Status::class)]
     #[ORM\JoinColumn(name: 'status', referencedColumnName: 'id')]
@@ -137,29 +153,29 @@ class Ticket
     #[ORM\Column(name: 'uuid', type: 'string')]
     private string $uuid;
 
-    #[ORM\Column(name: 'last_response_date', type: 'string')]
-    private ?string $lastResponseDate;
+    #[ORM\Column(name: 'last_response_date', type: 'utcdatetime', nullable: true)]
+    private ?DateTimeInterface $lastResponseDate = null;
 
-    #[ORM\Column(name: 'resolve_date', type: 'string')]
-    private ?string $resolveDate;
+    #[ORM\Column(name: 'resolve_date', type: 'utcdatetime', nullable: true)]
+    private ?DateTimeInterface $resolveDate = null;
 
-    #[ORM\Column(name: 'first_response_date', type: 'string')]
-    private ?string $firstResponseDate;
+    #[ORM\Column(name: 'first_response_date', type: 'utcdatetime', nullable: true)]
+    private ?DateTimeInterface $firstResponseDate = null;
 
-    #[ORM\Column(name: 'first_response_due', type: 'string')]
-    private ?string $firstResponseDue;
+    #[ORM\Column(name: 'first_response_due', type: 'utcdatetime', nullable: true)]
+    private ?DateTimeInterface $firstResponseDue = null;
 
-    #[ORM\Column(name: 'last_notified', type: 'string')]
-    private ?string $lastNotified;
+    #[ORM\Column(name: 'last_notified', type: 'utcdatetime', nullable: true)]
+    private ?DateTimeInterface $lastNotified = null;
 
-    #[ORM\Column(name: 'close_date', type: 'string')]
-    private ?string $closeDate;
+    #[ORM\Column(name: 'close_date', type: 'utcdatetime', nullable: true)]
+    private ?DateTimeInterface $closeDate = null;
 
-    #[ORM\Column(name: 'waiting_date', type: 'string')]
-    private ?string $waitingDate;
+    #[ORM\Column(name: 'waiting_date', type: 'utcdatetime', nullable: true)]
+    private ?DateTimeInterface $waitingDate = null;
 
-    #[ORM\Column(name: 'waiting_reset_date', type: 'string')]
-    private ?string $waitingResetDate;
+    #[ORM\Column(name: 'waiting_reset_date', type: 'utcdatetime', nullable: true)]
+    private ?DateTimeInterface $waitingResetDate = null;
 
     #[ORM\OneToOne(targetEntity: SlaTarget::class)]
     #[ORM\JoinColumn(name: 'sla_target_id', referencedColumnName: 'id')]
@@ -177,8 +193,8 @@ class Ticket
         $this->site     = null;
 
         $dateTime           = new DateTime('now', new DateTimeZone('UTC'));
-        $this->createdAt    = $dateTime->format('Y-m-d H:i:s');
-        $this->lastNotified = $dateTime->format('Y-m-d H:i:s');
+        $this->createdAt    = $dateTime;
+        $this->lastNotified = clone $dateTime;
     }
 
     public function getAssignedAgent(): ?User
@@ -192,12 +208,12 @@ class Ticket
         return $this;
     }
 
-    public function getCreatedAt(): string
+    public function getCreatedAt(): DateTimeInterface
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(string $createdAt): Ticket
+    public function setCreatedAt(DateTimeInterface $createdAt): Ticket
     {
         $this->createdAt = $createdAt;
         return $this;
@@ -280,12 +296,12 @@ class Ticket
         return $this;
     }
 
-    public function getDueDate(): string
+    public function getDueDate(): ?DateTimeInterface
     {
         return $this->dueDate;
     }
 
-    public function setDueDate(string $dueDate): Ticket
+    public function setDueDate(?DateTimeInterface $dueDate): Ticket
     {
         $this->dueDate = $dueDate;
         return $this;
@@ -382,34 +398,34 @@ class Ticket
         return $this;
     }
 
-    public function getLastResponseDate(): ?string
+    public function getLastResponseDate(): ?DateTimeInterface
     {
         return $this->lastResponseDate;
     }
 
-    public function setLastResponseDate(string $date): Ticket
+    public function setLastResponseDate(?DateTimeInterface $date): Ticket
     {
         $this->lastResponseDate = $date;
         return $this;
     }
 
-    public function getFirstResponseDate(): ?string
+    public function getFirstResponseDate(): ?DateTimeInterface
     {
         return $this->firstResponseDate;
     }
 
-    public function setFirstResponseDate(?string $firstResponseDate): Ticket
+    public function setFirstResponseDate(?DateTimeInterface $firstResponseDate): Ticket
     {
         $this->firstResponseDate = $firstResponseDate;
         return $this;
     }
 
-    public function getResolveDate(): ?string
+    public function getResolveDate(): ?DateTimeInterface
     {
         return $this->resolveDate;
     }
 
-    public function setResolveDate(?string $resolveDate): Ticket
+    public function setResolveDate(?DateTimeInterface $resolveDate): Ticket
     {
         $this->resolveDate = $resolveDate;
         return $this;
@@ -437,74 +453,104 @@ class Ticket
     {
         $businessHours     = $this->organisation->getSla()->getBusinessHours();
         $businessHoursCalc = new CalculateBusinessHours($businessHours);
-        $timeCreated       = Carbon::parse($this->getCreatedAt());
+        $timeCreated       = Carbon::instance($this->getCreatedAt());
         return $businessHoursCalc->addHoursTo($timeCreated, $this->getSlaTarget()->getResponseTime());
     }
 
-    public function getLastNotified(): ?string
+    public function getLastNotified(): ?DateTimeInterface
     {
         return $this->lastNotified;
     }
 
-    public function setLastNotified(?string $lastNotified): Ticket
+    public function setLastNotified(?DateTimeInterface $lastNotified): Ticket
     {
         $this->lastNotified = $lastNotified;
         return $this;
     }
 
-    public function getCloseDate(): ?string
+    public function getCloseDate(): ?DateTimeInterface
     {
         return $this->closeDate;
     }
 
-    public function getFirstResponseDue(): ?string
+    public function getFirstResponseDue(): ?DateTimeInterface
     {
         return $this->firstResponseDue;
     }
 
-    public function setFirstResponseDue(?string $firstResponseDue): Ticket
+    public function setFirstResponseDue(?DateTimeInterface $firstResponseDue): Ticket
     {
         $this->firstResponseDue = $firstResponseDue;
         return $this;
     }
 
-    public function setCloseDate(string $closeDate): Ticket
+    public function setCloseDate(?DateTimeInterface $closeDate): Ticket
     {
         $this->closeDate = $closeDate;
         return $this;
     }
 
-    public function getWaitingDate(): ?string
+    public function getWaitingDate(): ?DateTimeInterface
     {
         return $this->waitingDate;
     }
 
-    public function setWaitingDate(?string $waitingDate): Ticket
+    public function setWaitingDate(?DateTimeInterface $waitingDate): Ticket
     {
         $this->waitingDate = $waitingDate;
         return $this;
     }
 
-    public function getWaitingResetDate(): ?string
+    public function getWaitingResetDate(): ?DateTimeInterface
     {
         return $this->waitingResetDate;
     }
 
-    public function setWaitingResetDate(?string $waitingResetDate): Ticket
+    public function setWaitingResetDate(?DateTimeInterface $waitingResetDate): Ticket
     {
         $this->waitingResetDate = $waitingResetDate;
         return $this;
     }
 
+    /**
+     * Builds a UTC DateTime from a 'Y-m-d H:i:s' string.
+     * Returns null if the value is missing or will not parse.
+     */
+    private static function utcNow(): DateTimeInterface
+    {
+        return new DateTime('now', new DateTimeZone('UTC'));
+    }
+
+    private static function toUtcDateTime(mixed $value): ?DateTimeInterface
+    {
+        if (! is_string($value) || strlen($value) < 2) {
+            return null;
+        }
+
+        $date = DateTime::createFromFormat(self::DATE_FORMAT, $value, new DateTimeZone('UTC'));
+
+        return $date === false ? null : $date;
+    }
+
     public function getArrayCopy(): array
     {
-        return get_object_vars($this);
+        $values = get_object_vars($this);
+
+        // dates are held as DateTime objects; form elements expect scalars
+        foreach (self::DATE_PROPERTIES as $property) {
+            $date              = $values[$property] ?? null;
+            $values[$property] = $date instanceof DateTimeInterface
+                ? $date->format(self::DATE_FORMAT)
+                : null;
+        }
+
+        return $values;
     }
 
     public function exchangeArray(array $data): Ticket
     {
         $this->id               = isset($data['id']) ? (int) $data['id'] : null;
-        $this->createdAt        = isset($data['createdAt']) ? (string) $data['createdAt'] : date('Y-m-d H:i:s');
+        $this->createdAt        = self::toUtcDateTime($data['createdAt'] ?? null) ?? self::utcNow();
         $this->impact           = isset($data['impact']) ? (int) $data['impact'] : self::IMPACT_DEFAULT;
         $this->urgency          = isset($data['urgency']) ? (int) $data['urgency'] : self::URGENCY_DEFAULT;
         $this->shortDescription = isset($data['short_description']) ? (string) $data['short_description'] : null;
@@ -512,25 +558,15 @@ class Ticket
         $this->organisation     = $data['organisation'] ?? null;
         $this->longDescription  = isset($data['long_description']) ? (string) $data['long_description'] : null;
 
-        $this->dueDate = isset($data['due_date']) && strlen($data['due_date']) > 1
-            ? (string) $data['due_date']
-            : date('Y-m-d H:i:s');
+        $this->dueDate = self::toUtcDateTime($data['due_date'] ?? null) ?? self::utcNow();
 
-        $this->lastResponseDate = isset($data['last_response_date']) && strlen($data['last_response_date']) > 1
-            ? (string) $data['last_response_date']
-            : date('Y-m-d H:i:s');
+        $this->lastResponseDate = self::toUtcDateTime($data['last_response_date'] ?? null) ?? self::utcNow();
 
-        $this->lastResponseDate = isset($data['first_response_date']) && strlen($data['first_response_date']) > 1
-            ? (string) $data['first_response_date']
-            : date('Y-m-d H:i:s');
+        $this->lastResponseDate = self::toUtcDateTime($data['first_response_date'] ?? null) ?? self::utcNow();
 
-        $this->waitingDate = isset($data['waiting_date']) && strlen($data['waiting_date']) > 1
-            ? (string) $data['waiting_date']
-            : null;
+        $this->waitingDate = self::toUtcDateTime($data['waiting_date'] ?? null);
 
-        $this->waitingDate = isset($data['waiting_reset_date']) && strlen($data['waiting_reset_date']) > 1
-            ? (string) $data['waiting_reset_date']
-            : null;
+        $this->waitingDate = self::toUtcDateTime($data['waiting_reset_date'] ?? null);
 
         return $this;
     }
@@ -552,17 +588,11 @@ class Ticket
 
     public function isOverdue(): bool
     {
-        if (null === $this->getDueDate()) {
+        $dueDate = $this->getDueDate();
+        if (null === $dueDate) {
             return false;
         }
 
-        $now = Carbon::now('UTC');
-        $due = Carbon::createFromFormat('Y-m-d H:i:s', $this->getDueDate(), 'UTC');
-
-        if ($due < $now) {
-            return true;
-        }
-
-        return false;
+        return $dueDate < Carbon::now('UTC');
     }
 }
