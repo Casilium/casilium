@@ -841,53 +841,44 @@ class TicketService
                 ? Carbon::instance($ticket->getWaitingResetDate())
                 : null;
 
-            // update the due date
             $now = Carbon::now('UTC');
-            if (null !== $waitingResetDate) {
-                // get the difference in minutes between last reset and now
-                // add the difference to the due date
-                $diffInMinutes = $now->diffInMinutes($waitingResetDate);
 
-                // no point in updating if same
-                if ($diffInMinutes === 0) {
+            // measure from the last reset, or from when the ticket went on hold
+            $heldSince = $waitingResetDate ?? $waitingDate;
+
+            if ($ticket->hasSla()) {
+                // the ticket only loses SLA time during working hours, so working
+                // minutes are what gets handed back to the due date. Counting
+                // wall-clock here turned a night on hold into two working days.
+                $businessHours     = $ticket->getOrganisation()->getSla()->getBusinessHours();
+                $businessHoursCalc = new CalculateBusinessHours($businessHours);
+                $elapsedMinutes    = $businessHoursCalc->diffInBusinessMinutes($heldSince, $now);
+
+                if ($elapsedMinutes === 0) {
                     continue;
                 }
 
-                // if has sla then calculate according to SLA hours
-                if ($ticket->hasSla()) {
-                    $businessHours     = $ticket->getOrganisation()->getSla()->getBusinessHours();
-                    $businessHoursCalc = new CalculateBusinessHours($businessHours);
-                    $dueDate           = $businessHoursCalc->addMinutesTo($dueDate, $diffInMinutes);
-                } else {
-                    // otherwise just update
-                    $dueDate = $dueDate->addMinutes($diffInMinutes);
-                }
+                $dueDate = $businessHoursCalc->addMinutesTo($dueDate, $elapsedMinutes);
             } else {
-                // ticket has never been reset, get difference in seconds between
-                // date ticket was put on hold and now, add the difference to the due date
-                $diffInMinutes = $now->diffInMinutes($waitingDate);
-                if ($diffInMinutes === 0) {
+                // no SLA means the clock runs around the clock
+                $elapsedMinutes = (int) $heldSince->diffInMinutes($now);
+
+                if ($elapsedMinutes === 0) {
                     continue;
                 }
 
-                // if has sla then calculate according to SLA hours
-                if ($ticket->hasSla()) {
-                    $businessHours     = $ticket->getOrganisation()->getSla()->getBusinessHours();
-                    $businessHoursCalc = new CalculateBusinessHours($businessHours);
-                    $dueDate           = $businessHoursCalc->addMinutesTo($dueDate, $diffInMinutes);
-                } else {
-                    // otherwise just update
-                    $dueDate = $dueDate->addMinutes($diffInMinutes);
-                }
+                $dueDate = $dueDate->addMinutes($elapsedMinutes);
             }
 
             // update due date and set the last reset date to now
-            $ticket->setDueDate($dueDate->copy()->utc()->toDateTime());
+            $newDueDate = $dueDate->copy()->utc();
+
+            $ticket->setDueDate($newDueDate->toDateTime());
             $ticket->setWaitingResetDate($now->toDateTime());
 
             $updateStatus[$ticket->getId()] = [
                 'was_due' => $wasDue->format(Ticket::DATE_FORMAT),
-                'now_due' => $dueDate->format(Ticket::DATE_FORMAT),
+                'now_due' => $newDueDate->format(Ticket::DATE_FORMAT),
             ];
 
             // write ticket changes

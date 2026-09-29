@@ -136,6 +136,82 @@ class CalculateBusinessHoursTest extends TestCase
         $this->assertEquals('2023-01-09 10:00:00', $result->format('Y-m-d H:i:s'));
     }
 
+    public function testAddMinutesToWalksTheWindowInTheBusinessTimezone(): void
+    {
+        // 09:00-17:00 London is 08:00-16:00 UTC in July, so a UTC clock would
+        // put this inside the working day when it is actually past closing
+        $this->businessHours->setTimezone('Europe/London');
+        $calculator = new CalculateBusinessHours($this->businessHours);
+
+        $startDate = Carbon::create(2023, 7, 3, 16, 30, 0, 'UTC'); // 17:30 BST, Monday, after close
+
+        $result = $calculator->addMinutesTo($startDate, 30);
+
+        // next working day opens 09:00 BST, plus 30 minutes
+        $this->assertEquals('2023-07-04 08:30:00', $result->copy()->utc()->format('Y-m-d H:i:s'));
+    }
+
+    public function testDiffInBusinessMinutesWithinOneDay(): void
+    {
+        $from = Carbon::create(2023, 1, 2, 10, 0, 0, 'UTC'); // Monday
+        $to   = Carbon::create(2023, 1, 2, 12, 0, 0, 'UTC');
+
+        $this->assertEquals(120, $this->calculator->diffInBusinessMinutes($from, $to));
+    }
+
+    public function testDiffInBusinessMinutesSkipsTheNight(): void
+    {
+        // Mon 16:00-17:00 is 60, Tue 09:00-10:00 is 60; the 16 hours between are not working time
+        $from = Carbon::create(2023, 1, 2, 16, 0, 0, 'UTC');
+        $to   = Carbon::create(2023, 1, 3, 10, 0, 0, 'UTC');
+
+        $this->assertEquals(120, $this->calculator->diffInBusinessMinutes($from, $to));
+    }
+
+    public function testDiffInBusinessMinutesSkipsTheWeekend(): void
+    {
+        $from = Carbon::create(2023, 1, 6, 16, 0, 0, 'UTC'); // Friday
+        $to   = Carbon::create(2023, 1, 9, 10, 0, 0, 'UTC'); // Monday
+
+        $this->assertEquals(120, $this->calculator->diffInBusinessMinutes($from, $to));
+    }
+
+    public function testDiffInBusinessMinutesIsZeroWhollyOutsideHours(): void
+    {
+        $from = Carbon::create(2023, 1, 6, 18, 0, 0, 'UTC'); // Friday evening
+        $to   = Carbon::create(2023, 1, 9, 8, 0, 0, 'UTC');  // Monday before opening
+
+        $this->assertEquals(0, $this->calculator->diffInBusinessMinutes($from, $to));
+    }
+
+    public function testDiffInBusinessMinutesCountsAFullWorkingDay(): void
+    {
+        $from = Carbon::create(2023, 1, 2, 9, 0, 0, 'UTC');
+        $to   = Carbon::create(2023, 1, 3, 9, 0, 0, 'UTC');
+
+        $this->assertEquals(480, $this->calculator->diffInBusinessMinutes($from, $to));
+    }
+
+    public function testDiffInBusinessMinutesIsZeroWhenReversed(): void
+    {
+        $from = Carbon::create(2023, 1, 2, 12, 0, 0, 'UTC');
+        $to   = Carbon::create(2023, 1, 2, 10, 0, 0, 'UTC');
+
+        $this->assertEquals(0, $this->calculator->diffInBusinessMinutes($from, $to));
+    }
+
+    public function testDiffInBusinessMinutesReadsUtcInputAgainstLocalHours(): void
+    {
+        // 09:00-17:00 London in July is 08:00-16:00 UTC
+        $this->businessHours->setTimezone('Europe/London');
+        $calculator = new CalculateBusinessHours($this->businessHours);
+
+        $from = Carbon::create(2023, 7, 3, 7, 0, 0, 'UTC');  // 08:00 BST, before opening
+        $to   = Carbon::create(2023, 7, 3, 9, 0, 0, 'UTC');  // 10:00 BST
+
+        $this->assertEquals(60, $calculator->diffInBusinessMinutes($from, $to));
+    }
+
     public function testGetHoursBetweenDatesWithOptions(): void
     {
         $options    = ['start' => '09:00', 'end' => '17:00'];

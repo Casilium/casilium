@@ -111,6 +111,10 @@ class CalculateBusinessHours
 
     public function addMinutesTo(CarbonInterface $date, int $minutes): CarbonInterface
     {
+        // the working window is defined in the organisation's own timezone, so
+        // walk it there rather than on whatever clock the caller handed over
+        $date->setTimezone($this->businessHours->getTimezone());
+
         // is current day inactive?
         $dayOfWeek = strtolower($date->isoFormat('ddd'));
         $active    = $this->workingHours[$dayOfWeek]['active'] ?? false;
@@ -159,6 +163,52 @@ class CalculateBusinessHours
         }
 
         return $date;
+    }
+
+    /**
+     * Count the working minutes that elapsed between two instants.
+     *
+     * Time outside the working window is not counted, so a ticket held from
+     * 17:00 on Friday to 09:30 on Monday has used 30 working minutes of its
+     * SLA rather than the 64 hours of wall-clock that separate them.
+     *
+     * @param CarbonInterface $from start of the period
+     * @param CarbonInterface $to end of the period
+     * @return int elapsed working minutes, 0 if $to is not after $from
+     */
+    public function diffInBusinessMinutes(CarbonInterface $from, CarbonInterface $to): int
+    {
+        $timezone = $this->businessHours->getTimezone();
+        $start    = $from->copy()->setTimezone($timezone);
+        $end      = $to->copy()->setTimezone($timezone);
+
+        if ($end->lessThanOrEqualTo($start)) {
+            return 0;
+        }
+
+        $minutes = 0;
+        $cursor  = $start->copy();
+
+        while ($cursor->lessThan($end)) {
+            $day = $this->workingHours[strtolower($cursor->isoFormat('ddd'))] ?? [];
+
+            if (($day['active'] ?? false) === true && isset($day['startHour'], $day['endHour'])) {
+                $opens  = $cursor->copy()->setTime($day['startHour'], $day['startMinute'] ?? 0);
+                $closes = $cursor->copy()->setTime($day['endHour'], $day['endMinute'] ?? 0);
+
+                // the part of today's working window that falls inside [start, end]
+                $windowStart = $cursor->greaterThan($opens) ? $cursor->copy() : $opens;
+                $windowEnd   = $end->lessThan($closes) ? $end->copy() : $closes;
+
+                if ($windowEnd->greaterThan($windowStart)) {
+                    $minutes += (int) $windowStart->diffInMinutes($windowEnd);
+                }
+            }
+
+            $cursor = $cursor->copy()->addDay()->startOfDay();
+        }
+
+        return $minutes;
     }
 
     public function getHoursBetweenDates(Carbon $from, Carbon $to): int
