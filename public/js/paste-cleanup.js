@@ -50,11 +50,12 @@
             .replace(/&ldquo;|&rdquo;/g, '"')
             .replace(/&lsquo;|&rsquo;/g, "'")
             .replace(/&ndash;|&mdash;/g, '-')
-            .replace(/&bull;/g, '\u2022');
+            .replace(/&bull;/g, '\u2022')
+            .replace(/&nbsp;/gi, ' ');
 
         // Final normalization
         text = text
-            .replace(/ +/g, ' ')
+            .replace(/[ \xa0]+/g, ' ')
             .replace(/[ \t]+$/gm, '')
             .replace(/(\r?\n\s*){3,}/g, '\n\n')
             .trim();
