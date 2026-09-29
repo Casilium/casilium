@@ -47,6 +47,8 @@ class HomePageHandlerTest extends TestCase
         $ticketRepository->findSlaComplianceRate(Argument::any(), Argument::any())->willReturn(99.0);
         $ticketRepository->findResolutionStats(Argument::any(), Argument::any(), Argument::any())
             ->willReturn(['mean' => 2.5, 'median' => 1.5, 'count' => 10]);
+        $ticketRepository->findFirstResponseStats(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(['mean' => 0.5, 'median' => 0.25, 'count' => 4]);
 
         $homePage = new HomePageHandler($renderer->reveal(), $ticketRepository->reveal());
         $response = $homePage->handle($this->prophesize(ServerRequestInterface::class)->reveal());
@@ -82,6 +84,7 @@ class HomePageHandlerTest extends TestCase
         self::assertSame('4.0h', $viewModel['stats']['sla']['median']);
         self::assertSame('170.6h', $viewModel['stats']['sla']['mean']);
         self::assertSame(17, $viewModel['stats']['sla']['resolved']);
+        self::assertSame('15m', $viewModel['stats']['sla']['responseMedian']);
 
         // under an hour is shown in minutes
         self::assertSame('15m', $viewModel['stats']['service']['median']);
@@ -121,6 +124,8 @@ class HomePageHandlerTest extends TestCase
         $ticketRepository->findClosedTicketCount()->willReturn(5);
         $ticketRepository->findAllAgentStats(Argument::any(), Argument::any())->willReturn([]);
         $ticketRepository->findSlaComplianceRate(Argument::any(), Argument::any())->willReturn(99.0);
+        $ticketRepository->findFirstResponseStats(Argument::any(), Argument::any(), Argument::any())
+            ->willReturn(['mean' => 0.5, 'median' => 0.25, 'count' => 4]);
 
         return $ticketRepository;
     }

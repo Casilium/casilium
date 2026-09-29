@@ -61,18 +61,24 @@ class HomePageHandler implements RequestHandlerInterface
 
         $slaResolution     = $this->ticketRepo->findResolutionStats($periodStart, $periodEnd, true);
         $serviceResolution = $this->ticketRepo->findResolutionStats($periodStart, $periodEnd, false);
+        $slaResponse       = $this->ticketRepo->findFirstResponseStats($periodStart, $periodEnd, true);
+        $serviceResponse   = $this->ticketRepo->findFirstResponseStats($periodStart, $periodEnd, false);
 
         $stats['sla'] = [
-            'compliance' => $this->ticketRepo->findSlaComplianceRate($periodStart, $periodEnd),
-            'resolved'   => $slaResolution['count'],
-            'median'     => $this->formatResolutionDuration($slaResolution['median']),
-            'mean'       => $this->formatResolutionDuration($slaResolution['mean']),
+            'compliance'     => $this->ticketRepo->findSlaComplianceRate($periodStart, $periodEnd),
+            'resolved'       => $slaResolution['count'],
+            'median'         => $this->formatResolutionDuration($slaResolution['median']),
+            'mean'           => $this->formatResolutionDuration($slaResolution['mean']),
+            'responseMedian' => $this->formatResolutionDuration($slaResponse['median']),
+            'responded'      => $slaResponse['count'],
         ];
 
         $stats['service'] = [
-            'resolved' => $serviceResolution['count'],
-            'median'   => $this->formatResolutionDuration($serviceResolution['median']),
-            'mean'     => $this->formatResolutionDuration($serviceResolution['mean']),
+            'resolved'       => $serviceResolution['count'],
+            'median'         => $this->formatResolutionDuration($serviceResolution['median']),
+            'mean'           => $this->formatResolutionDuration($serviceResolution['mean']),
+            'responseMedian' => $this->formatResolutionDuration($serviceResponse['median']),
+            'responded'      => $serviceResponse['count'],
         ];
 
         $stats['agent'] = $this->ticketRepo->findAllAgentStats($periodStart, $periodEnd);

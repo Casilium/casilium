@@ -65,9 +65,11 @@ $this->inlineScript()->appendFile('https://cdnjs.cloudflare.com/ajax/libs/Chart.
                         <small class="text-muted"><?= $this->escapeHtml($this->stats['periodLabel']) ?></small>
                     </div>
                     <dl class="row mb-0">
+                        <dt class="col-7 text-uppercase small text-muted">Typical Response</dt>
+                        <dd class="col-5 text-end fw-semibold"><?= $this->stats['sla']['responseMedian'] ?></dd>
                         <dt class="col-7 text-uppercase small text-muted">Typical Resolution</dt>
                         <dd class="col-5 text-end fw-semibold"><?= $this->stats['sla']['median'] ?></dd>
-                        <dt class="col-7 small text-muted">Mean</dt>
+                        <dt class="col-7 small text-muted">Mean resolution</dt>
                         <dd class="col-5 text-end small text-muted"><?= $this->stats['sla']['mean'] ?></dd>
                         <dt class="col-7 text-uppercase small text-muted">Tickets Resolved</dt>
                         <dd class="col-5 text-end fw-semibold"><?= (int) $this->stats['sla']['resolved'] ?></dd>
@@ -87,7 +89,9 @@ $this->inlineScript()->appendFile('https://cdnjs.cloudflare.com/ajax/libs/Chart.
                         <small class="text-muted"><?= $this->escapeHtml($this->stats['periodLabel']) ?></small>
                     </div>
                     <dl class="row mb-0">
-                        <dt class="col-7 small text-muted">Mean</dt>
+                        <dt class="col-7 text-uppercase small text-muted">Typical Response</dt>
+                        <dd class="col-5 text-end fw-semibold"><?= $this->stats['service']['responseMedian'] ?></dd>
+                        <dt class="col-7 small text-muted">Mean resolution</dt>
                         <dd class="col-5 text-end small text-muted"><?= $this->stats['service']['mean'] ?></dd>
                         <dt class="col-7 text-uppercase small text-muted">Tickets Resolved</dt>
                         <dd class="col-5 text-end fw-semibold"><?= (int) $this->stats['service']['resolved'] ?></dd>

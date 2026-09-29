@@ -107,6 +107,20 @@ interface TicketRepositoryInterface
     ): float;
 
     /**
+     * Mean and median working hours before an agent first replied
+     *
+     * @param CarbonInterface|null $periodStart Start of period
+     * @param CarbonInterface|null $periodEnd End of period
+     * @param bool $requiresSla True counts tickets with an SLA target, false those without
+     * @return array{mean: float, median: float, count: int}
+     */
+    public function findFirstResponseStats(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null,
+        bool $requiresSla = true
+    ): array;
+
+    /**
      * Mean and median working hours taken to resolve tickets in the period
      *
      * @param CarbonInterface|null $periodStart Start of period

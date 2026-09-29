@@ -8,6 +8,7 @@ use Carbon\Carbon;
 use Carbon\CarbonInterface;
 use DateTime;
 use DateTimeZone;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\NonUniqueResultException;
 use Doctrine\ORM\NoResultException;
@@ -23,6 +24,7 @@ use Ticket\Entity\Ticket;
 use Ticket\Entity\TicketResponse;
 use Ticket\Service\TicketService;
 
+use function array_keys;
 use function array_map;
 use function array_sum;
 use function count;
@@ -734,6 +736,95 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             'median' => self::median($hours),
             'count'  => count($hours),
         ];
+    }
+
+    /**
+     * Mean and median working hours before an agent first replied.
+     *
+     * Taken from the responses themselves rather than ticket.first_response_date,
+     * because that column is set by the first response of any kind. A customer
+     * chasing before anyone had answered would count as a reply, which flatters
+     * the figure.
+     *
+     * @param bool $requiresSla true counts tickets carrying an SLA target, false those without
+     * @return array{mean: float, median: float, count: int}
+     */
+    public function findFirstResponseStats(
+        ?CarbonInterface $periodStart = null,
+        ?CarbonInterface $periodEnd = null,
+        bool $requiresSla = true
+    ): array {
+        $hours = $this->firstResponseHours($periodStart, $periodEnd, $requiresSla);
+
+        return [
+            'mean'   => self::mean($hours),
+            'median' => self::median($hours),
+            'count'  => count($hours),
+        ];
+    }
+
+    /**
+     * Working hours between each ticket being raised and its first agent reply.
+     *
+     * A ticket counts when that first reply falls inside the period, so one
+     * answered last month does not reappear because it was touched again.
+     *
+     * @return list<float>
+     */
+    private function firstResponseHours(
+        ?CarbonInterface $periodStart,
+        ?CarbonInterface $periodEnd,
+        bool $requiresSla
+    ): array {
+        $qb = $this->getEntityManager()->createQueryBuilder()
+            ->select('IDENTITY(r.ticket) AS ticketId', 'MIN(r.responseDate) AS firstResponse')
+            ->from(TicketResponse::class, 'r')
+            ->where('r.agent IS NOT NULL')
+            ->groupBy('r.ticket');
+
+        if ($periodStart && $periodEnd) {
+            // bound as dates rather than formatted strings, so the platform
+            // renders them and the comparison is not left to the database
+            $qb->having('MIN(r.responseDate) BETWEEN :start AND :end')
+                ->setParameter('start', $periodStart->toDateTime(), Types::DATETIME_MUTABLE)
+                ->setParameter('end', $periodEnd->toDateTime(), Types::DATETIME_MUTABLE);
+        }
+
+        $firstReplies = [];
+        foreach ($qb->getQuery()->getArrayResult() as $row) {
+            $firstReplies[(int) $row['ticketId']] = $row['firstResponse'];
+        }
+
+        if ($firstReplies === []) {
+            return [];
+        }
+
+        $tickets = $this->createQueryBuilder('t')
+            ->where('t.id IN (:ids)')
+            ->setParameter('ids', array_keys($firstReplies));
+
+        if ($requiresSla) {
+            $tickets->andWhere('t.slaTarget IS NOT NULL');
+        } else {
+            $tickets->andWhere('t.slaTarget IS NULL');
+        }
+
+        $hours = [];
+
+        /** @var Ticket $ticket */
+        foreach ($tickets->getQuery()->getResult() as $ticket) {
+            $createdAt = Carbon::instance($ticket->getCreatedAt());
+            $replied   = Carbon::parse($firstReplies[$ticket->getId()], 'UTC');
+
+            $calculator = $this->businessHoursFor($ticket);
+            $minutes    = $calculator === null
+                ? $createdAt->diffInMinutes($replied)
+                : $calculator->diffInBusinessMinutes($createdAt, $replied);
+
+            $hours[] = $minutes / 60;
+        }
+
+        return $hours;
     }
 
     /**
