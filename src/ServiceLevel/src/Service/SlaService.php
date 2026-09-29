@@ -14,6 +14,15 @@ use Ticket\Entity\Priority;
 
 class SlaService
 {
+    /** Form field prefix carrying each priority's response and resolve times */
+    private const TARGET_FIELDS = [
+        Priority::PRIORITY_LOW      => 'p_low',
+        Priority::PRIORITY_MEDIUM   => 'p_medium',
+        Priority::PRIORITY_HIGH     => 'p_high',
+        Priority::PRIORITY_URGENT   => 'p_urgent',
+        Priority::PRIORITY_CRITICAL => 'p_critical',
+    ];
+
     /** @var EntityManagerInterface */
     protected $entityManager;
 
@@ -123,10 +132,7 @@ class SlaService
         $this->entityManager->clear();
         $id = (int) $data['id'] ?? null;
         if ($id !== 0) {
-            // updating fetch sla and remove all targets
             $sla = $this->findSlaById($id);
-
-            $this->deleteSlaTargets($sla);
         } else {
             $sla = new Sla();
         }
@@ -144,49 +150,47 @@ class SlaService
         $sla->setName($data['name']);
         $sla->setBusinessHours($businessHours);
 
-        $target = new SlaTarget();
-        $target->setPriority($this->findPriorityById(Priority::PRIORITY_LOW));
-        $target->setResponseTime($data['p_low_response_time']);
-        $target->setResolveTime($data['p_low_resolve_time']);
-        $target->setSla($sla);
-        $sla->addSlaTarget($target);
-
-        $target = new SlaTarget();
-        $target->setPriority($this->findPriorityById(Priority::PRIORITY_MEDIUM));
-        $target->setResponseTime($data['p_medium_response_time']);
-        $target->setResolveTime($data['p_medium_resolve_time']);
-        $target->setSla($sla);
-        $sla->addSlaTarget($target);
-
-        $target = new SlaTarget();
-        $target->setPriority($this->findPriorityById(Priority::PRIORITY_HIGH));
-        $target->setResponseTime($data['p_high_response_time']);
-        $target->setResolveTime($data['p_high_resolve_time']);
-        $target->setSla($sla);
-        $sla->addSlaTarget($target);
-
-        $target = new SlaTarget();
-        $target->setPriority($this->findPriorityById(Priority::PRIORITY_URGENT));
-        $target->setResponseTime($data['p_urgent_response_time']);
-        $target->setResolveTime($data['p_urgent_resolve_time']);
-        $target->setSla($sla);
-        $sla->addSlaTarget($target);
-
-        $target = new SlaTarget();
-        $target->setPriority($this->findPriorityById(Priority::PRIORITY_CRITICAL));
-        $target->setResponseTime($data['p_critical_response_time']);
-        $target->setResolveTime($data['p_critical_resolve_time']);
-        $target->setSla($sla);
-        $sla->addSlaTarget($target);
-
-        //$this->entityManager->persist($target);
         if ($id === 0) {
             $this->entityManager->persist($sla);
         }
 
+        $this->applySlaTargets($sla, $data);
+
         $this->entityManager->flush();
 
         return $sla;
+    }
+
+    /**
+     * Set the response and resolve times for each priority.
+     *
+     * Targets are updated in place. Replacing them hands each one a new id and
+     * leaves every ticket referencing the old one pointing at a row that no
+     * longer exists, and ticket.sla_target_id has no foreign key to catch it.
+     *
+     * @param array $data submitted SLA form values
+     */
+    private function applySlaTargets(Sla $sla, array $data): void
+    {
+        $existing = [];
+        foreach ($sla->getSlaTargets() ?? [] as $target) {
+            $existing[$target->getPriority()->getId()] = $target;
+        }
+
+        foreach (self::TARGET_FIELDS as $priorityId => $prefix) {
+            $target = $existing[$priorityId] ?? null;
+
+            if ($target === null) {
+                $target = new SlaTarget();
+                $target->setPriority($this->findPriorityById($priorityId));
+                $target->setSla($sla);
+                $sla->addSlaTarget($target);
+                $this->entityManager->persist($target);
+            }
+
+            $target->setResponseTime($data[$prefix . '_response_time']);
+            $target->setResolveTime($data[$prefix . '_resolve_time']);
+        }
     }
 
     /**

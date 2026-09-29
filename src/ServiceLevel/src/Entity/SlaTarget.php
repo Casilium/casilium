@@ -19,7 +19,7 @@ class SlaTarget
     #[ORM\GeneratedValue(strategy: 'IDENTITY')]
     protected ?int $id;
 
-    #[ORM\ManyToOne(targetEntity: Sla::class, inversedBy: 'target_sla')]
+    #[ORM\ManyToOne(targetEntity: Sla::class, inversedBy: 'slaTargets')]
     #[ORM\JoinColumn(name: 'sla_id', referencedColumnName: 'id')]
     protected Sla $sla;
 

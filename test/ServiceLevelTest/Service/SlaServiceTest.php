@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace ServiceLevelTest\Service;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Query;
@@ -175,6 +176,7 @@ class SlaServiceTest extends TestCase
         $priorityRepo->find(Priority::PRIORITY_CRITICAL)->willReturn($criticalPriority);
 
         $this->entityManager->persist(Argument::type(Sla::class))->shouldBeCalled();
+        $this->entityManager->persist(Argument::type(SlaTarget::class))->shouldBeCalled();
         $this->entityManager->flush()->shouldBeCalled();
 
         $result = $this->slaService->createSla($data);
@@ -297,6 +299,73 @@ class SlaServiceTest extends TestCase
         $this->slaService->assignOrganisationSla(123, 0);
     }
 
+    /**
+     * Targets must keep their ids across an edit. Replacing them leaves every
+     * ticket carrying the old sla_target_id pointing at a deleted row, and
+     * nothing in the schema catches it.
+     */
+    public function testEditingAnSlaUpdatesTargetsInPlace(): void
+    {
+        $data = [
+            'id'                       => 999,
+            'name'                     => 'Standard',
+            'business_hours'           => 10,
+            'p_low_response_time'      => '16:00',
+            'p_low_resolve_time'       => '40:00',
+            'p_medium_response_time'   => '08:00',
+            'p_medium_resolve_time'    => '16:00',
+            'p_high_response_time'     => '02:00',
+            'p_high_resolve_time'      => '08:00',
+            'p_urgent_response_time'   => '01:00',
+            'p_urgent_resolve_time'    => '04:00',
+            'p_critical_response_time' => '01:00',
+            'p_critical_resolve_time'  => '02:00',
+        ];
+
+        $priorities = [
+            Priority::PRIORITY_LOW      => '40:00',
+            Priority::PRIORITY_MEDIUM   => '16:00',
+            Priority::PRIORITY_HIGH     => '08:00',
+            Priority::PRIORITY_URGENT   => '04:00',
+            Priority::PRIORITY_CRITICAL => '02:00',
+        ];
+
+        $targets = [];
+        foreach ($priorities as $priorityId => $resolveTime) {
+            $priority = $this->createMock(Priority::class);
+            $priority->method('getId')->willReturn($priorityId);
+
+            $target = $this->createMock(SlaTarget::class);
+            $target->method('getPriority')->willReturn($priority);
+            $target->expects($this->once())->method('setResolveTime')->with($resolveTime);
+            $target->expects($this->once())->method('setResponseTime');
+
+            $targets[] = $target;
+        }
+
+        $existingSla = $this->createMock(Sla::class);
+        $existingSla->method('getId')->willReturn(999);
+        $existingSla->method('getSlaTargets')->willReturn(new ArrayCollection($targets));
+
+        // nothing new is created, so nothing is added or persisted
+        $existingSla->expects($this->never())->method('addSlaTarget');
+        $this->entityManager->persist(Argument::any())->shouldNotBeCalled();
+
+        $businessHours     = $this->createMock(BusinessHours::class);
+        $businessHoursRepo = $this->prophesize(EntityRepository::class);
+        $slaRepo           = $this->prophesize(EntityRepository::class);
+
+        $this->entityManager->clear()->shouldBeCalled();
+        $this->entityManager->getRepository(Sla::class)->willReturn($slaRepo->reveal());
+        $this->entityManager->getRepository(BusinessHours::class)->willReturn($businessHoursRepo->reveal());
+        $slaRepo->find(999)->willReturn($existingSla);
+        $businessHoursRepo->find(10)->willReturn($businessHours);
+
+        $this->entityManager->flush()->shouldBeCalled();
+
+        $this->assertSame($existingSla, $this->slaService->createSla($data));
+    }
+
     public function testCreateSlaWithExistingSla(): void
     {
         $data = [
@@ -343,16 +412,9 @@ class SlaServiceTest extends TestCase
         $priorityRepo->find(Priority::PRIORITY_URGENT)->willReturn($urgentPriority);
         $priorityRepo->find(Priority::PRIORITY_CRITICAL)->willReturn($criticalPriority);
 
-        // Mock the deleteTargets call (simplified - it would call the query builder)
-        $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $query        = $this->prophesize(Query::class);
-        $this->entityManager->createQueryBuilder()->willReturn($queryBuilder->reveal());
-        $queryBuilder->select('t')->willReturn($queryBuilder->reveal());
-        $queryBuilder->from(SlaTarget::class, 't')->willReturn($queryBuilder->reveal());
-        $queryBuilder->where('t.sla = :slaId')->willReturn($queryBuilder->reveal());
-        $queryBuilder->setParameter('slaId', 999)->willReturn($queryBuilder->reveal());
-        $queryBuilder->getQuery()->willReturn($query->reveal());
-        $query->getResult()->willReturn([]); // No existing targets
+        // the SLA has no targets yet, so all five are created and persisted
+        $existingSla->method('getSlaTargets')->willReturn(null);
+        $this->entityManager->persist(Argument::type(SlaTarget::class))->shouldBeCalled();
 
         $existingSla->expects($this->once())->method('setName')->with('Updated SLA')->willReturn($existingSla);
         $existingSla->expects($this->once())
