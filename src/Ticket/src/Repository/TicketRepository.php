@@ -588,7 +588,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
                 ->setParameter('dateMax', $periodEnd->format(Ticket::DATE_FORMAT));
         }
 
-        $stats['open'] = $qb->getQuery()->getSingleScalarResult();
+        $stats['raised'] = (int) $qb->getQuery()->getSingleScalarResult();
 
         /** @var Status[] $statusTypes */
         $statusTypes = $this->getEntityManager()->getRepository(Status::class)->findAll();
@@ -599,7 +599,7 @@ class TicketRepository extends EntityRepository implements TicketRepositoryInter
             }
 
             $qb = $this->getEntityManager()->createQueryBuilder()
-                ->select('COUNT(t.id)')
+                ->select('COUNT(DISTINCT t.ticket)')
                 ->from(TicketResponse::class, 't')
                 ->where('t.agent = :agent')
                 ->andWhere('t.ticketStatus = :status')

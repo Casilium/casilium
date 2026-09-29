@@ -637,7 +637,9 @@ class TicketRepositoryTest extends TestCase
         $result = $this->repository->findAgentStats($agentId, $periodStart, $periodEnd);
 
         $this->assertIsArray($result);
-        $this->assertArrayHasKey('open', $result);
+        // ticket.agent_id records who raised the ticket, not who it is assigned to
+        $this->assertArrayHasKey('raised', $result);
+        $this->assertSame(5, $result['raised']);
     }
 
     public function testFindAgentStatsWithInvalidAgent(): void

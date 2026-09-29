@@ -174,13 +174,13 @@ $topAgents = array_slice($agentStats, 0, 5);
 
 $chartData = [
     'names'    => [],
-    'open'     => [],
+    'raised'   => [],
     'resolved' => [],
 ];
 
 foreach ($agentStats as $agent) {
     $chartData['names'][]    = $agent['name'];
-    $chartData['open'][]     = (int) ($agent['open'] ?? 0);
+    $chartData['raised'][]   = (int) ($agent['raised'] ?? 0);
     $chartData['resolved'][] = (int) ($agent['Resolved'] ?? 0);
 }
 ?>
@@ -217,11 +217,11 @@ foreach ($agentStats as $agent) {
                                     <div>
                                         <div class="fw-semibold"><?= $this->escapeHtml($agent['name']) ?></div>
                                         <div class="small text-muted">
-                                            Resolved: <?= (int) ($agent['Resolved'] ?? 0) ?> · Open: <?= (int) ($agent['open'] ?? 0) ?>
+                                            Resolved: <?= (int) ($agent['Resolved'] ?? 0) ?> · Raised: <?= (int) ($agent['raised'] ?? 0) ?>
                                         </div>
                                     </div>
                                     <span class="badge bg-success text-white">
-                                        <?= (int) ($agent['Resolved'] ?? 0) ?> closed
+                                        <?= (int) ($agent['Resolved'] ?? 0) ?> resolved
                                     </span>
                                 </div>
                             <?php endforeach; ?>
@@ -251,8 +251,8 @@ foreach ($agentStats as $agent) {
                 labels: labels,
                 datasets: [
                     {
-                        label: 'Open',
-                        data: <?= json_encode($chartData['open']) ?>,
+                        label: 'Raised',
+                        data: <?= json_encode($chartData['raised']) ?>,
                         backgroundColor: 'rgba(163,40,40,0.6)',
                         borderColor: 'rgba(163,40,40,0.9)',
                         borderWidth: 1,
@@ -274,7 +274,7 @@ foreach ($agentStats as $agent) {
                 },
                 title: {
                     display: true,
-                    text: 'Agent Statistics for <?= \Carbon\Carbon::now()->format('F') ?>',
+                    text: 'Agent Statistics, <?= $this->stats['periodLabel'] ?>',
                 },
                 scales: {
                     yAxes: [{
