@@ -194,39 +194,6 @@ class SlaService
     }
 
     /**
-     * Fetch SLA target response/resolution times
-     *
-     * @param int $slaId id of corresponding SLA
-     * @return array
-     */
-    public function findSlaTargetsBySlaId(int $slaId): array
-    {
-        return $this->entityManager->createQueryBuilder()
-            ->select('t')
-            ->from(SlaTarget::class, 't')
-            ->where('t.sla = :slaId')
-            ->setParameter('slaId', $slaId)
-            ->getQuery()->getResult();
-    }
-
-    /**
-     * Delete sla targets
-     *
-     * @param Sla $sla sla to delete targets for
-     */
-    public function deleteSlaTargets(Sla $sla): void
-    {
-        // find original sla targets
-        $targets = $this->findSlaTargetsBySlaId($sla->getId());
-
-        // remove them
-        foreach ($targets as $target) {
-            $this->entityManager->remove($target);
-            $this->entityManager->flush();
-        }
-    }
-
-    /**
      * Find priority from database
      *
      * @param int $id id of priority

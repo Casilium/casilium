@@ -200,52 +200,6 @@ class SlaServiceTest extends TestCase
         $this->slaService->createSla($data);
     }
 
-    public function testFindSlaTargetsBySlaId(): void
-    {
-        $slaId        = 123;
-        $targets      = [$this->createMock(SlaTarget::class)];
-        $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $query        = $this->prophesize(Query::class);
-
-        $this->entityManager->createQueryBuilder()->willReturn($queryBuilder->reveal());
-        $queryBuilder->select('t')->willReturn($queryBuilder->reveal());
-        $queryBuilder->from(SlaTarget::class, 't')->willReturn($queryBuilder->reveal());
-        $queryBuilder->where('t.sla = :slaId')->willReturn($queryBuilder->reveal());
-        $queryBuilder->setParameter('slaId', $slaId)->willReturn($queryBuilder->reveal());
-        $queryBuilder->getQuery()->willReturn($query->reveal());
-        $query->getResult()->willReturn($targets);
-
-        $result = $this->slaService->findSlaTargetsBySlaId($slaId);
-
-        $this->assertSame($targets, $result);
-    }
-
-    public function testDeleteSlaTargets(): void
-    {
-        $sla = $this->createMock(Sla::class);
-        $sla->method('getId')->willReturn(456);
-
-        $target  = $this->createMock(SlaTarget::class);
-        $targets = [$target];
-
-        // Mock the query for finding targets
-        $queryBuilder = $this->prophesize(QueryBuilder::class);
-        $query        = $this->prophesize(Query::class);
-
-        $this->entityManager->createQueryBuilder()->willReturn($queryBuilder->reveal());
-        $queryBuilder->select('t')->willReturn($queryBuilder->reveal());
-        $queryBuilder->from(SlaTarget::class, 't')->willReturn($queryBuilder->reveal());
-        $queryBuilder->where('t.sla = :slaId')->willReturn($queryBuilder->reveal());
-        $queryBuilder->setParameter('slaId', 456)->willReturn($queryBuilder->reveal());
-        $queryBuilder->getQuery()->willReturn($query->reveal());
-        $query->getResult()->willReturn($targets);
-
-        $this->entityManager->remove($target)->shouldBeCalled();
-        $this->entityManager->flush()->shouldBeCalled();
-
-        $this->slaService->deleteSlaTargets($sla);
-    }
-
     public function testFindPriorityById(): void
     {
         $id         = 2;
