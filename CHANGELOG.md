@@ -1,5 +1,65 @@
 # Changelog
 
+## v2.3.0 - 2026-09-29
+
+### Upgrading
+
+Run migrations after upgrading, and clear the config and Doctrine proxy caches.
+
+Due dates were previously stored in the business hours timezone rather than UTC.
+They are UTC from this release. Existing rows are not rewritten, so if your
+business hours are not UTC, due dates on tickets created before upgrading stay
+in local time until those tickets close.
+
+Dashboard figures will look very different. Resolution is now measured in
+working hours rather than elapsed time, over a rolling 30 days, and reported as
+a median.
+
+### Added
+
+- report time to first response
+
+- record time on hold and report resolution net of it
+
+- add canned responses
+
+
+### Changed
+
+- prepend changelog entries instead of regenerating
+
+- exclude local config from the coding standard
+
+- bind date parameters as dates
+
+- drop the target delete helpers
+
+- psalm ignore .phtml templates
+
+- bump dompdf to 3.1.6 and php_codesniffer to 3.13.6
+
+
+### Fixed
+
+- clear the SLA target when a ticket is retyped
+
+- label the agent card for what it measures
+
+- say what the resolved card counts
+
+- report resolution in working hours over a rolling window
+
+- refuse to delete business hours an SLA still uses
+
+- pause the SLA clock in working minutes while a ticket is on hold
+
+- update SLA targets in place instead of replacing them
+
+- store ticket timestamps as UTC
+
+- pin pecl imap to 1.0.3 and refresh the channel before install
+
+
 ## v2.2.0 - 2026-05-29
 
 ### Added
