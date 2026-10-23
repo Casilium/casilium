@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace Api\Handler;
 
+use DateTimeInterface;
 use Laminas\Diactoros\Response\JsonResponse;
 use Psr\Http\Message\ResponseInterface;
 use Psr\Http\Message\ServerRequestInterface;
@@ -31,6 +32,13 @@ class TicketSearchHandler implements RequestHandlerInterface
         }
 
         $results = $this->ticketService->searchTickets($query);
+
+        foreach ($results as &$result) {
+            if (($result['createdAt'] ?? null) instanceof DateTimeInterface) {
+                $result['createdAt'] = $result['createdAt']->format(DateTimeInterface::ATOM);
+            }
+        }
+        unset($result);
 
         return new JsonResponse($results);
     }
